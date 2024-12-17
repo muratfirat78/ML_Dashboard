@@ -4,24 +4,23 @@ Created on Wed Apr  3 11:46:59 2024
 
 @author: mfirat
 """
+import shutil
 
 ##### import ipywidgets as widgets
 from IPython.display import clear_output
 from IPython import display
 from ipywidgets import *
-from datetime import timedelta,date
+from datetime import timedelta,date, datetime
 import matplotlib.pyplot as plt
 import pandas as pd
 import warnings
 import seaborn as sns
 import os
+import logging
 from pathlib import Path
-
-
 
 colabpath = '/content/CPP_Datasets'
 warnings.filterwarnings("ignore")
-
 
 file_names = {'csv':['apple_quality','aug_train','diet','housing','loan_data','worldcities','flight_data','titanic','Telecom_Churn']}
 file_names['xlsx'] = ['crop_yield']
@@ -30,9 +29,6 @@ file_names['tsv'] = ['gapminder']
 #######################################################################################################################
 
 def read_data_set(curr_df,online_version,foldername,filename,sheetname,reslay,resultexp,processtypes,FeatPage,ProcssPage,DFPage):
-    
-   
-    
     #  filename = datasets.value 
     #  foldername = DataFolder.value
     #  sheetname = wsheets.value
@@ -223,12 +219,16 @@ def Handle_Missing_Values(curr_df,resultexp,misshands):
         check = check[:check.find(',')]
       
         if check != 'Drop':
-            if curact[curact.find(',')+1:] == 'Remove':  
-               
-                clean_df = clean_df.dropna(subset = [clean_df.columns[optind]])   
+            if curact[curact.find(',')+1:] == 'Remove':
+                logging.log(logging.INFO, 'Data cleaning: Removing rows with missing values. Column: ' + clean_df.columns[optind])
+                clean_df = clean_df.dropna(subset = [clean_df.columns[optind]])
+
             if curact[curact.find(',')+1:] == 'Mean':
+                logging.log(logging.INFO, 'Data cleaning: Replacing missing values with mean. Column: ' + clean_df.columns[optind])
                 clean_df[clean_df.columns[optind]].fillna(clean_df[clean_df.columns[optind]].mean(), inplace=True)
+
             if curact[curact.find(',')+1:] == 'Median':
+                logging.log(logging.INFO, 'Data cleaning: Replacing missing values with median. Column: ' + clean_df.columns[optind])
                 clean_df[clean_df.columns[optind]].fillna((clean_df[clean_df.columns[optind]].median()), inplace=True)    
         optind+=1
 
@@ -241,6 +241,7 @@ def Handle_Missing_Values(curr_df,resultexp,misshands):
         curact = curact[:curact.find(',')]
        
         if curact == 'Drop':
+            logging.log(logging.INFO,'Data cleaning: Dropped column:' + clean_df.columns[optind])
             resultexp.value += 'Column drop: '+clean_df.columns[optind]+'\n'
             nrrows+=1
             clean_df = clean_df.drop([clean_df.columns[optind-dropped]], axis=1)
@@ -252,7 +253,7 @@ def Handle_Missing_Values(curr_df,resultexp,misshands):
 
    
     resultexp.value += 'Cleaned data: '+str(len(clean_df.columns))+', columns, size  '+str(len(clean_df))+'\n'
-    
+    logging.log(logging.INFO,'Cleaned data: '+str(len(clean_df.columns))+', columns, size  '+str(len(clean_df))+'\n')
     
     
     
@@ -394,9 +395,13 @@ def featval_click(change):
     
     return
 ##################################################################################################################
-def savecurrdata(change):
-    
-    global curr_df,DataFolder
+def savedata(curr_df, dataFolder, datasetname):
+    datasetname = os.path.splitext(os.path.basename(datasetname))[0]
+    current_datetime = datetime.now().strftime('%Y%m%d_%H%M%S')
+    filename = dataFolder.value + '/' + datasetname + '_' + current_datetime
+    shutil.copy('output.log', filename + '.txt')
+    curr_df.to_csv(filename + '.csv')
+
     
     version = 0
 ##################################################################################################################
@@ -427,7 +432,7 @@ def drawlmplot(curr_df,xdrop,ydrop,huedrop,VisualPage):
 from sklearn.utils import resample
 ##################################################################################
 def StandardizeColumn(df,colname):
-    
+    logging.log('Data preprocessing, feature scaling: standardization of column '+ colname)
     colmean = df[colname].mean()
     
     df[colname] = (df[colname]- colmean)/df[colname].std()
@@ -435,7 +440,7 @@ def StandardizeColumn(df,colname):
     return df
 
 def NormalizeColumn(df,colname):
-    
+    logging.log('Data preprocessing, feature scaling: normalization of column '+ colname)
     col_min = min(df[colname])
     col_max = max(df[colname])
     
@@ -480,8 +485,7 @@ def Activate_Tab3(curr_df,rowheight,sveprbtn,online_version):
     return
 
 ###############
-def featureprclick(curr_df,ShowMode,features2,FeatPage,processtypes,ProcssPage,scalingacts):  
- 
+def featureprclick(curr_df,ShowMode,features2,FeatPage,processtypes,ProcssPage,scalingacts):
     if not ShowMode:
         return
     
@@ -617,7 +621,7 @@ def make_scaling(curr_df,features2,ProcssPage,scalingacts):
     return
 #################################################################################################################
 def make_balanced(curr_df,features2,balncacts,ProcssPage):  
-
+    logging.log(logging.INFO, 'Data preprocessing, checking and handling unbalancedness')
     
     colname = features2.value
 
@@ -708,7 +712,8 @@ def SelectProcess_Type(vis_list):
 
 ##################################################################################
 def remove_outliers(curr_df):
-    
+    logging.log(logging.INFO, 'Data preprocessing, outlier detection and removal')
+
     curr_df = curr_df[curr_df["outlier"] == False]
     curr_df = curr_df.drop(["outlier"], axis=1)
    

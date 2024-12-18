@@ -19,6 +19,22 @@ import os
 import logging
 from pathlib import Path
 
+def initialize_logging():
+    # clear log
+    with open('output.log', 'w'):
+        pass
+
+    # initiate logging
+    logging.basicConfig(
+        filename='output.log',
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s'
+    )
+    logging.info('Application started')
+
+
+initialize_logging()
+
 colabpath = '/content/CPP_Datasets'
 warnings.filterwarnings("ignore")
 
@@ -27,6 +43,8 @@ file_names['xlsx'] = ['crop_yield']
 file_names['tsv'] = ['gapminder']
 
 #######################################################################################################################
+
+
 
 def read_data_set(curr_df,online_version,foldername,filename,sheetname,reslay,resultexp,processtypes,FeatPage,ProcssPage,DFPage):
     #  filename = datasets.value 

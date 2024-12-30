@@ -27,27 +27,7 @@ file_names = {'csv':['apple_quality','aug_train','diet','housing','loan_data','w
 file_names['xlsx'] = ['crop_yield']
 file_names['tsv'] = ['gapminder']
 
-targetcolumn = None
-predictiontask = None
-
 #######################################################################################################################
-
-class MLModel: 
-    def __init__(self,mydf,target,mytype):
-        self.dataframe = mydf
-        self.Type = mytype
-        self.PythonObject = None
-        
-    def PythonObj(self):
-        return self.PythonObject
-    def SetPythonObj(self,Pyth_Obj):
-        self.PythonObject = Pyth_Obj
-    def DataFrame(self):
-        return self.dataframe
-    def Type(self):
-        return self.Type
-        
-    
 
 def read_data_set(curr_df,online_version,foldername,filename,sheetname,reslay,resultexp,processtypes,FeatPage,ProcssPage,DFPage):
     
@@ -754,22 +734,5 @@ def remove_outliers(curr_df):
         curr_df.to_csv(filename, index=False) 
     
     return
-######################################################################################################################
-def Assign_Target(curr_df,trg_lbl,prdtsk_lbl,features): 
 
-    targetcolumn = features.value
-
-    trg_lbl.value = targetcolumn
-
-    
-
-
-    if (curr_df[targetcolumn].dtype == 'float64') or (curr_df[targetcolumn].dtype == 'int64'):
-        predictiontask = "Regression"
-    else:
-        predictiontask = "Classification" 
-
-    prdtsk_lbl.value = predictiontask 
-    
-    return
 ####################################################################################

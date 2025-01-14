@@ -11,21 +11,31 @@ from IPython import display
 from ipywidgets import *
 from datetime import timedelta,date
 import matplotlib.pyplot as plt
-import pandas as pd
 import warnings
 import seaborn as sns
 import os
 from pathlib import Path
+import pandas as pd
+import warnings
+import sys
+from sklearn.model_selection import train_test_split 
 
+dtsetnames = [] 
+rowheight = 18
 
 
 colabpath = '/content/CPP_Datasets'
 warnings.filterwarnings("ignore")
 
-
-file_names = {'csv':['apple_quality','aug_train','diet','housing','loan_data','worldcities','flight_data','titanic','Telecom_Churn']}
-file_names['xlsx'] = ['crop_yield']
-file_names['tsv'] = ['gapminder']
+curr_df = pd.DataFrame()
+Xtrain_df = pd.DataFrame()
+Xtest_df = pd.DataFrame()
+ytrain_df = pd.DataFrame()
+ytest_df = pd.DataFrame()
+clean_df = pd.DataFrame()
+original_df = pd.DataFrame()
+datasetname = ''
+ShowMode = True
 
 targetcolumn = None
 predictiontask = None
@@ -37,6 +47,8 @@ class MLModel:
         self.dataframe = mydf
         self.Type = mytype
         self.PythonObject = None
+        self.PreprocessingSteps = [] 
+        
         
     def PythonObj(self):
         return self.PythonObject
@@ -636,6 +648,39 @@ def make_scaling(curr_df,features2,ProcssPage,scalingacts):
  
     return
 #################################################################################################################
+def make_split(curr_df,splt_txt,splt_btn,result2exp):  
+
+    global  Xtrain_df,Xtest_df, ytrain_df, ytest_df 
+
+    if targetcolumn is None:
+        return
+        
+    result2exp.value += 'Split, Target: '+targetcolumn+', Data features: '+'-'.join(curr_df.columns)+'\n'
+
+   
+    y = curr_df[targetcolumn] # Target variable 
+
+    result2exp.value += 'Split, Target column size: '+str(len(y))+'\n'
+
+    column_list = [col for col in curr_df.columns]
+    column_list.remove(targetcolumn)
+    X = curr_df[column_list]
+    
+    result2exp.value += 'Split, '+', Data features: '+'-'.join(X.columns)+'\n'
+
+    ratio_percnt = int(splt_txt.value)
+    
+    result2exp.value += 'Split ratio, '+str(ratio_percnt/100)+'\n'
+    
+    Xtrain_df,Xtest_df, ytrain_df, ytest_df = train_test_split(X, y, test_size=ratio_percnt/100, random_state=16)
+    
+    #splt_btn.disabled = True
+
+
+    result2exp.value += 'Split, Train size: '+str(len(Xtrain_df))+'\n'
+    
+    return
+#################################################################################################################
 def make_balanced(curr_df,features2,balncacts,ProcssPage):  
 
     
@@ -755,14 +800,15 @@ def remove_outliers(curr_df):
     
     return
 ######################################################################################################################
-def Assign_Target(curr_df,trg_lbl,prdtsk_lbl,features): 
+def Assign_Target(curr_df,trg_lbl,prdtsk_lbl,features,result2exp): 
 
+    global targetcolumn
+    
     targetcolumn = features.value
 
     trg_lbl.value = targetcolumn
 
     
-
 
     if (curr_df[targetcolumn].dtype == 'float64') or (curr_df[targetcolumn].dtype == 'int64'):
         predictiontask = "Regression"
@@ -770,6 +816,8 @@ def Assign_Target(curr_df,trg_lbl,prdtsk_lbl,features):
         predictiontask = "Classification" 
 
     prdtsk_lbl.value = predictiontask 
+
+    result2exp.value += 'Target assigned: '+targetcolumn+'\n'
     
     return
 ####################################################################################

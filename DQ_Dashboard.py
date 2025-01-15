@@ -21,7 +21,7 @@ import sys
 from sklearn.model_selection import train_test_split 
 
 dtsetnames = [] 
-rowheight = 18
+rowheight = 20
 
 
 colabpath = '/content/CPP_Datasets'
@@ -489,10 +489,10 @@ def Activate_Tab2(curr_df,ftlay2,features2,rowheight,sveprbtn,online_version):
         sveprbtn.disabled = True
     
     features2.options = curr_df.columns
-
    
+    
     currhghttxt = int(ftlay2.height[:ftlay2.height.find('px')])
-    ftlay2.height = str(min(450,currhghttxt+len(curr_df.columns)*rowheight))+'px'
+    ftlay2.height = str(min(500,currhghttxt+len(curr_df.columns)*rowheight))+'px'
     features2.layout = ftlay2 
     
     return
@@ -610,16 +610,33 @@ def vistypeclick(curr_df,ShowMode,vboxvis1,vbvs1lay,visualtypes,vlmpltcomps,vbox
         
     return
 ##############
-def make_scaling(curr_df,features2,ProcssPage,scalingacts):  
+def make_scaling(data_df,features2,ProcssPage,scalingacts,result2exp):  
     
   
     colname = features2.value
+
+    if colname is None:
+        return
+
+    curr_df = data_df
+    
+    if isinstance(data_df, list):
+        curr_df = data_df[0] # X_train 
+        result2exp.value += 'Scaling-> '+scalingacts.value+' using train data: '+colname+'\n'
+        if not colname in curr_df.columns: 
+            curr_df = data_df[2] # y_train 
+            if not colname in curr_df.columns:
+                return  
+    else:
+        result2exp.value += 'Scaling-> '+scalingacts.value+': '+colname+'\n'
     
     if (curr_df[colname].dtype == 'object') or (curr_df[colname].dtype== 'string'):
         with ProcssPage:
             clear_output()
             display.display('Selected column is not a numerical type..')
         return
+
+   
     
     if scalingacts.value == 'Standardize':
         curr_df =  StandardizeColumn(curr_df,colname)
@@ -647,39 +664,7 @@ def make_scaling(curr_df,features2,ProcssPage,scalingacts):
             plt.show()
  
     return
-#################################################################################################################
-def make_split(curr_df,splt_txt,splt_btn,result2exp):  
 
-    global  Xtrain_df,Xtest_df, ytrain_df, ytest_df 
-
-    if targetcolumn is None:
-        return
-        
-    result2exp.value += 'Split, Target: '+targetcolumn+', Data features: '+'-'.join(curr_df.columns)+'\n'
-
-   
-    y = curr_df[targetcolumn] # Target variable 
-
-    result2exp.value += 'Split, Target column size: '+str(len(y))+'\n'
-
-    column_list = [col for col in curr_df.columns]
-    column_list.remove(targetcolumn)
-    X = curr_df[column_list]
-    
-    result2exp.value += 'Split, '+', Data features: '+'-'.join(X.columns)+'\n'
-
-    ratio_percnt = int(splt_txt.value)
-    
-    result2exp.value += 'Split ratio, '+str(ratio_percnt/100)+'\n'
-    
-    Xtrain_df,Xtest_df, ytrain_df, ytest_df = train_test_split(X, y, test_size=ratio_percnt/100, random_state=16)
-    
-    #splt_btn.disabled = True
-
-
-    result2exp.value += 'Split, Train size: '+str(len(Xtrain_df))+'\n'
-    
-    return
 #################################################################################################################
 def make_balanced(curr_df,features2,balncacts,ProcssPage):  
 
@@ -712,10 +697,9 @@ def make_balanced(curr_df,features2,balncacts,ProcssPage):
 
     return
 ####################################################################################################################
-def SelectProcess_Type(vis_list):
-    
-     
-    
+
+def ResetProcessMenu(vis_list):
+
     processtypes = vis_list[0]
     sclblly = vis_list[1]
     scalelbl = vis_list[2]
@@ -727,29 +711,79 @@ def SelectProcess_Type(vis_list):
     imbllbl = vis_list[8]
     outrmvlay = vis_list[9]
     outrmvbtn = vis_list[10]
-    
+    encdlbl = vis_list[11]
+    encodingacts = vis_list[12]
+    encdblly = vis_list[13]
+    ecndlay = vis_list[14]
+    fxctlbl = vis_list[15]
+    fxctingacts = vis_list[16]
+    fxctblly = vis_list[17]
+    fxctlay = vis_list[18]
+   
+
+    fxctblly.display = 'none'
+    fxctlbl.layout = fxctblly
+
+    fxctlay.display = 'none'
+    fxctingacts.layout = fxctlay
+
+
     sclblly.display = 'none'
-    sclblly.visibility = 'hidden'
     scalelbl.layout = sclblly
-    
+
+    ecndlay.display = 'none'
+    encodingacts.layout = ecndlay
+
+    encdblly.display = 'none'
+    encdlbl.layout = encdblly
+
+ 
     outrmvlay.display = 'none'
-    outrmvlay.visibility = 'hidden'
     outrmvbtn.layout = outrmvlay
     
     imbllbllly.display = 'none'
-    imbllbllly.visibility = 'hidden'
     imbllbl.layout = imbllbllly
-    
-    prctlay.visibility = 'hidden'
+
+    prctlay.display = 'none'
     scalingacts.layout = prctlay
-    
-    imblncdlay.visibility = 'hidden'
+
+    imblncdlay.display = 'none'
     balncacts.layout = imblncdlay
+
+    return
+
+
+def SelectProcess_Type(vis_list):
+    
+ 
+    processtypes = vis_list[0]
+    sclblly = vis_list[1]
+    scalelbl = vis_list[2]
+    prctlay = vis_list[3]
+    scalingacts = vis_list[4]
+    imblncdlay = vis_list[5]
+    balncacts = vis_list[6]
+    imbllbllly = vis_list[7]
+    imbllbl = vis_list[8]
+    outrmvlay = vis_list[9]
+    outrmvbtn = vis_list[10]
+    encdlbl = vis_list[11]
+    encodingacts = vis_list[12]
+    encdblly = vis_list[13]
+    ecndlay = vis_list[14]
+    fxctlbl = vis_list[15]
+    fxctingacts = vis_list[16]
+    fxctblly = vis_list[17]
+    fxctlay = vis_list[18]
+   
+    ResetProcessMenu(vis_list)
+
     
     if processtypes.value == 'Scaling':
         sclblly.display = 'block'
         sclblly.visibility = 'visible'
         scalelbl.layout = sclblly
+        prctlay.display = 'block'
         prctlay.visibility = 'visible'
         scalingacts.layout = prctlay
         
@@ -758,6 +792,7 @@ def SelectProcess_Type(vis_list):
         imbllbllly.display = 'block'
         imbllbllly.visibility = 'visible'
         imbllbl.layout = imbllbllly
+        imblncdlay.display = 'block'
         imblncdlay.visibility = 'visible'
         balncacts.layout = imblncdlay
      
@@ -765,10 +800,24 @@ def SelectProcess_Type(vis_list):
         outrmvlay.display = 'block'
         outrmvlay.visibility = 'visible'
         outrmvbtn.layout = outrmvlay
-    
 
+    if processtypes.value == 'Encoding':     
+        encdblly.display = 'block'
+        encdblly.visibility = 'visible'
+        encdblly.layout = sclblly
+        ecndlay.display = 'block'
+        ecndlay.visibility = 'visible'
+        encodingacts.layout = ecndlay
 
-    
+    if processtypes.value == 'Feature Extraction':
+        fxctblly.display = 'block'
+        fxctblly.visibility = 'visible'
+        fxctlbl.layout = fxctblly
+        fxctlay.display = 'block'
+        fxctlay.visibility = 'visible'
+        fxctingacts.layout = fxctlay
+        
+
     return
 
 ##################################################################################
@@ -800,24 +849,3 @@ def remove_outliers(curr_df):
     
     return
 ######################################################################################################################
-def Assign_Target(curr_df,trg_lbl,prdtsk_lbl,features,result2exp): 
-
-    global targetcolumn
-    
-    targetcolumn = features.value
-
-    trg_lbl.value = targetcolumn
-
-    
-
-    if (curr_df[targetcolumn].dtype == 'float64') or (curr_df[targetcolumn].dtype == 'int64'):
-        predictiontask = "Regression"
-    else:
-        predictiontask = "Classification" 
-
-    prdtsk_lbl.value = predictiontask 
-
-    result2exp.value += 'Target assigned: '+targetcolumn+'\n'
-    
-    return
-####################################################################################

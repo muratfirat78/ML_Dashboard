@@ -19,6 +19,7 @@ import pandas as pd
 import warnings
 import sys
 from sklearn.model_selection import train_test_split 
+import numpy as np
 
 dtsetnames = [] 
 rowheight = 20
@@ -61,7 +62,7 @@ class MLModel:
         
     
 
-def read_data_set(curr_df,online_version,foldername,filename,sheetname,reslay,resultexp,processtypes,FeatPage,ProcssPage,DFPage):
+def read_data_set(curr_df,online_version,foldername,filename,sheetname,reslay,resultexp,processtypes,FeatPage,ProcssPage,DFPage,RightPage):
     
    
     
@@ -109,7 +110,11 @@ def read_data_set(curr_df,online_version,foldername,filename,sheetname,reslay,re
         display.display(curr_df.describe()) 
         display.display(curr_df) 
         #####################################
-  
+
+    with RightPage:
+        clear_output()
+      
+   
     return curr_df
 
 
@@ -496,6 +501,20 @@ def Activate_Tab2(curr_df,ftlay2,features2,rowheight,sveprbtn,online_version):
     features2.layout = ftlay2 
     
     return
+####################################################################################
+def Activate_Tab2a(curr_df,ftlaycl,featurescl,rowheight,online_version,misscl):
+    
+    
+    ftlaycl.display = 'block'
+    ftlaycl.height ='30px'
+ 
+    featurescl.options = [col+'('+str(curr_df[col].isnull().sum())+')' for col in curr_df.columns]
+   
+    currhghttxt = int(ftlaycl.height[:ftlaycl.height.find('px')])
+    ftlaycl.height = str(min(500,currhghttxt+len(curr_df.columns)*rowheight))+'px'
+    featurescl.layout = ftlaycl 
+    
+    return
 
 ###################################################################################
 def Activate_Tab3(curr_df,t4_ftlay,t4_vb1lay,tb4_vbox1,t4_features,rowheight,online_version):
@@ -578,6 +597,24 @@ def featureprclick(curr_df,ShowMode,features2,FeatPage,processtypes,ProcssPage,s
 
             
     scalingacts.value = scalingacts.options[0]
+    return
+##############
+###############
+def featureclclick(curr_df,trgcl_lbl,featurescl,trgtyp_lbl,miss_lbl):  
+
+    sel_ind = 0
+    for opt in featurescl.options:
+        if opt == featurescl.value:
+            break
+        sel_ind+=1   
+    
+    colname = curr_df.columns[sel_ind]
+
+
+    trgcl_lbl.value = " Column: "+colname
+    trgtyp_lbl.value= " Type: " +str(curr_df[colname].dtype)
+    miss_lbl.value =" Missing values: " + str(curr_df[colname].isnull().sum())
+    
     return
 ##############
 def vistypeclick(curr_df,ShowMode,vboxvis1,vbvs1lay,visualtypes,vlmpltcomps,vboxlmplot,vblmpltlay,VisualPage,changenew):  

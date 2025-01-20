@@ -19,8 +19,7 @@ import pandas as pd
 import warnings
 import sys
 from sklearn.model_selection import train_test_split 
-from sklearn import tree 
-from sklearn import neighbors
+from sklearn import tree,neighbors,linear_model,ensemble,svm
 from sklearn.metrics import accuracy_score,mean_squared_error
 from sklearn import preprocessing 
 import numpy as np
@@ -44,6 +43,8 @@ ShowMode = True
 
 targetcolumn = None
 predictiontask = None
+
+TrainedModels = []
 
 #######################################################################################################################
 
@@ -74,36 +75,57 @@ class MLModel:
                 self.PythonObject = neighbors.KNeighborsClassifier(n_neighbors=5)
             if self.myTask == 'Regression': 
                 self.PythonObject = neighbors.KNeighborsRegressor(n_neighbors=5)
+        if self.Type == 'Linear Model':
+            if self.myTask == 'Classification': 
+                self.PythonObject = linear_model.SGDClassifier()       
+            if self.myTask == 'Regression': 
+                self.PythonObject = linear_model.LinearRegression() # try before standardization..
+        if self.Type == 'Random Forest':
+            if self.myTask == 'Classification': 
+                self.PythonObject = ensemble.RandomForestClassifier()       
+            if self.myTask == 'Regression': 
+                self.PythonObject = ensemble.RandomForestRegressor(n_estimators=15, random_state=0,)   # try before standardization..
+        if self.Type == 'SVM':
+            if self.myTask == 'Classification': 
+                self.PythonObject = svm.SVC(kernel='linear', gamma='auto',probability = True)
+            if self.myTask == 'Regression': 
+                self.PythonObject = svm.SVR(kernel = 'rbf')
+        if self.Type == 'Logistic Regression':
+            self.PythonObject = linear_model.LogisticRegression(random_state=16)   # Initialize the model object 
+           
 
-    
-                
         report.value += 'Model.. Type '+str(type(self.PythonObject))+'.. \n' 
         return
 
-  
+
+    def GetPredictions(self):
+        if self.myTask == 'Classification':
+            return self.PythonObject.predict(self.test_df) 
+        if self.myTask == 'Regression':
+            if self.Type == 'Logistic Regression': 
+                return self.PythonObject.predict_proba(self.test_df)
+            else:
+                return self.PythonObject.predict(self.test_df)
       
-    def GetPythonObj(self):
+    def getSkLearnModel(self):
         return self.PythonObject
         
-    def GetData(self):
+    def getData(self):
         return self.train_df,self.traintrg_df,self.test_df,self.testtrg_df
         
-    def Type(self):
+    def getType(self):
         return self.Type
 
     def GetPerformanceDict(self):
         return self.performance
 
-def Train_Model(data,target,tasktype,mytype,results):
+def Train_Model(data,target,tasktype,mytype,results,trmodels):
 
-    
     mymodel = MLModel(data,target,tasktype,mytype,results)
 
- 
-    model = mymodel.GetPythonObj().fit(data[0], data[1]) 
+    model = mymodel.getSkLearnModel().fit(data[0], data[1]) 
 
-  
-    y_pred = mymodel.GetPythonObj().predict(data[2]) 
+    y_pred = mymodel.GetPredictions()
 
     if tasktype == 'Classification': 
         mymodel.GetPerformanceDict()['Accuracy'] = accuracy_score(data[3], y_pred)
@@ -111,9 +133,15 @@ def Train_Model(data,target,tasktype,mytype,results):
     if tasktype == 'Regression': 
         mymodel.GetPerformanceDict()['MSE'] = mean_squared_error(data[3], y_pred)
 
+    TrainedModels.append(mymodel)
+
     results.value += 'Train Model-> '+mytype+'\n'
     for prf,val in mymodel.GetPerformanceDict().items():
         results.value += 'Model Performance-> '+prf+': '+str(val)+'\n'
+
+    trmodels.options = [mdl.getType() for mdl in TrainedModels]
+   
+    
     
     return 
 ############################################################################################################    
@@ -155,6 +183,8 @@ def make_encoding(data_df,features2,ProcssPage,encodingacts,result2exp):
             result2exp.value += 'One Hot Encoding-> (test) after one-hot features: '+str(data2_df.columns)+'\n'
 
             data_df = data1_df,data2_df
+
+            features2.options = [col+'('+str(data1_df[col].isnull().sum())+')' for col in data1_df.columns]
     else:
         if encodingacts.value == "Label Encoding":
             label_encoder = preprocessing.LabelEncoder() 
@@ -170,10 +200,11 @@ def make_encoding(data_df,features2,ProcssPage,encodingacts,result2exp):
             data_df = pd.concat([data_df.drop(categorical_columns, axis=1), one_hot_df], axis=1)
             result2exp.value += 'One Hot Encoding-> after one-hot features: '+str(data_df.columns)+'\n'
 
+        features2.options = [col for col in data_df.columns]
     
     return data_df
 #############################################################################################################
-def read_data_set(curr_df,online_version,foldername,filename,sheetname,reslay,resultexp,processtypes,FeatPage,ProcssPage,DFPage,RightPage):
+def read_data_set(curr_df,online_version,foldername,filename,sheetname,processtypes,FeatPage,ProcssPage,DFPage,RightPage):
     
    
     
@@ -203,9 +234,7 @@ def read_data_set(curr_df,online_version,foldername,filename,sheetname,reslay,re
     datasetname = filename[:filename.find('.')]  
     
      
-    reslay.height = '100px'
-    resultexp.value = '' 
-    resultexp.layout = reslay
+
     
     processtypes.value = processtypes.options[0]
     
@@ -689,7 +718,9 @@ def featureprclick(curr_df,ShowMode,features2,FeatPage,processtypes,ProcssPage,s
         return
     
     colname = features2.value
-    
+
+    if not colname in curr_df.columns:
+        return
     
     with FeatPage:
         clear_output()

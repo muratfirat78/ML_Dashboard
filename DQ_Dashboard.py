@@ -19,6 +19,10 @@ import pandas as pd
 import warnings
 import sys
 from sklearn.model_selection import train_test_split 
+from sklearn import tree 
+from sklearn import neighbors
+from sklearn.metrics import accuracy_score,mean_squared_error
+from sklearn import preprocessing 
 import numpy as np
 
 dtsetnames = [] 
@@ -44,24 +48,131 @@ predictiontask = None
 #######################################################################################################################
 
 class MLModel: 
-    def __init__(self,mydf,target,mytype):
-        self.dataframe = mydf
+    def __init__(self,data,target,tasktype,mytype,report):
+
+        #data  = [trdf,tr_tgtdf,tstdf,tst_tgtdf] 
+        self.train_df = data[0]
+        self.traintrg_df = data[1]
+        self.test_df = data[2]
+        self.testtrg_df = data[3]
+
+        self.modelsetting = dict()
+        self.performance = dict()
+        
         self.Type = mytype
+        self.myTask = tasktype
         self.PythonObject = None
         self.PreprocessingSteps = [] 
-        
-        
-    def PythonObj(self):
+
+        if self.Type == 'Decision Tree':
+            if self.myTask == 'Classification': 
+                self.PythonObject = tree.DecisionTreeClassifier()
+            if self.myTask == 'Regression': 
+                self.PythonObject = tree.DecisionTreeRegressor(random_state = 0) 
+        if self.Type == 'KNN':
+            if self.myTask == 'Classification': 
+                self.PythonObject = neighbors.KNeighborsClassifier(n_neighbors=5)
+            if self.myTask == 'Regression': 
+                self.PythonObject = neighbors.KNeighborsRegressor(n_neighbors=5)
+
+    
+                
+        report.value += 'Model.. Type '+str(type(self.PythonObject))+'.. \n' 
+        return
+
+  
+      
+    def GetPythonObj(self):
         return self.PythonObject
-    def SetPythonObj(self,Pyth_Obj):
-        self.PythonObject = Pyth_Obj
-    def DataFrame(self):
-        return self.dataframe
+        
+    def GetData(self):
+        return self.train_df,self.traintrg_df,self.test_df,self.testtrg_df
+        
     def Type(self):
         return self.Type
-        
-    
 
+    def GetPerformanceDict(self):
+        return self.performance
+
+def Train_Model(data,target,tasktype,mytype,results):
+
+    
+    mymodel = MLModel(data,target,tasktype,mytype,results)
+
+ 
+    model = mymodel.GetPythonObj().fit(data[0], data[1]) 
+
+  
+    y_pred = mymodel.GetPythonObj().predict(data[2]) 
+
+    if tasktype == 'Classification': 
+        mymodel.GetPerformanceDict()['Accuracy'] = accuracy_score(data[3], y_pred)
+    
+    if tasktype == 'Regression': 
+        mymodel.GetPerformanceDict()['MSE'] = mean_squared_error(data[3], y_pred)
+
+    results.value += 'Train Model-> '+mytype+'\n'
+    for prf,val in mymodel.GetPerformanceDict().items():
+        results.value += 'Model Performance-> '+prf+': '+str(val)+'\n'
+    
+    return 
+############################################################################################################    
+def make_encoding(data_df,features2,ProcssPage,encodingacts,result2exp):
+    
+    colname = features2.value
+
+    if colname is None:
+        return
+
+  
+    # Encode column  
+    if isinstance(data_df, list):
+        
+        if encodingacts.value == "Label Encoding":
+            label_encoder = preprocessing.LabelEncoder() 
+            result2exp.value += 'Encoding-> '+features2.value+' (train) current classes: '+str(data_df[0][colname].unique())+'\n'
+            data_df[0][colname] = label_encoder.fit_transform(data_df[0][colname]) # train 
+            result2exp.value += 'Encoding-> '+features2.value+' (train) after labeling classes: '+str(data_df[0][colname].unique())+'\n'
+            result2exp.value += 'Encoding-> '+features2.value+' (test) current classes: '+str(data_df[1][colname].unique())+'\n'
+            data_df[1][colname] = label_encoder.fit_transform(data_df[1][colname]) # test
+            result2exp.value += 'Encoding-> '+features2.value+' (test) after labeling classes: '+str(data_df[1][colname].unique())+'\n'
+
+            data_df = data_df[0],data_df[1]
+            
+        if encodingacts.value == "One Hot Encoding":
+            categorical_columns = [colname]
+            
+            encoder = preprocessing.OneHotEncoder(sparse_output=False)  # Initialize OneHotEncoder
+            one_hot_encoded = encoder.fit_transform(data_df[0][categorical_columns])  # Fit and transform the categorical columns          
+            one_hot_df = pd.DataFrame(one_hot_encoded,columns=encoder.get_feature_names_out(categorical_columns)) # Create a DataFrame with the encoded columns
+            data1_df = pd.concat([data_df[0].drop(categorical_columns, axis=1), one_hot_df], axis=1)
+            result2exp.value += 'One Hot Encoding-> (train) after one-hot features: '+str(data1_df.columns)+'\n'
+
+            encoder = preprocessing.OneHotEncoder(sparse_output=False)  # Initialize OneHotEncoder
+            one_hot_encoded = encoder.fit_transform(data_df[1][categorical_columns])  # Fit and transform the categorical columns          
+            one_hot_df = pd.DataFrame(one_hot_encoded,columns=encoder.get_feature_names_out(categorical_columns)) # Create a DataFrame with the encoded columns
+            data2_df = pd.concat([data_df[1].drop(categorical_columns, axis=1), one_hot_df], axis=1)
+            result2exp.value += 'One Hot Encoding-> (test) after one-hot features: '+str(data2_df.columns)+'\n'
+
+            data_df = data1_df,data2_df
+    else:
+        if encodingacts.value == "Label Encoding":
+            label_encoder = preprocessing.LabelEncoder() 
+            result2exp.value += 'Encoding-> '+features2.value+' current classes: '+str(data_df[colname].unique())+'\n'
+            data_df[colname] = label_encoder.fit_transform(data_df[colname]) 
+            result2exp.value += 'Encoding-> '+features2.value+' after labeling classes: '+str(data_df[colname].unique())+'\n'
+            
+        if encodingacts.value == "One Hot Encoding":
+            categorical_columns = [colname]
+            encoder = preprocessing.OneHotEncoder(sparse_output=False)  # Initialize OneHotEncoder
+            one_hot_encoded = encoder.fit_transform(data_df[categorical_columns])  # Fit and transform the categorical columns          
+            one_hot_df = pd.DataFrame(one_hot_encoded,columns=encoder.get_feature_names_out(categorical_columns)) # Create a DataFrame with the encoded columns
+            data_df = pd.concat([data_df.drop(categorical_columns, axis=1), one_hot_df], axis=1)
+            result2exp.value += 'One Hot Encoding-> after one-hot features: '+str(data_df.columns)+'\n'
+
+    
+    return data_df
+#############################################################################################################
 def read_data_set(curr_df,online_version,foldername,filename,sheetname,reslay,resultexp,processtypes,FeatPage,ProcssPage,DFPage,RightPage):
     
    

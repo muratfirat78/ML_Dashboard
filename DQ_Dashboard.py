@@ -351,6 +351,47 @@ def Activate_Tab1(online_version,rowheight,curr_df,ShowMode,mhndslay,ftlay,dtlay
     return curr_df
 
 ##########################################################################################################
+def make_cleaning(curr_df,featurescl,result2aexp,missacts): 
+
+    colname = featurescl.value
+
+    optind = 0   
+    for opt in featurescl.options:
+        if opt == featurescl.value:
+            break
+        optind+=1
+
+    colname = curr_df.columns[optind]
+
+    
+    handling = missacts.value
+
+    result2aexp.value+= 'Handling missing values: col '+colname+', action '+handling+'\n' 
+
+    if handling == 'Drop Column':
+        del curr_df[colname]
+    else:    
+    
+        if (curr_df[colname].dtype == 'float64') or (curr_df[colname].dtype == 'int64'):
+            if handling in ['Replace-Mean','Replace-Median','Remove']:
+                if handling == 'Replace-Mean': 
+                    curr_df[colname].fillna(curr_df[colname].mean(), inplace=True)
+                if handling == 'Replace-Median': 
+                    curr_df[colname].fillna(curr_df[colname].median(), inplace=True)
+                if handling == 'Remove': 
+                    curr_df = curr_df.dropna(subset = [colname])   
+            else:
+                result2aexp.value+= 'Handling missing values: Improper action is selected.. '+'\n'
+                return
+        else: 
+            if handling == 'Replace-Mode': 
+                curr_df[colname].fillna(curr_df[colname].mode(), inplace=True)
+            
+    featurescl.options = [col+'('+str(curr_df[col].isnull().sum())+')' for col in curr_df.columns]
+    
+    result2aexp.value+= 'Handling missing values: done.. '+'\n'    
+
+    return
 def Handle_Missing_Values(curr_df,resultexp,misshands): 
     
    

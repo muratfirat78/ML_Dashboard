@@ -668,9 +668,9 @@ def make_scaling(dt_features,ProcssPage,scalingacts,result2exp):
     return
 
 #################################################################################################################
-def make_balanced(curr_df,features2,balncacts,ProcssPage):  
+def make_balanced(features2,balncacts,ProcssPage):  
 
-    
+    global curr_df
     colname = features2.value
 
     if balncacts.value == 'Upsample':
@@ -823,8 +823,9 @@ def SelectProcess_Type(vis_list):
     return
 
 ##################################################################################
-def remove_outliers(curr_df):
-    
+def remove_outliers():
+
+    global curr_df
     curr_df = curr_df[curr_df["outlier"] == False]
     curr_df = curr_df.drop(["outlier"], axis=1)
    

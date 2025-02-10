@@ -29,6 +29,16 @@ import numpy as np
 dtsetnames = [] 
 rowheight = 20
 
+def write_log(msg, log_display, category):
+    log_display.value +=  msg + '\n'
+    logging.info(category + ': ' +msg)
+
+
+def initialize_logging():
+    # clear log
+    with open('output.log', 'w'):
+        pass
+
     # initiate logging
     logging.basicConfig(
         filename='output.log',
@@ -105,8 +115,7 @@ class MLModel:
         if self.Type == 'Logistic Regression':
             self.PythonObject = linear_model.LogisticRegression(random_state=16)   # Initialize the model object 
            
-
-        report.value += 'Model.. Type '+str(type(self.PythonObject))+'.. \n' 
+        write_log('Model.. Type '+str(type(self.PythonObject)), report, 'Predictive modeling')
         return
 
 
@@ -151,9 +160,9 @@ def Train_Model(tasktype,mytype,results,trmodels):
 
     TrainedModels.append(mymodel)
 
-    results.value += 'Train Model-> '+mytype+'\n'
+    write_log('Train Model-> '+ mytype, results, 'Predictive modeling')
     for prf,val in mymodel.GetPerformanceDict().items():
-        results.value += 'Model Performance-> '+prf+': '+str(val)+'\n'
+        write_log('Model Performance-> '+prf+': '+str(val), results, 'Predictive modeling')
 
     trmodels.options = [mdl.getType() for mdl in TrainedModels]
    
@@ -167,7 +176,7 @@ def make_encoding(features2,encodingacts,result2exp):
     colname = features2.value
 
     
-    result2exp.value += 'Encoding.. col '+colname+' is list:'+str(int(isinstance(curr_df, list)))+'\n'
+    write_log('Encoding.. col '+colname+' is list:'+str(int(isinstance(curr_df, list))), result2exp, 'Data processing')
 
     if colname is None:
         return
@@ -179,12 +188,12 @@ def make_encoding(features2,encodingacts,result2exp):
         
         if encodingacts.value == "Label Encoding":
             label_encoder = preprocessing.LabelEncoder() 
-            result2exp.value += 'Encoding-> '+features2.value+' (train) current classes: '+str(data_df[0][colname].unique())+'\n'
+            write_log('Encoding-> '+features2.value+' (train) current classes: '+str(data_df[0][colname].unique()), result2exp, 'Data processing')
             data_df[0][colname] = label_encoder.fit_transform(data_df[0][colname]) # train 
-            result2exp.value += 'Encoding-> '+features2.value+' (train) after labeling classes: '+str(data_df[0][colname].unique())+'\n'
-            result2exp.value += 'Encoding-> '+features2.value+' (test) current classes: '+str(data_df[1][colname].unique())+'\n'
+            write_log('Encoding-> '+features2.value+' (train) after labeling classes: '+str(data_df[0][colname].unique()), result2exp, 'Data processing')
+            write_log('Encoding-> '+features2.value+' (test) current classes: '+str(data_df[1][colname].unique()), result2exp, 'Data processing')
             data_df[1][colname] = label_encoder.fit_transform(data_df[1][colname]) # test
-            result2exp.value += 'Encoding-> '+features2.value+' (test) after labeling classes: '+str(data_df[1][colname].unique())+'\n'
+            write_log('Encoding-> '+features2.value+' (test) after labeling classes: '+str(data_df[1][colname].unique()), result2exp, 'Data processing')
 
             data_df = data_df[0],data_df[1]
             
@@ -195,34 +204,34 @@ def make_encoding(features2,encodingacts,result2exp):
             one_hot_encoded = encoder.fit_transform(data_df[0][categorical_columns])  # Fit and transform the categorical columns          
             one_hot_df = pd.DataFrame(one_hot_encoded,columns=encoder.get_feature_names_out(categorical_columns)) # Create a DataFrame
             data1_df = pd.concat([data_df[0].drop(categorical_columns, axis=1), one_hot_df], axis=1)
-            result2exp.value += 'One Hot Encoding-> (train) after one-hot features: '+str(data1_df.columns)+'\n'
+            write_log('One Hot Encoding-> (train) after one-hot features: '+str(data1_df.columns), result2exp, 'Data processing')
 
             encoder = preprocessing.OneHotEncoder(sparse_output=False)  # Initialize OneHotEncoder
             one_hot_encoded = encoder.fit_transform(data_df[1][categorical_columns])  # Fit and transform the categorical columns          
             one_hot_df = pd.DataFrame(one_hot_encoded,columns=encoder.get_feature_names_out(categorical_columns)) # Create a DataFrame 
             data2_df = pd.concat([data_df[1].drop(categorical_columns, axis=1), one_hot_df], axis=1)
-            result2exp.value += 'One Hot Encoding-> (test) after one-hot features: '+str(data2_df.columns)+'\n'
+            write_log('One Hot Encoding-> (test) after one-hot features: '+str(data2_df.columns), result2exp, 'Data processing')
 
             data_df = data1_df,data2_df
 
             features2.options = [col+'('+str(data1_df[col].isnull().sum())+')' for col in data1_df.columns]
     else:
-        result2exp.value += 'Encoding-> '+encodingacts.value+', '+str(encodingacts.value == "One Hot Encoding")+'\n'
-        result2exp.value += 'Encoding-> '+colname+' current classes: '+str(len(curr_df))+'\n'
+        write_log('Encoding-> '+encodingacts.value+', '+str(encodingacts.value == "One Hot Encoding"), result2exp, 'Data processing')
+        write_log('Encoding-> '+colname+' current classes: '+str(len(curr_df)), result2exp, 'Data processing')
         if encodingacts.value == "Label Encoding":
             label_encoder = preprocessing.LabelEncoder() 
-            result2exp.value += 'Encoding-> '+features2.value+' current classes: '+str(curr_df[colname].unique())+'\n'
+            write_log('Encoding-> '+features2.value+' current classes: '+str(curr_df[colname].unique()), result2exp, 'Data processing')
             curr_df[colname] = label_encoder.fit_transform(curr_df[colname]) 
-            result2exp.value += 'Encoding-> '+features2.value+' after labeling classes: '+str([cls for cls in curr_df[colname].unique()])+'\n'
+            write_log('Encoding-> '+features2.value+' after labeling classes: '+str([cls for cls in curr_df[colname].unique()]), result2exp, 'Data processing')
             
         if encodingacts.value == "One Hot Encoding":
-            result2exp.value += 'Encoding-> '+colname+' current classes: '+str(curr_df[colname].unique())+'\n'
+            write_log('Encoding-> '+colname+' current classes: '+str(curr_df[colname].unique()), result2exp, 'Data processing')
             categorical_columns = [colname]
             encoder = preprocessing.OneHotEncoder(sparse_output=False)  # Initialize OneHotEncoder
             one_hot_encoded = encoder.fit_transform(curr_df[categorical_columns])  # Fit and transform the categorical columns          
             one_hot_df = pd.DataFrame(one_hot_encoded,columns=encoder.get_feature_names_out(categorical_columns)) # Create a DataFrame
             curr_df = pd.concat([curr_df.drop(categorical_columns, axis=1), one_hot_df], axis=1)
-            result2exp.value += 'One Hot Encoding-> after one-hot features: '+str(curr_df.columns)+'\n'
+            write_log('One Hot Encoding-> after one-hot features: '+str(curr_df.columns), result2exp, 'Data processing')
 
         features2.options = [col for col in curr_df.columns]
     
@@ -244,7 +253,7 @@ def assign_target(trg_lbl,dt_features,prdtsk_lbl,result2exp,trg_btn,predictionta
         predictiontask = "Classification" 
 
     prdtsk_lbl.value = predictiontask 
-    result2exp.value += 'Target assigned: '+targetcolumn+'\n'
+    write_log('Target assigned: '+targetcolumn, result2exp, 'Data processing')
     
 
     return 
@@ -261,11 +270,11 @@ def make_split(splt_txt,splt_btn,result2exp):
     X = curr_df[column_list]
     
     ratio_percnt = int(splt_txt.value) 
-    result2exp.value += 'Split ratio, '+str(ratio_percnt/100)+'\n'
+    write_log('Split ratio, '+str(ratio_percnt/100), result2exp, 'Data processing')
     Xtrain_df,Xtest_df, ytrain_df, ytest_df = train_test_split(X, y, test_size=ratio_percnt/100, random_state=16)
     splt_btn.disabled = True
 
-    result2exp.value += 'Split, Train size: '+str(len(Xtrain_df))+'\n' 
+    write_log('Split, Train size: '+str(len(Xtrain_df)), result2exp, 'Data processing')
 
 
     return
@@ -324,6 +333,7 @@ def read_data_set(online_version,foldername,filename,sheetname,processtypes,Page
     with RightPage:
         clear_output()
 
+    logging.info('Data Selection: Read data set' + filename)
     return 
 
 
@@ -418,8 +428,7 @@ def make_cleaning(featurescl,result2aexp,missacts,dt_features):
     colname = featurescl.value[:bk_ind-1]
 
     handling = missacts.value
-
-    result2aexp.value+= 'Data cleaning: col '+colname+', action '+handling+', coltype '+str(curr_df[colname].dtype)+'\n' 
+    write_log('col '+colname+', action '+handling+', coltype '+str(curr_df[colname].dtype), result2aexp, 'Data cleaning')
 
     if handling == 'Drop Column':
         del curr_df[colname]
@@ -430,20 +439,19 @@ def make_cleaning(featurescl,result2aexp,missacts,dt_features):
                     curr_df[colname].fillna(curr_df[colname].mean(), inplace=True)
                 if handling == 'Replace-Median': 
                     curr_df[colname].fillna(curr_df[colname].median(), inplace=True)
+
                 if handling == 'Remove': 
-                    curr_df = curr_df.dropna(subset = [colname])   
+                    curr_df = curr_df.dropna(subset = [colname])
             else:
-                result2aexp.value+= 'Data cleaning: Improper action is selected.. '+'\n'
+                write_log('Improper action is selected.. ',  result2aexp, 'Data cleaning')
                 return
         else: 
-            result2aexp.value+= 'Data cleaning: mode.. '+str(curr_df[colname].mode()[0])+'\n'
+            write_log('mode.. '+str(curr_df[colname].mode()[0]), result2aexp, 'Data cleaning')
             if handling == 'Replace-Mode': 
                 curr_df[colname].fillna(curr_df[colname].mode()[0], inplace=True)
             
     featurescl.options = [col+'('+str(curr_df[col].isnull().sum())+')' for col in curr_df.columns]
     dt_features.options = [col for col in curr_df.columns]
-    
-    result2aexp.value+= 'Done.. '+'\n'    
 
     return
 ##################################################################################################################
@@ -485,7 +493,7 @@ from sklearn.utils import resample
 ##################################################################################
 
 def NormalizeColumn(df,colname):
-    logging.log('Data preprocessing, feature scaling: normalization of column '+ colname)
+    logging.info('Data preprocessing, feature scaling: normalization of column '+ colname)
     col_min = min(df[colname])
     col_max = max(df[colname])
     
@@ -613,7 +621,7 @@ def make_scaling(dt_features,ProcssPage,scalingacts,result2exp):
     if colname is None:
         return
 
-    result2exp.value += 'Scaling-> '+scalingacts.value+': '+colname+'\n'
+    write_log('Scaling-> '+scalingacts.value+': '+colname, result2exp, 'Data processing')
     
     if (curr_df[colname].dtype == 'object') or (curr_df[colname].dtype== 'string'):
         with ProcssPage:
@@ -622,7 +630,6 @@ def make_scaling(dt_features,ProcssPage,scalingacts,result2exp):
         return
 
     if scalingacts.value == 'Standardize':
-
         if len(Xtrain_df)>0:
             if colname in Xtrain_df.columns:
                 colmean = Xtrain_df[colname].mean(); colstd = Xtrain_df[colname].std()
@@ -635,6 +642,7 @@ def make_scaling(dt_features,ProcssPage,scalingacts,result2exp):
                  
         colmean = curr_df[colname].mean()
         curr_df[colname] = (curr_df[colname]- colmean)/curr_df[colname].std()
+        logging.info('Data preprocessing, feature scaling: standardization of column '+ colname)
 
 
     if scalingacts.value == 'Normalize':
@@ -668,6 +676,8 @@ def make_scaling(dt_features,ProcssPage,scalingacts,result2exp):
             curr_df[colname] = (curr_df[colname]/col_min)
         else:
             curr_df[colname] = (curr_df[colname]-col_min)/denominator
+
+        logging.info('Data preprocessing, feature scaling: normalization of column '+ colname)
 
     with ProcssPage:
         clear_output()
@@ -712,7 +722,7 @@ def make_balanced(features2,balncacts,ProcssPage):
                 for p in ax.patches:
                     ax.annotate("{:.1f}".format(p.get_height()), (p.get_x()+0.25, p.get_height()+0.01))
                 plt.show()
-
+    logging.info('Data preprocessing, checking and handling unbalancedness')
     return
 ####################################################################################################################
 
@@ -844,7 +854,8 @@ def remove_outliers():
     global curr_df
     curr_df = curr_df[curr_df["outlier"] == False]
     curr_df = curr_df.drop(["outlier"], axis=1)
-   
+    logging.info('Data preprocessing, outlier detection and removal')
+    
     return
 
 ##################################################################################

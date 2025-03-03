@@ -16,11 +16,12 @@ import matplotlib.pyplot as plt
 import warnings
 import seaborn as sns
 import os
-import logging
+from log import *
 from pathlib import Path
 import pandas as pd
 import warnings
 import sys
+import logging
 from sklearn.model_selection import train_test_split 
 from sklearn import tree,neighbors,linear_model,ensemble,svm
 from sklearn.metrics import accuracy_score,mean_squared_error
@@ -29,27 +30,6 @@ import numpy as np
 
 dtsetnames = [] 
 rowheight = 20
-
-def write_log(msg, log_display, category):
-    log_display.value +=  msg + '\n'
-    logging.info(category + ': ' +msg)
-
-
-def initialize_logging():
-    # clear log
-    with open('output.log', 'w'):
-        pass
-
-    # initiate logging
-    logging.basicConfig(
-        filename='output.log',
-        level=logging.INFO,
-        format='%(asctime)s - %(levelname)s - %(message)s'
-    )
-    logging.info('Application started')
-
-
-initialize_logging()
 
 colabpath = '/content/CPP_Datasets'
 warnings.filterwarnings("ignore")

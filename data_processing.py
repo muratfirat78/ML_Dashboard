@@ -37,6 +37,20 @@ def assign_target(trg_lbl,dt_features,prdtsk_lbl,result2exp,trg_btn,predictionta
     
 
     return 
+##################################################################################
+
+def NormalizeColumn(df,colname):
+    logging.info('Data preprocessing, feature scaling: normalization of column '+ colname)
+    col_min = min(df[colname])
+    col_max = max(df[colname])
+    
+    if col_max == col_min: 
+        return
+    
+    df[colname] = (df[colname]- col_min)/(col_max-col_min)
+    
+    return df
+
 ############################################################################################################    
 
 def make_scaling(dt_features,ProcssPage,scalingacts,result2exp):  

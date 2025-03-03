@@ -42,166 +42,6 @@ predictiontask = None
 
 TrainedModels = []
 
-#######################################################################################################################
-
-class MLModel: 
-    def __init__(self,data,target,tasktype,mytype,report):
-
-        #data  = [trdf,tr_tgtdf,tstdf,tst_tgtdf] 
-        self.train_df = data[0]
-        self.traintrg_df = data[1]
-        self.test_df = data[2]
-        self.testtrg_df = data[3]
-
-        self.modelsetting = dict()
-        self.performance = dict()
-        
-        self.Type = mytype
-        self.myTask = tasktype
-        self.PythonObject = None
-        self.PreprocessingSteps = [] 
-
-        if self.Type == 'Decision Tree':
-            if self.myTask == 'Classification': 
-                self.PythonObject = tree.DecisionTreeClassifier()
-            if self.myTask == 'Regression': 
-                self.PythonObject = tree.DecisionTreeRegressor(random_state = 0) 
-        if self.Type == 'KNN':
-            if self.myTask == 'Classification': 
-                self.PythonObject = neighbors.KNeighborsClassifier(n_neighbors=5)
-            if self.myTask == 'Regression': 
-                self.PythonObject = neighbors.KNeighborsRegressor(n_neighbors=5)
-        if self.Type == 'Linear Model':
-            if self.myTask == 'Classification': 
-                self.PythonObject = linear_model.SGDClassifier()       
-            if self.myTask == 'Regression': 
-                self.PythonObject = linear_model.LinearRegression() # try before standardization..
-        if self.Type == 'Random Forest':
-            if self.myTask == 'Classification': 
-                self.PythonObject = ensemble.RandomForestClassifier()       
-            if self.myTask == 'Regression': 
-                self.PythonObject = ensemble.RandomForestRegressor(n_estimators=15, random_state=0,)   # try before standardization..
-        if self.Type == 'SVM':
-            if self.myTask == 'Classification': 
-                self.PythonObject = svm.SVC(kernel='linear', gamma='auto',probability = True)
-            if self.myTask == 'Regression': 
-                self.PythonObject = svm.SVR(kernel = 'rbf')
-        if self.Type == 'Logistic Regression':
-            self.PythonObject = linear_model.LogisticRegression(random_state=16)   # Initialize the model object 
-           
-        write_log('Model.. Type '+str(type(self.PythonObject)), report, 'Predictive modeling')
-        return
-
-
-    def GetPredictions(self):
-        if self.myTask == 'Classification':
-            return self.PythonObject.predict(self.test_df) 
-        if self.myTask == 'Regression':
-            if self.Type == 'Logistic Regression': 
-                return self.PythonObject.predict_proba(self.test_df)
-            else:
-                return self.PythonObject.predict(self.test_df)
-      
-    def getSkLearnModel(self):
-        return self.PythonObject
-        
-    def getData(self):
-        return self.train_df,self.traintrg_df,self.test_df,self.testtrg_df
-        
-    def getType(self):
-        return self.Type
-
-    def GetPerformanceDict(self):
-        return self.performance
-
-def Train_Model(tasktype,mytype,results,trmodels):
-
-    data = [settings.Xtrain_df,settings.ytrain_df,settings.Xtest_df,settings.ytest_df]
-
-    mymodel = MLModel(data,targetcolumn,tasktype,mytype,results)
-
-    model = mymodel.getSkLearnModel().fit(data[0], data[1]) 
-
-    y_pred = mymodel.GetPredictions()
-
-    if tasktype == 'Classification': 
-        mymodel.GetPerformanceDict()['Accuracy'] = accuracy_score(data[3], y_pred)
-    
-    if tasktype == 'Regression': 
-        mymodel.GetPerformanceDict()['MSE'] = mean_squared_error(data[3], y_pred)
-
-    TrainedModels.append(mymodel)
-
-    write_log('Train Model-> '+ mytype, results, 'Predictive modeling')
-    for prf,val in mymodel.GetPerformanceDict().items():
-        write_log('Model Performance-> '+prf+': '+str(val), results, 'Predictive modeling')
-
-    trmodels.options = [mdl.getType() for mdl in TrainedModels]
-   
-
-    return 
-
-
-####################################################################################################################
-
-
-def read_data_set(online_version,foldername,filename,sheetname,processtypes,Pages,dt_features,dt_ftslay,featurescl,ftlaycl):
-
-    FeatPage,ProcssPage,DFPage,RightPage = Pages
-    
-    rel_path = foldername+'\\'+filename
-    
-    if online_version:
-        abs_file_path = colabpath+'/'+filename
-    else:
-        abs_file_path = os.path.join(Path.cwd(), rel_path)
-        
-
-    if abs_file_path.find('.csv') > -1:
-        settings.curr_df = pd.read_csv(abs_file_path, sep=sheetname) 
-    if (abs_file_path.find('.xlsx') > -1) or (filename.find('.xls') > -1):
-        xls = pd.ExcelFile(abs_file_path)
-        settings.curr_df = pd.read_excel(xls,sheetname)
-    if abs_file_path.find('.tsv') > -1:    
-       
-        settings.curr_df = pd.read_csv(abs_file_path, sep="\t")
-        
-    settings.curr_df.convert_dtypes()
-     
-    datasetname = filename[:filename.find('.')]  
-    
-    dt_ftslay.height = str(rowheight*len(settings.curr_df.columns))+'px'
-    dt_features.layout = dt_ftslay
-    dt_features.options = [col for col in settings.curr_df.columns]
-
-
-    ftlaycl.display = 'block'
-    ftlaycl.height = str(rowheight*len(settings.curr_df.columns))+'px'
-    featurescl.layout = ftlaycl
-    featurescl.options = [col+'('+str(settings.curr_df[col].isnull().sum())+')' for col in settings.curr_df.columns]
-    
-    processtypes.value = processtypes.options[0]
-    
-    with FeatPage:
-        clear_output()
-    with ProcssPage:
-        clear_output()
-    
-    with DFPage:
-        clear_output()
-        #####################################
-        display.display(settings.curr_df.info()) 
-        display.display(settings.curr_df.describe()) 
-        display.display(settings.curr_df) 
-        #####################################
-
-    with RightPage:
-        clear_output()
-
-    logging.info('Data Selection: Read data set' + filename)
-    return 
-
-
 ################################################################################################################
 def File_Click(online_version,foldername,filename,wsheets,wslay,butlay):
     
@@ -313,19 +153,6 @@ def drawlmplot(curr_df,xdrop,ydrop,huedrop,VisualPage):
 #########################################  TAB: Data Processing   ################################################
 ##################################################################################################################
 from sklearn.utils import resample
-##################################################################################
-
-def NormalizeColumn(df,colname):
-    logging.info('Data preprocessing, feature scaling: normalization of column '+ colname)
-    col_min = min(df[colname])
-    col_max = max(df[colname])
-    
-    if col_max == col_min: 
-        return
-    
-    df[colname] = (df[colname]- col_min)/(col_max-col_min)
-    
-    return df
 
 ###############
 def featureprclick(features2,FeatPage,processtypes,ProcssPage,scalingacts):  
@@ -434,118 +261,8 @@ def vistypeclick(curr_df,ShowMode,vboxvis1,vbvs1lay,visualtypes,vlmpltcomps,vbox
 
         
     return
-##############
-def make_scaling(dt_features,ProcssPage,scalingacts,result2exp):  
-  
-    colname = dt_features.value
+#############
 
-    if colname is None:
-        return
-
-    write_log('Scaling-> '+scalingacts.value+': '+colname, result2exp, 'Data processing')
-    
-    if (settings.curr_df[colname].dtype == 'object') or (settings.curr_df[colname].dtype== 'string'):
-        with ProcssPage:
-            clear_output()
-            display.display('Selected column is not a numerical type..')
-        return
-
-    if scalingacts.value == 'Standardize':
-        if len(settings.Xtrain_df)>0:
-            if colname in settings.Xtrain_df.columns:
-                colmean = settings.Xtrain_df[colname].mean(); colstd = settings.Xtrain_df[colname].std()
-                settings.Xtrain_df[colname] = (settings.Xtrain_df[colname]- colmean)/colstd
-                settings.Xtest_df[colname] = (settings.Xtest_df[colname]- colmean)/colstd
-            if colname in settings.ytrain_df.columns:
-                colmean = settings.ytrain_df[colname].mean(); colstd = settings.ytrain_df[colname].std()
-                settings.ytrain_df[colname] = (settings.ytrain_df[colname]- colmean)/colstd
-                settings.ytest_df[colname] = (settings.ytest_df[colname]- colmean)/colstd
-                 
-        colmean = settings.curr_df[colname].mean()
-        settings.curr_df[colname] = (settings.curr_df[colname]- colmean)/settings.curr_df[colname].std()
-        logging.info('Data preprocessing, feature scaling: standardization of column '+ colname)
-
-
-    if scalingacts.value == 'Normalize':
-
-        if len(settings.Xtrain_df)>0:
-            if colname in settings.Xtrain_df.columns:
-                col_min = min(settings.Xtrain_df[colname]); col_max = max(settings.Xtrain_df[colname])
-                denominator = (col_max-col_min)
-                if denominator== 0:
-                    settings.Xtrain_df[colname] = (settings.Xtrain_df[colname]/col_min)
-                    settings.Xtest_df[colname] = (settings.Xtest_df[colname]/col_min)
-                else:
-                    settings.Xtrain_df[colname] = (settings.Xtrain_df[colname]-col_min)/denominator
-                    settings.Xtest_df[colname] = (settings.Xtest_df[colname]-col_min)/denominator
-               
-            if colname in settings.ytrain_df.columns:
-                col_min = min(settings.ytrain_df[colname]); col_max = max(settings.ytrain_df[colname])
-                denominator = (col_max-col_min)
-                if denominator== 0:
-                    settings.ytrain_df[colname] = (settings.ytrain_df[colname]/col_min)
-                    settings.ytest_df[colname] = (settings.ytest_df[colname]/col_min)
-                else:
-                    settings.ytrain_df[colname] = (settings.ytrain_df[colname]-col_min)/denominator
-                    settings.ytest_df[colname] = (settings.ytest_df[colname]-col_min)/denominator
-
-        
-        col_min = min(settings.curr_df[colname]); col_max = max(settings.curr_df[colname])
-        denominator = (col_max-col_min)
-
-        if denominator== 0:
-            settings.curr_df[colname] = (settings.curr_df[colname]/col_min)
-        else:
-            settings.curr_df[colname] = (settings.curr_df[colname]-col_min)/denominator
-
-        logging.info('Data preprocessing, feature scaling: normalization of column '+ colname)
-
-    with ProcssPage:
-        clear_output()
-        fig, (axbox, axhist) = plt.subplots(1,2)
-     
-        sns.boxplot(x=colname,data=settings.curr_df, ax=axbox)
-        axbox.set_title('Box plot') 
-        sns.distplot(settings.curr_df[colname],ax=axhist)
-        axhist.set_title('Histogram') 
-        plt.legend(['Mean '+str(round(settings.curr_df[colname].mean(),2)),'Stdev '+str(round(settings.curr_df[colname].std(),2))], bbox_to_anchor=(0.6, 0.6))
-        plt.show()
-    
- 
-    return
-
-#################################################################################################################
-def make_balanced(features2,balncacts,ProcssPage):  
-
-
-    colname = features2.value
-
-    if balncacts.value == 'Upsample':
-         
-        if len(settings.curr_df[colname].unique()) == 2: # binary detection
-            
-            colvals = settings.curr_df[colname].unique()
-            ColmFirst = settings.curr_df[ settings.curr_df[colname] == colvals[0]]
-            ColmOther = settings.curr_df[ settings.curr_df[colname] == colvals[1]]
-          
-            if len(ColmFirst) < len(ColmOther):
-                upsampled_First = resample(ColmFirst, replace=True, n_samples=len(ColmOther), random_state=27) 
-                settings.curr_df = pd.concat([ColmOther, upsampled_First])
-            else:
-                upsampled_Other= resample(ColmOther, replace=True, n_samples=len(ColmFirst), random_state=27) 
-                settings.curr_df = pd.concat([ColmFirst, upsampled_Other])
-                
-            with ProcssPage:
-                
-                clear_output()
-                plt.figure(figsize=(6, 2))
-                ax = sns.countplot(x=colname,data=settings.curr_df, palette="cool_r")
-                for p in ax.patches:
-                    ax.annotate("{:.1f}".format(p.get_height()), (p.get_x()+0.25, p.get_height()+0.01))
-                plt.show()
-    logging.info('Data preprocessing, checking and handling unbalancedness')
-    return
-####################################################################################################################
 
 def ResetProcessMenu(vis_list):
 
@@ -670,31 +387,23 @@ def SelectProcess_Type(vis_list):
     return
 
 ##################################################################################
-def remove_outliers():
-    settings.curr_df = settings.curr_df[settings.curr_df["outlier"] == False]
-    settings.curr_df = settings.curr_df.drop(["outlier"], axis=1)
-    logging.info('Data preprocessing, outlier detection and removal')
     
-    return
-
-##################################################################################
-    
-    if datasetname.find('_clean') > 0:
+    # if datasetname.find('_clean') > 0:
         
-        checkstr = datasetname[datasetname.find('_clean')+1:]
+    #     checkstr = datasetname[datasetname.find('_clean')+1:]
         
      
-        version = int(checkstr[checkstr.find('_v')+2:])
+    #     version = int(checkstr[checkstr.find('_v')+2:])
         
-        dsname = datasetname[:datasetname.find('_clean')]
+    #     dsname = datasetname[:datasetname.find('_clean')]
 
-        filename = DataFolder.value+'/'+dsname+'_clean_v'+str(version+1)+'.csv'
-        settings.curr_df.to_csv(filename, index=False) 
+    #     filename = DataFolder.value+'/'+dsname+'_clean_v'+str(version+1)+'.csv'
+    #     settings.curr_df.to_csv(filename, index=False) 
             
-    else:
+    # else:
         
-        filename = DataFolder.value+'/'+datasetname+'_clean_v'+str(version)+'.csv'
-        settings.curr_df.to_csv(filename, index=False) 
+    #     filename = DataFolder.value+'/'+datasetname+'_clean_v'+str(version)+'.csv'
+    #     settings.curr_df.to_csv(filename, index=False) 
     
-    return
+    # return
 ######################################################################################################################

@@ -4,38 +4,280 @@ Created on Wed Apr  3 11:46:59 2024
 
 @author: mfirat
 """
+import shutil
 
 ##### import ipywidgets as widgets
 from IPython.display import clear_output
 from IPython import display
 from ipywidgets import *
-from datetime import timedelta,date
+from datetime import timedelta,date, datetime
+from data import *
 import matplotlib.pyplot as plt
-import pandas as pd
 import warnings
 import seaborn as sns
 import os
+import logging
 from pathlib import Path
+import pandas as pd
+import warnings
+import sys
+from sklearn.model_selection import train_test_split 
+from sklearn import tree,neighbors,linear_model,ensemble,svm
+from sklearn.metrics import accuracy_score,mean_squared_error
+from sklearn import preprocessing 
+import numpy as np
+
+dtsetnames = [] 
+rowheight = 20
+
+def write_log(msg, log_display, category):
+    log_display.value +=  msg + '\n'
+    logging.info(category + ': ' +msg)
 
 
+def initialize_logging():
+    # clear log
+    with open('output.log', 'w'):
+        pass
+
+    # initiate logging
+    logging.basicConfig(
+        filename='output.log',
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s'
+    )
+    logging.info('Application started')
+
+
+initialize_logging()
 
 colabpath = '/content/CPP_Datasets'
 warnings.filterwarnings("ignore")
 
 
-file_names = {'csv':['apple_quality','aug_train','diet','housing','loan_data','worldcities','flight_data','titanic','Telecom_Churn']}
-file_names['xlsx'] = ['crop_yield']
-file_names['tsv'] = ['gapminder']
+datasetname = ''
+ShowMode = True
+
+targetcolumn = None
+predictiontask = None
+
+TrainedModels = []
 
 #######################################################################################################################
 
-def read_data_set(curr_df,online_version,foldername,filename,sheetname,reslay,resultexp,processtypes,FeatPage,ProcssPage,DFPage):
+class MLModel: 
+    def __init__(self,data,target,tasktype,mytype,report):
+
+        #data  = [trdf,tr_tgtdf,tstdf,tst_tgtdf] 
+        self.train_df = data[0]
+        self.traintrg_df = data[1]
+        self.test_df = data[2]
+        self.testtrg_df = data[3]
+
+        self.modelsetting = dict()
+        self.performance = dict()
+        
+        self.Type = mytype
+        self.myTask = tasktype
+        self.PythonObject = None
+        self.PreprocessingSteps = [] 
+
+        if self.Type == 'Decision Tree':
+            if self.myTask == 'Classification': 
+                self.PythonObject = tree.DecisionTreeClassifier()
+            if self.myTask == 'Regression': 
+                self.PythonObject = tree.DecisionTreeRegressor(random_state = 0) 
+        if self.Type == 'KNN':
+            if self.myTask == 'Classification': 
+                self.PythonObject = neighbors.KNeighborsClassifier(n_neighbors=5)
+            if self.myTask == 'Regression': 
+                self.PythonObject = neighbors.KNeighborsRegressor(n_neighbors=5)
+        if self.Type == 'Linear Model':
+            if self.myTask == 'Classification': 
+                self.PythonObject = linear_model.SGDClassifier()       
+            if self.myTask == 'Regression': 
+                self.PythonObject = linear_model.LinearRegression() # try before standardization..
+        if self.Type == 'Random Forest':
+            if self.myTask == 'Classification': 
+                self.PythonObject = ensemble.RandomForestClassifier()       
+            if self.myTask == 'Regression': 
+                self.PythonObject = ensemble.RandomForestRegressor(n_estimators=15, random_state=0,)   # try before standardization..
+        if self.Type == 'SVM':
+            if self.myTask == 'Classification': 
+                self.PythonObject = svm.SVC(kernel='linear', gamma='auto',probability = True)
+            if self.myTask == 'Regression': 
+                self.PythonObject = svm.SVR(kernel = 'rbf')
+        if self.Type == 'Logistic Regression':
+            self.PythonObject = linear_model.LogisticRegression(random_state=16)   # Initialize the model object 
+           
+        write_log('Model.. Type '+str(type(self.PythonObject)), report, 'Predictive modeling')
+        return
+
+
+    def GetPredictions(self):
+        if self.myTask == 'Classification':
+            return self.PythonObject.predict(self.test_df) 
+        if self.myTask == 'Regression':
+            if self.Type == 'Logistic Regression': 
+                return self.PythonObject.predict_proba(self.test_df)
+            else:
+                return self.PythonObject.predict(self.test_df)
+      
+    def getSkLearnModel(self):
+        return self.PythonObject
+        
+    def getData(self):
+        return self.train_df,self.traintrg_df,self.test_df,self.testtrg_df
+        
+    def getType(self):
+        return self.Type
+
+    def GetPerformanceDict(self):
+        return self.performance
+
+def Train_Model(tasktype,mytype,results,trmodels):
+
+    global  Xtrain_df,Xtest_df, ytrain_df, ytest_df,curr_df,targetcolumn
+
+    data = [Xtrain_df,ytrain_df,Xtest_df,ytest_df]
+
+    mymodel = MLModel(data,targetcolumn,tasktype,mytype,results)
+
+    model = mymodel.getSkLearnModel().fit(data[0], data[1]) 
+
+    y_pred = mymodel.GetPredictions()
+
+    if tasktype == 'Classification': 
+        mymodel.GetPerformanceDict()['Accuracy'] = accuracy_score(data[3], y_pred)
     
+    if tasktype == 'Regression': 
+        mymodel.GetPerformanceDict()['MSE'] = mean_squared_error(data[3], y_pred)
+
+    TrainedModels.append(mymodel)
+
+    write_log('Train Model-> '+ mytype, results, 'Predictive modeling')
+    for prf,val in mymodel.GetPerformanceDict().items():
+        write_log('Model Performance-> '+prf+': '+str(val), results, 'Predictive modeling')
+
+    trmodels.options = [mdl.getType() for mdl in TrainedModels]
    
+
+    return 
+############################################################################################################    
+def make_encoding(features2,encodingacts,result2exp):
+
+    global  Xtrain_df,Xtest_df, ytrain_df, ytest_df,curr_df 
+
+    colname = features2.value
+
     
-    #  filename = datasets.value 
-    #  foldername = DataFolder.value
-    #  sheetname = wsheets.value
+    write_log('Encoding.. col '+colname+' is list:'+str(int(isinstance(curr_df, list))), result2exp, 'Data processing')
+
+    if colname is None:
+        return
+
+    
+  
+    # Encode column  
+    if len(Xtrain_df) > 0:
+        
+        if encodingacts.value == "Label Encoding":
+            label_encoder = preprocessing.LabelEncoder() 
+            write_log('Encoding-> '+features2.value+' (train) current classes: '+str(data_df[0][colname].unique()), result2exp, 'Data processing')
+            data_df[0][colname] = label_encoder.fit_transform(data_df[0][colname]) # train 
+            write_log('Encoding-> '+features2.value+' (train) after labeling classes: '+str(data_df[0][colname].unique()), result2exp, 'Data processing')
+            write_log('Encoding-> '+features2.value+' (test) current classes: '+str(data_df[1][colname].unique()), result2exp, 'Data processing')
+            data_df[1][colname] = label_encoder.fit_transform(data_df[1][colname]) # test
+            write_log('Encoding-> '+features2.value+' (test) after labeling classes: '+str(data_df[1][colname].unique()), result2exp, 'Data processing')
+
+            data_df = data_df[0],data_df[1]
+            
+        if encodingacts.value == "One Hot Encoding":
+            categorical_columns = [colname]
+            
+            encoder = preprocessing.OneHotEncoder(sparse_output=False)  # Initialize OneHotEncoder
+            one_hot_encoded = encoder.fit_transform(data_df[0][categorical_columns])  # Fit and transform the categorical columns          
+            one_hot_df = pd.DataFrame(one_hot_encoded,columns=encoder.get_feature_names_out(categorical_columns)) # Create a DataFrame
+            data1_df = pd.concat([data_df[0].drop(categorical_columns, axis=1), one_hot_df], axis=1)
+            write_log('One Hot Encoding-> (train) after one-hot features: '+str(data1_df.columns), result2exp, 'Data processing')
+
+            encoder = preprocessing.OneHotEncoder(sparse_output=False)  # Initialize OneHotEncoder
+            one_hot_encoded = encoder.fit_transform(data_df[1][categorical_columns])  # Fit and transform the categorical columns          
+            one_hot_df = pd.DataFrame(one_hot_encoded,columns=encoder.get_feature_names_out(categorical_columns)) # Create a DataFrame 
+            data2_df = pd.concat([data_df[1].drop(categorical_columns, axis=1), one_hot_df], axis=1)
+            write_log('One Hot Encoding-> (test) after one-hot features: '+str(data2_df.columns), result2exp, 'Data processing')
+
+            data_df = data1_df,data2_df
+
+            features2.options = [col+'('+str(data1_df[col].isnull().sum())+')' for col in data1_df.columns]
+    else:
+        write_log('Encoding-> '+encodingacts.value+', '+str(encodingacts.value == "One Hot Encoding"), result2exp, 'Data processing')
+        write_log('Encoding-> '+colname+' current classes: '+str(len(curr_df)), result2exp, 'Data processing')
+        if encodingacts.value == "Label Encoding":
+            label_encoder = preprocessing.LabelEncoder() 
+            write_log('Encoding-> '+features2.value+' current classes: '+str(curr_df[colname].unique()), result2exp, 'Data processing')
+            curr_df[colname] = label_encoder.fit_transform(curr_df[colname]) 
+            write_log('Encoding-> '+features2.value+' after labeling classes: '+str([cls for cls in curr_df[colname].unique()]), result2exp, 'Data processing')
+            
+        if encodingacts.value == "One Hot Encoding":
+            write_log('Encoding-> '+colname+' current classes: '+str(curr_df[colname].unique()), result2exp, 'Data processing')
+            categorical_columns = [colname]
+            encoder = preprocessing.OneHotEncoder(sparse_output=False)  # Initialize OneHotEncoder
+            one_hot_encoded = encoder.fit_transform(curr_df[categorical_columns])  # Fit and transform the categorical columns          
+            one_hot_df = pd.DataFrame(one_hot_encoded,columns=encoder.get_feature_names_out(categorical_columns)) # Create a DataFrame
+            curr_df = pd.concat([curr_df.drop(categorical_columns, axis=1), one_hot_df], axis=1)
+            write_log('One Hot Encoding-> after one-hot features: '+str(curr_df.columns), result2exp, 'Data processing')
+
+        features2.options = [col for col in curr_df.columns]
+    
+    return
+#############################################################################################################
+def assign_target(trg_lbl,dt_features,prdtsk_lbl,result2exp,trg_btn,predictiontask):
+
+    global curr_df,targetcolumn
+
+    targetcolumn = dt_features.value
+
+    trg_lbl.value = targetcolumn
+    trg_btn.disabled = True
+
+    
+    if (curr_df[targetcolumn].dtype == 'float64') or (curr_df[targetcolumn].dtype == 'int64'):
+        predictiontask = "Regression"
+    else:
+        predictiontask = "Classification" 
+
+    prdtsk_lbl.value = predictiontask 
+    write_log('Target assigned: '+targetcolumn, result2exp, 'Data processing')
+    
+
+    return 
+####################################################################################################################
+def make_split(splt_txt,splt_btn,result2exp):
+    global curr_df,Xtrain_df,Xtest_df, ytrain_df, ytest_df,targetcolumn
+
+    if targetcolumn is None:
+        return
+  
+    y = curr_df[targetcolumn] # Target variable 
+    column_list = [col for col in curr_df.columns]
+    column_list.remove(targetcolumn)
+    X = curr_df[column_list]
+    
+    ratio_percnt = int(splt_txt.value) 
+    write_log('Split ratio, '+str(ratio_percnt/100), result2exp, 'Data processing')
+    Xtrain_df,Xtest_df, ytrain_df, ytest_df = train_test_split(X, y, test_size=ratio_percnt/100, random_state=16)
+    splt_btn.disabled = True
+
+    write_log('Split, Train size: '+str(len(Xtrain_df)), result2exp, 'Data processing')
+
+
+    return
+
+def read_data_set(online_version,foldername,filename,sheetname,processtypes,Pages,dt_features,dt_ftslay,featurescl,ftlaycl):
+
+    FeatPage,ProcssPage,DFPage,RightPage = Pages
+    global curr_df
     
     rel_path = foldername+'\\'+filename
     
@@ -58,10 +300,15 @@ def read_data_set(curr_df,online_version,foldername,filename,sheetname,reslay,re
      
     datasetname = filename[:filename.find('.')]  
     
-     
-    reslay.height = '100px'
-    resultexp.value = '' 
-    resultexp.layout = reslay
+    dt_ftslay.height = str(rowheight*len(curr_df.columns))+'px'
+    dt_features.layout = dt_ftslay
+    dt_features.options = [col for col in curr_df.columns]
+
+
+    ftlaycl.display = 'block'
+    ftlaycl.height = str(rowheight*len(curr_df.columns))+'px'
+    featurescl.layout = ftlaycl
+    featurescl.options = [col+'('+str(curr_df[col].isnull().sum())+')' for col in curr_df.columns]
     
     processtypes.value = processtypes.options[0]
     
@@ -77,8 +324,12 @@ def read_data_set(curr_df,online_version,foldername,filename,sheetname,reslay,re
         display.display(curr_df.describe()) 
         display.display(curr_df) 
         #####################################
-  
-    return curr_df
+
+    with RightPage:
+        clear_output()
+
+    logging.info('Data Selection: Read data set' + filename)
+    return 
 
 
 ################################################################################################################
@@ -86,7 +337,6 @@ def File_Click(online_version,foldername,filename,wsheets,wslay,butlay):
     
     # filename = datasets.value
     # foldername = DataFolder.value
-
 
     
     abs_file_path = ''
@@ -158,245 +408,55 @@ def on_submitfunc(online_version,foldername,datasets):
 #######################################################################################################
 ###########################################  TAB: Data Cleaning ##################################################
 
-def Activate_Tab1(online_version,rowheight,curr_df,ShowMode,mhndslay,ftlay,dtlay,featurevals,features,dtypes,missing,msslay,misshands,svebtn):
-    
 
-    
-    ShowMode = False
-    
-    msslay.display = 'block'
-    msslay.height ='30px'
-    mhndslay.display = 'block'
-    mhndslay.height ='30px'
-    ftlay.display = 'block'
-    ftlay.height ='30px'
-    dtlay.display = 'block'
-    dtlay.height ='30px'
-    
-    if online_version: 
-        svebtn.disabled = True
-    
-    featurevals.options = []
-     
-    features.options = curr_df.columns
-    dtypes.options =[str(colid)+'-'+str(curr_df[curr_df.columns[colid]].dtype) for colid in  range(len(curr_df.columns))]
-
-    currhghttxt = int(ftlay.height[:ftlay.height.find('px')])
-    ftlay.height = str(min(450,currhghttxt+len(curr_df.columns)*rowheight))+'px'
-    features.layout = ftlay 
-
-    currhghttxt = int(dtlay.height[:dtlay.height.find('px')])
-    dtlay.height = str(min(450,currhghttxt+len(curr_df.columns)*rowheight))+'px'
-    dtypes.layout = dtlay 
-
-       
-    missing.options = [str(colid)+'-'+str(curr_df[curr_df.columns[colid]].isnull().sum()) for colid in  range(len(curr_df.columns))]
-    msslay.height = ftlay.height 
-    missing.layout = msslay
-
-    misshands.options = [str(colid)+'-'+'Keep'+','+'Remove' for colid in  range(len(curr_df.columns))]
-    mhndslay.height = ftlay.height 
-    misshands.layout = mhndslay
-    
-    ShowMode = True
-     
-    return curr_df
 
 ##########################################################################################################
-def Handle_Missing_Values(curr_df,resultexp,misshands): 
-    
-   
-    clean_df = curr_df.copy()
-    optind = 0
-    rowheight = 16
-  
-    inisize = len(curr_df)
-    inicols = len(curr_df.columns)
-    
-    resultexp.value += 'Initial data: '+str(inicols)+', columns,  size '+str(inisize)+'\n'
-    
-    nrrows = 0
-    
-    for opt in misshands.options:
-        curact = misshands.options[optind]  
-        check = curact[curact.find('-')+1:]  
-        check = check[:check.find(',')]
-      
-        if check != 'Drop':
-            if curact[curact.find(',')+1:] == 'Remove':  
-               
-                clean_df = clean_df.dropna(subset = [clean_df.columns[optind]])   
-            if curact[curact.find(',')+1:] == 'Mean':
-                clean_df[clean_df.columns[optind]].fillna(clean_df[clean_df.columns[optind]].mean(), inplace=True)
-            if curact[curact.find(',')+1:] == 'Median':
-                clean_df[clean_df.columns[optind]].fillna((clean_df[clean_df.columns[optind]].median()), inplace=True)    
-        optind+=1
+def make_cleaning(featurescl,result2aexp,missacts,dt_features): 
 
-    # check dropped columns
-    optind = 0
-    dropped = 0 
-    for opt in misshands.options:
-        curact = misshands.options[optind]
-        curact = curact[curact.find('-')+1:]  
-        curact = curact[:curact.find(',')]
-       
-        if curact == 'Drop':
-            resultexp.value += 'Column drop: '+clean_df.columns[optind]+'\n'
-            nrrows+=1
-            clean_df = clean_df.drop([clean_df.columns[optind-dropped]], axis=1)
-            dropped+=1
-
-        optind+=1 
-        
-    curr_df = clean_df
-
-   
-    resultexp.value += 'Cleaned data: '+str(len(clean_df.columns))+', columns, size  '+str(len(clean_df))+'\n'
-    
-    
-    
-    
-    return curr_df
-######################################################################################################################
-def featureclick(ShowMode,features,featurevals,featurename,curr_df,dtypes,missing,misshands,HCPage):  
-
-    
-    if not ShowMode:
-        return
-    
-    
-    featurename.value = 'Selected Feature: '+features.value
-    ratiosum = 0
-    optind = 0
-    datasize = len(curr_df)
-    
-  
-    
-    for opt in features.options:
-        if features.value == opt:
-           
-            dtypes.value = dtypes.options[optind]
-            missing.value = missing.options[optind]
-            misshands.value = misshands.options[optind]
-            typecheck = dtypes.value
-            checkissing = missing.value
+    global curr_df
+    bk_ind = 0
+    for c in reversed(featurescl.value):
+        if c == '(':
             break
+        bk_ind-=1
+
+    colname = featurescl.value[:bk_ind-1]
+
+    handling = missacts.value
+    write_log('col '+colname+', action '+handling+', coltype '+str(curr_df[colname].dtype), result2aexp, 'Data cleaning')
+
+    if handling == 'Drop Column':
+        del curr_df[colname]
+    else:    
+        if (curr_df[colname].dtype == 'float64') or (curr_df[colname].dtype == 'int64'):
+            if handling in ['Replace-Mean','Replace-Median','Remove']:
+                if handling == 'Replace-Mean': 
+                    curr_df[colname].fillna(curr_df[colname].mean(), inplace=True)
+                if handling == 'Replace-Median': 
+                    curr_df[colname].fillna(curr_df[colname].median(), inplace=True)
+
+                if handling == 'Remove': 
+                    curr_df = curr_df.dropna(subset = [colname])
+            else:
+                write_log('Improper action is selected.. ',  result2aexp, 'Data cleaning')
+                return
+        else: 
+            write_log('mode.. '+str(curr_df[colname].mode()[0]), result2aexp, 'Data cleaning')
+            if handling == 'Replace-Mode': 
+                curr_df[colname].fillna(curr_df[colname].mode()[0], inplace=True)
             
-            
-            '''
-            if (checkissing[checkissing.find('-')+1:] == '0') & (len(curr_df[curr_df.columns[optind]].unique())) <= 250:
-             
-                featurevals.options = [x for x in curr_df[curr_df.columns[optind]].unique()]
-              
-                if (typecheck[typecheck.find('-')+1:] == 'float64') | (typecheck[typecheck.find('-')+1:] == 'int64'):
-                    featurevals.options = sorted(featurevals.options, key=lambda x: x, reverse=False)
-                    ratiosum =sum([len(curr_df[curr_df[curr_df.columns[optind]] == x])/datasize for x in featurevals.options])
-              
-                featurevals.options = [str(x)+' ('+str(round(100*len(curr_df[curr_df[curr_df.columns[optind]] == x])/datasize,3))+'%)' for x in featurevals.options]       
-                featurevals.value = featurevals.options[0]
-            '''
+    featurescl.options = [col+'('+str(curr_df[col].isnull().sum())+')' for col in curr_df.columns]
+    dt_features.options = [col for col in curr_df.columns]
 
-           
-        optind+=1
-        
-   
-   
-
-    return
-
-#####################################################################################################################
-def actionclick(features,dtypes,newchg,misshands):  
-    
- 
-    selectid = 0
-    optind = 0
-    firstpart=  ''
-    
-   
-    for opt in features.options:
-       
-        if opt == features.value:
-            checktype = dtypes.options[optind]
-            if (newchg == 'Mean') or  (newchg == 'Median'):
-                if checktype[checktype.find('-')+1:] != 'float64':
-                    return
-            selectid = optind
-            firstpart = misshands.options[selectid][:misshands.options[selectid].find(',')]
-            break
-        optind+=1
-  
-            
-    newopt = firstpart+','+newchg
- 
-    misshands.options = [misshands.options[optind] if optind!= selectid else newopt for optind in range(len(misshands.options))]
- 
-   
-    
-    return
-
-##################################################################################################################
-def columnclick(colmnacts,features,misshands,newchg):  
-
-    if colmnacts.value == colmnacts.options[0]:
-        return
- 
-    selectid = 0
-    
-    
-    
-    optind = 0   
-    for opt in features.options:
-        if opt == features.value:
-            selectid = optind
-            break
-        optind+=1
-        
-    prevstr = misshands.options[selectid]
-  
-
-    newopt = str(selectid)+'-'+newchg+','+prevstr[prevstr.find(',')+1:]
-    
-    misshands.options = [misshands.options[optind] if optind!= selectid else newopt for optind in range(len(misshands.options))]
-    colmnacts.value = colmnacts.options[0]
-    
-    return
-#################################################################################################################
-def featval_click(change):  
-    global misshands,colmnacts,features,dtypes,missingacts,curr_df,featurevals,valchangeacts,resultexp,reslay
- 
-    selectid = 0      
-     
-    
-    optind = 0   
-    for opt in featurevals.options:
-        if opt == featurevals.value:
-            selectid = optind
-            break
-        optind+=1
-    
-    colname = features.value 
-    
-   
-    
-    featureval =  featurevals.value
- 
-    featureval =  featureval[:featureval.find('(')-1]
-  
-    
-    prevsize = len(curr_df)
-    
-    if valchangeacts.value == 'Remove':
-        curr_df = curr_df.drop(curr_df[curr_df[colname] == featureval].index)
-     
-    
-    resultexp.value += 'Feature: '+colname+' value '+featureval+ ' removed. Size: '+str(prevsize)+'->'+str(len(curr_df))+'\n'
-    valchangeacts.value == valchangeacts.options[0]
-    
     return
 ##################################################################################################################
-def savecurrdata(change):
-    
-    global curr_df,DataFolder
+def savedata(curr_df, dataFolder, datasetname):
+    datasetname = os.path.splitext(os.path.basename(datasetname))[0]
+    current_datetime = datetime.now().strftime('%Y%m%d_%H%M%S')
+    filename = dataFolder.value + '/' + datasetname + '_' + current_datetime
+    shutil.copy('output.log', filename + '.txt')
+    curr_df.to_csv(filename + '.csv')
+
     
     version = 0
 ##################################################################################################################
@@ -426,16 +486,9 @@ def drawlmplot(curr_df,xdrop,ydrop,huedrop,VisualPage):
 ##################################################################################################################
 from sklearn.utils import resample
 ##################################################################################
-def StandardizeColumn(df,colname):
-    
-    colmean = df[colname].mean()
-    
-    df[colname] = (df[colname]- colmean)/df[colname].std()
-    
-    return df
 
 def NormalizeColumn(df,colname):
-    
+    logging.info('Data preprocessing, feature scaling: normalization of column '+ colname)
     col_min = min(df[colname])
     col_max = max(df[colname])
     
@@ -446,77 +499,34 @@ def NormalizeColumn(df,colname):
     
     return df
 
-####################################################################################
-def Activate_Tab2(curr_df,ftlay2,features2,rowheight,sveprbtn,online_version):
-    
-    
-    ftlay2.display = 'block'
-    ftlay2.height ='30px'
-    
-    if online_version:
-        sveprbtn.disabled = True
-    
-    features2.options = curr_df.columns
-
-   
-    currhghttxt = int(ftlay2.height[:ftlay2.height.find('px')])
-    ftlay2.height = str(min(450,currhghttxt+len(curr_df.columns)*rowheight))+'px'
-    features2.layout = ftlay2 
-    
-    return
-
-###################################################################################
-def Activate_Tab3(curr_df,t4_ftlay,t4_vb1lay,tb4_vbox1,t4_features,rowheight,online_version):
-    #curr_df,t4_ftlay,t4_vb1lay,tb4_vbox1,t4_features,rowheight,online_version
-
-    if online_version:
-        sveprbtn.disabled = True
-    
-    #visualtypes.options = curr_df.columns
-    t4_features.options = curr_df.columns
-   
-    
-    
-    return
-
 ###############
-def featureprclick(curr_df,ShowMode,features2,FeatPage,processtypes,ProcssPage,scalingacts):  
+def featureprclick(features2,FeatPage,processtypes,ProcssPage,scalingacts):  
+
+    global curr_df
  
-    if not ShowMode:
-        return
-    
     colname = features2.value
-    
+
+    if not colname in curr_df.columns:
+        return
     
     with FeatPage:
         clear_output()
             
         if (curr_df[colname].dtype == 'float64') or (curr_df[colname].dtype == 'int64'):
-            
-            if processtypes.value == 'Scaling':
-                sns.distplot(curr_df[colname]).set_title('Histogram of feature '+colname)
 
-                plt.legend(['Mean '+str(round(curr_df[colname].mean(),2)),'Stdev '+str(round(curr_df[colname].std(),2))], bbox_to_anchor=(0.6, 0.6))
-
-                plt.show()
-                       
-            if processtypes.value == 'Outlier':
-                #######################################################################################################
-                
-                quantiles = curr_df[colname].quantile([0.25,0.5,0.75])
-                IQR = quantiles[0.75] - quantiles[0.25]
-                boxplot_outlierLB =  quantiles[0.25]-1.5*IQR
-                boxplot_outlierUB =  quantiles[0.75]+1.5*IQR
-            
-                sns.boxplot(curr_df[colname]).set_title('Box plot of '+colname+' (Boundaries '+
-                                                        str(round(boxplot_outlierLB,2))
-                                                        +','+str(round(boxplot_outlierUB,2))+')')
-                plt.show()
-             
+            fig, (axbox, axhist) = plt.subplots(1,2)
+     
+            sns.boxplot(x=colname,data=curr_df, ax=axbox)
+            axbox.set_title('Box plot') 
+            sns.distplot(curr_df[colname],ax=axhist)
+            axhist.set_title('Histogram') 
+            plt.legend(['Mean '+str(round(curr_df[colname].mean(),2)),'Stdev '+str(round(curr_df[colname].std(),2))], bbox_to_anchor=(0.6, 0.6))
+            plt.show()
              
          
                 
                 ############################################################################################################
+        '''
             if processtypes.value == 'Imbalancedness':
                 if len(curr_df[colname].unique()) == 2: # binary detection
           
@@ -525,7 +535,7 @@ def featureprclick(curr_df,ShowMode,features2,FeatPage,processtypes,ProcssPage,s
                     for p in ax.patches:
                         ax.annotate("{:.1f}".format(p.get_height()), (p.get_x()+0.25, p.get_height()+0.01))
                     plt.show()
-                    
+         '''           
         
         if (curr_df[colname].dtype == 'object') or (curr_df[colname].dtype== 'string'):
         
@@ -546,6 +556,25 @@ def featureprclick(curr_df,ShowMode,features2,FeatPage,processtypes,ProcssPage,s
 
             
     scalingacts.value = scalingacts.options[0]
+    return
+##############
+###############
+def featureclclick(trgcl_lbl,featurescl,trgtyp_lbl,miss_lbl):  
+
+    global curr_df
+    #curr_df,trgcl_lbl,featurescl,trgtyp_lbl,miss_lbl
+    bk_ind = 0
+    for c in reversed(featurescl.value):
+        if c == '(':
+            break
+        bk_ind-=1
+
+    colname = featurescl.value[:bk_ind-1]
+
+    trgcl_lbl.value = " Column: "+colname
+    trgtyp_lbl.value= " Type: " +str(curr_df[colname].dtype)
+    miss_lbl.value =" Missing values: " + str(curr_df[colname].isnull().sum())
+    
     return
 ##############
 def vistypeclick(curr_df,ShowMode,vboxvis1,vbvs1lay,visualtypes,vlmpltcomps,vboxlmplot,vblmpltlay,VisualPage,changenew):  
@@ -578,47 +607,91 @@ def vistypeclick(curr_df,ShowMode,vboxvis1,vbvs1lay,visualtypes,vlmpltcomps,vbox
         
     return
 ##############
-def make_scaling(curr_df,features2,ProcssPage,scalingacts):  
-    
+def make_scaling(dt_features,ProcssPage,scalingacts,result2exp):  
+
+    global  Xtrain_df,Xtest_df, ytrain_df, ytest_df,curr_df
   
-    colname = features2.value
+    colname = dt_features.value
+
+    if colname is None:
+        return
+
+    write_log('Scaling-> '+scalingacts.value+': '+colname, result2exp, 'Data processing')
     
     if (curr_df[colname].dtype == 'object') or (curr_df[colname].dtype== 'string'):
         with ProcssPage:
             clear_output()
             display.display('Selected column is not a numerical type..')
         return
-    
+
     if scalingacts.value == 'Standardize':
-        curr_df =  StandardizeColumn(curr_df,colname)
+        if len(Xtrain_df)>0:
+            if colname in Xtrain_df.columns:
+                colmean = Xtrain_df[colname].mean(); colstd = Xtrain_df[colname].std()
+                Xtrain_df[colname] = (Xtrain_df[colname]- colmean)/colstd
+                Xtest_df[colname] = (Xtest_df[colname]- colmean)/colstd
+            if colname in ytrain_df.columns:
+                colmean = ytrain_df[colname].mean(); colstd = ytrain_df[colname].std()
+                ytrain_df[colname] = (ytrain_df[colname]- colmean)/colstd
+                ytest_df[colname] = (ytest_df[colname]- colmean)/colstd
+                 
+        colmean = curr_df[colname].mean()
+        curr_df[colname] = (curr_df[colname]- colmean)/curr_df[colname].std()
+        logging.info('Data preprocessing, feature scaling: standardization of column '+ colname)
 
-        with ProcssPage:
-            clear_output()
-            sns.distplot(curr_df[colname]).set_title('Histogram of standardized feature '+colname)
-            plt.legend(['Mean '+str(round(curr_df[colname].mean(),2)),'Stdev '+str(round(curr_df[colname].std(),2))], bbox_to_anchor=(0.6, 0.6))
-          
-            #plt.text(20,20, 'Mean= '+str(round(curr_df[colname].mean(),2)), dict(size=10))
-            #plt.text(25,25, 'Stdev= '+str(round(curr_df[colname].std(),2)), dict(size=10))
-            plt.show()
-            
+
     if scalingacts.value == 'Normalize':
-        curr_df =  NormalizeColumn(curr_df,colname)
 
-        with ProcssPage:
-            clear_output()
+        if len(Xtrain_df)>0:
+            if colname in Xtrain_df.columns:
+                col_min = min(Xtrain_df[colname]); col_max = max(Xtrain_df[colname])
+                denominator = (col_max-col_min)
+                if denominator== 0:
+                    Xtrain_df[colname] = (Xtrain_df[colname]/col_min)
+                    Xtest_df[colname] = (Xtest_df[colname]/col_min)
+                else:
+                    Xtrain_df[colname] = (Xtrain_df[colname]-col_min)/denominator
+                    Xtest_df[colname] = (Xtest_df[colname]-col_min)/denominator
+               
+            if colname in ytrain_df.columns:
+                col_min = min(ytrain_df[colname]); col_max = max(ytrain_df[colname])
+                denominator = (col_max-col_min)
+                if denominator== 0:
+                    ytrain_df[colname] = (ytrain_df[colname]/col_min)
+                    ytest_df[colname] = (ytest_df[colname]/col_min)
+                else:
+                    ytrain_df[colname] = (ytrain_df[colname]-col_min)/denominator
+                    ytest_df[colname] = (ytest_df[colname]-col_min)/denominator
 
-            sns.distplot(curr_df[colname]).set_title('Histogram of normalized feature '+colname)
-            plt.legend(['Mean '+str(round(curr_df[colname].mean(),4)),'Stdev '+str(round(curr_df[colname].std(),4))], bbox_to_anchor=(0.6, 0.6))
-          
-            #plt.text(20,20, 'Mean= '+str(round(curr_df[colname].mean(),2)), dict(size=10))
-            #plt.text(25,25, 'Stdev= '+str(round(curr_df[colname].std(),2)), dict(size=10))
-            plt.show()
+        
+        col_min = min(curr_df[colname]); col_max = max(curr_df[colname])
+        denominator = (col_max-col_min)
+
+        if denominator== 0:
+            curr_df[colname] = (curr_df[colname]/col_min)
+        else:
+            curr_df[colname] = (curr_df[colname]-col_min)/denominator
+
+        logging.info('Data preprocessing, feature scaling: normalization of column '+ colname)
+
+    with ProcssPage:
+        clear_output()
+        fig, (axbox, axhist) = plt.subplots(1,2)
+     
+        sns.boxplot(x=colname,data=curr_df, ax=axbox)
+        axbox.set_title('Box plot') 
+        sns.distplot(curr_df[colname],ax=axhist)
+        axhist.set_title('Histogram') 
+        plt.legend(['Mean '+str(round(curr_df[colname].mean(),2)),'Stdev '+str(round(curr_df[colname].std(),2))], bbox_to_anchor=(0.6, 0.6))
+        plt.show()
+    
  
     return
-#################################################################################################################
-def make_balanced(curr_df,features2,balncacts,ProcssPage):  
 
-    
+#################################################################################################################
+def make_balanced(features2,balncacts,ProcssPage):  
+
+    global curr_df
     colname = features2.value
 
     if balncacts.value == 'Upsample':
@@ -644,13 +717,12 @@ def make_balanced(curr_df,features2,balncacts,ProcssPage):
                 for p in ax.patches:
                     ax.annotate("{:.1f}".format(p.get_height()), (p.get_x()+0.25, p.get_height()+0.01))
                 plt.show()
-
+    logging.info('Data preprocessing, checking and handling unbalancedness')
     return
 ####################################################################################################################
-def SelectProcess_Type(vis_list):
-    
-     
-    
+
+def ResetProcessMenu(vis_list):
+
     processtypes = vis_list[0]
     sclblly = vis_list[1]
     scalelbl = vis_list[2]
@@ -662,29 +734,79 @@ def SelectProcess_Type(vis_list):
     imbllbl = vis_list[8]
     outrmvlay = vis_list[9]
     outrmvbtn = vis_list[10]
-    
+    encdlbl = vis_list[11]
+    encodingacts = vis_list[12]
+    encdblly = vis_list[13]
+    ecndlay = vis_list[14]
+    fxctlbl = vis_list[15]
+    fxctingacts = vis_list[16]
+    fxctblly = vis_list[17]
+    fxctlay = vis_list[18]
+   
+
+    fxctblly.display = 'none'
+    fxctlbl.layout = fxctblly
+
+    fxctlay.display = 'none'
+    fxctingacts.layout = fxctlay
+
+
     sclblly.display = 'none'
-    sclblly.visibility = 'hidden'
     scalelbl.layout = sclblly
-    
+
+    ecndlay.display = 'none'
+    encodingacts.layout = ecndlay
+
+    encdblly.display = 'none'
+    encdlbl.layout = encdblly
+
+ 
     outrmvlay.display = 'none'
-    outrmvlay.visibility = 'hidden'
     outrmvbtn.layout = outrmvlay
     
     imbllbllly.display = 'none'
-    imbllbllly.visibility = 'hidden'
     imbllbl.layout = imbllbllly
-    
-    prctlay.visibility = 'hidden'
+
+    prctlay.display = 'none'
     scalingacts.layout = prctlay
-    
-    imblncdlay.visibility = 'hidden'
+
+    imblncdlay.display = 'none'
     balncacts.layout = imblncdlay
+
+    return
+
+
+def SelectProcess_Type(vis_list):
+    
+ 
+    processtypes = vis_list[0]
+    sclblly = vis_list[1]
+    scalelbl = vis_list[2]
+    prctlay = vis_list[3]
+    scalingacts = vis_list[4]
+    imblncdlay = vis_list[5]
+    balncacts = vis_list[6]
+    imbllbllly = vis_list[7]
+    imbllbl = vis_list[8]
+    outrmvlay = vis_list[9]
+    outrmvbtn = vis_list[10]
+    encdlbl = vis_list[11]
+    encodingacts = vis_list[12]
+    encdblly = vis_list[13]
+    ecndlay = vis_list[14]
+    fxctlbl = vis_list[15]
+    fxctingacts = vis_list[16]
+    fxctblly = vis_list[17]
+    fxctlay = vis_list[18]
+   
+    ResetProcessMenu(vis_list)
+
     
     if processtypes.value == 'Scaling':
         sclblly.display = 'block'
         sclblly.visibility = 'visible'
         scalelbl.layout = sclblly
+        prctlay.display = 'block'
         prctlay.visibility = 'visible'
         scalingacts.layout = prctlay
         
@@ -693,6 +815,7 @@ def SelectProcess_Type(vis_list):
         imbllbllly.display = 'block'
         imbllbllly.visibility = 'visible'
         imbllbl.layout = imbllbllly
+        imblncdlay.display = 'block'
         imblncdlay.visibility = 'visible'
         balncacts.layout = imblncdlay
      
@@ -700,18 +823,34 @@ def SelectProcess_Type(vis_list):
         outrmvlay.display = 'block'
         outrmvlay.visibility = 'visible'
         outrmvbtn.layout = outrmvlay
-    
 
+    if processtypes.value == 'Encoding':     
+        encdblly.display = 'block'
+        encdblly.visibility = 'visible'
+        encdblly.layout = sclblly
+        ecndlay.display = 'block'
+        ecndlay.visibility = 'visible'
+        encodingacts.layout = ecndlay
 
-    
+    if processtypes.value == 'Feature Extraction':
+        fxctblly.display = 'block'
+        fxctblly.visibility = 'visible'
+        fxctlbl.layout = fxctblly
+        fxctlay.display = 'block'
+        fxctlay.visibility = 'visible'
+        fxctingacts.layout = fxctlay
+        
+
     return
 
 ##################################################################################
-def remove_outliers(curr_df):
-    
+def remove_outliers():
+
+    global curr_df
     curr_df = curr_df[curr_df["outlier"] == False]
     curr_df = curr_df.drop(["outlier"], axis=1)
-   
+    logging.info('Data preprocessing, outlier detection and removal')
+    
     return
 
 ##################################################################################
@@ -734,5 +873,4 @@ def remove_outliers(curr_df):
         curr_df.to_csv(filename, index=False) 
     
     return
-
-####################################################################################
+######################################################################################################################

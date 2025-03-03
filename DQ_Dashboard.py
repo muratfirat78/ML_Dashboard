@@ -11,6 +11,7 @@ from IPython.display import clear_output
 from IPython import display
 from ipywidgets import *
 from datetime import timedelta,date, datetime
+from data import *
 import matplotlib.pyplot as plt
 import warnings
 import seaborn as sns
@@ -53,13 +54,7 @@ initialize_logging()
 colabpath = '/content/CPP_Datasets'
 warnings.filterwarnings("ignore")
 
-curr_df = pd.DataFrame()
-Xtrain_df = pd.DataFrame()
-Xtest_df = pd.DataFrame()
-ytrain_df = pd.DataFrame()
-ytest_df = pd.DataFrame()
-clean_df = pd.DataFrame()
-original_df = pd.DataFrame()
+
 datasetname = ''
 ShowMode = True
 

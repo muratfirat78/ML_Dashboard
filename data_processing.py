@@ -8,6 +8,9 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.utils import resample
 import pandas as pd
+import os
+import shutil
+from datetime import timedelta,date, datetime
 
 def remove_outliers():
     settings.curr_df = settings.curr_df[settings.curr_df["outlier"] == False]
@@ -251,4 +254,209 @@ def make_encoding(features2,encodingacts,result2exp):
 
         features2.options = [col for col in settings.curr_df.columns]
     
+    return
+
+def savedata( dataFolder, datasetname):
+    datasetname = os.path.splitext(os.path.basename(datasetname))[0]
+    current_datetime = datetime.now().strftime('%Y%m%d_%H%M%S')
+    filename = dataFolder.value + '/' + datasetname + '_' + current_datetime
+    shutil.copy('output.log', filename + '.txt')
+    settings.curr_df.to_csv(filename + '.csv')
+
+    
+    version = 0
+
+def SelectProcess_Type(vis_list):
+    
+ 
+    processtypes = vis_list[0]
+    sclblly = vis_list[1]
+    scalelbl = vis_list[2]
+    prctlay = vis_list[3]
+    scalingacts = vis_list[4]
+    imblncdlay = vis_list[5]
+    balncacts = vis_list[6]
+    imbllbllly = vis_list[7]
+    imbllbl = vis_list[8]
+    outrmvlay = vis_list[9]
+    outrmvbtn = vis_list[10]
+    encdlbl = vis_list[11]
+    encodingacts = vis_list[12]
+    encdblly = vis_list[13]
+    ecndlay = vis_list[14]
+    fxctlbl = vis_list[15]
+    fxctingacts = vis_list[16]
+    fxctblly = vis_list[17]
+    fxctlay = vis_list[18]
+   
+    ResetProcessMenu(vis_list)
+
+    
+    if processtypes.value == 'Scaling':
+        sclblly.display = 'block'
+        sclblly.visibility = 'visible'
+        scalelbl.layout = sclblly
+        prctlay.display = 'block'
+        prctlay.visibility = 'visible'
+        scalingacts.layout = prctlay
+        
+    if processtypes.value == 'Imbalancedness':
+        
+        imbllbllly.display = 'block'
+        imbllbllly.visibility = 'visible'
+        imbllbl.layout = imbllbllly
+        imblncdlay.display = 'block'
+        imblncdlay.visibility = 'visible'
+        balncacts.layout = imblncdlay
+     
+    if processtypes.value == 'Outlier':     
+        outrmvlay.display = 'block'
+        outrmvlay.visibility = 'visible'
+        outrmvbtn.layout = outrmvlay
+
+    if processtypes.value == 'Encoding':     
+        encdblly.display = 'block'
+        encdblly.visibility = 'visible'
+        encdblly.layout = sclblly
+        ecndlay.display = 'block'
+        ecndlay.visibility = 'visible'
+        encodingacts.layout = ecndlay
+
+    if processtypes.value == 'Feature Extraction':
+        fxctblly.display = 'block'
+        fxctblly.visibility = 'visible'
+        fxctlbl.layout = fxctblly
+        fxctlay.display = 'block'
+        fxctlay.visibility = 'visible'
+        fxctingacts.layout = fxctlay
+        
+
+    return
+
+def ResetProcessMenu(vis_list):
+
+    processtypes = vis_list[0]
+    sclblly = vis_list[1]
+    scalelbl = vis_list[2]
+    prctlay = vis_list[3]
+    scalingacts = vis_list[4]
+    imblncdlay = vis_list[5]
+    balncacts = vis_list[6]
+    imbllbllly = vis_list[7]
+    imbllbl = vis_list[8]
+    outrmvlay = vis_list[9]
+    outrmvbtn = vis_list[10]
+    encdlbl = vis_list[11]
+    encodingacts = vis_list[12]
+    encdblly = vis_list[13]
+    ecndlay = vis_list[14]
+    fxctlbl = vis_list[15]
+    fxctingacts = vis_list[16]
+    fxctblly = vis_list[17]
+    fxctlay = vis_list[18]
+   
+
+    fxctblly.display = 'none'
+    fxctlbl.layout = fxctblly
+
+    fxctlay.display = 'none'
+    fxctingacts.layout = fxctlay
+
+
+    sclblly.display = 'none'
+    scalelbl.layout = sclblly
+
+    ecndlay.display = 'none'
+    encodingacts.layout = ecndlay
+
+    encdblly.display = 'none'
+    encdlbl.layout = encdblly
+
+ 
+    outrmvlay.display = 'none'
+    outrmvbtn.layout = outrmvlay
+    
+    imbllbllly.display = 'none'
+    imbllbl.layout = imbllbllly
+
+    prctlay.display = 'none'
+    scalingacts.layout = prctlay
+
+    imblncdlay.display = 'none'
+    balncacts.layout = imblncdlay
+
+    return
+
+
+def featureclclick(trgcl_lbl,featurescl,trgtyp_lbl,miss_lbl):  
+
+    
+    #settings.curr_df,trgcl_lbl,featurescl,trgtyp_lbl,miss_lbl
+    bk_ind = 0
+    for c in reversed(featurescl.value):
+        if c == '(':
+            break
+        bk_ind-=1
+
+    colname = featurescl.value[:bk_ind-1]
+
+    trgcl_lbl.value = " Column: "+colname
+    trgtyp_lbl.value= " Type: " +str(settings.curr_df[colname].dtype)
+    miss_lbl.value =" Missing values: " + str(settings.curr_df[colname].isnull().sum())
+    
+    return
+
+def featureprclick(features2,FeatPage,processtypes,ProcssPage,scalingacts):  
+    colname = features2.value
+
+    if not colname in settings.curr_df.columns:
+        return
+    
+    with FeatPage:
+        clear_output()
+            
+        if (settings.curr_df[colname].dtype == 'float64') or (settings.curr_df[colname].dtype == 'int64'):
+
+            fig, (axbox, axhist) = plt.subplots(1,2)
+     
+            sns.boxplot(x=colname,data=settings.curr_df, ax=axbox)
+            axbox.set_title('Box plot') 
+            sns.distplot(settings.curr_df[colname],ax=axhist)
+            axhist.set_title('Histogram') 
+            plt.legend(['Mean '+str(round(settings.curr_df[colname].mean(),2)),'Stdev '+str(round(settings.curr_df[colname].std(),2))], bbox_to_anchor=(0.6, 0.6))
+            plt.show()
+             
+         
+                
+                ############################################################################################################
+        '''
+            if processtypes.value == 'Imbalancedness':
+                if len(settings.curr_df[colname].unique()) == 2: # binary detection
+          
+                    plt.figure(figsize=(6, 2))
+                    ax = sns.countplot(x=colname,data=settings.curr_df, palette="cool_r")
+                    for p in ax.patches:
+                        ax.annotate("{:.1f}".format(p.get_height()), (p.get_x()+0.25, p.get_height()+0.01))
+                    plt.show()
+         '''           
+        
+        if (settings.curr_df[colname].dtype == 'object') or (settings.curr_df[colname].dtype== 'string'):
+        
+        
+            nrclasses = len(settings.curr_df[colname].unique())
+            if nrclasses < 250:
+                g = sns.countplot(settings.curr_df, x=colname)
+                g.set_xticklabels(g.get_xticklabels(),rotation= 45)
+                  
+                    #sns.distplot(settings.curr_df[settings.curr_df.columns[optind]]).set_title('Histogram of feature '+settings.curr_df.columns[optind])
+                plt.show()
+            else:
+                display.display('Number of classes: ',nrclasses)
+                
+    with ProcssPage:
+        clear_output()            
+    
+
+            
+    scalingacts.value = scalingacts.options[0]
     return

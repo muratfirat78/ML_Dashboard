@@ -6,9 +6,8 @@ from sklearn.metrics import accuracy_score,mean_squared_error
 TrainedModels = []
 targetcolumn = None
 
-class MLModel: 
+class MLModel:
     def __init__(self,data,target,tasktype,mytype,report):
-
         #data  = [trdf,tr_tgtdf,tstdf,tst_tgtdf] 
         self.train_df = data[0]
         self.traintrg_df = data[1]
@@ -50,11 +49,10 @@ class MLModel:
                 self.PythonObject = svm.SVR(kernel = 'rbf')
         if self.Type == 'Logistic Regression':
             self.PythonObject = linear_model.LogisticRegression(random_state=16)   # Initialize the model object 
-           
+            
         write_log('Model.. Type '+str(type(self.PythonObject)), report, 'Predictive modeling')
         return
-
-
+    
     def GetPredictions(self):
         if self.myTask == 'Classification':
             return self.PythonObject.predict(self.test_df) 
@@ -76,31 +74,30 @@ class MLModel:
     def GetPerformanceDict(self):
         return self.performance
 
+class PredictiveModelingModel: 
+    def train_Model(self,tasktype,mytype,results,trmodels):
 
+        data = [settings.Xtrain_df,settings.ytrain_df,settings.Xtest_df,settings.ytest_df]
 
-def Train_Model(tasktype,mytype,results,trmodels):
+        mymodel = MLModel(data,targetcolumn,tasktype,mytype,results)
 
-    data = [settings.Xtrain_df,settings.ytrain_df,settings.Xtest_df,settings.ytest_df]
+        model = mymodel.getSkLearnModel().fit(data[0], data[1]) 
 
-    mymodel = MLModel(data,targetcolumn,tasktype,mytype,results)
+        y_pred = mymodel.GetPredictions()
 
-    model = mymodel.getSkLearnModel().fit(data[0], data[1]) 
+        if tasktype == 'Classification': 
+            mymodel.GetPerformanceDict()['Accuracy'] = accuracy_score(data[3], y_pred)
+        
+        if tasktype == 'Regression': 
+            mymodel.GetPerformanceDict()['MSE'] = mean_squared_error(data[3], y_pred)
 
-    y_pred = mymodel.GetPredictions()
+        settings.trainedModels.append(mymodel)
 
-    if tasktype == 'Classification': 
-        mymodel.GetPerformanceDict()['Accuracy'] = accuracy_score(data[3], y_pred)
+        write_log('Train Model-> '+ mytype, results, 'Predictive modeling')
+        for prf,val in mymodel.GetPerformanceDict().items():
+            write_log('Model Performance-> '+prf+': '+str(val), results, 'Predictive modeling')
+
+        trmodels.options = [mdl.getType() for mdl in settings.trainedModels]
     
-    if tasktype == 'Regression': 
-        mymodel.GetPerformanceDict()['MSE'] = mean_squared_error(data[3], y_pred)
 
-    TrainedModels.append(mymodel)
-
-    write_log('Train Model-> '+ mytype, results, 'Predictive modeling')
-    for prf,val in mymodel.GetPerformanceDict().items():
-        write_log('Model Performance-> '+prf+': '+str(val), results, 'Predictive modeling')
-
-    trmodels.options = [mdl.getType() for mdl in TrainedModels]
-   
-
-    return 
+        return 

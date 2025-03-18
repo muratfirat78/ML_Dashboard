@@ -1,0 +1,67 @@
+from model.data_cleaning import DataCleaningModel
+from model.data_processing import DataProcessingModel
+from model.data_selection import DataSelectionModel
+from model.predictive_modeling import PredictiveModelingModel
+from view.data_cleaning import DataCleaningView
+from view.data_processing import DataProcessingView
+from view.data_selection import DataSelectionView
+from view.main_view import MainView
+from view.predictive_modeling import PredictiveModelingView
+
+class Controller:
+    def __init__(self):
+        self.data_selection_view = DataSelectionView(self)
+        self.data_selection_model = DataSelectionModel()
+        self.data_cleaning_view = DataCleaningView(self)
+        self.data_cleaning_model = DataCleaningModel()
+        self.data_processing_view = DataProcessingView(self)
+        self.data_processing_model = DataProcessingModel()
+        self.predictive_modeling_view = PredictiveModelingView(self)
+        self.predictive_modeling_model = PredictiveModelingModel()
+        self.main_view = MainView()
+
+    def get_tabs(self):
+        tab_1 = self.data_selection_view.get_data_selection_tab()
+        tab_2 = self.data_cleaning_view.get_data_cleaning_tab()
+        tab_3 = self.data_processing_view.get_data_processing_tab()
+        tab_4 = self.predictive_modeling_view.get_predictive_modeling_tab()
+        return [tab_1,tab_2,tab_3, tab_4]
+
+    def train_Model(self,tasktype,mytype,results,trmodels):
+        self.predictive_modeling_model.train_Model(tasktype,mytype,results,trmodels)
+    
+    def make_cleaning(self,featurescl,result2aexp,missacts,dt_features):
+         self.data_cleaning_model.make_cleaning(featurescl,result2aexp,missacts,dt_features)
+
+    def selectProcess_Type(self,vis_list):
+        self.data_processing_model.selectProcess_Type(vis_list)
+
+    def assign_target(self,trg_lbl,dt_features,prdtsk_lbl,result2exp,trg_btn,predictiontask):
+        self.data_processing_model.assign_target(trg_lbl,dt_features,prdtsk_lbl,result2exp,trg_btn,predictiontask)  
+
+    def make_balanced(self,features2,balncacts,ProcssPage):
+        self.data_processing_model. make_balanced(features2,balncacts,ProcssPage)
+
+    def make_encoding(self,features2,encodingacts,result2exp):
+        self.data_processing_model.make_encoding(features2,encodingacts,result2exp)
+
+    def make_scaling(self,dt_features,ProcssPage,scalingacts,result2exp):
+        self.data_processing_model.make_scaling(dt_features,ProcssPage,scalingacts,result2exp)
+
+    def make_split(self,splt_txt,splt_btn,result2exp):
+        self.data_processing_model.make_split(splt_txt,splt_btn,result2exp)
+
+    def remove_outliers(self):
+        self.data_processing_model.remove_outliers()
+
+    def savedata(self,dataFolder, datasetname):
+        self.data_processing_model.savedata(dataFolder, datasetname)
+
+    def file_Click(self,online_version,foldername,filename,wsheets,wslay,butlay):
+        self.data_selection_model.file_Click(online_version,foldername,filename,wsheets,wslay,butlay)
+
+    def on_submitfunc(self,online_version,foldername,datasets):
+        self.data_selection_model.on_submitfunc(online_version,foldername,datasets)
+
+    def read_data_set(self,online_version,foldername,filename,sheetname,processtypes,Pages,dt_features,dt_ftslay,featurescl,ftlaycl):
+        self.data_selection_model.read_data_set(online_version,foldername,filename,sheetname,processtypes,Pages,dt_features,dt_ftslay,featurescl,ftlaycl)

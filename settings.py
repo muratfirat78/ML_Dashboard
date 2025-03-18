@@ -25,6 +25,7 @@ def init():
     global featurescl
     global ftlaycl
     global DataFolder
+    global trainedModels
     
     curr_df = pd.DataFrame()
     Xtrain_df = pd.DataFrame()
@@ -34,3 +35,4 @@ def init():
     clean_df = pd.DataFrame()
     original_df = pd.DataFrame()
     online_version = False
+    trainedModels = []

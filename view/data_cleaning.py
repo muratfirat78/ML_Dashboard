@@ -1,11 +1,11 @@
 from IPython.display import clear_output
 from IPython import display
 from ipywidgets import *
-import settings
 
 class DataCleaningView:
-    def __init__(self, controller):
+    def __init__(self, controller, main_view):
         self.controller = controller
+        self.main_view = main_view
 
     def featureclclick(self,trgcl_lbl,featurescl,trgtyp_lbl,miss_lbl):  
         #settings.curr_df,trgcl_lbl,featurescl,trgtyp_lbl,miss_lbl
@@ -18,21 +18,21 @@ class DataCleaningView:
         colname = featurescl.value[:bk_ind-1]
 
         trgcl_lbl.value = " Column: "+colname
-        trgtyp_lbl.value= " Type: " +str(settings.curr_df[colname].dtype)
-        miss_lbl.value =" Missing values: " + str(settings.curr_df[colname].isnull().sum())
+        trgtyp_lbl.value= " Type: " +str(self.controller.get_curr_df()[colname].dtype)
+        miss_lbl.value =" Missing values: " + str(self.controller.get_curr_df()[colname].isnull().sum())
         
         return
 
     def featurecl_click(self,event):  
         global trgcl_lbl,trgtyp_lbl,miss_lbl
         
-        self.featureclclick(trgcl_lbl,settings.featurescl,trgtyp_lbl,miss_lbl)
+        self.featureclclick(trgcl_lbl,self.main_view.featurescl,trgtyp_lbl,miss_lbl)
 
         return
 
     def makecleaning(self,event):
         global result2aexp,missacts
-        self.controller.make_cleaning(settings.featurescl,result2aexp,missacts,settings.dt_features) 
+        self.controller.make_cleaning(self.main_view.featurescl,result2aexp,missacts,self.main_view.dt_features) 
 
         return
 
@@ -40,11 +40,11 @@ class DataCleaningView:
         global trgcl_lbl, trgtyp_lbl, miss_lbl, result2aexp, missacts
         RP_lay=Layout(height='250px',width ='70%',align_items='center',overflow="visible")
 
-        settings.RightPage = widgets.Output(layout = RP_lay)
+        self.main_view.right_page = widgets.Output(layout = RP_lay)
 
-        settings.ftlaycl =  widgets.Layout(display = 'none')
-        settings.featurescl = widgets.Select(options=[],description = '',layout = settings.ftlaycl)
-        settings.featurescl.observe(self.featurecl_click, 'value')
+        self.main_view.ftlaycl =  widgets.Layout(display = 'none')
+        self.main_view.featurescl = widgets.Select(options=[],description = '',layout = self.main_view.ftlaycl)
+        self.main_view.featurescl.observe(self.featurecl_click, 'value')
 
         misslycl =  widgets.Layout(display = 'none')
         misscl = widgets.Select(options=[],description = '',layout = misslycl)
@@ -69,7 +69,7 @@ class DataCleaningView:
 
 
         fbox2alay = widgets.Layout(width = '30%')
-        f2a_box = VBox(children=[widgets.Label(value ='Features'),HBox(children=[settings.featurescl,misscl])],layout = fbox2alay)
+        f2a_box = VBox(children=[widgets.Label(value ='Features'),HBox(children=[self.main_view.featurescl,misscl])],layout = fbox2alay)
 
 
 
@@ -85,5 +85,5 @@ class DataCleaningView:
         tab2a_lay = widgets.Layout(witdh='99%')
         tab2_lftbox = VBox(children = [HBox(children=[f2a_box,selcl_box]),result2aexp],layout = tab2a_lay)
 
-        tab_2 = HBox(children=[tab2_lftbox,settings.RightPage])
+        tab_2 = HBox(children=[tab2_lftbox,self.main_view.right_page])
         return tab_2

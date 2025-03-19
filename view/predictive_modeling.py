@@ -1,18 +1,18 @@
 from IPython.display import clear_output
 from IPython import display
 from ipywidgets import *
-import settings
 
 class PredictiveModelingView:
-    def __init__(self, controller):
+    def __init__(self, controller, main_view):
         self.controller = controller
+        self.main_view = main_view
 
     def models_click(self,change):     
         global  trmodels,model_sumry
 
         model_sumry.value = ''
 
-        for mdl in settings.trainedModels:
+        for mdl in self.controller.get_trained_models():
             if trmodels.value == mdl.getType():
                 model_sumry.value += 'Model-> '+mdl.getType()+'\n'
                 for prf,val in mdl.GetPerformanceDict().items():
@@ -25,7 +25,7 @@ class PredictiveModelingView:
 
         t4_results.value += 'Train Model...'+'\n'
     
-        self.controller.train_Model(settings.prdtsk_lbl.value,t4_models.value,t4_results,trmodels)
+        self.controller.train_Model(self.main_view.prdtsk_lbl.value,t4_models.value,t4_results,trmodels)
         return
 
     def get_predictive_modeling_tab(self):
@@ -53,10 +53,10 @@ class PredictiveModelingView:
 
 
         mlsboxxlay = widgets.Layout()
-        mlsel_box = VBox(children=[settings.trg_lbl,settings.prdtsk_lbl,HBox(children=[t4_models,trnml_btn]),trmlbl,trmodels,mdsmrylbl,model_sumry],layout = mlsboxxlay)
+        mlsel_box = VBox(children=[self.main_view.trg_lbl,self.main_view.prdtsk_lbl,HBox(children=[t4_models,trnml_btn]),trmlbl,trmodels,mdsmrylbl,model_sumry],layout = mlsboxxlay)
 
         t4_vb1lay = widgets.Layout()
-        tb4_vbox1 = VBox(children = [HBox(children=[settings.f_box,mlsel_box]),t4_results],layout = t4_vb1lay)
+        tb4_vbox1 = VBox(children = [HBox(children=[self.main_view.f_box,mlsel_box]),t4_results],layout = t4_vb1lay)
 
         tab_4 = HBox(children=[tb4_vbox1])
         return tab_4

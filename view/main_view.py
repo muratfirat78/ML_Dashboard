@@ -1,13 +1,12 @@
-from ipywidgets import widgets
-
 class MainView:
-    def start(self,tab_1, tab_2, tab_3, tab_4):
-        tab_set = widgets.Tab([tab_1,tab_2,tab_3,tab_4])
-        tab_set.set_title(
-            0, 'Data Selection')
-
-        tab_set.set_title(1, 'Data Cleaning')
-        tab_set.set_title(2, 'Data Processing')
-        tab_set.set_title(3, 'Predictive Modeling')
-
-        tab_set
+    def __init__(self):
+            self.dt_features = None
+            self.feat_page = None
+            self.process_page = None
+            self.right_page = None
+            self.process_types = None
+            self.f_box = None
+            self.trg_lbl = None
+            self.dt_ftslay = None
+            self.ftlaycl = None
+            self.prdtsk_lbl = None

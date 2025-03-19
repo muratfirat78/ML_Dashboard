@@ -1,10 +1,6 @@
-import settings
 from log import *
 from sklearn import tree,neighbors,linear_model,ensemble,svm
 from sklearn.metrics import accuracy_score,mean_squared_error
-
-TrainedModels = []
-targetcolumn = None
 
 class MLModel:
     def __init__(self,data,target,tasktype,mytype,report):
@@ -75,12 +71,16 @@ class MLModel:
         return self.performance
 
 class PredictiveModelingModel: 
+
+    def __init__(self, main_model):
+        self.main_model = main_model
+        self.trainedModels = []
+
     def train_Model(self,tasktype,mytype,results,trmodels):
+        data = [self.main_model.Xtrain_df,self.main_model.ytrain_df,self.main_model.Xtest_df,self.main_model.ytest_df]
 
-        data = [settings.Xtrain_df,settings.ytrain_df,settings.Xtest_df,settings.ytest_df]
-
-        mymodel = MLModel(data,targetcolumn,tasktype,mytype,results)
-
+        mymodel = MLModel(data,self.main_model.targetcolumn,tasktype,mytype,results)
+    
         model = mymodel.getSkLearnModel().fit(data[0], data[1]) 
 
         y_pred = mymodel.GetPredictions()
@@ -91,13 +91,16 @@ class PredictiveModelingModel:
         if tasktype == 'Regression': 
             mymodel.GetPerformanceDict()['MSE'] = mean_squared_error(data[3], y_pred)
 
-        settings.trainedModels.append(mymodel)
+        self.trainedModels.append(mymodel)
 
         write_log('Train Model-> '+ mytype, results, 'Predictive modeling')
         for prf,val in mymodel.GetPerformanceDict().items():
             write_log('Model Performance-> '+prf+': '+str(val), results, 'Predictive modeling')
 
-        trmodels.options = [mdl.getType() for mdl in settings.trainedModels]
+        trmodels.options = [mdl.getType() for mdl in self.trainedModels]
     
 
         return 
+    
+    def get_trained_models(self):
+        return self.trainedModels

@@ -1,5 +1,4 @@
 from log import *
-import settings
 import pandas as pd
 from IPython.display import clear_output
 from IPython import display
@@ -10,10 +9,12 @@ rowheight = 20
 colabpath = '/content/CPP_Datasets'
 
 class DataSelectionModel:
+    def __init__(self, main_model):
+        self.main_model = main_model
+        self.datafolder = None
+        
     def on_submitfunc(self,online_version,foldername,datasets):
-        
-        #  foldername = DataFolder.value
-        
+        self.datafolder = foldername
         dtsetnames = [] 
         
         if online_version: 
@@ -55,27 +56,27 @@ class DataSelectionModel:
             
 
         if abs_file_path.find('.csv') > -1:
-            settings.curr_df = pd.read_csv(abs_file_path, sep=sheetname) 
+            self.main_model.curr_df = pd.read_csv(abs_file_path, sep=sheetname) 
         if (abs_file_path.find('.xlsx') > -1) or (filename.find('.xls') > -1):
             xls = pd.ExcelFile(abs_file_path)
-            settings.curr_df = pd.read_excel(xls,sheetname)
+            self.main_model.curr_df = pd.read_excel(xls,sheetname)
         if abs_file_path.find('.tsv') > -1:    
         
-            settings.curr_df = pd.read_csv(abs_file_path, sep="\t")
+            self.main_model.curr_df = pd.read_csv(abs_file_path, sep="\t")
             
-        settings.curr_df.convert_dtypes()
+        self.main_model.curr_df.convert_dtypes()
         
         datasetname = filename[:filename.find('.')]  
         
-        dt_ftslay.height = str(rowheight*len(settings.curr_df.columns))+'px'
+        dt_ftslay.height = str(rowheight*len(self.main_model.curr_df.columns))+'px'
         dt_features.layout = dt_ftslay
-        dt_features.options = [col for col in settings.curr_df.columns]
+        dt_features.options = [col for col in self.main_model.curr_df.columns]
 
 
         ftlaycl.display = 'block'
-        ftlaycl.height = str(rowheight*len(settings.curr_df.columns))+'px'
+        ftlaycl.height = str(rowheight*len(self.main_model.curr_df.columns))+'px'
         featurescl.layout = ftlaycl
-        featurescl.options = [col+'('+str(settings.curr_df[col].isnull().sum())+')' for col in settings.curr_df.columns]
+        featurescl.options = [col+'('+str(self.main_model.curr_df[col].isnull().sum())+')' for col in self.main_model.curr_df.columns]
         
         processtypes.value = processtypes.options[0]
         
@@ -87,9 +88,9 @@ class DataSelectionModel:
         with DFPage:
             clear_output()
             #####################################
-            display.display(settings.curr_df.info()) 
-            display.display(settings.curr_df.describe()) 
-            display.display(settings.curr_df) 
+            display.display(self.main_model.curr_df.info()) 
+            display.display(self.main_model.curr_df.describe()) 
+            display.display(self.main_model.curr_df) 
             #####################################
 
         with RightPage:
@@ -101,12 +102,7 @@ class DataSelectionModel:
 
     ################################################################################################################
 
-    def file_Click(self,online_version,foldername,filename,wsheets,wslay,butlay):
-        
-        # filename = datasets.value
-        # foldername = DataFolder.value
-
-        
+    def file_Click(self,online_version,foldername,filename,wsheets,wslay,butlay): 
         abs_file_path = ''
         
         if online_version:
@@ -138,3 +134,6 @@ class DataSelectionModel:
         butlay.display = 'block'
             
         return
+    
+    def get_datafolder(self):
+        return self.datafolder

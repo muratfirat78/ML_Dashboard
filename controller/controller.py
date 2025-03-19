@@ -5,20 +5,23 @@ from model.predictive_modeling import PredictiveModelingModel
 from view.data_cleaning import DataCleaningView
 from view.data_processing import DataProcessingView
 from view.data_selection import DataSelectionView
+from model.main_model import MainModel
 from view.main_view import MainView
 from view.predictive_modeling import PredictiveModelingView
 
 class Controller:
     def __init__(self):
-        self.data_selection_view = DataSelectionView(self)
-        self.data_selection_model = DataSelectionModel()
-        self.data_cleaning_view = DataCleaningView(self)
-        self.data_cleaning_model = DataCleaningModel()
-        self.data_processing_view = DataProcessingView(self)
-        self.data_processing_model = DataProcessingModel()
-        self.predictive_modeling_view = PredictiveModelingView(self)
-        self.predictive_modeling_model = PredictiveModelingModel()
+        self.main_model = MainModel()
         self.main_view = MainView()
+        self.data_selection_view = DataSelectionView(self, self.main_view)
+        self.data_selection_model = DataSelectionModel(self.main_model)
+        self.data_cleaning_view = DataCleaningView(self, self.main_view)
+        self.data_cleaning_model = DataCleaningModel(self.main_model)
+        self.data_processing_view = DataProcessingView(self, self.main_view)
+        self.data_processing_model = DataProcessingModel(self.main_model)
+        self.predictive_modeling_view = PredictiveModelingView(self, self.main_view)
+        self.predictive_modeling_model = PredictiveModelingModel(self.main_model)
+
 
     def get_tabs(self):
         tab_1 = self.data_selection_view.get_data_selection_tab()
@@ -57,11 +60,23 @@ class Controller:
     def savedata(self,dataFolder, datasetname):
         self.data_processing_model.savedata(dataFolder, datasetname)
 
-    def file_Click(self,online_version,foldername,filename,wsheets,wslay,butlay):
-        self.data_selection_model.file_Click(online_version,foldername,filename,wsheets,wslay,butlay)
+    def file_Click(self,foldername,filename,wsheets,wslay,butlay):
+        self.data_selection_model.file_Click(self.get_online_version(),foldername,filename,wsheets,wslay,butlay)
 
-    def on_submitfunc(self,online_version,foldername,datasets):
-        self.data_selection_model.on_submitfunc(online_version,foldername,datasets)
+    def on_submitfunc(self,foldername,datasets):
+        self.data_selection_model.on_submitfunc(self.get_online_version(),foldername,datasets)
 
-    def read_data_set(self,online_version,foldername,filename,sheetname,processtypes,Pages,dt_features,dt_ftslay,featurescl,ftlaycl):
-        self.data_selection_model.read_data_set(online_version,foldername,filename,sheetname,processtypes,Pages,dt_features,dt_ftslay,featurescl,ftlaycl)
+    def read_data_set(self,foldername,filename,sheetname,processtypes,Pages,dt_features,dt_ftslay,featurescl,ftlaycl):
+        self.data_selection_model.read_data_set(self.get_online_version(),foldername,filename,sheetname,processtypes,Pages,dt_features,dt_ftslay,featurescl,ftlaycl)
+
+    def get_curr_df(self):
+        return self.main_model.curr_df
+    
+    def get_trained_models(self):
+        return self.predictive_modeling_model.get_trained_models()
+    
+    def get_datafolder(self):
+        return self.data_selection_model.get_datafolder()
+    
+    def get_online_version(self):
+        return self.main_model.get_online_version()

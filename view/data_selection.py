@@ -1,31 +1,31 @@
 from IPython.display import clear_output
 from IPython import display
 from ipywidgets import *
-import settings
 
 
 class DataSelectionView:
-    def __init__(self, controller):
+    def __init__(self, controller, main_view):
         self.controller = controller
+        self.datafolder = None
+        self.main_view = main_view
 
-    def fileClick(self, change):
+    def fileClick(self, event):
         global wslay,wsheets,butlay
 
-        self.controller.file_Click(settings.online_version,settings.DataFolder.value,settings.datasets.value,wsheets,wslay,butlay)
+        self.controller.file_Click(self.controller.get_datafolder(),self.main_view.datasets.value,wsheets,wslay,butlay)
 
         return
 
     def read_dataset(self,b):  
         global DFPage,wsheets
-        Pages = (settings.FeatPage,settings.ProcssPage,DFPage,settings.RightPage)
+        Pages = (self.main_view.feat_page,self.main_view.process_page,DFPage,self.main_view.right_page)
         
-        self.controller.read_data_set(settings.online_version,settings.DataFolder.value,settings.datasets.value,wsheets.value,settings.processtypes,Pages,settings.dt_features,settings.dt_ftslay,settings.featurescl,settings.ftlaycl)
+        self.controller.read_data_set(self.controller.get_datafolder(),self.main_view.datasets.value,wsheets.value,self.main_view.process_types,Pages,self.main_view.dt_features,self.main_view.dt_ftslay,self.main_view.featurescl,self.main_view.ftlaycl)
         
         return
 
-    def on_submit_func(self, change):
-        self.controller.on_submitfunc(settings.online_version,settings.DataFolder.value,settings.datasets)
-
+    def on_submit_func(self, event):
+        self.controller.on_submitfunc(self.datafolder.value,self.main_view.datasets)
         return
 
     def get_data_selection_tab(self):
@@ -34,15 +34,15 @@ class DataSelectionView:
         wslay.display = 'none'
         wsheets = widgets.Dropdown( options=[], description='..', disabled=False, layout = wslay)
 
-        settings.DataFolder=widgets.Text(description ='Folder name:',value = 'DataSets')
-        settings.datasets = widgets.Dropdown(options=[], description='DataSets:',layout = Layout(width='50%'))
+        self.datafolder=widgets.Text(description ='Folder name:',value = 'DataSets')
+        self.main_view.datasets = widgets.Dropdown(options=[], description='DataSets:',layout = Layout(width='50%'))
 
         butlay = Layout(width='75px')
         butlay.display = 'none'
         readfile = widgets.Button(description="Read",layout = butlay)
 
-        settings.DataFolder.on_submit(self.on_submit_func)
-        settings.datasets.observe(self.fileClick,'value')
+        self.datafolder.on_submit(self.on_submit_func)
+        self.main_view.datasets.observe(self.fileClick,'value')
         readfile.on_click(self.read_dataset)
 
 
@@ -53,7 +53,7 @@ class DataSelectionView:
         DFPage = widgets.Output(layout=Layout(height='250px',align_items='center',overflow="visible"))
 
         tab_1 = VBox(children=[
-            HBox(children = [settings.DataFolder,settings.datasets,wsheets,readfile],layout=filelay),
+            HBox(children = [self.datafolder,self.main_view.datasets,wsheets,readfile],layout=filelay),
             HBox(children = [DFPage],layout = fthboxlay)
                             ],layout=tablayout)
         return tab_1

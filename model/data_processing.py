@@ -30,13 +30,16 @@ class DataProcessingModel:
         trg_lbl.value = self.main_model.targetcolumn
         trg_btn.disabled = True
 
-        if (self.main_model.curr_df[self.main_model.targetcolumn].dtype == 'float64') or (self.main_model.curr_df[self.main_model.targetcolumn].dtype == 'int64'):
+        curr_df = self.main_model.curr_df
+        target_column = self.main_model.targetcolumn
+
+        if (curr_df[self.main_model.targetcolumn].dtype == 'float64') or (curr_df[target_column].dtype == 'int64'):
             predictiontask = "Regression"
         else:
             predictiontask = "Classification" 
 
         prdtsk_lbl.value = predictiontask 
-        write_log('Target assigned: '+self.main_model.targetcolumn, result2exp, 'Data processing')
+        write_log('Target assigned: '+target_column, result2exp, 'Data processing')
         
 
         return 
@@ -57,7 +60,11 @@ class DataProcessingModel:
     ############################################################################################################    
 
     def make_scaling(self,dt_features,ProcssPage,scalingacts,result2exp):  
-    
+        curr_df = self.main_model.curr_df
+        Xtest_df = self.main_model.Xtest_df
+        ytrain_df = self.main_model.ytrain_df
+        ytest_df = self.main_model.ytest_df
+
         colname = dt_features.value
 
         if colname is None:
@@ -65,59 +72,59 @@ class DataProcessingModel:
 
         write_log('Scaling-> '+scalingacts.value+': '+colname, result2exp, 'Data processing')
         
-        if (self.main_model.curr_df[colname].dtype == 'object') or (self.main_model.curr_df[colname].dtype== 'string'):
+        if (curr_df[colname].dtype == 'object') or (curr_df[colname].dtype== 'string'):
             with ProcssPage:
                 clear_output()
                 display.display('Selected column is not a numerical type..')
             return
 
         if scalingacts.value == 'Standardize':
-            if len(self.main_model.Xtest_df)>0:
-                if colname in self.main_model.Xtest_df.columns:
-                    colmean = self.main_model.Xtest_df[colname].mean(); colstd = self.main_model.Xtest_df[colname].std()
-                    self.main_model.Xtest_df[colname] = (self.main_model.Xtest_df[colname]- colmean)/colstd
-                    self.main_model.Xtest_df[colname] = (self.main_model.Xtest_df[colname]- colmean)/colstd
-                if colname in self.main_model.ytrain_df.columns:
-                    colmean = self.main_model.ytrain_df[colname].mean(); colstd = self.main_model.ytrain_df[colname].std()
-                    self.main_model.ytrain_df[colname] = (self.main_model.ytrain_df[colname]- colmean)/colstd
-                    self.main_model.ytest_df[colname] = (self.main_model.ytest_df[colname]- colmean)/colstd
+            if len(Xtest_df)>0:
+                if colname in Xtest_df.columns:
+                    colmean = Xtest_df[colname].mean(); colstd = Xtest_df[colname].std()
+                    Xtest_df[colname] = (Xtest_df[colname]- colmean)/colstd
+                    Xtest_df[colname] = (Xtest_df[colname]- colmean)/colstd
+                if colname in ytrain_df.columns:
+                    colmean = ytrain_df[colname].mean(); colstd = ytrain_df[colname].std()
+                    ytrain_df[colname] = (ytrain_df[colname]- colmean)/colstd
+                    ytest_df[colname] = (ytest_df[colname]- colmean)/colstd
                     
-            colmean = self.main_model.curr_df[colname].mean()
-            self.main_model.curr_df[colname] = (self.main_model.curr_df[colname]- colmean)/self.main_model.curr_df[colname].std()
+            colmean = curr_df[colname].mean()
+            curr_df[colname] = (curr_df[colname]- colmean)/curr_df[colname].std()
             logging.info('Data preprocessing, feature scaling: standardization of column '+ colname)
 
 
         if scalingacts.value == 'Normalize':
 
-            if len(self.main_model.Xtest_df)>0:
-                if colname in self.main_model.Xtest_df.columns:
-                    col_min = min(self.main_model.Xtest_df[colname]); col_max = max(self.main_model.Xtest_df[colname])
+            if len(Xtest_df)>0:
+                if colname in Xtest_df.columns:
+                    col_min = min(Xtest_df[colname]); col_max = max(Xtest_df[colname])
                     denominator = (col_max-col_min)
                     if denominator== 0:
-                        self.main_model.Xtest_df[colname] = (self.main_model.Xtest_df[colname]/col_min)
-                        self.main_model.Xtest_df[colname] = (self.main_model.Xtest_df[colname]/col_min)
+                        Xtest_df[colname] = (Xtest_df[colname]/col_min)
+                        Xtest_df[colname] = (Xtest_df[colname]/col_min)
                     else:
-                        self.main_model.Xtest_df[colname] = (self.main_model.Xtest_df[colname]-col_min)/denominator
-                        self.main_model.Xtest_df[colname] = (self.main_model.Xtest_df[colname]-col_min)/denominator
+                        Xtest_df[colname] = (Xtest_df[colname]-col_min)/denominator
+                        Xtest_df[colname] = (Xtest_df[colname]-col_min)/denominator
                 
-                if colname in self.main_model.ytrain_df.columns:
-                    col_min = min(self.main_model.ytrain_df[colname]); col_max = max(self.main_model.ytrain_df[colname])
+                if colname in ytrain_df.columns:
+                    col_min = min(ytrain_df[colname]); col_max = max(ytrain_df[colname])
                     denominator = (col_max-col_min)
                     if denominator== 0:
-                        self.main_model.ytrain_df[colname] = (self.main_model.ytrain_df[colname]/col_min)
-                        self.main_model.ytest_df[colname] = (self.main_model.ytest_df[colname]/col_min)
+                        ytrain_df[colname] = (ytrain_df[colname]/col_min)
+                        ytest_df[colname] = (ytest_df[colname]/col_min)
                     else:
-                        self.main_model.ytrain_df[colname] = (self.main_model.ytrain_df[colname]-col_min)/denominator
-                        self.main_model.ytest_df[colname] = (self.main_model.ytest_df[colname]-col_min)/denominator
+                        ytrain_df[colname] = (ytrain_df[colname]-col_min)/denominator
+                        ytest_df[colname] = (ytest_df[colname]-col_min)/denominator
 
             
-            col_min = min(self.main_model.curr_df[colname]); col_max = max(self.main_model.curr_df[colname])
+            col_min = min(curr_df[colname]); col_max = max(curr_df[colname])
             denominator = (col_max-col_min)
 
             if denominator== 0:
-                self.main_model.curr_df[colname] = (self.main_model.curr_df[colname]/col_min)
+                curr_df[colname] = (curr_df[colname]/col_min)
             else:
-                self.main_model.curr_df[colname] = (self.main_model.curr_df[colname]-col_min)/denominator
+                curr_df[colname] = (curr_df[colname]-col_min)/denominator
 
             logging.info('Data preprocessing, feature scaling: normalization of column '+ colname)
 
@@ -125,26 +132,26 @@ class DataProcessingModel:
             clear_output()
             fig, (axbox, axhist) = plt.subplots(1,2)
         
-            sns.boxplot(x=colname,data=self.main_model.curr_df, ax=axbox)
+            sns.boxplot(x=colname,data=curr_df, ax=axbox)
             axbox.set_title('Box plot') 
-            sns.distplot(self.main_model.curr_df[colname],ax=axhist)
+            sns.distplot(curr_df[colname],ax=axhist)
             axhist.set_title('Histogram') 
-            plt.legend(['Mean '+str(round(self.main_model.curr_df[colname].mean(),2)),'Stdev '+str(round(self.main_model.curr_df[colname].std(),2))], bbox_to_anchor=(0.6, 0.6))
+            plt.legend(['Mean '+str(round(curr_df[colname].mean(),2)),'Stdev '+str(round(curr_df[colname].std(),2))], bbox_to_anchor=(0.6, 0.6))
             plt.show()
         
     
         return
     #################################################################################################################
     def make_balanced(self,features2,balncacts,ProcssPage):  
+        curr_df = self.main_model.curr_df
         colname = features2.value
 
         if balncacts.value == 'Upsample':
             
-            if len(self.main_model.curr_df[colname].unique()) == 2: # binary detection
-                
-                colvals = self.main_model.curr_df[colname].unique()
-                ColmFirst = self.main_model.curr_df[ self.main_model.curr_df[colname] == colvals[0]]
-                ColmOther = self.main_model.curr_df[ self.main_model.curr_df[colname] == colvals[1]]
+            if len(curr_df[colname].unique()) == 2: # binary detection
+                colvals = curr_df[colname].unique()
+                ColmFirst = curr_df[curr_df[colname] == colvals[0]]
+                ColmOther = curr_df[curr_df[colname] == colvals[1]]
             
                 if len(ColmFirst) < len(ColmOther):
                     upsampled_First = resample(ColmFirst, replace=True, n_samples=len(ColmOther), random_state=27) 
@@ -154,7 +161,6 @@ class DataProcessingModel:
                     self.main_model.curr_df = pd.concat([ColmFirst, upsampled_Other])
                     
                 with ProcssPage:
-                    
                     clear_output()
                     plt.figure(figsize=(6, 2))
                     ax = sns.countplot(x=colname,data=self.main_model.curr_df, palette="cool_r")
@@ -168,14 +174,15 @@ class DataProcessingModel:
 
 
     def make_split(self,splt_txt,splt_btn,result2exp):
+        curr_df = self.main_model.curr_df
         targetcolumn = self.main_model.targetcolumn
         if targetcolumn is None:
             return
     
-        y = self.main_model.curr_df[targetcolumn] # Target variable 
-        column_list = [col for col in self.main_model.curr_df.columns]
+        y = curr_df[targetcolumn] # Target variable 
+        column_list = [col for col in curr_df.columns]
         column_list.remove(targetcolumn)
-        X = self.main_model.curr_df[column_list]
+        X = curr_df[column_list]
         
         ratio_percnt = int(splt_txt.value) 
         write_log('Split ratio, '+str(ratio_percnt/100), result2exp, 'Data processing')

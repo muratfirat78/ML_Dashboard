@@ -68,10 +68,7 @@ class DataSelectionModel:
 
         logging.info('Data Selection: Read data set' + filename)
         return 
-
-
-    ################################################################################################################
-
+    
     def file_Click(self,online_version,foldername,filename,wsheets): 
         abs_file_path = ''
         

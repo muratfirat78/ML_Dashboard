@@ -15,7 +15,7 @@ class DataProcessingModel:
     def __init__(self, main_model):
         self.main_model = main_model
 
-    def remove_outliers(self):
+    def remove_outliers(self): 
         self.main_model.curr_df[self.main_model.curr_df["outlier"] == False]
         self.main_model.curr_df.drop(["outlier"], axis=1)
         logging.info('Data preprocessing, outlier detection and removal')
@@ -66,7 +66,9 @@ class DataProcessingModel:
         ytest_df = self.main_model.ytest_df
 
         colname = dt_features.value
-
+        print(ytrain_df)
+        print(ytrain_df.columns)
+        print(type(ytrain_df))
         if colname is None:
             return
 
@@ -204,11 +206,11 @@ class DataProcessingModel:
             return
 
         
-    
+        curr_df = self.main_model.curr_df
         # Encode column  
         if len(self.main_model.Xtest_df) > 0:
             
-            curr_df = self.main_model.curr_df
+            
             if encodingacts.value == "Label Encoding":
                 label_encoder = preprocessing.LabelEncoder() 
                 write_log('Encoding-> '+features2.value+' (train) current classes: '+str(curr_df[0][colname].unique()), result2exp, 'Data processing')
@@ -263,7 +265,7 @@ class DataProcessingModel:
     def savedata(self, dataFolder, datasetname):
         datasetname = os.path.splitext(os.path.basename(datasetname))[0]
         current_datetime = datetime.now().strftime('%Y%m%d_%H%M%S')
-        filename = dataFolder.value + '/' + datasetname + '_' + current_datetime
+        filename = dataFolder + '/' + datasetname + '_' + current_datetime
         shutil.copy('output.log', filename + '.txt')
         self.main_model.curr_df.to_csv(filename + '.csv')
 

@@ -10,3 +10,4 @@ class MainView:
             self.dt_ftslay = None
             self.ftlaycl = None
             self.prdtsk_lbl = None
+            self.datasets = None

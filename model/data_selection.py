@@ -5,7 +5,6 @@ from IPython import display
 from pathlib import Path
 import os
 
-rowheight = 20
 colabpath = '/content/CPP_Datasets'
 
 class DataSelectionModel:
@@ -43,9 +42,7 @@ class DataSelectionModel:
             datasets.value = dtsetnames[0]
         return
 
-    def read_data_set(self,online_version,foldername,filename,sheetname,processtypes,Pages,dt_features,dt_ftslay,featurescl,ftlaycl):
-
-        FeatPage,ProcssPage,DFPage,RightPage = Pages
+    def read_data_set(self,online_version,foldername,filename,sheetname):
         
         rel_path = foldername+'\\'+filename
         
@@ -66,35 +63,8 @@ class DataSelectionModel:
             
         self.main_model.curr_df.convert_dtypes()
         
-        datasetname = filename[:filename.find('.')]  
-        
-        dt_ftslay.height = str(rowheight*len(self.main_model.curr_df.columns))+'px'
-        dt_features.layout = dt_ftslay
-        dt_features.options = [col for col in self.main_model.curr_df.columns]
+        filename[:filename.find('.')]  
 
-
-        ftlaycl.display = 'block'
-        ftlaycl.height = str(rowheight*len(self.main_model.curr_df.columns))+'px'
-        featurescl.layout = ftlaycl
-        featurescl.options = [col+'('+str(self.main_model.curr_df[col].isnull().sum())+')' for col in self.main_model.curr_df.columns]
-        
-        processtypes.value = processtypes.options[0]
-        
-        with FeatPage:
-            clear_output()
-        with ProcssPage:
-            clear_output()
-        
-        with DFPage:
-            clear_output()
-            #####################################
-            display.display(self.main_model.curr_df.info()) 
-            display.display(self.main_model.curr_df.describe()) 
-            display.display(self.main_model.curr_df) 
-            #####################################
-
-        with RightPage:
-            clear_output()
 
         logging.info('Data Selection: Read data set' + filename)
         return 
@@ -102,7 +72,7 @@ class DataSelectionModel:
 
     ################################################################################################################
 
-    def file_Click(self,online_version,foldername,filename,wsheets,wslay,butlay): 
+    def file_Click(self,online_version,foldername,filename,wsheets): 
         abs_file_path = ''
         
         if online_version:
@@ -126,12 +96,6 @@ class DataSelectionModel:
             wsheets.description = 'Worksheets'
             xls = pd.ExcelFile(abs_file_path)
             wsheets.options = xls.sheet_names
-            
-        wslay.display = 'block'
-        wsheets.value = wsheets.options[0]    
-        wsheets.layout = wslay
-            
-        butlay.display = 'block'
             
         return
     

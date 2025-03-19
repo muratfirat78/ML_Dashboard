@@ -107,8 +107,7 @@ class DataProcessingView:
         global sclblly,scalelbl,prctlay,scalingacts,imblncdlay,balncacts,imbllbllly,imbllbl,encdlbl,encodingacts 
         global outrmvlay,outrmvbtn,encdblly,ecndlay,fxctlbl,fxctingacts,fxctblly,fxctlay
 
-        
-        self.controller.selectProcess_Type([self.main_view.process_types,sclblly,scalelbl,prctlay,scalingacts,imblncdlay,balncacts,imbllbllly,imbllbl,outrmvlay,outrmvbtn,encdlbl,encodingacts,encdblly,ecndlay,fxctlbl,fxctingacts,fxctblly,fxctlay])
+        self.selectProcess_Type([self.main_view.process_types,sclblly,scalelbl,prctlay,scalingacts,imblncdlay,balncacts,imbllbllly,imbllbl,outrmvlay,outrmvbtn,encdlbl,encodingacts,encdblly,ecndlay,fxctlbl,fxctingacts,fxctblly,fxctlay])
         
         return
 
@@ -221,3 +220,122 @@ class DataProcessingView:
         vbox2 = VBox(children = [self.main_view.feat_page,self.main_view.process_page],layout = vb2lay)
         tab_3 = HBox(children=[vbox1,vbox2])
         return tab_3
+    
+    def selectProcess_Type(self,vis_list):
+        processtypes = vis_list[0]
+        sclblly = vis_list[1]
+        scalelbl = vis_list[2]
+        prctlay = vis_list[3]
+        scalingacts = vis_list[4]
+        imblncdlay = vis_list[5]
+        balncacts = vis_list[6]
+        imbllbllly = vis_list[7]
+        imbllbl = vis_list[8]
+        outrmvlay = vis_list[9]
+        outrmvbtn = vis_list[10]
+        encdlbl = vis_list[11]
+        encodingacts = vis_list[12]
+        encdblly = vis_list[13]
+        ecndlay = vis_list[14]
+        fxctlbl = vis_list[15]
+        fxctingacts = vis_list[16]
+        fxctblly = vis_list[17]
+        fxctlay = vis_list[18]
+    
+        self.ResetProcessMenu(vis_list)
+
+        
+        if processtypes.value == 'Scaling':
+            sclblly.display = 'block'
+            sclblly.visibility = 'visible'
+            scalelbl.layout = sclblly
+            prctlay.display = 'block'
+            prctlay.visibility = 'visible'
+            scalingacts.layout = prctlay
+            
+        if processtypes.value == 'Imbalancedness':
+            
+            imbllbllly.display = 'block'
+            imbllbllly.visibility = 'visible'
+            imbllbl.layout = imbllbllly
+            imblncdlay.display = 'block'
+            imblncdlay.visibility = 'visible'
+            balncacts.layout = imblncdlay
+        
+        if processtypes.value == 'Outlier':     
+            outrmvlay.display = 'block'
+            outrmvlay.visibility = 'visible'
+            outrmvbtn.layout = outrmvlay
+
+        if processtypes.value == 'Encoding':     
+            encdblly.display = 'block'
+            encdblly.visibility = 'visible'
+            encdblly.layout = sclblly
+            ecndlay.display = 'block'
+            ecndlay.visibility = 'visible'
+            encodingacts.layout = ecndlay
+
+        if processtypes.value == 'Feature Extraction':
+            fxctblly.display = 'block'
+            fxctblly.visibility = 'visible'
+            fxctlbl.layout = fxctblly
+            fxctlay.display = 'block'
+            fxctlay.visibility = 'visible'
+            fxctingacts.layout = fxctlay
+            
+
+        return
+
+    def ResetProcessMenu(self,vis_list):
+
+        processtypes = vis_list[0]
+        sclblly = vis_list[1]
+        scalelbl = vis_list[2]
+        prctlay = vis_list[3]
+        scalingacts = vis_list[4]
+        imblncdlay = vis_list[5]
+        balncacts = vis_list[6]
+        imbllbllly = vis_list[7]
+        imbllbl = vis_list[8]
+        outrmvlay = vis_list[9]
+        outrmvbtn = vis_list[10]
+        encdlbl = vis_list[11]
+        encodingacts = vis_list[12]
+        encdblly = vis_list[13]
+        ecndlay = vis_list[14]
+        fxctlbl = vis_list[15]
+        fxctingacts = vis_list[16]
+        fxctblly = vis_list[17]
+        fxctlay = vis_list[18]
+    
+
+        fxctblly.display = 'none'
+        fxctlbl.layout = fxctblly
+
+        fxctlay.display = 'none'
+        fxctingacts.layout = fxctlay
+
+
+        sclblly.display = 'none'
+        scalelbl.layout = sclblly
+
+        ecndlay.display = 'none'
+        encodingacts.layout = ecndlay
+
+        encdblly.display = 'none'
+        encdlbl.layout = encdblly
+
+    
+        outrmvlay.display = 'none'
+        outrmvbtn.layout = outrmvlay
+        
+        imbllbllly.display = 'none'
+        imbllbl.layout = imbllbllly
+
+        prctlay.display = 'none'
+        scalingacts.layout = prctlay
+
+        imblncdlay.display = 'none'
+        balncacts.layout = imblncdlay
+
+        return

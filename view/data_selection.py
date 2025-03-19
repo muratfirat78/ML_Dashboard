@@ -12,16 +12,49 @@ class DataSelectionView:
     def fileClick(self, event):
         global wslay,wsheets,butlay
 
-        self.controller.file_Click(self.controller.get_datafolder(),self.main_view.datasets.value,wsheets,wslay,butlay)
+        self.controller.file_Click(self.controller.get_datafolder(),self.main_view.datasets.value,wsheets)
+        wslay.display = 'block'
+        wsheets.value = wsheets.options[0]    
+        wsheets.layout = wslay
+            
+        butlay.display = 'block'
 
         return
 
     def read_dataset(self,b):  
         global DFPage,wsheets
-        Pages = (self.main_view.feat_page,self.main_view.process_page,DFPage,self.main_view.right_page)
+        rowheight = 20
+        self.controller.read_data_set(self.controller.get_datafolder(),self.main_view.datasets.value,wsheets.value)
+
+        df = self.controller.get_curr_df()
+        self.main_view.dt_ftslay.height = str(rowheight*len(df.columns))+'px'
+        self.main_view.dt_features.layout = self.main_view.dt_ftslay
+        self.main_view.dt_features.options = [col for col in df.columns]
+
+
+        self.main_view.ftlaycl.display = 'block'
+        self.main_view.ftlaycl.height = str(rowheight*len(df.columns))+'px'
+        self.main_view.featurescl.layout = self.main_view.ftlaycl
+        self.main_view.featurescl.options = [col+'('+str(df[col].isnull().sum())+')' for col in df.columns]
         
-        self.controller.read_data_set(self.controller.get_datafolder(),self.main_view.datasets.value,wsheets.value,self.main_view.process_types,Pages,self.main_view.dt_features,self.main_view.dt_ftslay,self.main_view.featurescl,self.main_view.ftlaycl)
+        self.main_view.process_types.value = self.main_view.process_types.options[0]
+
+        with self.main_view.feat_page:
+            clear_output()
+        with self.main_view.process_page:
+            clear_output()
         
+        with DFPage:
+            clear_output()
+            #####################################
+            display.display(df.info()) 
+            display.display(df.describe()) 
+            display.display(df) 
+            #####################################
+
+        with self.main_view.right_page:
+            clear_output()
+
         return
 
     def on_submit_func(self, event):

@@ -36,9 +36,6 @@ class Controller:
     def make_cleaning(self,featurescl,result2aexp,missacts,dt_features):
          self.data_cleaning_model.make_cleaning(featurescl,result2aexp,missacts,dt_features)
 
-    def selectProcess_Type(self,vis_list):
-        self.data_processing_model.selectProcess_Type(vis_list)
-
     def assign_target(self,trg_lbl,dt_features,prdtsk_lbl,result2exp,trg_btn,predictiontask):
         self.data_processing_model.assign_target(trg_lbl,dt_features,prdtsk_lbl,result2exp,trg_btn,predictiontask)  
 
@@ -60,14 +57,14 @@ class Controller:
     def savedata(self,dataFolder, datasetname):
         self.data_processing_model.savedata(dataFolder, datasetname)
 
-    def file_Click(self,foldername,filename,wsheets,wslay,butlay):
-        self.data_selection_model.file_Click(self.get_online_version(),foldername,filename,wsheets,wslay,butlay)
+    def file_Click(self,foldername,filename,wsheets):
+        self.data_selection_model.file_Click(self.get_online_version(),foldername,filename,wsheets)
 
     def on_submitfunc(self,foldername,datasets):
         self.data_selection_model.on_submitfunc(self.get_online_version(),foldername,datasets)
 
-    def read_data_set(self,foldername,filename,sheetname,processtypes,Pages,dt_features,dt_ftslay,featurescl,ftlaycl):
-        self.data_selection_model.read_data_set(self.get_online_version(),foldername,filename,sheetname,processtypes,Pages,dt_features,dt_ftslay,featurescl,ftlaycl)
+    def read_data_set(self,foldername,filename,sheetname):
+        self.data_selection_model.read_data_set(self.get_online_version(),foldername,filename,sheetname)
 
     def get_curr_df(self):
         return self.main_model.curr_df

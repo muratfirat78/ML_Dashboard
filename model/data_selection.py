@@ -1,4 +1,3 @@
-from log import *
 import pandas as pd
 from IPython.display import clear_output
 from IPython import display
@@ -8,9 +7,10 @@ import os
 colabpath = '/content/ML_Dashboard/CPP_Datasets'
 
 class DataSelectionModel:
-    def __init__(self, main_model):
+    def __init__(self, main_model, logger):
         self.main_model = main_model
         self.datafolder = None
+        self.logger = logger
         
     def on_submitfunc(self,online_version,foldername,datasets):
         self.datafolder = foldername
@@ -66,7 +66,7 @@ class DataSelectionModel:
         filename[:filename.find('.')]  
 
 
-        logging.info('Data Selection: Read data set' + filename)
+        self.logger.write_log('Read data set' + filename,None, 'Data Selection')
         return 
     
     def file_Click(self,online_version,foldername,filename,wsheets): 

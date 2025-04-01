@@ -8,20 +8,21 @@ from view.data_selection import DataSelectionView
 from model.main_model import MainModel
 from view.main_view import MainView
 from view.predictive_modeling import PredictiveModelingView
+from model.logger import Logger
 
 class Controller:
     def __init__(self):
         self.main_model = MainModel()
         self.main_view = MainView()
+        self.logger = Logger(self)
         self.data_selection_view = DataSelectionView(self, self.main_view)
-        self.data_selection_model = DataSelectionModel(self.main_model)
+        self.data_selection_model = DataSelectionModel(self.main_model, self.logger)
         self.data_cleaning_view = DataCleaningView(self, self.main_view)
-        self.data_cleaning_model = DataCleaningModel(self.main_model)
+        self.data_cleaning_model = DataCleaningModel(self.main_model, self.logger)
         self.data_processing_view = DataProcessingView(self, self.main_view)
-        self.data_processing_model = DataProcessingModel(self.main_model)
+        self.data_processing_model = DataProcessingModel(self.main_model, self.logger)
         self.predictive_modeling_view = PredictiveModelingView(self, self.main_view)
-        self.predictive_modeling_model = PredictiveModelingModel(self.main_model)
-
+        self.predictive_modeling_model = PredictiveModelingModel(self.main_model, self.logger)
 
     def get_tabs(self):
         tab_1 = self.data_selection_view.get_data_selection_tab()
@@ -77,3 +78,6 @@ class Controller:
     
     def get_online_version(self):
         return self.main_model.get_online_version()
+    
+    def write_log(self, msg, log_display, category):
+        self.logger.write_log(msg, log_display, category)

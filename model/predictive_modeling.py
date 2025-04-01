@@ -1,9 +1,8 @@
-from log import *
 from sklearn import tree,neighbors,linear_model,ensemble,svm
 from sklearn.metrics import accuracy_score,mean_squared_error
 
 class MLModel:
-    def __init__(self,data,target,tasktype,mytype,report):
+    def __init__(self,data,target,tasktype,mytype,report,logger):
         #data  = [trdf,tr_tgtdf,tstdf,tst_tgtdf] 
         self.train_df = data[0]
         self.traintrg_df = data[1]
@@ -46,7 +45,7 @@ class MLModel:
         if self.Type == 'Logistic Regression':
             self.PythonObject = linear_model.LogisticRegression(random_state=16)   # Initialize the model object 
             
-        write_log('Model.. Type '+str(type(self.PythonObject)), report, 'Predictive modeling')
+        logger.write_log('Model.. Type '+str(type(self.PythonObject)), report, 'Predictive modeling')
         return
     
     def GetPredictions(self):
@@ -72,9 +71,10 @@ class MLModel:
 
 class PredictiveModelingModel: 
 
-    def __init__(self, main_model):
+    def __init__(self, main_model, logger):
         self.main_model = main_model
         self.trainedModels = []
+        self.logger = logger
 
     def train_Model(self,tasktype,mytype,results,trmodels):
         data = [self.main_model.Xtrain_df,self.main_model.ytrain_df,self.main_model.Xtest_df,self.main_model.ytest_df]
@@ -93,9 +93,9 @@ class PredictiveModelingModel:
 
         self.trainedModels.append(mymodel)
 
-        write_log('Train Model-> '+ mytype, results, 'Predictive modeling')
+        self.logger.write_log('Train Model-> '+ mytype, results, 'Predictive modeling')
         for prf,val in mymodel.GetPerformanceDict().items():
-            write_log('Model Performance-> '+prf+': '+str(val), results, 'Predictive modeling')
+            self.logger.write_log('Model Performance-> '+prf+': '+str(val), results, 'Predictive modeling')
 
         trmodels.options = [mdl.getType() for mdl in self.trainedModels]
     

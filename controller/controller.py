@@ -1,6 +1,7 @@
 from model.data_cleaning import DataCleaningModel
 from model.data_processing import DataProcessingModel
 from model.data_selection import DataSelectionModel
+from model.logger import Logger
 from model.predictive_modeling import PredictiveModelingModel
 from view.data_cleaning import DataCleaningView
 from view.data_processing import DataProcessingView
@@ -13,14 +14,15 @@ class Controller:
     def __init__(self, drive):
         self.main_model = MainModel()
         self.main_view = MainView()
+        self.logger = Logger()
         self.data_selection_view = DataSelectionView(self, self.main_view)
-        self.data_selection_model = DataSelectionModel(self.main_model)
+        self.data_selection_model = DataSelectionModel(self.main_model, self.logger)
         self.data_cleaning_view = DataCleaningView(self, self.main_view)
-        self.data_cleaning_model = DataCleaningModel(self.main_model)
+        self.data_cleaning_model = DataCleaningModel(self.main_model, self.logger)
         self.data_processing_view = DataProcessingView(self, self.main_view)
-        self.data_processing_model = DataProcessingModel(self.main_model)
+        self.data_processing_model = DataProcessingModel(self.main_model, self.logger)
         self.predictive_modeling_view = PredictiveModelingView(self, self.main_view)
-        self.predictive_modeling_model = PredictiveModelingModel(self.main_model, self)
+        self.predictive_modeling_model = PredictiveModelingModel(self.main_model, self, self.logger)
         if drive != None:
             self.drive = drive
 
@@ -81,4 +83,4 @@ class Controller:
         return self.main_model.get_online_version()
     
     def upload_log(self):
-        self.drive.upload_log()
+        self.drive.upload_log(self.logger.get_result())

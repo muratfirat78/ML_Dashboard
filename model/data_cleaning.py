@@ -1,8 +1,9 @@
 from log import *
 
 class DataCleaningModel:
-    def __init__(self, main_model):
+    def __init__(self, main_model, logger):
         self.main_model = main_model
+        self.logger = logger
 
     def make_cleaning(self,featurescl,result2aexp,missacts,dt_features): 
         curr_df = self.main_model.curr_df
@@ -16,6 +17,7 @@ class DataCleaningModel:
 
         handling = missacts.value
         write_log('col '+colname+', action '+handling+', coltype '+str(curr_df[colname].dtype), result2aexp, 'Data cleaning')
+        self.logger.add_action(['DataCleaning', handling], [colname])
 
         if handling == 'Drop Column':
             del curr_df[colname]

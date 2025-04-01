@@ -12,13 +12,15 @@ import shutil
 from datetime import timedelta,date, datetime
 
 class DataProcessingModel:
-    def __init__(self, main_model):
+    def __init__(self, main_model, logger):
         self.main_model = main_model
+        self.logger = logger
 
     def remove_outliers(self): 
         self.main_model.curr_df[self.main_model.curr_df["outlier"] == False]
         self.main_model.curr_df.drop(["outlier"], axis=1)
         logging.info('Data preprocessing, outlier detection and removal')
+        self.logger.add_action(['DataProcessing', 'outlier'], 'All columns')
         
         return
     ##################################################################################
@@ -40,13 +42,15 @@ class DataProcessingModel:
 
         prdtsk_lbl.value = predictiontask 
         write_log('Target assigned: '+target_column, result2exp, 'Data processing')
+        self.logger.add_action(['ModelDevelopment', 'AssignTarget'], target_column)
         
 
         return 
     ##################################################################################
 
-    def NormalizeColumn(df,colname):
+    def NormalizeColumn(self,df,colname):
         logging.info('Data preprocessing, feature scaling: normalization of column '+ colname)
+        self.logger.add_action(['DataProcessing', 'Normalization'], [colname])
         col_min = min(df[colname])
         col_max = max(df[colname])
         
@@ -73,7 +77,6 @@ class DataProcessingModel:
             return
 
         write_log('Scaling-> '+scalingacts.value+': '+colname, result2exp, 'Data processing')
-        
         if (curr_df[colname].dtype == 'object') or (curr_df[colname].dtype== 'string'):
             with ProcssPage:
                 clear_output()
@@ -93,6 +96,7 @@ class DataProcessingModel:
                     
             colmean = curr_df[colname].mean()
             curr_df[colname] = (curr_df[colname]- colmean)/curr_df[colname].std()
+            self.logger.add_action(['DataProcessing', 'Standardize'], [colname])
             logging.info('Data preprocessing, feature scaling: standardization of column '+ colname)
 
 
@@ -128,6 +132,7 @@ class DataProcessingModel:
             else:
                 curr_df[colname] = (curr_df[colname]-col_min)/denominator
 
+            self.logger.add_action(['DataProcessing', 'Normalize'], [colname])
             logging.info('Data preprocessing, feature scaling: normalization of column '+ colname)
 
         with ProcssPage:
@@ -170,6 +175,7 @@ class DataProcessingModel:
                         ax.annotate("{:.1f}".format(p.get_height()), (p.get_x()+0.25, p.get_height()+0.01))
                     plt.show()
         logging.info('Data preprocessing, checking and handling unbalancedness')
+        self.logger.add_action(['DataProcessing', 'Unbalancedness'], [colname])
         return
 
     #####################################################################################################################
@@ -192,14 +198,13 @@ class DataProcessingModel:
         splt_btn.disabled = True
 
         write_log('Split, Train size: '+str(len(self.main_model.Xtest_df)), result2exp, 'Data processing')
-
+        self.logger.add_action(['DataProcessing', 'Split'], str(ratio_percnt) + '%')
         return
     ############################################################################################################    
     def make_encoding(self,features2,encodingacts,result2exp):
 
         colname = features2.value
 
-        
         write_log('Encoding.. col '+colname+' is list:'+str(int(isinstance(self.main_model.curr_df, list))), result2exp, 'Data processing')
 
         if colname is None:
@@ -221,6 +226,7 @@ class DataProcessingModel:
                 write_log('Encoding-> '+features2.value+' (test) after labeling classes: '+str(curr_df[1][colname].unique()), result2exp, 'Data processing')
 
                 curr_df = curr_df[0],curr_df[1]
+                self.logger.add_action(['DataProcessing', 'LabelEncoding'], [colname])
                 
             if encodingacts.value == "One Hot Encoding":
                 categorical_columns = [colname]
@@ -240,6 +246,7 @@ class DataProcessingModel:
                 curr_df = data1_df,data2_df
 
                 features2.options = [col+'('+str(data1_df[col].isnull().sum())+')' for col in data1_df.columns]
+                self.logger.add_action(['DataProcessing', 'OneHotEncoding'], [colname])
         else:
             write_log('Encoding-> '+encodingacts.value+', '+str(encodingacts.value == "One Hot Encoding"), result2exp, 'Data processing')
             write_log('Encoding-> '+colname+' current classes: '+str(len(curr_df)), result2exp, 'Data processing')
@@ -248,6 +255,7 @@ class DataProcessingModel:
                 write_log('Encoding-> '+features2.value+' current classes: '+str(curr_df[colname].unique()), result2exp, 'Data processing')
                 curr_df[colname] = label_encoder.fit_transform(curr_df[colname]) 
                 write_log('Encoding-> '+features2.value+' after labeling classes: '+str([cls for cls in curr_df[colname].unique()]), result2exp, 'Data processing')
+                self.logger.add_action(['DataProcessing', 'LabelEncoding'], [colname])
                 
             if encodingacts.value == "One Hot Encoding":
                 write_log('Encoding-> '+colname+' current classes: '+str(curr_df[colname].unique()), result2exp, 'Data processing')
@@ -257,6 +265,7 @@ class DataProcessingModel:
                 one_hot_df = pd.DataFrame(one_hot_encoded,columns=encoder.get_feature_names_out(categorical_columns)) # Create a DataFrame
                 curr_df = pd.concat([curr_df.drop(categorical_columns, axis=1), one_hot_df], axis=1)
                 write_log('One Hot Encoding-> after one-hot features: '+str(curr_df.columns), result2exp, 'Data processing')
+                self.logger.add_action(['DataProcessing', 'OneHotEncoding'], [colname])
 
             features2.options = [col for col in curr_df.columns]
         

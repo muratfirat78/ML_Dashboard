@@ -25,5 +25,5 @@ class Logger:
         self.student_performance.addAction(action, value)
     
     def get_result(self):
-        return str(self.student_performance)
+        return self.student_performance.performance
 

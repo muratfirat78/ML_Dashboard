@@ -81,4 +81,4 @@ class Controller:
         return self.main_model.get_online_version()
     
     def upload_log(self):
-        self.drive.upload_log
+        self.drive.upload_log()

@@ -101,7 +101,7 @@ class PredictiveModelingModel:
         trmodels.options = [mdl.getType() for mdl in self.trainedModels]
         
         if self.controller.get_online_version():
-            write_to_drive()
+            self.controller.upload_log()
 
         return 
     

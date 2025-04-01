@@ -10,7 +10,7 @@ from view.main_view import MainView
 from view.predictive_modeling import PredictiveModelingView
 
 class Controller:
-    def __init__(self):
+    def __init__(self, drive):
         self.main_model = MainModel()
         self.main_view = MainView()
         self.data_selection_view = DataSelectionView(self, self.main_view)
@@ -21,6 +21,8 @@ class Controller:
         self.data_processing_model = DataProcessingModel(self.main_model)
         self.predictive_modeling_view = PredictiveModelingView(self, self.main_view)
         self.predictive_modeling_model = PredictiveModelingModel(self.main_model, self)
+        if drive != None:
+            self.drive = drive
 
 
     def get_tabs(self):
@@ -77,3 +79,6 @@ class Controller:
     
     def get_online_version(self):
         return self.main_model.get_online_version()
+    
+    def upload_log(self):
+        self.drive.upload_log

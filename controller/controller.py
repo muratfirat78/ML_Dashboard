@@ -20,7 +20,7 @@ class Controller:
         self.data_processing_view = DataProcessingView(self, self.main_view)
         self.data_processing_model = DataProcessingModel(self.main_model)
         self.predictive_modeling_view = PredictiveModelingView(self, self.main_view)
-        self.predictive_modeling_model = PredictiveModelingModel(self.main_model)
+        self.predictive_modeling_model = PredictiveModelingModel(self.main_model, self)
 
 
     def get_tabs(self):

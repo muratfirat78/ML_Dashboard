@@ -72,9 +72,10 @@ class MLModel:
 
 class PredictiveModelingModel: 
 
-    def __init__(self, main_model):
+    def __init__(self, main_model, controller):
         self.main_model = main_model
         self.trainedModels = []
+        self.controller = controller
 
     def train_Model(self,tasktype,mytype,results,trmodels):
         data = [self.main_model.Xtrain_df,self.main_model.ytrain_df,self.main_model.Xtest_df,self.main_model.ytest_df]
@@ -98,7 +99,9 @@ class PredictiveModelingModel:
             write_log('Model Performance-> '+prf+': '+str(val), results, 'Predictive modeling')
 
         trmodels.options = [mdl.getType() for mdl in self.trainedModels]
-    
+        
+        if self.controller.get_online_version():
+            write_to_drive()
 
         return 
     

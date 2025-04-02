@@ -92,11 +92,14 @@ class Controller:
         self.drive.upload_log(self.logger.get_result(), self.login_model.get_userid())
 
     def login(self, userid):
-        self.login_model.login(userid)
-        self.login_view.hide_login()
-        self.main_view.show_tabs()
+        if self.login_model.login_correct(userid, self.drive):
+            self.login_view.hide_login()
+            self.main_view.show_tabs()
+        else:
+            print("login incorrect")
     
     def get_ui(self):
         login_view = self.login_view.get_login_view()
         tabs = self.get_tab_set()
         return self.main_view.get_ui(login_view, tabs)
+    

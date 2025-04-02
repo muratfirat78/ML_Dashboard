@@ -5,3 +5,6 @@ class LoginModel:
 
     def login(self,userid):
         self.userid = userid
+
+    def get_userid(self):
+        return self.userid

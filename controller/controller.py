@@ -2,6 +2,7 @@ from model.data_cleaning import DataCleaningModel
 from model.data_processing import DataProcessingModel
 from model.data_selection import DataSelectionModel
 from model.logger import Logger
+from model.login import LoginModel
 from model.predictive_modeling import PredictiveModelingModel
 from view.data_cleaning import DataCleaningView
 from view.data_processing import DataProcessingView
@@ -9,12 +10,15 @@ from view.data_selection import DataSelectionView
 from model.main_model import MainModel
 from view.main_view import MainView
 from view.predictive_modeling import PredictiveModelingView
+from view.login import LoginView
 
 class Controller:
     def __init__(self, drive):
         self.main_model = MainModel()
         self.main_view = MainView()
         self.logger = Logger()
+        self.login_view = LoginView(self)
+        self.login_model = LoginModel(self)
         self.data_selection_view = DataSelectionView(self, self.main_view)
         self.data_selection_model = DataSelectionModel(self.main_model, self.logger)
         self.data_cleaning_view = DataCleaningView(self, self.main_view)
@@ -23,16 +27,18 @@ class Controller:
         self.data_processing_model = DataProcessingModel(self.main_model, self.logger)
         self.predictive_modeling_view = PredictiveModelingView(self, self.main_view)
         self.predictive_modeling_model = PredictiveModelingModel(self.main_model, self, self.logger)
-        if drive != None:
-            self.drive = drive
+        self.drive = drive
 
-
-    def get_tabs(self):
+    def get_tab_set(self):
         tab_1 = self.data_selection_view.get_data_selection_tab()
         tab_2 = self.data_cleaning_view.get_data_cleaning_tab()
         tab_3 = self.data_processing_view.get_data_processing_tab()
         tab_4 = self.predictive_modeling_view.get_predictive_modeling_tab()
-        return [tab_1,tab_2,tab_3, tab_4]
+
+        self.main_view.set_tabs(tab_1, tab_2, tab_3, tab_4)
+        tab_set = self.main_view.get_tabs()
+        
+        return tab_set
 
     def train_Model(self,tasktype,mytype,results,trmodels):
         self.predictive_modeling_model.train_Model(tasktype,mytype,results,trmodels)
@@ -84,3 +90,13 @@ class Controller:
     
     def upload_log(self):
         self.drive.upload_log(self.logger.get_result())
+
+    def login(self, userid):
+        self.login_model.login(userid)
+        self.login_view.hide_login()
+        self.main_view.show_tabs()
+    
+    def get_ui(self):
+        login_view = self.login_view.get_login_view()
+        tabs = self.get_tab_set()
+        return self.main_view.get_ui(login_view, tabs)

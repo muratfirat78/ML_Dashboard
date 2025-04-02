@@ -103,10 +103,7 @@ class PredictiveModelingModel:
 
         trmodels.options = [mdl.getType() for mdl in self.trainedModels]
         
-        if self.controller.get_online_version():
-            self.controller.upload_log()
-
-        return 
+        self.controller.upload_log()
     
     def get_trained_models(self):
         return self.trainedModels

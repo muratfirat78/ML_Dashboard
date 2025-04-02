@@ -1,6 +1,7 @@
 from model.data_cleaning import DataCleaningModel
 from model.data_processing import DataProcessingModel
 from model.data_selection import DataSelectionModel
+from model.local_drive import GoogleDrive
 from model.logger import Logger
 from model.login import LoginModel
 from model.predictive_modeling import PredictiveModelingModel
@@ -27,7 +28,10 @@ class Controller:
         self.data_processing_model = DataProcessingModel(self.main_model, self.logger)
         self.predictive_modeling_view = PredictiveModelingView(self, self.main_view)
         self.predictive_modeling_model = PredictiveModelingModel(self.main_model, self, self.logger)
-        self.drive = drive
+        if drive != None:
+            self.drive = drive
+        else:
+            self.drive = GoogleDrive()
 
     def get_tab_set(self):
         tab_1 = self.data_selection_view.get_data_selection_tab()

@@ -23,5 +23,3 @@ class StudentPerformance:
                 self.performance[category][action_type] = value
         else:
             self.performance[category] = {action_type: value}
-        
-        print(self.performance)

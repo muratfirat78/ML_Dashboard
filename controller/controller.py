@@ -13,8 +13,8 @@ from view.predictive_modeling import PredictiveModelingView
 from view.login import LoginView
 
 class Controller:
-    def __init__(self, drive):
-        self.main_model = MainModel()
+    def __init__(self, drive, online_version):
+        self.main_model = MainModel(online_version)
         self.main_view = MainView()
         self.logger = Logger()
         self.login_view = LoginView(self)

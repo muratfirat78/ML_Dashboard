@@ -1,3 +1,5 @@
+import ast
+
 class StudentPerformance:
     def __init__(self):
         self.performance = {            
@@ -23,3 +25,19 @@ class StudentPerformance:
                 self.performance[category][action_type] = value
         else:
             self.performance[category] = {action_type: value}
+
+    def string_to_student_performance(self, input_str):
+        data_dict = ast.literal_eval(input_str)
+        for category, actions in data_dict.items():
+            for action_type, value in actions.items():
+                if isinstance(value, list):
+                    for item in value:
+                        self.addAction([category, action_type], item)
+                else:
+                    self.addAction([category, action_type], value)
+                
+    def get_score(self):
+        return self.performance
+    
+    def printperformances(self):
+        print(self.performance['ModelDevelopment']['ModelPerformance'])

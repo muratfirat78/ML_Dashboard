@@ -105,7 +105,7 @@ class Controller:
             if self.login_model.login_correct(userid, self.drive):
                 self.drive.get_performances(userid)
                 self.learning_path = StudentLearningPath(userid)
-                self.learning_path.get_scores()
+                # self.learning_path.get_scores()
                 self.login_view.hide_login()
                 self.main_view.show_tabs()
             else:

@@ -95,12 +95,15 @@ class Controller:
     def upload_log(self):
         self.drive.upload_log(self.logger.get_result(), self.login_model.get_userid())
 
-    def login(self, userid):
-        if self.login_model.login_correct(userid, self.drive):
-            self.login_view.hide_login()
-            self.main_view.show_tabs()
+    def login(self, userid, terms_checkbox):
+        if terms_checkbox:
+            if self.login_model.login_correct(userid, self.drive):
+                self.login_view.hide_login()
+                self.main_view.show_tabs()
+            else:
+                print("login incorrect")
         else:
-            print("login incorrect")
+            print("You must agree to the terms before continuing")
     
     def get_ui(self):
         login_view = self.login_view.get_login_view()

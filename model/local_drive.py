@@ -15,4 +15,7 @@ class GoogleDrive():
        timestamp = datetime.now().strftime("%d-%m-%Y %H-%M-%S")
        with open('./drive/'+ userid + '/' + timestamp + '.txt', 'w') as f:
           f.write(str(result))
-      
+
+    def get_performances(self, userid):
+       None
+       #This function is not neccesary for the local drive, since the files are already stored locally

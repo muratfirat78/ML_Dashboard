@@ -98,6 +98,7 @@ class Controller:
     def login(self, userid, terms_checkbox):
         if terms_checkbox:
             if self.login_model.login_correct(userid, self.drive):
+                self.drive.get_performances(userid)
                 self.login_view.hide_login()
                 self.main_view.show_tabs()
             else:

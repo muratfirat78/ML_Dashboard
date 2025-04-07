@@ -5,7 +5,6 @@ from model.local_drive import GoogleDrive
 from model.logger import Logger
 from model.login import LoginModel
 from model.predictive_modeling import PredictiveModelingModel
-from model.student_learning_path import StudentLearningPath
 from view.data_cleaning import DataCleaningView
 from view.data_processing import DataProcessingView
 from view.data_selection import DataSelectionView
@@ -29,7 +28,6 @@ class Controller:
         self.data_processing_model = DataProcessingModel(self.main_model, self.logger)
         self.predictive_modeling_view = PredictiveModelingView(self, self.main_view)
         self.predictive_modeling_model = PredictiveModelingModel(self.main_model, self, self.logger)
-        self.learning_path = None
         if drive != None:
             self.drive = drive
         else:
@@ -49,8 +47,8 @@ class Controller:
     def train_Model(self,tasktype,mytype,results,trmodels):
         self.predictive_modeling_model.train_Model(tasktype,mytype,results,trmodels)
     
-    def make_cleaning(self,featurescl,result2aexp,missacts,dt_features,params):
-         self.data_cleaning_model.make_cleaning(featurescl,result2aexp,missacts,dt_features,params)
+    def make_cleaning(self,featurescl,result2aexp,missacts,dt_features):
+         self.data_cleaning_model.make_cleaning(featurescl,result2aexp,missacts,dt_features)
 
     def assign_target(self,trg_lbl,dt_features,prdtsk_lbl,result2exp,trg_btn,predictiontask):
         self.data_processing_model.assign_target(trg_lbl,dt_features,prdtsk_lbl,result2exp,trg_btn,predictiontask)  
@@ -84,9 +82,6 @@ class Controller:
 
     def get_curr_df(self):
         return self.main_model.curr_df
-
-    def get_curr_info(self):
-        return self.main_model.currinfo
     
     def get_trained_models(self):
         return self.predictive_modeling_model.get_trained_models()
@@ -100,18 +95,12 @@ class Controller:
     def upload_log(self):
         self.drive.upload_log(self.logger.get_result(), self.login_model.get_userid())
 
-    def login(self, userid, terms_checkbox):
-        if terms_checkbox:
-            if self.login_model.login_correct(userid, self.drive):
-                self.drive.get_performances(userid)
-                self.learning_path = StudentLearningPath(userid)
-                self.learning_path.get_scores()
-                self.login_view.hide_login()
-                self.main_view.show_tabs()
-            else:
-                print("login incorrect")
+    def login(self, userid):
+        if self.login_model.login_correct(userid, self.drive):
+            self.login_view.hide_login()
+            self.main_view.show_tabs()
         else:
-            print("You must agree to the terms before continuing")
+            print("login incorrect")
     
     def get_ui(self):
         login_view = self.login_view.get_login_view()

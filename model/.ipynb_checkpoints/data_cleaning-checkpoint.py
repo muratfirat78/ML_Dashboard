@@ -5,7 +5,7 @@ class DataCleaningModel:
         self.main_model = main_model
         self.logger = logger
 
-    def make_cleaning(self,featurescl,result2aexp,missacts,dt_features,params): 
+    def make_cleaning(self,featurescl,result2aexp,missacts,dt_features): 
         curr_df = self.main_model.curr_df
         bk_ind = 0
         for c in reversed(featurescl.value):
@@ -19,26 +19,7 @@ class DataCleaningModel:
         write_log('col '+colname+', action '+handling+', coltype '+str(curr_df[colname].dtype), result2aexp, 'Data cleaning')
         self.logger.add_action(['DataCleaning', handling], [colname])
 
-
-        if handling == 'Edit Range':
-
-            prev_size = len(curr_df)
-            
-            minval = params[0].value; maxval = params[1].value
-            
-            if (curr_df[colname].dtype == 'int64'):
-                minval =int(minval); maxval =int(maxval); 
-
-            if (curr_df[colname].dtype == 'float64'):
-                minval =float(minval); maxval =float(maxval); 
-            
-            self.main_model.curr_df = curr_df[(curr_df[colname] >= minval) & (curr_df[colname] <= maxval)]
-       
-            
-            write_log('Edit Range is selected.. '+str(prev_size)+"->"+str(len(self.main_model.curr_df)),  result2aexp, 'Data cleaning')
-     
-            
-        elif handling == 'Drop Column':
+        if handling == 'Drop Column':
             del curr_df[colname]
         else:    
             if (curr_df[colname].dtype == 'float64') or (curr_df[colname].dtype == 'int64'):
@@ -47,7 +28,7 @@ class DataCleaningModel:
                         curr_df[colname].fillna(curr_df[colname].mean(), inplace=True)
                     if handling == 'Replace-Median': 
                         curr_df[colname].fillna(curr_df[colname].median(), inplace=True)
-    
+
                     if handling == 'Remove': 
                         curr_df = curr_df.dropna(subset = [colname])
                 else:
@@ -57,7 +38,7 @@ class DataCleaningModel:
                 write_log('mode.. '+str(curr_df[colname].mode()[0]), result2aexp, 'Data cleaning')
                 if handling == 'Replace-Mode': 
                     curr_df[colname].fillna(curr_df[colname].mode()[0], inplace=True)
-                    
+                
         featurescl.options = [col+'('+str(curr_df[col].isnull().sum())+')' for col in curr_df.columns]
         dt_features.options = [col for col in curr_df.columns]
 

@@ -3,7 +3,6 @@ import pandas as pd
 class MainModel:
     def __init__(self, online_version):
         self.curr_df = pd.DataFrame()
-        self.currinfo = None
         self.Xtrain_df = pd.DataFrame()
         self.Xtest_df = pd.DataFrame()
         self.ytrain_df = pd.DataFrame()

@@ -47,8 +47,8 @@ class Controller:
     def train_Model(self,tasktype,mytype,results,trmodels):
         self.predictive_modeling_model.train_Model(tasktype,mytype,results,trmodels)
     
-    def make_cleaning(self,featurescl,result2aexp,missacts,dt_features):
-         self.data_cleaning_model.make_cleaning(featurescl,result2aexp,missacts,dt_features)
+    def make_cleaning(self,featurescl,result2aexp,missacts,dt_features,params):
+         self.data_cleaning_model.make_cleaning(featurescl,result2aexp,missacts,dt_features,params)
 
     def assign_target(self,trg_lbl,dt_features,prdtsk_lbl,result2exp,trg_btn,predictiontask):
         self.data_processing_model.assign_target(trg_lbl,dt_features,prdtsk_lbl,result2exp,trg_btn,predictiontask)  

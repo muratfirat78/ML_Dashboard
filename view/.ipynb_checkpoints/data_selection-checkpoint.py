@@ -8,8 +8,6 @@ class DataSelectionView:
         self.controller = controller
         self.datafolder = None
         self.main_view = main_view
-        self.DFPage = None
-        self.InfoPage = None
 
     def fileClick(self, event):
         global wslay,wsheets,butlay
@@ -24,12 +22,11 @@ class DataSelectionView:
         return
 
     def read_dataset(self,b):  
-        global InfoPage,wsheets
+        global DFPage,wsheets
         rowheight = 20
         self.controller.read_data_set(self.controller.get_datafolder(),self.main_view.datasets.value,wsheets.value)
 
         df = self.controller.get_curr_df()
-        info = self.controller.get_curr_info()
         self.main_view.dt_ftslay.height = str(rowheight*len(df.columns))+'px'
         self.main_view.dt_features.layout = self.main_view.dt_ftslay
         self.main_view.dt_features.options = [col for col in df.columns]
@@ -47,32 +44,13 @@ class DataSelectionView:
         with self.main_view.process_page:
             clear_output()
         
-        with self.DFPage:
+        with DFPage:
             clear_output()
             #####################################
             display.display(df.info()) 
             display.display(df.describe()) 
             display.display(df) 
             #####################################
-
-       
-        nrlines = 0
-        with self.InfoPage:
-            clear_output()
-            
-            infotxt = str(info)
-            if len(infotxt) > 0:
-                display.display("Dataset Description:")
-            while infotxt.find("\n") > -1:
-                line = infotxt[:infotxt.find("\n")]
-                infotxt = infotxt[infotxt.find("\n")+1:]
-                if (infotxt == '') or (infotxt == None):
-                    continue
-                display.display(line)
-                nrlines+=1
-            #####################################
-            #####################################
-        self.InfoPage.layout.height = str(18*nrlines)+'px'
 
         with self.main_view.right_page:
             clear_output()
@@ -105,11 +83,11 @@ class DataSelectionView:
         tablayout = widgets.Layout(height='500px')
         fthboxlay = widgets.Layout(height='500px')
 
-        self.DFPage = widgets.Output(layout=Layout(width='50%',height='250px',align_items='center',overflow="visible"))
-        self.InfoPage = widgets.Output(layout=Layout(height='150px',align_items='center',overflow="visible"))
+        DFPage = widgets.Output(layout=Layout(height='250px',align_items='center',overflow="visible"))
 
         tab_1 = VBox(children=[
             HBox(children = [self.datafolder,self.main_view.datasets,wsheets,readfile],layout=filelay),
-            HBox(children = [self.DFPage,self.InfoPage],layout = fthboxlay)],layout=tablayout)
+            HBox(children = [DFPage],layout = fthboxlay)
+                            ],layout=tablayout)
         return tab_1
         

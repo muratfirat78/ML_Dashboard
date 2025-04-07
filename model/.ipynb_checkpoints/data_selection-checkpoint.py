@@ -44,17 +44,14 @@ class DataSelectionModel:
         return
 
     def read_data_set(self,online_version,foldername,filename,sheetname):
-
-        stemfile = filename[:filename.find(".")]
+        
         rel_path = foldername+'\\'+filename
-        infopath = foldername+'\\'+"Info_"+stemfile+".txt"
         
         if online_version:
             abs_file_path = colabpath+'/'+filename
-            abs_info_path = colabpath+'/'+infopath
         else:
             abs_file_path = os.path.join(Path.cwd(), rel_path)
-            abs_info_path = os.path.join(Path.cwd(), infopath)
+            
 
         if abs_file_path.find('.csv') > -1:
             self.main_model.curr_df = pd.read_csv(abs_file_path, sep=sheetname) 
@@ -62,16 +59,8 @@ class DataSelectionModel:
             xls = pd.ExcelFile(abs_file_path)
             self.main_model.curr_df = pd.read_excel(xls,sheetname)
         if abs_file_path.find('.tsv') > -1:    
+        
             self.main_model.curr_df = pd.read_csv(abs_file_path, sep="\t")
-
-       
-        try: 
-            f = open(abs_info_path)
-            self.main_model.currinfo = f.read()
-            f.close()
-        except: 
-            self.main_model.currinfo = "No info found for this file"
-            
             
         self.main_model.curr_df.convert_dtypes()
         

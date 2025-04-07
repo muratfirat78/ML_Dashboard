@@ -82,9 +82,6 @@ class Controller:
 
     def get_curr_df(self):
         return self.main_model.curr_df
-
-    def get_curr_info(self):
-        return self.main_model.currinfo
     
     def get_trained_models(self):
         return self.predictive_modeling_model.get_trained_models()

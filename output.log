@@ -1,4 +1,4 @@
-2025-04-07 15:33:00,610 - INFO - Application started
-2025-04-07 15:33:07,276 - INFO - Data Selection: Read data setWater Pollution_and_Disease.csv
-2025-04-07 15:33:17,172 - INFO - Data cleaning: col Nitrate Level (mg/L), action Edit Range, coltype float64
-2025-04-07 15:33:17,176 - INFO - Data cleaning: Edit Range is selected.. 3000->922
+2025-04-07 15:38:35,145 - INFO - Application started
+2025-04-07 15:38:44,642 - INFO - Data Selection: Read data setWater Pollution_and_Disease.csv
+2025-04-07 15:38:57,880 - INFO - Data cleaning: col Nitrate Level (mg/L), action Edit Range, coltype float64
+2025-04-07 15:38:57,892 - INFO - Data cleaning: Edit Range is selected.. 3000->922

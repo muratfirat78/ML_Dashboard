@@ -44,5 +44,5 @@ class LoginView:
     def hide_login(self):
         self.vbox.layout.display = 'none'
     
-    def update_percentage_done(self, percentage):
-        self.download_progress.value = percentage
+    def disable_login_button(self):
+        self.login_button.disabled = True

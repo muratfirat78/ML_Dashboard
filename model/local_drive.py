@@ -11,8 +11,7 @@ class GoogleDrive():
         else:
            return False
         
-    def upload_log(self, result, userid):
-       timestamp = datetime.now().strftime("%d-%m-%Y %H-%M-%S")
+    def upload_log(self, result, userid, timestamp):
        with open('./drive/'+ userid + '/' + timestamp + '.txt', 'w') as f:
           f.write(str(result))
 

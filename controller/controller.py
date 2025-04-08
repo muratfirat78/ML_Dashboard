@@ -98,7 +98,7 @@ class Controller:
         return self.main_model.get_online_version()
     
     def upload_log(self):
-        self.drive.upload_log(self.logger.get_result(), self.login_model.get_userid())
+        self.drive.upload_log(self.logger.get_result(), self.login_model.get_userid(), self.logger.get_timestamp())
 
     def login(self, userid, terms_checkbox):
         if terms_checkbox:

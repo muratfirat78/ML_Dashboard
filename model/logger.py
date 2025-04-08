@@ -26,4 +26,6 @@ class Logger:
     
     def get_result(self):
         return self.student_performance.performance
-
+    
+    def get_timestamp(self):
+        return self.student_performance.get_timestamp()

@@ -54,4 +54,4 @@ class LoginView:
         self.login_button.disabled = True
 
     def show_loading(self):
-        self.hbox.layout.display = widgets.Layout(visibility = 'visible')
+        self.hbox.layout.display = 'flex'

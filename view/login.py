@@ -25,7 +25,7 @@ class LoginView:
         self.login_button = widgets.Button(description="Login")
 
         self.loading_text = widgets.Label(
-            value="Loading..."
+            value="Downloading user data..."
         )
         
         with open('./loader.gif', 'rb') as f:
@@ -54,4 +54,4 @@ class LoginView:
         self.login_button.disabled = True
 
     def show_loading(self):
-        self.vbox.layout.display = widgets.Layout(visibility = 'visible')
+        self.hbox.layout.display = widgets.Layout(visibility = 'visible')

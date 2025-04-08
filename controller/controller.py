@@ -33,7 +33,7 @@ class Controller:
         if drive != None:
             self.drive = drive
         else:
-            self.drive = GoogleDrive(self)
+            self.drive = GoogleDrive()
 
     def get_tab_set(self):
         tab_1 = self.data_selection_view.get_data_selection_tab()

@@ -7,6 +7,9 @@ class LoginView:
         self.terms_text = None
         self.terms_checkbox = None
         self.login_button = None
+        self.loading_spinner = None
+        self.loading_text = None
+        self.hbox = None
 
         self.login_input = widgets.Text(
             description='User ID:',
@@ -21,9 +24,22 @@ class LoginView:
                                                 disabled=False)
         self.login_button = widgets.Button(description="Login")
 
-        self.login_button.on_click(self.login)
+        self.loading_text = widgets.Label(
+            value="Loading..."
+        )
+        
+        with open('./loader.gif', 'rb') as f:
+            img = f.read()
 
-        self.vbox = widgets.VBox([self.login_input,self.terms_text, self.terms_checkbox, self.login_button ])
+        self.loading_spinner = widgets.Image(value=img
+                                             , width=25,
+                                              height=25)
+
+        self.login_button.on_click(self.login)
+        self.hbox = widgets.HBox([self.loading_spinner, self.loading_text])
+        self.hbox.layout.display = 'none'
+
+        self.vbox = widgets.VBox([self.login_input,self.terms_text, self.terms_checkbox, self.login_button, self.hbox])
 
     def login(self, event):
         self.controller.login(self.login_input.value, self.terms_checkbox.value)
@@ -36,3 +52,6 @@ class LoginView:
     
     def disable_login_button(self):
         self.login_button.disabled = True
+
+    def show_loading(self):
+        self.vbox.layout.display = 'display'

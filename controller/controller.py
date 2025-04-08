@@ -104,6 +104,7 @@ class Controller:
         if terms_checkbox:
             if self.login_model.login_correct(userid, self.drive):
                 self.login_view.disable_login_button()
+                self.login_view.show_loading()
                 self.drive.get_performances(userid)
                 self.learning_path = StudentLearningPath(userid)
                 # self.learning_path.get_scores()

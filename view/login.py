@@ -23,17 +23,7 @@ class LoginView:
 
         self.login_button.on_click(self.login)
 
-        self.download_progress = widgets.IntProgress(
-            value=0,
-            min=0,
-            max=100,
-            description='Loading...',
-            bar_style='', # 'success', 'info', 'warning', 'danger' or ''
-            style={'bar_color': 'maroon'},
-            orientation='horizontal'
-        )
-
-        self.vbox = widgets.VBox([self.login_input,self.terms_text, self.terms_checkbox, self.login_button, self.download_progress ])
+        self.vbox = widgets.VBox([self.login_input,self.terms_text, self.terms_checkbox, self.login_button ])
 
     def login(self, event):
         self.controller.login(self.login_input.value, self.terms_checkbox.value)

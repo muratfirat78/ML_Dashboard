@@ -33,7 +33,7 @@ class Controller:
         if drive != None:
             self.drive = drive
         else:
-            self.drive = GoogleDrive()
+            self.drive = GoogleDrive(self)
 
     def get_tab_set(self):
         tab_1 = self.data_selection_view.get_data_selection_tab()
@@ -118,3 +118,5 @@ class Controller:
         tabs = self.get_tab_set()
         return self.main_view.get_ui(login_view, tabs)
     
+    def update_percentage_done(self, percentage):
+        self.login_view.update_percentage_done(percentage)

@@ -2,6 +2,9 @@ import os
 from datetime import datetime
 
 class GoogleDrive():
+    def __init__(self, controller):
+       self.controller = controller
+
     def login_correct(self,userid):
         if userid == '':
            return False

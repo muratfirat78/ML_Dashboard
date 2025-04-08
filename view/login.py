@@ -54,4 +54,4 @@ class LoginView:
         self.login_button.disabled = True
 
     def show_loading(self):
-        self.vbox.layout.display = 'display'
+        self.vbox.layout.display = widgets.Layout(visibility = 'visible')

@@ -96,10 +96,10 @@ class PredictiveModelingModel:
         self.trainedModels.append(mymodel)
 
         write_log('Train Model-> '+ mytype, results, 'Predictive modeling')
-        self.logger.add_action(['ModelDevelopment', 'SelectModel'], mytype)
+        # self.logger.add_action(['ModelDevelopment', 'SelectModel'], mytype)
         for prf,val in mymodel.GetPerformanceDict().items():
             write_log('Model Performance-> '+prf+': '+str(val), results, 'Predictive modeling')
-            self.logger.add_action(['ModelDevelopment', 'ModelPerformance'], (prf, val))
+            self.logger.add_action(['ModelDevelopment', 'ModelPerformance'], (mytype, prf, val))
 
         trmodels.options = [mdl.getType() for mdl in self.trainedModels]
         

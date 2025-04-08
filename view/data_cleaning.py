@@ -125,7 +125,7 @@ class DataCleaningView:
         self.applybutton.on_click(self.makecleaning)
 
 
-        trgcl_lbl =widgets.Label(value ='Column: -',disabled = True)
+        trgcl_lbl = widgets.Label(value ='Column: -',disabled = True)
         trgtyp_lbl =widgets.Label(value ='Type: -',disabled = True)
         miss_lbl =widgets.Label(value ='Missing values: -',disabled = True)
 

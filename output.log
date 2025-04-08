@@ -1,4 +1,28 @@
-2025-04-07 15:38:35,145 - INFO - Application started
-2025-04-07 15:38:44,642 - INFO - Data Selection: Read data setWater Pollution_and_Disease.csv
-2025-04-07 15:38:57,880 - INFO - Data cleaning: col Nitrate Level (mg/L), action Edit Range, coltype float64
-2025-04-07 15:38:57,892 - INFO - Data cleaning: Edit Range is selected.. 3000->922
+2025-04-08 16:56:20,625 - INFO - Application started
+2025-04-08 16:56:29,869 - INFO - Data Selection: Read data setWater Pollution_and_Disease.csv
+2025-04-08 16:56:41,849 - INFO - Data processing: Target assigned: Typhoid Cases per 100,000 people
+2025-04-08 16:56:45,045 - INFO - Data processing: Split ratio, 0.2
+2025-04-08 16:56:45,055 - INFO - Data processing: Split, XTrain size: 2400
+2025-04-08 16:56:45,056 - INFO - Data processing: Split, XTest size: 600
+2025-04-08 16:56:45,057 - INFO - Data processing: Split, yTrain size: 2400
+2025-04-08 16:56:45,058 - INFO - Data processing: Split, yTest size: 600
+2025-04-08 16:56:59,730 - INFO - Data processing: Scaling-> Standardize
+2025-04-08 16:56:59,731 - INFO - Data processing: Scaling (maindf)-> 3000
+2025-04-08 16:56:59,731 - INFO - Data processing: Scaling (xtest)-> 600
+2025-04-08 16:56:59,732 - INFO - Data processing: Scaling (xtrain)-> 2400
+2025-04-08 16:56:59,732 - INFO - Data processing: Scaling (ytrain)-> 2400
+2025-04-08 16:56:59,732 - INFO - Data processing: Scaling (ytest)-> 600
+2025-04-08 16:56:59,733 - INFO - Data processing: Scaling-> Standardize: pH Level
+2025-04-08 16:56:59,733 - INFO - Data processing: Scaling (split)-> Standardize: pH Level
+2025-04-08 16:56:59,735 - INFO - Data processing: Scaling (split) done-> pH Level1
+2025-04-08 16:56:59,735 - INFO - Data preprocessing, feature scaling: standardization of column pH Level
+2025-04-08 16:57:18,567 - INFO - Data processing: Scaling-> Standardize
+2025-04-08 16:57:18,569 - INFO - Data processing: Scaling (maindf)-> 3000
+2025-04-08 16:57:18,569 - INFO - Data processing: Scaling (xtest)-> 600
+2025-04-08 16:57:18,570 - INFO - Data processing: Scaling (xtrain)-> 2400
+2025-04-08 16:57:18,571 - INFO - Data processing: Scaling (ytrain)-> 2400
+2025-04-08 16:57:18,571 - INFO - Data processing: Scaling (ytest)-> 600
+2025-04-08 16:57:18,572 - INFO - Data processing: Scaling-> Standardize: GDP per Capita (USD)
+2025-04-08 16:57:18,573 - INFO - Data processing: Scaling (split)-> Standardize: GDP per Capita (USD)
+2025-04-08 16:57:18,575 - INFO - Data processing: Scaling (split) done-> GDP per Capita (USD)1
+2025-04-08 16:57:18,575 - INFO - Data preprocessing, feature scaling: standardization of column GDP per Capita (USD)

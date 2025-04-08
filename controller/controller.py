@@ -83,6 +83,17 @@ class Controller:
     def get_curr_df(self):
         return self.main_model.curr_df
 
+    def set_curr_df(self,mydf):
+        self.main_model.curr_df = mydf
+        return
+
+    def get_XTrain(self):
+        return self.main_model.Xtrain_df
+
+    def set_XTrain(self,mfdf):
+        self.main_model.Xtrain_df = mydf
+        return
+
     def get_curr_info(self):
         return self.main_model.currinfo
     

@@ -15,7 +15,7 @@ class DataProcessingModel:
     def __init__(self, main_model, logger):
         self.main_model = main_model
         self.logger = logger
-     
+
     def remove_outliers(self): 
         self.main_model.curr_df[self.main_model.curr_df["outlier"] == False]
         self.main_model.curr_df.drop(["outlier"], axis=1)
@@ -29,7 +29,7 @@ class DataProcessingModel:
 
         self.main_model.targetcolumn = dt_features.value
 
-        trg_lbl.value = "Target: ["+self.main_model.targetcolumn+"]"
+        trg_lbl.value = self.main_model.targetcolumn
         trg_btn.disabled = True
 
         curr_df = self.main_model.curr_df
@@ -40,7 +40,7 @@ class DataProcessingModel:
         else:
             predictiontask = "Classification" 
 
-        prdtsk_lbl.value = "Prediction type: "+predictiontask 
+        prdtsk_lbl.value = predictiontask 
         write_log('Target assigned: '+target_column, result2exp, 'Data processing')
         self.logger.add_action(['ModelDevelopment', 'AssignTarget'], target_column)
         
@@ -63,67 +63,55 @@ class DataProcessingModel:
 
     ############################################################################################################    
 
-    def make_scaling(self,dt_features,ProcssPage,scalingacts,result2exp):
-                    
-        write_log('Scaling-> '+scalingacts.value, result2exp, 'Data processing')
-        curr_df = self.main_model.get_curr_df()
-        Xtest_df = self.main_model.get_XTest()
-        Xtrain_df = self.main_model.get_XTrain()
-        ytrain_df = self.main_model.getYtrain().to_frame()
-        ytest_df = self.main_model.get_YTest().to_frame()
-      
+    def make_scaling(self,dt_features,ProcssPage,scalingacts,result2exp):  
+        curr_df = self.main_model.curr_df
+        Xtest_df = self.main_model.Xtest_df
+        ytrain_df = self.main_model.ytrain_df
+        ytest_df = self.main_model.ytest_df
 
         colname = dt_features.value
-      
+        print(ytrain_df)
+        print(ytrain_df.columns)
+        print(type(ytrain_df))
         if colname is None:
             return
 
         write_log('Scaling-> '+scalingacts.value+': '+colname, result2exp, 'Data processing')
         if (curr_df[colname].dtype == 'object') or (curr_df[colname].dtype== 'string'):
-            
             with ProcssPage:
                 clear_output()
                 display.display('Selected column is not a numerical type..')
             return
 
-        
         if scalingacts.value == 'Standardize':
-            if self.main_model.datasplit:
-                # use parameters of training data for scaling
-                write_log('Scaling (split)-> '+scalingacts.value+': '+colname, result2exp, 'Data processing')
-                
-                
-                if colname in Xtrain_df.columns:
-                    colmean = Xtrain_df[colname].mean(); colstd = Xtrain_df[colname].std()
+            if len(Xtest_df)>0:
+                if colname in Xtest_df.columns:
+                    colmean = Xtest_df[colname].mean(); colstd = Xtest_df[colname].std()
                     Xtest_df[colname] = (Xtest_df[colname]- colmean)/colstd
-                    Xtrain_df[colname] = (Xtrain_df[colname]- colmean)/colstd
-                
+                    Xtest_df[colname] = (Xtest_df[colname]- colmean)/colstd
                 if colname in ytrain_df.columns:
                     colmean = ytrain_df[colname].mean(); colstd = ytrain_df[colname].std()
                     ytrain_df[colname] = (ytrain_df[colname]- colmean)/colstd
                     ytest_df[colname] = (ytest_df[colname]- colmean)/colstd
-            else:
-                # standardization before splitting data
-                colmean = curr_df[colname].mean();colstd = curr_df[colname].std()
-                curr_df[colname] = (curr_df[colname]- colmean)/colstd
-
-            write_log('Scaling (split) done-> '+colname+str(len(ytrain_df.columns)), result2exp, 'Data processing')
+                    
+            colmean = curr_df[colname].mean()
+            curr_df[colname] = (curr_df[colname]- colmean)/curr_df[colname].std()
             self.logger.add_action(['DataProcessing', 'Standardize'], [colname])
             logging.info('Data preprocessing, feature scaling: standardization of column '+ colname)
 
 
         if scalingacts.value == 'Normalize':
 
-            if self.main_model.datasplit:
-                if colname in Xtrain_df.columns:
-                    col_min = min(Xtrain_df[colname]); col_max = max(Xtrain_df[colname])
+            if len(Xtest_df)>0:
+                if colname in Xtest_df.columns:
+                    col_min = min(Xtest_df[colname]); col_max = max(Xtest_df[colname])
                     denominator = (col_max-col_min)
                     if denominator== 0:
                         Xtest_df[colname] = (Xtest_df[colname]/col_min)
-                        Xtrain_df[colname] = (Xtrain_df[colname]/col_min)
+                        Xtest_df[colname] = (Xtest_df[colname]/col_min)
                     else:
                         Xtest_df[colname] = (Xtest_df[colname]-col_min)/denominator
-                        Xtrain_df[colname] = (Xtrain_df[colname]-col_min)/denominator
+                        Xtest_df[colname] = (Xtest_df[colname]-col_min)/denominator
                 
                 if colname in ytrain_df.columns:
                     col_min = min(ytrain_df[colname]); col_max = max(ytrain_df[colname])
@@ -134,14 +122,15 @@ class DataProcessingModel:
                     else:
                         ytrain_df[colname] = (ytrain_df[colname]-col_min)/denominator
                         ytest_df[colname] = (ytest_df[colname]-col_min)/denominator
-            else:                
-                col_min = min(curr_df[colname]); col_max = max(curr_df[colname])
-                denominator = (col_max-col_min)
-                
-                if denominator== 0:
-                    curr_df[colname] = (curr_df[colname]/col_min)
-                else:
-                    curr_df[colname] = (curr_df[colname]-col_min)/denominator
+
+            
+            col_min = min(curr_df[colname]); col_max = max(curr_df[colname])
+            denominator = (col_max-col_min)
+
+            if denominator== 0:
+                curr_df[colname] = (curr_df[colname]/col_min)
+            else:
+                curr_df[colname] = (curr_df[colname]-col_min)/denominator
 
             self.logger.add_action(['DataProcessing', 'Normalize'], [colname])
             logging.info('Data preprocessing, feature scaling: normalization of column '+ colname)
@@ -149,37 +138,13 @@ class DataProcessingModel:
         with ProcssPage:
             clear_output()
             fig, (axbox, axhist) = plt.subplots(1,2)
-
-            if self.main_model.datasplit:
-                if colname in Xtrain_df.columns:
-
-                    sns.boxplot(x=colname,data=Xtrain_df, ax=axbox)
-                    axbox.set_title('Box plot (train)') 
-                    sns.distplot(Xtrain_df[colname],ax=axhist)
-                    axhist.set_title('Histogram (train)') 
-                    plt.legend(['Mean '+str(round(Xtrain_df[colname].mean(),2)),'Stdev '+str(round(Xtrain_df[colname].std(),2))], bbox_to_anchor=(0.6, 0.6))
-                    plt.show()
-                if colname in ytrain_df.columns:
-                    sns.boxplot(x=colname,data=ytrain_df, ax=axbox)
-                    axbox.set_title('Box plot (train)') 
-                    sns.distplot(ytrain_df[colname],ax=axhist)
-                    axhist.set_title('Histogram (train)') 
-                    plt.legend(['Mean '+str(round(ytrain_df[colname].mean(),2)),'Stdev '+str(round(ytrain_df[colname].std(),2))], bbox_to_anchor=(0.6, 0.6))
-                    plt.show()
-                    
-            else:
-                sns.boxplot(x=colname,data=curr_df, ax=axbox)
-                axbox.set_title('Box plot') 
-                sns.distplot(curr_df[colname],ax=axhist)
-                axhist.set_title('Histogram') 
-                plt.legend(['Mean '+str(round(curr_df[colname].mean(),2)),'Stdev '+str(round(curr_df[colname].std(),2))], bbox_to_anchor=(0.6, 0.6))
-                plt.show()
-
-        self.main_model.set_curr_df(curr_df)
-        self.main_model.set_XTest(Xtest_df)
-        self.main_model.set_XTrain(Xtrain_df)
-        self.main_model.set_YTrain(ytrain_df.squeeze())
-        self.main_model.set_YTest(ytest_df.squeeze())
+        
+            sns.boxplot(x=colname,data=curr_df, ax=axbox)
+            axbox.set_title('Box plot') 
+            sns.distplot(curr_df[colname],ax=axhist)
+            axhist.set_title('Histogram') 
+            plt.legend(['Mean '+str(round(curr_df[colname].mean(),2)),'Stdev '+str(round(curr_df[colname].std(),2))], bbox_to_anchor=(0.6, 0.6))
+            plt.show()
         
     
         return
@@ -230,18 +195,10 @@ class DataProcessingModel:
         ratio_percnt = int(splt_txt.value) 
         write_log('Split ratio, '+str(ratio_percnt/100), result2exp, 'Data processing')
         self.main_model.Xtrain_df,self.main_model.Xtest_df, self.main_model.ytrain_df, self.main_model.ytest_df = train_test_split(X, y, test_size=ratio_percnt/100, random_state=16)
-        splt_txt.layout.visibility = 'hidden'
-        splt_txt.layout.display = 'none'
-        splt_btn.layout.visibility = 'hidden'
         splt_btn.disabled = True
-        splt_btn.layout.display = 'none'
 
-        write_log('Split, XTrain size: '+str(len(self.main_model.Xtrain_df)), result2exp, 'Data processing')
-        write_log('Split, XTest size: '+str(len(self.main_model.Xtest_df)), result2exp, 'Data processing')
-        write_log('Split, yTrain size: '+str(len(self.main_model.ytrain_df)), result2exp, 'Data processing')
-        write_log('Split, yTest size: '+str(len(self.main_model.ytest_df)), result2exp, 'Data processing')
+        write_log('Split, Train size: '+str(len(self.main_model.Xtest_df)), result2exp, 'Data processing')
         self.logger.add_action(['DataProcessing', 'Split'], str(ratio_percnt) + '%')
-        self.main_model.datasplit = True
         return
     ############################################################################################################    
     def make_encoding(self,features2,encodingacts,result2exp):

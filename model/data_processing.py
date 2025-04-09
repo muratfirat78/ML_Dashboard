@@ -63,7 +63,7 @@ class DataProcessingModel:
 
     ############################################################################################################    
 
-    def make_scaling(self,dt_features,ProcssPage,scalingacts,result2exp):
+    def make_scaling(self,dt_features,FeatPage,scalingacts,result2exp):
                     
         write_log('Scaling-> '+scalingacts.value, result2exp, 'Data processing')
         curr_df = self.main_model.get_curr_df()
@@ -81,7 +81,7 @@ class DataProcessingModel:
         write_log('Scaling-> '+scalingacts.value+': '+colname, result2exp, 'Data processing')
         if (curr_df[colname].dtype == 'object') or (curr_df[colname].dtype== 'string'):
             
-            with ProcssPage:
+            with FeatPage:
                 clear_output()
                 display.display('Selected column is not a numerical type..')
             return
@@ -146,7 +146,7 @@ class DataProcessingModel:
             self.logger.add_action(['DataProcessing', 'Normalize'], [colname])
             logging.info('Data preprocessing, feature scaling: normalization of column '+ colname)
 
-        with ProcssPage:
+        with FeatPage:
             clear_output()
             fig, (axbox, axhist) = plt.subplots(1,2)
 
@@ -248,57 +248,79 @@ class DataProcessingModel:
 
         colname = features2.value
 
-        write_log('Encoding.. col '+colname+' is list:'+str(int(isinstance(self.main_model.curr_df, list))), result2exp, 'Data processing')
+        write_log('Encoding.. col '+colname, result2exp, 'Data processing')
 
-        if colname is None:
+        if (colname is None) or (colname == ''):
             return
 
-        
-        curr_df = self.main_model.curr_df
-        # Encode column  
-        if len(self.main_model.Xtest_df) > 0:
-            
-            
-            if encodingacts.value == "Label Encoding":
-                label_encoder = preprocessing.LabelEncoder() 
-                write_log('Encoding-> '+features2.value+' (train) current classes: '+str(curr_df[0][colname].unique()), result2exp, 'Data processing')
-                curr_df[0][colname] = label_encoder.fit_transform(curr_df[0][colname]) # train 
-                write_log('Encoding-> '+features2.value+' (train) after labeling classes: '+str(curr_df[0][colname].unique()), result2exp, 'Data processing')
-                write_log('Encoding-> '+features2.value+' (test) current classes: '+str(curr_df[1][colname].unique()), result2exp, 'Data processing')
-                curr_df[1][colname] = label_encoder.fit_transform(curr_df[1][colname]) # test
-                write_log('Encoding-> '+features2.value+' (test) after labeling classes: '+str(curr_df[1][colname].unique()), result2exp, 'Data processing')
+        encodingtype = encodingacts.value
 
-                curr_df = curr_df[0],curr_df[1]
-                self.logger.add_action(['DataProcessing', 'LabelEncoding'], [colname])
-                
-            if encodingacts.value == "One Hot Encoding":
+        write_log('Encoding.. col '+colname+', split '+str(self.main_model.datasplit)+', type '+encodingtype, result2exp, 'Data processing')
+
+        # Encode column  
+        if self.main_model.datasplit:
+
+            Xtest_df = self.main_model.get_XTest()
+            Xtrain_df = self.main_model.get_XTrain()
+            ytrain_df = self.main_model.getYtrain().to_frame()
+            ytest_df = self.main_model.get_YTest().to_frame()
+    
+            if encodingtype == "Label Encoding":
+                if colname in Xtrain_df.columns:
+
+                    label_encoder = preprocessing.LabelEncoder() 
+                    write_log('Encoding-> '+colname+' (train) current classes: '+str(Xtrain_df[colname].unique()), result2exp, 'Data processing')
+                    label_encoder.fit(Xtrain_df[colname]) 
+                    Xtrain_df[colname] = label_encoder.transform(Xtrain_df[colname]) # train 
+                    #Xtrain_df[colname] = label_encoder.fit_transform(Xtrain_df[colname]) # train 
+                    write_log('Encoding-> '+colname+' (train) after labeling classes: '+str(Xtrain_df[colname].unique()), result2exp, 'Data processing')
+                    Xtrain_df[colname] = Xtrain_df[colname].apply(np.int64)
+                    
+                    write_log('Encoding-> '+colname+' (test) current classes: '+str(Xtest_df[colname].unique()), result2exp, 'Data processing')
+                    Xtest_df[colname] = label_encoder.fit_transform(Xtest_df[colname]) # test
+                    write_log('Encoding-> '+colname+' (test) after labeling classes: '+str(Xtest_df[colname].unique()), result2exp, 'Data processing')
+                    Xtest_df[colname] = Xtest_df[colname].apply(np.int64)
+    
+                    self.logger.add_action(['DataProcessing', 'LabelEncoding'], [colname])
+                else: 
+                    write_log('Encoding-> '+colname+', target features..', result2exp, 'Data processing')
+                    
+            if encodingtype == "One Hot Encoding":
                 categorical_columns = [colname]
                 
                 encoder = preprocessing.OneHotEncoder(sparse_output=False)  # Initialize OneHotEncoder
-                one_hot_encoded = encoder.fit_transform(curr_df[0][categorical_columns])  # Fit and transform the categorical columns          
+                
+                one_hot_encoded = encoder.fit_transform(Xtrain_df[categorical_columns])  # Fit and transform the categorical columns          
                 one_hot_df = pd.DataFrame(one_hot_encoded,columns=encoder.get_feature_names_out(categorical_columns)) # Create a DataFrame
-                data1_df = pd.concat([curr_df[0].drop(categorical_columns, axis=1), one_hot_df], axis=1)
-                write_log('One Hot Encoding-> (train) after one-hot features: '+str(data1_df.columns), result2exp, 'Data processing')
+                Xtrain_df = pd.concat([Xtrain_df.drop(categorical_columns, axis=1), one_hot_df], axis=1)
+                write_log('One Hot Encoding-> (train) after one-hot features: '+str(Xtrain_df.columns), result2exp, 'Data processing')
 
                 encoder = preprocessing.OneHotEncoder(sparse_output=False)  # Initialize OneHotEncoder
-                one_hot_encoded = encoder.fit_transform(curr_df[1][categorical_columns])  # Fit and transform the categorical columns          
+                one_hot_encoded = encoder.fit_transform(Xtest_df[categorical_columns])  # Fit and transform the categorical columns          
                 one_hot_df = pd.DataFrame(one_hot_encoded,columns=encoder.get_feature_names_out(categorical_columns)) # Create a DataFrame 
-                data2_df = pd.concat([curr_df[1].drop(categorical_columns, axis=1), one_hot_df], axis=1)
-                write_log('One Hot Encoding-> (test) after one-hot features: '+str(data2_df.columns), result2exp, 'Data processing')
+                Xtest_df = pd.concat([Xtest_df.drop(categorical_columns, axis=1), one_hot_df], axis=1)
+                write_log('One Hot Encoding-> (test) after one-hot features: '+str(Xtest_df.columns), result2exp, 'Data processing')
 
-                curr_df = data1_df,data2_df
+               
 
-                features2.options = [col+'('+str(data1_df[col].isnull().sum())+')' for col in data1_df.columns]
+                features2.options = [col+'('+str(Xtrain_df[col].isnull().sum())+')' for col in Xtrain_df.columns]
                 self.logger.add_action(['DataProcessing', 'OneHotEncoding'], [colname])
-        else:
-            write_log('Encoding-> '+encodingacts.value+', '+str(encodingacts.value == "One Hot Encoding"), result2exp, 'Data processing')
+        else: #before split
+
+            curr_df = self.main_model.get_curr_df()
+              
+            write_log('Encoding-> '+encodingtype+', '+str(encodingacts.value == "One Hot Encoding"), result2exp, 'Data processing')
             write_log('Encoding-> '+colname+' current classes: '+str(len(curr_df)), result2exp, 'Data processing')
-            if encodingacts.value == "Label Encoding":
+            
+            if encodingtype == "Label Encoding":
                 label_encoder = preprocessing.LabelEncoder() 
-                write_log('Encoding-> '+features2.value+' current classes: '+str(curr_df[colname].unique()), result2exp, 'Data processing')
-                curr_df[colname] = label_encoder.fit_transform(curr_df[colname]) 
-                write_log('Encoding-> '+features2.value+' after labeling classes: '+str([cls for cls in curr_df[colname].unique()]), result2exp, 'Data processing')
+                write_log('Encoding-> '+colname+' current classes: '+str(curr_df[colname].unique()), result2exp, 'Data processing')
+                label_encoder.fit(curr_df[colname]) 
+                curr_df[colname] = label_encoder.transform(curr_df[colname]) 
+                #curr_df[colname] = label_encoder.fit_transform(curr_df[colname]) 
+                write_log('Encoding-> '+colname+' after labeling classes: '+str([cls for cls in curr_df[colname].unique()]), result2exp, 'Data processing')
                 self.logger.add_action(['DataProcessing', 'LabelEncoding'], [colname])
+                curr_df[colname] = curr_df[colname].apply(np.int64)
                 
             if encodingacts.value == "One Hot Encoding":
                 write_log('Encoding-> '+colname+' current classes: '+str(curr_df[colname].unique()), result2exp, 'Data processing')
@@ -311,6 +333,12 @@ class DataProcessingModel:
                 self.logger.add_action(['DataProcessing', 'OneHotEncoding'], [colname])
 
             features2.options = [col for col in curr_df.columns]
+
+        self.main_model.set_curr_df(curr_df)
+        self.main_model.set_XTest(Xtest_df)
+        self.main_model.set_XTrain(Xtrain_df)
+        self.main_model.set_YTrain(ytrain_df.squeeze())
+        self.main_model.set_YTest(ytest_df.squeeze())
         
         return
 

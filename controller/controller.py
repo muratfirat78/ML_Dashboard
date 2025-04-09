@@ -59,8 +59,8 @@ class Controller:
     def make_encoding(self,features2,encodingacts,result2exp):
         self.data_processing_model.make_encoding(features2,encodingacts,result2exp)
 
-    def make_scaling(self,dt_features,ProcssPage,scalingacts,result2exp):
-        self.data_processing_model.make_scaling(dt_features,ProcssPage,scalingacts,result2exp)
+    def make_scaling(self,dt_features,FeatPage,scalingacts,result2exp):
+        self.data_processing_model.make_scaling(dt_features,FeatPage,scalingacts,result2exp)
 
     def make_split(self,splt_txt,splt_btn,result2exp):
         self.data_processing_model.make_split(splt_txt,splt_btn,result2exp)

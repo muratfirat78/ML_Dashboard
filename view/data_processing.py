@@ -44,7 +44,7 @@ class DataProcessingView:
         with FeatPage:
             clear_output()
 
-            if (display_df[colname].dtype == 'float64') or (display_df[colname].dtype == 'int64'):
+            if (display_df[colname].dtype == 'float64') or (display_df[colname].dtype == 'int64') or (display_df[colname].dtype == 'int32'):
 
                 fig, (axbox, axhist) = plt.subplots(1,2)
         
@@ -96,11 +96,7 @@ class DataProcessingView:
         
         return
 
-    def makeencoding(self,event):   
-        global encodingacts,result2exp
-        self.controller.make_encoding(self.main_view.dt_features,encodingacts,result2exp)
-        
-        return
+   
 
     def makesplit(self,event):  
         global result2exp
@@ -140,7 +136,9 @@ class DataProcessingView:
 
         if self.main_view.process_types.value == "Scaling":
             self.controller.make_scaling(self.main_view.dt_features,self.main_view.process_page,scalingacts,result2exp)
-        
+        if self.main_view.process_types.value == "Encoding":
+            self.controller.make_encoding(self.main_view.dt_features,encodingacts,result2exp)
+
         
         return
 
@@ -226,8 +224,7 @@ class DataProcessingView:
 
         ecndlay = widgets.Layout(width="25%",display = 'none')
         encodingacts = widgets.Dropdown( options=['Select','Label Encoding','One Hot Encoding'], description='', disabled=False,layout = ecndlay)
-        encodingacts.observe(self.makeencoding,'value')
-
+     
         fxctblly = widgets.Layout(width="25%",visibility = 'hidden')
         fxctlbl = widgets.Label(value ='Methods',layout = encdblly)
 

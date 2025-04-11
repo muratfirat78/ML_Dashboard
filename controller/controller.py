@@ -47,6 +47,7 @@ class Controller:
         return tab_set
 
     def train_Model(self,tasktype,mytype,results,trmodels):
+        self.main_view.close_tab(2)
         self.predictive_modeling_model.train_Model(tasktype,mytype,results,trmodels)
     
     def make_cleaning(self,featurescl,result2aexp,missacts,dt_features,params):
@@ -65,6 +66,8 @@ class Controller:
         self.data_processing_model.make_scaling(dt_features,ProcssPage,scalingacts,result2exp)
 
     def make_split(self,splt_txt,splt_btn,result2exp):
+        self.main_view.close_tab(0)
+        self.main_view.close_tab(1)
         self.data_processing_model.make_split(splt_txt,splt_btn,result2exp)
 
     def remove_outliers(self):

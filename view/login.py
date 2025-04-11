@@ -17,7 +17,7 @@ class LoginView:
         )
 
         self.terms_text = widgets.Label(
-            value="Terms: All actions performed within this tool will be recorded and stored in Google Drive to assess skill level and recommend relevant assignments."
+            value="Terms: All actions performed within this tool will be recorded and stored in Google Drive to assess skill level and recommend relevant assignments. This information may be a subject for statistical analysis."
         )
         self.terms_checkbox = widgets.Checkbox( value=False,
                                                 description='I agree to the terms above',

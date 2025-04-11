@@ -5,6 +5,7 @@ class MainView:
             self.dt_features = None
             self.feat_page = None
             self.process_page = None
+            self.vis_page = None
             self.right_page = None
             self.process_types = None
             self.f_box = None

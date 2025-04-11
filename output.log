@@ -1,9 +1,26 @@
-2025-04-09 12:04:05,641 - INFO - Application started
-2025-04-09 12:04:13,353 - INFO - Data Selection: Read data setWater Pollution_and_Disease.csv
-2025-04-09 12:04:20,439 - INFO - Data processing: Encoding.. col Country
-2025-04-09 12:04:20,439 - INFO - Data processing: Encoding.. col Country, split False, type Label Encoding
-2025-04-09 12:04:20,441 - INFO - Data processing: Encoding-> Label Encoding, False
-2025-04-09 12:04:20,441 - INFO - Data processing: Encoding-> Country current classes: 3000
-2025-04-09 12:04:20,441 - INFO - Data processing: Encoding-> Country current classes: ['Mexico' 'Brazil' 'Indonesia' 'Nigeria' 'Ethiopia' 'China' 'Bangladesh'
- 'India' 'USA' 'Pakistan']
-2025-04-09 12:04:20,445 - INFO - Data processing: Encoding-> Country after labeling classes: [6, 1, 5, 7, 3, 2, 0, 4, 9, 8]
+2025-04-11 16:08:26,148 - INFO - Application started
+2025-04-11 16:08:35,808 - INFO - Data Selection: Read data setTelecom_Churn.csv
+2025-04-11 16:08:38,789 - INFO - Data processing: Target assigned: churn
+2025-04-11 16:08:39,225 - INFO - Data processing: Split ratio, 0.2
+2025-04-11 16:08:39,247 - INFO - Data processing: Split, XTrain size: 2666
+2025-04-11 16:08:39,249 - INFO - Data processing: Split, XTest size: 667
+2025-04-11 16:08:39,250 - INFO - Data processing: Split, yTrain size: 2666
+2025-04-11 16:08:39,250 - INFO - Data processing: Split, yTrain indices: 2666
+2025-04-11 16:08:39,250 - INFO - Data processing: Split, yTest size: 667
+2025-04-11 16:08:56,179 - INFO - PCA: PCA (split): 
+2025-04-11 16:08:56,206 - INFO - PCA: PCA: explained variance[0.99999998]
+2025-04-11 16:08:56,210 - INFO - PCA: PCA: name of column Princ_Comp_0,type <class 'numpy.ndarray'>
+2025-04-11 16:08:56,210 - INFO - PCA: PCA (split): cols initial Index(['state', 'account length', 'area code', 'phone number',
+       'international plan', 'voice mail plan', 'number vmail messages',
+       'total day minutes', 'total day calls', 'total day charge',
+       'total eve minutes', 'total eve calls', 'total eve charge',
+       'total night minutes', 'total night calls', 'total night charge',
+       'total intl minutes', 'total intl calls', 'total intl charge',
+       'customer service calls'],
+      dtype='object')
+2025-04-11 16:08:56,214 - INFO - PCA: PCA (split): size of PCA 2666
+2025-04-11 16:08:56,214 - INFO - PCA: PCA (split): cols before 18
+2025-04-11 16:08:56,223 - INFO - PCA: PCA (split): cols after 19
+2025-04-11 16:08:56,229 - INFO - PCA: PCA (split): size of final df2666
+2025-04-11 16:11:39,359 - INFO - Correlation: Correlation: Correlation
+2025-04-11 16:11:39,360 - INFO - Correlation: Correlation: 3333

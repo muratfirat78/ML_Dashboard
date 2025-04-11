@@ -13,8 +13,8 @@ class DataCleaningView:
         self.missacts = None
         self.applybutton = None
 
-    def featureclclick(self,trgcl_lbl,featurescl,trgtyp_lbl,miss_lbl):  
-        #settings.curr_df,trgcl_lbl,featurescl,trgtyp_lbl,miss_lbl
+    def featureclclick(self,trgcl_lbl,featurescl,miss_lbl):  
+        #settings.curr_df,trgcl_lbl,featurescl,miss_lbl
         bk_ind = 0
         for c in reversed(featurescl.value):
             if c == '(':
@@ -24,7 +24,8 @@ class DataCleaningView:
         colname = featurescl.value[:bk_ind-1]
 
         trgcl_lbl.value = " Column: "+colname
-        trgtyp_lbl.value= " Type: " +str(self.controller.get_curr_df()[colname].dtype)
+        trgcl_lbl.value = "Column: ["+str(colname)+"] | Type -> "+str(self.controller.get_curr_df()[colname].dtype)
+        
         miss_lbl.value =" Missing values: " + str(self.controller.get_curr_df()[colname].isnull().sum())
 
         
@@ -41,9 +42,9 @@ class DataCleaningView:
         return
 
     def featurecl_click(self,event):  
-        global trgcl_lbl,trgtyp_lbl,miss_lbl
+        global trgcl_lbl,miss_lbl
         
-        self.featureclclick(trgcl_lbl,self.main_view.featurescl,trgtyp_lbl,miss_lbl)
+        self.featureclclick(trgcl_lbl,self.main_view.featurescl,miss_lbl)
 
         return
 
@@ -102,7 +103,7 @@ class DataCleaningView:
         return
 
     def get_data_cleaning_tab(self):
-        global trgcl_lbl, trgtyp_lbl, miss_lbl, result2aexp
+        global trgcl_lbl,miss_lbl, result2aexp
         RP_lay=Layout(height='250px',width ='70%',align_items='center',overflow="visible")
 
         self.main_view.right_page = widgets.Output(layout = RP_lay)
@@ -126,7 +127,7 @@ class DataCleaningView:
 
 
         trgcl_lbl = widgets.Label(value ='Column: -',disabled = True)
-        trgtyp_lbl =widgets.Label(value ='Type: -',disabled = True)
+     
         miss_lbl =widgets.Label(value ='Missing values: -',disabled = True)
 
 
@@ -147,7 +148,7 @@ class DataCleaningView:
 
 
         sboxcllay = widgets.Layout()
-        selcl_box = VBox(children=[trgcl_lbl,trgtyp_lbl,miss_lbl,
+        selcl_box = VBox(children=[trgcl_lbl,miss_lbl,
                                    HBox(children=[self.min_lbl,self.min_text,self.max_lbl,self.max_text]),
                                    HBox(children=[self.missacts,self.applybutton],layout = Layout(align_items='flex-start'))],layout = sboxcllay)
 

@@ -1,17 +1,29 @@
-2025-04-14 17:25:26,315 - INFO - Application started
-2025-04-14 17:25:32,697 - INFO - Data Selection: Read data setworldcities.csv
-2025-04-14 17:25:36,798 - INFO - Data cleaning: col capital, action Drop Column, coltype object
-2025-04-14 17:25:36,798 - INFO - Data cleaning: Initial data size42905
-2025-04-14 17:25:36,799 - INFO - Data cleaning: Cleaning action done..Index(['Unnamed: 0', 'city', 'city_ascii', 'lat', 'lng', 'country', 'iso2',
-       'iso3', 'admin_name', 'population', 'id'],
+2025-04-14 22:45:50,787 - INFO - Application started
+2025-04-14 22:46:02,948 - INFO - Data Selection: Read data setWater Pollution_and_Disease.csv
+2025-04-14 22:46:29,642 - INFO - Data cleaning: col Water Treatment Method, action Replace-Mode, coltype object
+2025-04-14 22:46:29,642 - INFO - Data cleaning: Initial data size3000
+2025-04-14 22:46:29,642 - INFO - Data cleaning: mode.. Boiling
+2025-04-14 22:46:29,645 - INFO - Data cleaning: Cleaning action done..Index(['Country', 'Region', 'Year', 'Water Source Type',
+       'Contaminant Level (ppm)', 'pH Level', 'Turbidity (NTU)',
+       'Dissolved Oxygen (mg/L)', 'Nitrate Level (mg/L)',
+       'Lead Concentration (µg/L)', 'Bacteria Count (CFU/mL)',
+       'Water Treatment Method', 'Access to Clean Water (% of Population)',
+       'Diarrheal Cases per 100,000 people',
+       'Cholera Cases per 100,000 people', 'Typhoid Cases per 100,000 people',
+       'Infant Mortality Rate (per 1,000 live births)', 'GDP per Capita (USD)',
+       'Healthcare Access Index (0-100)', 'Urbanization Rate (%)',
+       'Sanitation Coverage (% of Population)', 'Rainfall (mm per year)',
+       'Temperature (°C)', 'Population Density (people per km²)'],
       dtype='object')
-2025-04-14 17:25:36,799 - INFO - Data cleaning: Final data size42905
-2025-04-14 17:25:41,709 - INFO - Data processing: Target assigned: country
-2025-04-14 17:25:41,722 - INFO - Data processing: Split ratio, 0.2
-2025-04-14 17:25:41,752 - INFO - Data processing: Split, XTrain size: 34324
-2025-04-14 17:25:41,753 - INFO - Data processing: Split, XTest size: 8581
-2025-04-14 17:25:41,754 - INFO - Data processing: Split, yTrain size: 34324
-2025-04-14 17:25:41,756 - INFO - Data processing: Split, yTrain indices: 34324
-2025-04-14 17:25:41,758 - INFO - Data processing: Split, yTest size: 8581
-2025-04-14 17:25:50,064 - INFO - Data cleaning: col (split) population, action Replace-Median, coltype float64
-2025-04-14 17:25:50,067 - INFO - Data cleaning: Data size (split) 0->34324
+2025-04-14 22:46:29,645 - INFO - Data cleaning: Final data size3000
+2025-04-14 22:50:45,728 - INFO - Data processing: Target assigned: Country
+2025-04-14 22:50:47,292 - INFO - Data processing: Split ratio, 0.2
+2025-04-14 22:50:47,298 - INFO - Data processing: Split, XTrain size: 2400
+2025-04-14 22:50:47,300 - INFO - Data processing: Split, XTest size: 600
+2025-04-14 22:50:47,300 - INFO - Data processing: Split, yTrain size: 2400
+2025-04-14 22:50:47,300 - INFO - Data processing: Split, yTrain indices: 2400
+2025-04-14 22:50:47,300 - INFO - Data processing: Split, yTest size: 600
+2025-04-14 22:51:04,343 - INFO - Correlation: Correlation: Correlation
+2025-04-14 22:51:04,343 - INFO - Correlation: Correlation: 3000
+2025-04-14 22:52:01,258 - INFO - Data cleaning: col (split) Water Source Type, action Drop Column, coltype object
+2025-04-14 22:52:01,258 - INFO - Data cleaning: Data size (split) 2400->2400

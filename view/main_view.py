@@ -17,7 +17,7 @@ class MainView:
             self.tabs = None
 
             
-    def set_tabs(self,tab_1,tab_2,tab_3,tab_4, tab_5):
+    def set_tabs(self,tab_1,tab_2,tab_3,tab_4):
         self.tabs = [tab_1,tab_2,tab_3, tab_4]
         tab_set = widgets.Tab(self.tabs)
         tab_set.set_title(0, 'Data Selection')

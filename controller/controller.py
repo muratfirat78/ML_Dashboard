@@ -31,7 +31,7 @@ class Controller:
         self.predictive_modeling_view = PredictiveModelingView(self, self.main_view)
         self.predictive_modeling_model = PredictiveModelingModel(self.main_model, self, self.logger)
         self.learning_path_model = LearningPathModel()
-        self.learning_path_view = LearningPathView(self)
+        # self.learning_path_view = LearningPathView(self)
         self.learning_path = None
         if drive != None:
             self.drive = drive
@@ -43,9 +43,9 @@ class Controller:
         tab_2 = self.data_cleaning_view.get_data_cleaning_tab()
         tab_3 = self.data_processing_view.get_data_processing_tab()
         tab_4 = self.predictive_modeling_view.get_predictive_modeling_tab()
-        tab_5 = self.learning_path_view.get_learning_path_tab()
+        # tab_5 = self.learning_path_view.get_learning_path_tab()
 
-        self.main_view.set_tabs(tab_1, tab_2, tab_3, tab_4, tab_5)
+        self.main_view.set_tabs(tab_1, tab_2, tab_3, tab_4)
         tab_set = self.main_view.get_tabs()
         
         return tab_set
@@ -134,4 +134,5 @@ class Controller:
         return self.logger.get_list_of_actions()
     
     def update_log_view(self):
-        self.learning_path_view.update_actions()
+        # self.learning_path_view.update_actions()
+        None

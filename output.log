@@ -1,28 +1,17 @@
-2025-04-14 13:54:46,217 - INFO - Application started
-2025-04-14 13:54:53,245 - INFO - Data Selection: Read data setTelecom_Churn.csv
-2025-04-14 13:55:05,122 - INFO - PCA: PCA: ['total day minutes', 'total day charge']
-2025-04-14 13:55:05,122 - INFO - PCA: PCA: explained variance[0.99999998]
-2025-04-14 13:55:05,122 - INFO - PCA: PCA: name of column Princ_Comp_0
-2025-04-14 13:55:05,122 - INFO - PCA: PCA: size of PCA3333
-2025-04-14 13:55:05,122 - INFO - PCA: PCA: size of final df3333
-2025-04-14 13:55:08,847 - INFO - Data processing: Target assigned: churn
-2025-04-14 13:55:09,977 - INFO - Data processing: Split ratio, 0.2
-2025-04-14 13:55:09,987 - INFO - Data processing: Split, XTrain size: 2666
-2025-04-14 13:55:09,987 - INFO - Data processing: Split, XTest size: 667
-2025-04-14 13:55:09,987 - INFO - Data processing: Split, yTrain size: 2666
-2025-04-14 13:55:09,987 - INFO - Data processing: Split, yTrain indices: 2666
-2025-04-14 13:55:09,987 - INFO - Data processing: Split, yTest size: 667
-2025-04-14 13:55:21,461 - INFO - PCA: PCA (split): 
-2025-04-14 13:55:21,471 - INFO - PCA: PCA: explained variance[0.99999989]
-2025-04-14 13:55:21,473 - INFO - PCA: PCA: name of column Princ_Comp_1,type <class 'numpy.ndarray'>
-2025-04-14 13:55:21,473 - INFO - PCA: PCA (split): cols initial Index(['state', 'account length', 'area code', 'phone number',
-       'international plan', 'voice mail plan', 'number vmail messages',
-       'total day calls', 'total eve minutes', 'total eve calls',
-       'total eve charge', 'total night minutes', 'total night calls',
-       'total night charge', 'total intl minutes', 'total intl calls',
-       'total intl charge', 'customer service calls', 'Princ_Comp_0'],
+2025-04-14 17:25:26,315 - INFO - Application started
+2025-04-14 17:25:32,697 - INFO - Data Selection: Read data setworldcities.csv
+2025-04-14 17:25:36,798 - INFO - Data cleaning: col capital, action Drop Column, coltype object
+2025-04-14 17:25:36,798 - INFO - Data cleaning: Initial data size42905
+2025-04-14 17:25:36,799 - INFO - Data cleaning: Cleaning action done..Index(['Unnamed: 0', 'city', 'city_ascii', 'lat', 'lng', 'country', 'iso2',
+       'iso3', 'admin_name', 'population', 'id'],
       dtype='object')
-2025-04-14 13:55:21,475 - INFO - PCA: PCA (split): size of PCA 2666
-2025-04-14 13:55:21,475 - INFO - PCA: PCA (split): cols before 17
-2025-04-14 13:55:21,475 - INFO - PCA: PCA (split): cols after 18
-2025-04-14 13:55:21,480 - INFO - PCA: PCA (split): size of final df2666
+2025-04-14 17:25:36,799 - INFO - Data cleaning: Final data size42905
+2025-04-14 17:25:41,709 - INFO - Data processing: Target assigned: country
+2025-04-14 17:25:41,722 - INFO - Data processing: Split ratio, 0.2
+2025-04-14 17:25:41,752 - INFO - Data processing: Split, XTrain size: 34324
+2025-04-14 17:25:41,753 - INFO - Data processing: Split, XTest size: 8581
+2025-04-14 17:25:41,754 - INFO - Data processing: Split, yTrain size: 34324
+2025-04-14 17:25:41,756 - INFO - Data processing: Split, yTrain indices: 34324
+2025-04-14 17:25:41,758 - INFO - Data processing: Split, yTest size: 8581
+2025-04-14 17:25:50,064 - INFO - Data cleaning: col (split) population, action Replace-Median, coltype float64
+2025-04-14 17:25:50,067 - INFO - Data cleaning: Data size (split) 0->34324

@@ -18,26 +18,56 @@ class DataCleaningView:
 
     def featureclclick(self,trgcl_lbl,featurescl,miss_lbl):  
         #settings.curr_df,trgcl_lbl,featurescl,miss_lbl
- 
         colname = featurescl.value
- 
+
+        missng_vals = 0
         totalmisses  = 0
-        for col in self.controller.get_curr_df().columns:
-            curr_miss = self.controller.get_curr_df()[col].isnull().sum()  
+
+        display_df = self.controller.get_curr_df()
+
+        for col in display_df.columns:
+            curr_miss = display_df[col].isnull().sum()  
             totalmisses+=curr_miss
 
 
+        if self.controller.main_model.datasplit:
+            totalmisses  = 0
+            if colname in self.controller.get_XTrain().columns: 
+                display_df = self.controller.main_model.get_XTrain()
+                missng_vals = display_df[colname].isnull().sum()
+                missng_vals+= self.controller.main_model.get_XTest()[colname].isnull().sum()
+
+                for col in display_df.columns:
+                    curr_miss = display_df[col].isnull().sum()  
+                    totalmisses+=curr_miss
+
+                for col in self.controller.main_model.get_XTest().columns:
+                    curr_miss = self.controller.main_model.get_XTest()[col].isnull().sum()  
+                    totalmisses+=curr_miss
+
+            else: 
+                ytrain_df = self.controller.main_model.getYtrain().to_frame()
+                if colname in ytrain_df.columns: 
+                    display_df = ytrain_df
+                    for col in display_df.columns:
+                        curr_miss = display_df[col].isnull().sum()  
+                        totalmisses+=curr_miss
+                else: 
+                    return
+        
+ 
+        
 
         trgcl_lbl.value = " Column: "+colname
-        trgcl_lbl.value = "Column: ["+str(colname)+"] | Type -> "+str(self.controller.get_curr_df()[colname].dtype)
+        trgcl_lbl.value = "Column: ["+str(colname)+"] | Type -> "+str(display_df[colname].dtype)
         
-        miss_lbl.value =" Missing values: " + str(self.controller.get_curr_df()[colname].isnull().sum())+" ( Total: "+str(totalmisses)+")"
+        miss_lbl.value =" Missing values: " + str(missng_vals)+" ( Total: "+str(totalmisses)+")"
 
 
         
-        if (self.controller.get_curr_df()[colname].dtype == 'int64') or (self.controller.get_curr_df()[colname].dtype == 'float64'):
-            self.min_lbl.value = "Min: "+str(self.controller.get_curr_df()[colname].min())
-            self.max_lbl.value = "Max: "+str(self.controller.get_curr_df()[colname].max())
+        if (display_df[colname].dtype == 'int64') or (display_df[colname].dtype == 'float64') or (display_df[colname].dtype == 'int32'):
+            self.min_lbl.value = "Min: "+str(display_df[colname].min())
+            self.max_lbl.value = "Max: "+str(display_df[colname].max())
         else:
             self.min_lbl.value = "Min: -"
             self.max_lbl.value = "Max: -"
@@ -68,36 +98,68 @@ class DataCleaningView:
         self.missacts.value = "Select"
 
         missings = []
-        for col in self.controller.get_curr_df().columns:
-            missings.append((self.controller.get_curr_df()[col].isnull().sum(),col))
+        if not self.controller.main_model.datasplit:
+            for col in self.controller.get_curr_df().columns:
+                missings.append((self.controller.get_curr_df()[col].isnull().sum(),col))
 
-        new_list = sorted(missings, key=lambda x: x[0], reverse=True)
+            curr_df = self.controller.get_curr_df()
+            new_list = sorted(missings, key=lambda x: x[0], reverse=True)
+            curr_df = curr_df[[col for (miss,col) in new_list]]
 
-        curr_df = self.controller.get_curr_df()
+            self.controller.set_curr_df(curr_df)
+            
+        else:
+            for col in self.controller.main_model.get_XTrain().columns:
+                missings.append((self.controller.main_model.get_XTrain()[col].isnull().sum()+self.controller.main_model.get_XTest()[col].isnull().sum(),col))
+            
 
-        curr_df = curr_df[[col for (miss,col) in new_list]]
+            new_list = sorted(missings, key=lambda x: x[0], reverse=True)
+            Xtrain = self.controller.main_model.get_XTrain()
+            Xtrain = Xtrain[[col for (miss,col) in new_list]]
+            Xtest = self.controller.main_model.get_XTest()
+            Xtest = Xtest[[col for (miss,col) in new_list]]
 
-        self.controller.set_curr_df(curr_df)
+            self.controller.main_model.set_XTest(Xtest)
+            self.controller.main_model.set_XTrain(Xtrain)
+        
 
         with self.main_view.right_page:
             clear_output()
             
             missing_df = pd.DataFrame(columns=['feature','missing values'])
             totalmisses  = 0
-            for col in self.controller.get_curr_df().columns:
-                curr_miss = self.controller.get_curr_df()[col].isnull().sum()
-                row = {'feature': col, 'missing values':curr_miss}
-                new_df = pd.DataFrame([row])
-                missing_df = pd.concat([missing_df, new_df], axis=0, ignore_index=True)
-                totalmisses+=curr_miss
+            if not self.controller.main_model.datasplit:
+                for col in self.controller.get_curr_df().columns:
+                    curr_miss = self.controller.get_curr_df()[col].isnull().sum()
+                    row = {'feature': col, 'missing values':curr_miss}
+                    new_df = pd.DataFrame([row])
+                    missing_df = pd.concat([missing_df, new_df], axis=0, ignore_index=True)
+                    totalmisses+=curr_miss
 
+            else:
+                for col in self.controller.main_model.get_XTrain().columns:
+                    curr_miss = self.controller.main_model.get_XTrain()[col].isnull().sum()
+                    curr_miss +=  self.controller.main_model.get_XTest()[col].isnull().sum()
+                    row = {'feature': col, 'missing values':curr_miss}
+                    new_df = pd.DataFrame([row])
+                    missing_df = pd.concat([missing_df, new_df], axis=0, ignore_index=True)
+                    totalmisses+=curr_miss
+                for col in self.controller.main_model.getYtrain().to_frame().columns:   
+                    trg_miss = self.controller.main_model.getYtrain().to_frame()[col].isnull().sum()
+                    trg_miss +=  self.controller.main_model.get_YTest().to_frame()[col].isnull().sum()
+                    totalmisses+=trg_miss
+                    row = {'feature': self.controller.main_model.targetcolumn , 'missing values':trg_miss}
+                    new_df = pd.DataFrame([row])
+                    missing_df = pd.concat([missing_df, new_df], axis=0, ignore_index=True)
+
+                
+            #display.display(missing_df.head(20))  
             g = sns.barplot(x='feature', y='missing values', data=missing_df)
             g.set_xticklabels(g.get_xticklabels(),rotation= 45)
             plt.title('Total Missing Values: '+str(totalmisses))
             plt.show()
+                    
 
-       
-        
         self.main_view.dt_features.options = [col for (miss,col) in new_list]
         self.main_view.featurescl.options = [col for (miss,col) in new_list]
 
@@ -149,7 +211,7 @@ class DataCleaningView:
 
 
         mssactlay = widgets.Layout(display = 'block')
-        self.missacts = widgets.Dropdown(description='Actions',options=['Select','Drop Column','Remove Missing','Replace-Mean','Replace-Median','Replace-Mode','Edit Range'], disabled=False,layout = mssactlay)
+        self.missacts = widgets.Dropdown(description='Actions',options=['Select','Drop Column','Remove-Missing','Replace-Mean','Replace-Median','Replace-Mode','Edit Range'], disabled=False,layout = mssactlay)
 
         self.missacts.observe(self.makerangedit)
 

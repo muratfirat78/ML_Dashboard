@@ -19,7 +19,7 @@ class Controller:
     def __init__(self, drive, online_version):
         self.main_model = MainModel(online_version)
         self.main_view = MainView()
-        self.logger = Logger()
+        self.logger = Logger(self)
         self.login_view = LoginView(self)
         self.login_model = LoginModel(self)
         self.data_selection_view = DataSelectionView(self, self.main_view)
@@ -51,7 +51,7 @@ class Controller:
         return tab_set
 
     def train_Model(self,tasktype,mytype,results,trmodels):
-        self.main_view.close_tab(2)
+        # self.main_view.close_tab(2)
         self.predictive_modeling_model.train_Model(tasktype,mytype,results,trmodels)
     
     def make_cleaning(self,featurescl,result2aexp,missacts,dt_features,params):
@@ -70,8 +70,8 @@ class Controller:
         self.data_processing_model.make_scaling(dt_features,ProcssPage,scalingacts,result2exp)
 
     def make_split(self,splt_txt,splt_btn,result2exp):
-        self.main_view.close_tab(0)
-        self.main_view.close_tab(1)
+        # self.main_view.close_tab(0)
+        # self.main_view.close_tab(1)
         self.data_processing_model.make_split(splt_txt,splt_btn,result2exp)
 
     def remove_outliers(self):
@@ -129,3 +129,9 @@ class Controller:
     
     def update_percentage_done(self, percentage):
         self.login_view.update_percentage_done(percentage)
+
+    def get_list_of_actions(self):
+        return self.logger.get_list_of_actions()
+    
+    def update_log_view(self):
+        self.learning_path_view.update_actions()

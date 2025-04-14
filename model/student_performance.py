@@ -50,3 +50,15 @@ class StudentPerformance:
     
     def printperformances(self):
         print(self.performance['ModelDevelopment']['ModelPerformance'])
+
+    def get_list_of_actions(self):
+        actions = []
+        for category, action_dict in self.performance.items():
+            for action_type, value in action_dict.items():
+                values = value if isinstance(value, list) else [value]
+                for v in values:
+                    val, idx = v
+                    action_str = f"{action_type}: {val}"
+                    actions.append((category, action_str, idx))
+        actions.sort(key=lambda x: x[2])
+        return actions

@@ -16,7 +16,7 @@ from view.predictive_modeling import PredictiveModelingView
 from view.login import LoginView
 
 class Controller:
-    def __init__(self, drive, online_version):
+    def __init__(self, drive, online_version, Tree, Node):
         self.main_model = MainModel(online_version)
         self.main_view = MainView()
         self.logger = Logger(self)
@@ -31,7 +31,7 @@ class Controller:
         self.predictive_modeling_view = PredictiveModelingView(self, self.main_view)
         self.predictive_modeling_model = PredictiveModelingModel(self.main_model, self, self.logger)
         self.learning_path_model = LearningPathModel()
-        self.learning_path_view = LearningPathView(self)
+        self.learning_path_view = LearningPathView(self, Tree, Node)
         self.learning_path = None
         if drive != None:
             self.drive = drive

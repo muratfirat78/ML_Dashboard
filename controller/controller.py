@@ -1,15 +1,16 @@
 from model.data_cleaning import DataCleaningModel
 from model.data_processing import DataProcessingModel
 from model.data_selection import DataSelectionModel
+from model.learning_path import LearningPathModel
 from model.local_drive import GoogleDrive
 from model.logger import Logger
 from model.login import LoginModel
 from model.predictive_modeling import PredictiveModelingModel
-from model.student_learning_path import StudentLearningPath
 from view.data_cleaning import DataCleaningView
 from view.data_processing import DataProcessingView
 from view.data_selection import DataSelectionView
 from model.main_model import MainModel
+from view.learning_path import LearningPathView
 from view.main_view import MainView
 from view.predictive_modeling import PredictiveModelingView
 from view.login import LoginView
@@ -29,6 +30,8 @@ class Controller:
         self.data_processing_model = DataProcessingModel(self.main_model, self.logger)
         self.predictive_modeling_view = PredictiveModelingView(self, self.main_view)
         self.predictive_modeling_model = PredictiveModelingModel(self.main_model, self, self.logger)
+        self.learning_path_model = LearningPathModel()
+        self.learning_path_view = LearningPathView(self)
         self.learning_path = None
         if drive != None:
             self.drive = drive
@@ -40,8 +43,9 @@ class Controller:
         tab_2 = self.data_cleaning_view.get_data_cleaning_tab()
         tab_3 = self.data_processing_view.get_data_processing_tab()
         tab_4 = self.predictive_modeling_view.get_predictive_modeling_tab()
+        tab_5 = self.learning_path_view.get_learning_path_tab()
 
-        self.main_view.set_tabs(tab_1, tab_2, tab_3, tab_4)
+        self.main_view.set_tabs(tab_1, tab_2, tab_3, tab_4, tab_5)
         tab_set = self.main_view.get_tabs()
         
         return tab_set
@@ -104,7 +108,7 @@ class Controller:
         if terms_checkbox:
             if self.login_model.login_correct(userid, self.drive):
                 self.drive.get_performances(userid)
-                self.learning_path = StudentLearningPath(userid)
+                self.learning_path_model.set_learning_path(userid)
                 # self.learning_path.get_scores()
                 self.login_view.hide_login()
                 self.main_view.show_tabs()

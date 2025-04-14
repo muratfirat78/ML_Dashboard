@@ -2,10 +2,9 @@ import os
 
 from model.student_performance import StudentPerformance
 
-class StudentLearningPath:
-    def __init__(self, userid):
+class LearningPathModel:
+    def __init__(self):
         self.learning_path = []
-        self.set_learning_path(userid)
 
     def set_learning_path(self,userid):
         path = os.path.join('drive', str(userid))

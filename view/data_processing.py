@@ -100,6 +100,17 @@ class DataProcessingView:
         
         self.testratiolbl.layout.display = 'block'
         self.testratiolbl.layout.visibility = 'visible'
+
+        opts = []
+        if not self.controller.main_model.datasplit:
+            opts =  [col for col in self.controller.main_model.get_curr_df().columns]
+        else:
+            opts = [col for col in self.controller.main_model.get_XTrain().columns]
+            for col in self.controller.main_model.getYtrain().columns:
+                opts.append(col)
+          
+        self.main_view.dt_features.options =[x for x in opts]
+        self.main_view.featurescl.options  = [x for x in opts] 
         
         
         return
@@ -149,7 +160,19 @@ class DataProcessingView:
                 self.pca_btn.layout.display = 'none'
                 self.pcaselect.layout.visibility = 'hidden'
                 self.pcaselect.layout.display = 'none'
+            fxctingacts.value = fxctingacts.options[0]
 
+        
+        opts = []
+        if not self.controller.main_model.datasplit:
+            opts =  [col for col in self.controller.main_model.get_curr_df().columns]
+        else:
+            opts = [col for col in self.controller.main_model.get_XTrain().columns]
+            for col in self.controller.main_model.getYtrain().columns:
+                opts.append(col)
+          
+        self.main_view.dt_features.options = [x for x in opts]
+        self.main_view.featurescl.options  = [x for x in opts] 
 
         
         return
@@ -161,6 +184,8 @@ class DataProcessingView:
         self.controller.assign_target(self.main_view.trg_lbl,self.main_view.dt_features,self.main_view.prdtsk_lbl,result2exp,self.trg_btn,predictiontask)
         self.trg_btn.layout.visibility = 'hidden'
         self.trg_btn.layout.display = 'none'
+
+
         return
 
     def get_data_processing_tab(self):

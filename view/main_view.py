@@ -16,6 +16,7 @@ class MainView:
             self.datasets = None
             self.tab_set = None
             self.tabs = None
+            self.cleaningoutput = None
 
             
     def set_tabs(self,tab_1,tab_2,tab_3,tab_4):

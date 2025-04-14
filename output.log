@@ -1,26 +1,28 @@
-2025-04-11 16:08:26,148 - INFO - Application started
-2025-04-11 16:08:35,808 - INFO - Data Selection: Read data setTelecom_Churn.csv
-2025-04-11 16:08:38,789 - INFO - Data processing: Target assigned: churn
-2025-04-11 16:08:39,225 - INFO - Data processing: Split ratio, 0.2
-2025-04-11 16:08:39,247 - INFO - Data processing: Split, XTrain size: 2666
-2025-04-11 16:08:39,249 - INFO - Data processing: Split, XTest size: 667
-2025-04-11 16:08:39,250 - INFO - Data processing: Split, yTrain size: 2666
-2025-04-11 16:08:39,250 - INFO - Data processing: Split, yTrain indices: 2666
-2025-04-11 16:08:39,250 - INFO - Data processing: Split, yTest size: 667
-2025-04-11 16:08:56,179 - INFO - PCA: PCA (split): 
-2025-04-11 16:08:56,206 - INFO - PCA: PCA: explained variance[0.99999998]
-2025-04-11 16:08:56,210 - INFO - PCA: PCA: name of column Princ_Comp_0,type <class 'numpy.ndarray'>
-2025-04-11 16:08:56,210 - INFO - PCA: PCA (split): cols initial Index(['state', 'account length', 'area code', 'phone number',
+2025-04-14 13:54:46,217 - INFO - Application started
+2025-04-14 13:54:53,245 - INFO - Data Selection: Read data setTelecom_Churn.csv
+2025-04-14 13:55:05,122 - INFO - PCA: PCA: ['total day minutes', 'total day charge']
+2025-04-14 13:55:05,122 - INFO - PCA: PCA: explained variance[0.99999998]
+2025-04-14 13:55:05,122 - INFO - PCA: PCA: name of column Princ_Comp_0
+2025-04-14 13:55:05,122 - INFO - PCA: PCA: size of PCA3333
+2025-04-14 13:55:05,122 - INFO - PCA: PCA: size of final df3333
+2025-04-14 13:55:08,847 - INFO - Data processing: Target assigned: churn
+2025-04-14 13:55:09,977 - INFO - Data processing: Split ratio, 0.2
+2025-04-14 13:55:09,987 - INFO - Data processing: Split, XTrain size: 2666
+2025-04-14 13:55:09,987 - INFO - Data processing: Split, XTest size: 667
+2025-04-14 13:55:09,987 - INFO - Data processing: Split, yTrain size: 2666
+2025-04-14 13:55:09,987 - INFO - Data processing: Split, yTrain indices: 2666
+2025-04-14 13:55:09,987 - INFO - Data processing: Split, yTest size: 667
+2025-04-14 13:55:21,461 - INFO - PCA: PCA (split): 
+2025-04-14 13:55:21,471 - INFO - PCA: PCA: explained variance[0.99999989]
+2025-04-14 13:55:21,473 - INFO - PCA: PCA: name of column Princ_Comp_1,type <class 'numpy.ndarray'>
+2025-04-14 13:55:21,473 - INFO - PCA: PCA (split): cols initial Index(['state', 'account length', 'area code', 'phone number',
        'international plan', 'voice mail plan', 'number vmail messages',
-       'total day minutes', 'total day calls', 'total day charge',
-       'total eve minutes', 'total eve calls', 'total eve charge',
-       'total night minutes', 'total night calls', 'total night charge',
-       'total intl minutes', 'total intl calls', 'total intl charge',
-       'customer service calls'],
+       'total day calls', 'total eve minutes', 'total eve calls',
+       'total eve charge', 'total night minutes', 'total night calls',
+       'total night charge', 'total intl minutes', 'total intl calls',
+       'total intl charge', 'customer service calls', 'Princ_Comp_0'],
       dtype='object')
-2025-04-11 16:08:56,214 - INFO - PCA: PCA (split): size of PCA 2666
-2025-04-11 16:08:56,214 - INFO - PCA: PCA (split): cols before 18
-2025-04-11 16:08:56,223 - INFO - PCA: PCA (split): cols after 19
-2025-04-11 16:08:56,229 - INFO - PCA: PCA (split): size of final df2666
-2025-04-11 16:11:39,359 - INFO - Correlation: Correlation: Correlation
-2025-04-11 16:11:39,360 - INFO - Correlation: Correlation: 3333
+2025-04-14 13:55:21,475 - INFO - PCA: PCA (split): size of PCA 2666
+2025-04-14 13:55:21,475 - INFO - PCA: PCA (split): cols before 17
+2025-04-14 13:55:21,475 - INFO - PCA: PCA (split): cols after 18
+2025-04-14 13:55:21,480 - INFO - PCA: PCA (split): size of final df2666

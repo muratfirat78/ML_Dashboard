@@ -6,17 +6,15 @@ class DataCleaningModel:
         self.logger = logger
 
     def make_cleaning(self,featurescl,result2aexp,missacts,dt_features,params): 
-        curr_df = self.main_model.curr_df
-        bk_ind = 0
-        for c in reversed(featurescl.value):
-            if c == '(':
-                break
-            bk_ind-=1
+        curr_df = self.main_model.get_curr_df()
+      
 
-        colname = featurescl.value[:bk_ind-1]
+        colname = featurescl.value
 
         handling = missacts.value
         write_log('col '+colname+', action '+handling+', coltype '+str(curr_df[colname].dtype), result2aexp, 'Data cleaning')
+        write_log('Initial data size'+str(len(curr_df)),  result2aexp, 'Data cleaning')  
+
         self.logger.add_action(['DataCleaning', handling], [colname])
 
 
@@ -32,10 +30,9 @@ class DataCleaningModel:
             if (curr_df[colname].dtype == 'float64'):
                 minval =float(minval); maxval =float(maxval); 
             
-            self.main_model.curr_df = curr_df[(curr_df[colname] >= minval) & (curr_df[colname] <= maxval)]
-       
-            
-            write_log('Edit Range is selected.. '+str(prev_size)+"->"+str(len(self.main_model.curr_df)),  result2aexp, 'Data cleaning')
+            curr_df = curr_df[(curr_df[colname] >= minval) & (curr_df[colname] <= maxval)]
+
+            write_log('Edit Range is selected.. ',  result2aexp, 'Data cleaning')
      
             
         elif handling == 'Drop Column':
@@ -58,7 +55,8 @@ class DataCleaningModel:
                 if handling == 'Replace-Mode': 
                     curr_df[colname].fillna(curr_df[colname].mode()[0], inplace=True)
                     
-        featurescl.options = [col+'('+str(curr_df[col].isnull().sum())+')' for col in curr_df.columns]
-        dt_features.options = [col for col in curr_df.columns]
+        self.main_model.set_curr_df(curr_df)
+        write_log('Cleaning action done..'+str(self.main_model.get_curr_df().columns),  result2aexp, 'Data cleaning') 
+        write_log('Final data size'+str(len(self.main_model.get_curr_df())),  result2aexp, 'Data cleaning')  
 
         return

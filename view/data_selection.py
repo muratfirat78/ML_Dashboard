@@ -1,5 +1,8 @@
 from IPython.display import clear_output
 from IPython import display
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 from ipywidgets import *
 
 
@@ -32,13 +35,46 @@ class DataSelectionView:
         info = self.controller.get_curr_info()
         self.main_view.dt_ftslay.height = str(rowheight*len(df.columns))+'px'
         self.main_view.dt_features.layout = self.main_view.dt_ftslay
-        self.main_view.dt_features.options = [col for col in df.columns]
+
+     
 
 
         self.main_view.ftlaycl.display = 'block'
         self.main_view.ftlaycl.height = str(rowheight*len(df.columns))+'px'
         self.main_view.featurescl.layout = self.main_view.ftlaycl
-        self.main_view.featurescl.options = [col+'('+str(df[col].isnull().sum())+')' for col in df.columns]
+
+
+        missings = []
+        for col in self.controller.get_curr_df().columns:
+            missings.append((self.controller.get_curr_df()[col].isnull().sum(),col))
+
+        new_list = sorted(missings, key=lambda x: x[0], reverse=True)
+        
+        self.main_view.dt_features.options = [col for (miss,col) in new_list]
+        self.main_view.featurescl.options = [col for (miss,col) in new_list]
+
+        df = df[[col for (miss,col) in new_list]]
+        
+
+        self.main_view.right_page.layout.display = 'block'
+        self.main_view.right_page.layout.visibility = 'visible'
+        
+        with self.main_view.right_page:
+            clear_output()
+            totalmisses = 0
+            missing_df = pd.DataFrame(columns=['feature','missing values'])
+            for col in df.columns:
+                row = {'feature': col, 'missing values':df[col].isnull().sum()}
+                new_df = pd.DataFrame([row])
+                missing_df = pd.concat([missing_df, new_df], axis=0, ignore_index=True)
+                totalmisses+=df[col].isnull().sum()
+
+            g = sns.barplot(x='feature', y='missing values', data=missing_df)
+            g.set_xticklabels(g.get_xticklabels(),rotation= 45)
+            plt.title('Total Missing Values: '+str(totalmisses))
+            plt.show()
+
+                
         
         self.main_view.process_types.value = self.main_view.process_types.options[0]
 
@@ -74,9 +110,7 @@ class DataSelectionView:
             #####################################
         self.InfoPage.layout.height = str(18*nrlines)+'px'
 
-        with self.main_view.right_page:
-            clear_output()
-
+    
         return
 
     def on_submit_func(self, event):

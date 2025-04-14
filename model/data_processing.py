@@ -118,7 +118,6 @@ class DataProcessingModel:
           
             write_log('PCA (split): size of final df'+str(len(self.main_model.get_XTrain())),result2exp, 'PCA')
 
-            features2.options = [col for col in self.main_model.get_XTrain().columns]
     
         else:
             current_df = self.main_model.get_curr_df()
@@ -156,11 +155,6 @@ class DataProcessingModel:
             write_log('PCA: size of final df'+str(len(self.main_model.get_curr_df())),result2exp, 'PCA')
 
 
-    
-        oplist = [col for col in self.main_model.get_curr_df().columns]
-      
-        features2.options
-        
         return
      
     def remove_outliers(self,dt_features,result2exp): 
@@ -261,7 +255,7 @@ class DataProcessingModel:
         trg_lbl.value = "Target: ["+self.main_model.targetcolumn+"]"
         trg_btn.disabled = True
 
-        curr_df = self.main_model.curr_df
+        curr_df = self.main_model.get_curr_df()
         target_column = self.main_model.targetcolumn
 
         if (curr_df[self.main_model.targetcolumn].dtype == 'float64') or (curr_df[target_column].dtype == 'int64'):
@@ -275,21 +269,6 @@ class DataProcessingModel:
         
 
         return 
-    ##################################################################################
-
-    def NormalizeColumn(self,df,colname):
-        logging.info('Data preprocessing, feature scaling: normalization of column '+ colname)
-        self.logger.add_action(['DataProcessing', 'Normalization'], [colname])
-        col_min = min(df[colname])
-        col_max = max(df[colname])
-        
-        if col_max == col_min: 
-            return
-        
-        df[colname] = (df[colname]- col_min)/(col_max-col_min)
-        
-        return df
-
     ############################################################################################################    
 
     def make_scaling(self,dt_features,FeatPage,scalingacts,result2exp):
@@ -303,8 +282,7 @@ class DataProcessingModel:
             return
 
         write_log('Scaling-> '+scalingtype+': '+colname, result2exp, 'Data processing')
-        
-       
+    
         
         if scalingtype == 'Standardize':
             
@@ -560,9 +538,6 @@ class DataProcessingModel:
                 else:
                     write_log('Balancing-> Categorical feature has more than 2 classes', result2exp, 'Data processing')
             
-                
-               
-            
                     
         logging.info('Data preprocessing, checking and handling unbalancedness')
         self.logger.add_action(['DataProcessing', 'Unbalancedness'], [colname])
@@ -587,20 +562,30 @@ class DataProcessingModel:
         X_indices = X.index
         y_indices = y.index
 
-        self.main_model.Xtrain_df,self.main_model.Xtest_df, self.main_model.ytrain_df, self.main_model.ytest_df = train_test_split(X, y, test_size=ratio_percnt/100, random_state=16)
+        xtrain,xtest, ytrain, ytest = train_test_split(X, y, test_size=ratio_percnt/100, random_state=16)
+        self.main_model.set_XTest(xtest)
+        self.main_model.set_XTrain(xtrain)
+        self.main_model.set_YTrain(ytrain)
+        self.main_model.set_YTest(ytest)
         splt_txt.layout.visibility = 'hidden'
         splt_txt.layout.display = 'none'
         splt_btn.layout.visibility = 'hidden'
         splt_btn.disabled = True
         splt_btn.layout.display = 'none'
 
-        write_log('Split, XTrain size: '+str(len(self.main_model.Xtrain_df)), result2exp, 'Data processing')
-        write_log('Split, XTest size: '+str(len(self.main_model.Xtest_df)), result2exp, 'Data processing')
-        write_log('Split, yTrain size: '+str(len(self.main_model.ytrain_df)), result2exp, 'Data processing')
-        write_log('Split, yTrain indices: '+str(len(self.main_model.ytrain_df.index)), result2exp, 'Data processing')
-        write_log('Split, yTest size: '+str(len(self.main_model.ytest_df)), result2exp, 'Data processing')
+
+        write_log('Split, XTrain size: '+str(len(self.main_model.get_XTrain())), result2exp, 'Data processing')
+        write_log('Split, XTest size: '+str(len(self.main_model.get_XTest())), result2exp, 'Data processing')
+        write_log('Split, yTrain size: '+str(len(self.main_model.getYtrain())), result2exp, 'Data processing')
+        write_log('Split, yTrain indices: '+str(len(self.main_model.getYtrain().index)), result2exp, 'Data processing')
+        write_log('Split, yTest size: '+str(len(self.main_model.get_YTest())), result2exp, 'Data processing')
         self.logger.add_action(['DataProcessing', 'Split'], str(ratio_percnt) + '%')
         self.main_model.datasplit = True
+
+
+    
+       
+        
         return
     ############################################################################################################    
     def make_encoding(self,features2,encodingacts,result2exp):
@@ -660,9 +645,6 @@ class DataProcessingModel:
                 Xtest_df = pd.concat([Xtest_df.drop(categorical_columns, axis=1), one_hot_df], axis=1)
                 write_log('One Hot Encoding-> (test) after one-hot features: '+str(Xtest_df.columns), result2exp, 'Data processing')
 
-               
-
-                features2.options = [col+'('+str(Xtrain_df[col].isnull().sum())+')' for col in Xtrain_df.columns]
                 self.logger.add_action(['DataProcessing', 'OneHotEncoding'], [colname])
         else: #before split
 
@@ -691,8 +673,7 @@ class DataProcessingModel:
                 write_log('One Hot Encoding-> after one-hot features: '+str(curr_df.columns), result2exp, 'Data processing')
                 self.logger.add_action(['DataProcessing', 'OneHotEncoding'], [colname])
 
-            features2.options = [col for col in curr_df.columns]
-
+      
         self.main_model.set_curr_df(curr_df)
         self.main_model.set_XTest(Xtest_df)
         self.main_model.set_XTrain(Xtrain_df)

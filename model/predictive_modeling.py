@@ -109,31 +109,36 @@ class PredictiveModelingModel:
         write_log('*Train Model-> model'+str(type(mymodel)),results,'Predictive modeling')
 
         write_log('++Train Model-> '+str(len(Xtrain_df)),results,'Predictive modeling')
+
+        success = False
+        try: 
+            mymodel.getSkLearnModel().fit(Xtrain_df,ytrain_df) 
+            write_log('Train Model-> trained..',results,'Predictive modeling')
+            y_pred = mymodel.GetPredictions(Xtest_df)
     
-        mymodel.getSkLearnModel().fit(Xtrain_df,ytrain_df) 
-
-      
-        y_pred = mymodel.GetPredictions(Xtest_df)
-
-        write_log('>>Train Model-> predcts'+str(len(y_pred))+", "+tasktype,results,'Predictive modeling')
-
-        if tasktype[tasktype.find(":")+2:] == 'Classification': 
-            mymodel.GetPerformanceDict()['Accuracy'] = accuracy_score(ytest_df, y_pred)
-            mymodel.setConfMatrix(confusion_matrix(ytest_df,y_pred))
-        
-        if tasktype[tasktype.find(":")+2:] == 'Regression': 
-            mymodel.GetPerformanceDict()['MSE'] = mean_squared_error(ytest_df, y_pred)
-
-        self.trainedModels.append(mymodel)
-
-        write_log('**Train Model-> '+ mytype, results, 'Predictive modeling')
-        self.logger.add_action(['ModelDevelopment', 'SelectModel'], mytype)
-        
-        for prf,val in mymodel.GetPerformanceDict().items():
-            write_log('Model Performance-> '+prf+': '+str(val), results, 'Predictive modeling')
-            self.logger.add_action(['ModelDevelopment', 'ModelPerformance'], (prf, val))
-
-        trmodels.options = [mdl.getName() for mdl in self.trainedModels]
+            write_log('>>Train Model-> predcts'+str(len(y_pred))+", "+tasktype,results,'Predictive modeling')
+    
+            if tasktype[tasktype.find(":")+2:] == 'Classification': 
+                mymodel.GetPerformanceDict()['Accuracy'] = accuracy_score(ytest_df, y_pred)
+                mymodel.setConfMatrix(confusion_matrix(ytest_df,y_pred))
+            
+            if tasktype[tasktype.find(":")+2:] == 'Regression': 
+                mymodel.GetPerformanceDict()['MSE'] = mean_squared_error(ytest_df, y_pred)
+    
+            self.trainedModels.append(mymodel)
+    
+            write_log('**Train Model-> '+ mytype, results, 'Predictive modeling')
+            self.logger.add_action(['ModelDevelopment', 'SelectModel'], mytype)
+            
+            for prf,val in mymodel.GetPerformanceDict().items():
+                write_log('Model Performance-> '+prf+': '+str(val), results, 'Predictive modeling')
+                self.logger.add_action(['ModelDevelopment', 'ModelPerformance'], (prf, val))
+    
+            trmodels.options = [mdl.getName() for mdl in self.trainedModels]
+            
+        except Exception as e: 
+            write_log('Train Model-> exception raised \"'+str(e)+'\"',results,'Predictive modeling')
+            write_log('Train Model-> unsuccessful trial',results,'Predictive modeling')
         
         self.controller.upload_log()
     

@@ -5,6 +5,7 @@ class MainView:
             self.dt_features = None
             self.feat_page = None
             self.process_page = None
+            self.vis_page = None
             self.right_page = None
             self.process_types = None
             self.f_box = None
@@ -15,6 +16,7 @@ class MainView:
             self.datasets = None
             self.tab_set = None
             self.tabs = None
+            self.cleaningoutput = None
 
             
     def set_tabs(self,tab_1,tab_2,tab_3,tab_4, tab_5):

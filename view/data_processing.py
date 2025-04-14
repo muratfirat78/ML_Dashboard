@@ -10,50 +10,65 @@ class DataProcessingView:
     def __init__(self, controller, main_view):
         self.controller = controller
         self.main_view = main_view
+        self.coltype = None
+        self.selcl = None
+        self.ApplyButton = None
+        self.trg_btn = None
+        self.splt_btn = None
+        self.pca_btn = None
+        self.pcaselect = None
+        
 
     def featureprclick(self,features2,FeatPage,processtypes,ProcssPage,scalingacts):  
         colname = features2.value
 
-        if not colname in self.controller.get_curr_df().columns:
+        display_df = self.controller.get_curr_df()
+
+
+        
+        if self.controller.main_model.datasplit:
+            if colname in self.controller.get_XTrain().columns: 
+                display_df = self.controller.get_XTrain()
+            else: 
+                ytrain_df = self.controller.main_model.getYtrain().to_frame()
+                if colname in ytrain_df.columns: 
+                    display_df = ytrain_df
+                else: 
+                    return
+
+
+        if not colname in display_df.columns:
             return
+
+        self.selcl.value = "Column: ["+str(colname)+"] | Type -> "+str(display_df[colname].dtype)+""
+      
         
         with FeatPage:
             clear_output()
-                
-            if (self.controller.get_curr_df()[colname].dtype == 'float64') or (self.controller.get_curr_df()[colname].dtype == 'int64'):
+
+            if (display_df[colname].dtype == 'float64') or (display_df[colname].dtype == 'int64') or (display_df[colname].dtype == 'int32'):
 
                 fig, (axbox, axhist) = plt.subplots(1,2)
         
-                sns.boxplot(x=colname,data=self.controller.get_curr_df(), ax=axbox)
-                axbox.set_title('Box plot') 
-                sns.distplot(self.controller.get_curr_df()[colname],ax=axhist)
-                axhist.set_title('Histogram') 
-                plt.legend(['Mean '+str(round(self.controller.get_curr_df()[colname].mean(),2)),'Stdev '+str(round(self.controller.get_curr_df()[colname].std(),2))], bbox_to_anchor=(0.6, 0.6))
+                sns.boxplot(x=colname,data=display_df, ax=axbox)
+                bxtitle = 'Box plot'
+                if self.controller.main_model.datasplit:
+                    bxtitle+=' (train)'
+                axbox.set_title(bxtitle) 
+                sns.distplot(display_df[colname],ax=axhist)
+                title = 'Histogram' 
+                if self.controller.main_model.datasplit:
+                    title+=' (train)'
+                axhist.set_title(title) 
+                plt.legend(['Mean '+str(round(display_df[colname].mean(),2)),'Stdev '+str(round(display_df[colname].std(),2))], bbox_to_anchor=(0.6, 0.6))
                 plt.show()
+        
+            if (display_df[colname].dtype == 'object') or (display_df[colname].dtype== 'string') or (display_df[colname].dtype== 'bool')  :
                 
-            
-                    
-                    ############################################################################################################
-            '''
-                if processtypes.value == 'Imbalancedness':
-                    if len(self.controller.get_curr_df()[colname].unique()) == 2: # binary detection
-            
-                        plt.figure(figsize=(6, 2))
-                        ax = sns.countplot(x=colname,data=self.controller.get_curr_df(), palette="cool_r")
-                        for p in ax.patches:
-                            ax.annotate("{:.1f}".format(p.get_height()), (p.get_x()+0.25, p.get_height()+0.01))
-                        plt.show()
-            '''           
-            
-            if (self.controller.get_curr_df()[colname].dtype == 'object') or (self.controller.get_curr_df()[colname].dtype== 'string'):
-            
-            
-                nrclasses = len(self.controller.get_curr_df()[colname].unique())
+                nrclasses = len(display_df[colname].unique())
                 if nrclasses < 250:
-                    g = sns.countplot(self.controller.get_curr_df(), x=colname)
+                    g = sns.countplot(display_df, x=colname)
                     g.set_xticklabels(g.get_xticklabels(),rotation= 45)
-                    
-                        #sns.distplot(self.controller.get_curr_df()[self.controller.get_curr_df().columns[optind]]).set_title('Histogram of feature '+self.controller.get_curr_df().columns[optind])
                     plt.show()
                 else:
                     display.display('Number of classes: ',nrclasses)
@@ -70,29 +85,33 @@ class DataProcessingView:
         self.controller.savedata(self.controller.get_datafolder(), self.main_view.datasets.value)
 
     def makebalanced(self,event):  
-        global balncacts
+        global balncacts,result2exp
         
-        self.controller.make_balanced(self.main_view.dt_features,balncacts,self.main_view.process_page)
         
-        return
-
-    def makescaling(self,event):    
-        global scalingacts,result2exp
-
-        self.controller.make_scaling(self.main_view.dt_features,self.main_view.process_page,scalingacts,result2exp)
         
         return
 
-    def makeencoding(self,event):   
-        global encodingacts,result2exp
-        self.controller.make_encoding(self.main_view.dt_features,encodingacts,result2exp)
-        
-        return
 
     def makesplit(self,event):  
-        global splt_txt,splt_btn,result2exp
+        global result2exp
         
-        self.controller.make_split(splt_txt,splt_btn,result2exp)
+        self.testratiolbl.value = 'Test Ratio(%): '+str(self.splt_txt.value)
+        self.controller.make_split(self.splt_txt,self.splt_btn,result2exp)
+        
+        self.testratiolbl.layout.display = 'block'
+        self.testratiolbl.layout.visibility = 'visible'
+
+        opts = []
+        if not self.controller.main_model.datasplit:
+            opts =  [col for col in self.controller.main_model.get_curr_df().columns]
+        else:
+            opts = [col for col in self.controller.main_model.get_XTrain().columns]
+            for col in self.controller.main_model.getYtrain().to_frame().columns:
+                opts.append(col)
+          
+        self.main_view.dt_features.options =[x for x in opts]
+        self.main_view.featurescl.options  = [x for x in opts] 
+        
         
         return
 
@@ -107,27 +126,74 @@ class DataProcessingView:
         global sclblly,scalelbl,prctlay,scalingacts,imblncdlay,balncacts,imbllbllly,imbllbl,encdlbl,encodingacts 
         global outrmvlay,outrmvbtn,encdblly,ecndlay,fxctlbl,fxctingacts,fxctblly,fxctlay
 
-        self.selectProcess_Type([self.main_view.process_types,sclblly,scalelbl,prctlay,scalingacts,imblncdlay,balncacts,imbllbllly,imbllbl,outrmvlay,outrmvbtn,encdlbl,encodingacts,encdblly,ecndlay,fxctlbl,fxctingacts,fxctblly,fxctlay])
+        self.selectProcess_Type([self.main_view.process_types,sclblly,scalelbl,prctlay
+                                 ,scalingacts,imblncdlay,balncacts,imbllbllly,imbllbl,outrmvlay,
+                                 outrmvbtn,encdlbl,encodingacts,encdblly,
+                                 ecndlay,fxctlbl,fxctingacts,fxctblly,fxctlay])
         
         return
 
-    def removeoutliers(self, event): 
-        self.controller.remove_outliers()
 
+
+    def ApplyMethod(self,event):  
+        global scalingacts,result2exp,balncacts,fxctingacts
+        #'Select Processing','Scaling','Encoding','Feature Extraction','Outlier','Imbalancedness'
+
+        with self.main_view.vis_page:
+            clear_output()
+    
+        if self.main_view.process_types.value == "Scaling":
+            self.controller.make_scaling(self.main_view.dt_features,self.main_view.process_page,scalingacts,result2exp)
+        if self.main_view.process_types.value == "Encoding":
+            self.controller.make_encoding(self.main_view.dt_features,encodingacts,result2exp)
+        if self.main_view.process_types.value == "Outlier":
+            self.controller.remove_outliers(self.main_view.dt_features,result2exp)
+        if self.main_view.process_types.value == "Imbalancedness":
+            self.controller.make_balanced(self.main_view.dt_features,balncacts,self.main_view.process_page,result2exp)
+        if self.main_view.process_types.value == "Feature Extraction":
+            if fxctingacts.value == "Correlation":
+                self.controller.showCorrHeatMap(self.main_view.vis_page,fxctingacts,result2exp)
+            if fxctingacts.value == "PCA":
+                self.controller.ApplyPCA(self.main_view.dt_features,self.pcaselect,result2exp)
+                self.pcaselect.options = []
+                self.pca_btn.layout.visibility = 'hidden'
+                self.pca_btn.layout.display = 'none'
+                self.pcaselect.layout.visibility = 'hidden'
+                self.pcaselect.layout.display = 'none'
+            fxctingacts.value = fxctingacts.options[0]
+
+        
+        opts = []
+        if not self.controller.main_model.datasplit:
+            opts =  [col for col in self.controller.main_model.get_curr_df().columns]
+        else:
+            opts = [col for col in self.controller.main_model.get_XTrain().columns]
+            for col in self.controller.main_model.getYtrain().columns:
+                opts.append(col)
+          
+        self.main_view.dt_features.options = [x for x in opts]
+        self.main_view.featurescl.options  = [x for x in opts] 
+
+        
         return
 
     def assignTarget(self, event): 
-        global result2exp,trg_btn,predictiontask
+        global result2exp,predictiontask
 
-        self.controller.assign_target(self.main_view.trg_lbl,self.main_view.dt_features,self.main_view.prdtsk_lbl,result2exp,trg_btn,predictiontask)
+        
+        self.controller.assign_target(self.main_view.trg_lbl,self.main_view.dt_features,self.main_view.prdtsk_lbl,result2exp,self.trg_btn,predictiontask)
+        self.trg_btn.layout.visibility = 'hidden'
+        self.trg_btn.layout.display = 'none'
+
 
         return
 
     def get_data_processing_tab(self):
-        global scalingacts, result2exp, trg_btn, balncacts, imblncdlay, imbllbllly, imbllbl, encdlbl, encodingacts, prctlay, scalelbl, sclblly, splt_txt,splt_btn
+        global scalingacts, result2exp, balncacts, imblncdlay, imbllbllly, imbllbl, encdlbl, encodingacts, prctlay, scalelbl, sclblly
         global outrmvlay,outrmvbtn,encdblly,ecndlay,fxctlbl,fxctingacts,fxctblly,fxctlay
         fpgelay = Layout(width="100%")
         self.main_view.feat_page = widgets.Output(layout = fpgelay)
+        fpgelay = Layout(width="100%")
         self.main_view.process_page = widgets.Output(layout=fpgelay)
 
         svprtlay = Layout(width='150px')
@@ -147,41 +213,48 @@ class DataProcessingView:
 
         imblncdlay = widgets.Layout()
         balncacts = widgets.Dropdown( options=['Select','Upsample','DownSample'], description='', disabled=False,layout = imblncdlay)
-        balncacts.observe(self.makebalanced,'value')
-
+    
         imblncdlay.visibility = 'hidden'
         balncacts.layout = imblncdlay
 
 
         outrmvlay = Layout(width='150px',visibility = 'hidden')
         outrmvbtn = widgets.Button(description="Remove Outliers",layout = outrmvlay)
-        outrmvbtn.on_click(self.removeoutliers)
+       
         outrmvbtn.layout = outrmvlay
 
         self.main_view.process_types = widgets.Dropdown( options=['Select Processing','Scaling','Encoding','Feature Extraction','Outlier','Imbalancedness'], description='', disabled=False)
         self.main_view.process_types.observe(self.selectProcessType,'value')
+        self.main_view.process_types.layout.width = '200px'
 
 
 
         self.main_view.dt_ftslay =  widgets.Layout( width="99%",display = 'block')
         self.main_view.dt_features = widgets.Select(options=[],description = '',layout = self.main_view.dt_ftslay)
         self.main_view.dt_features.observe(self.featurepr_click, 'value')
+       
+        self.testratiolbl  =widgets.Label(value = 'Test Ratio(%):',disabled = True)
+        self.testratiolbl.layout.visibility = 'hidden'
+        self.testratiolbl.layout.display = 'none'
+        self.splt_txt =widgets.Dropdown(description ='Test Ratio(%): ',options=[20,25,30,35])
+        self.splt_txt.layout.width = '160px'
+        self.splt_btn = widgets.Button(description="Split")
+        self.splt_btn.layout.width = '100px'
+        self.splt_btn.on_click(self.makesplit)
 
-        splt_txt =widgets.Dropdown(description ='Split (Test%):',options=[20,25,30,35])
-        spltlay = Layout(width='150px')
-        splt_btn = widgets.Button(description="Apply Split",layout = spltlay)
-        splt_btn.on_click(self.makesplit)
-
-        self.main_view.trg_lbl =widgets.Text(description ='Target:',value = '',disabled = True)
-        self.main_view.prdtsk_lbl =widgets.Text(description ='Pred. Task:',value = '',disabled = True)
+        self.main_view.trg_lbl = widgets.Label(value ='Target: -',disabled = True)
+        
+        #self.main_view.trg_lbl.layout.display = 'none'
+        self.main_view.prdtsk_lbl =widgets.Label(value = ' | Prediction Task: - ',disabled = True)
         trglay = Layout(width='150px')
-        trg_btn = widgets.Button(description="Assign Target",layout = trglay)
-        trg_btn.on_click(self.assignTarget)
+        self.trg_btn = widgets.Button(description="Assign Target",layout = trglay)
+        self.trg_btn.layout.width = '125px'
+        self.trg_btn.on_click(self.assignTarget)
 
 
         prctlay = widgets.Layout(width="25%",display = 'none')
         scalingacts = widgets.Dropdown( options=['Select','Standardize','Normalize'], description='', disabled=False,layout = prctlay)
-        scalingacts.observe(self.makescaling,'value')
+        #scalingacts.observe(self.makescaling,'value')
 
 
         encdblly = widgets.Layout(width="25%",visibility = 'hidden')
@@ -189,20 +262,41 @@ class DataProcessingView:
 
         ecndlay = widgets.Layout(width="25%",display = 'none')
         encodingacts = widgets.Dropdown( options=['Select','Label Encoding','One Hot Encoding'], description='', disabled=False,layout = ecndlay)
-        encodingacts.observe(self.makeencoding,'value')
-
+     
         fxctblly = widgets.Layout(width="25%",visibility = 'hidden')
-        fxctlbl = widgets.Label(value ='Methods',layout = encdblly)
+        fxctlbl = widgets.Label(value ='Methods',layout = fxctblly)
 
         fxctlay = widgets.Layout(width="25%",display = 'none')
-        fxctingacts = widgets.Dropdown( options=['Select','PCA','Correlation'], description='', disabled=False,layout = ecndlay)
+        fxctingacts = widgets.Dropdown( options=['Select','PCA','Correlation'], description='', disabled=False,layout = fxctlay)
+        fxctingacts.observe(self.PCAView)
 
+        
+        self.selcl = widgets.Label(value ='Column: -',disabled = True)
+        self.ApplyButton = widgets.Button(description="Apply")
+        self.ApplyButton.on_click(self.ApplyMethod)
+
+        self.main_view.vis_page = widgets.Output()
+
+        self.pca_btn = widgets.Button(description=">> Add PCA >> ")
+        self.pca_btn.layout.visibility = 'hidden'
+        self.pca_btn.layout.display = 'none'
+        self.pca_btn.on_click(self.AddftPCA)
+        
+        self.pcaselect = widgets.Select(options=[],description = '')
+        self.pcaselect.layout.visibility = 'hidden'
+        self.pcaselect.layout.display = 'none'
 
         sboxxlay = widgets.Layout()
-        sel_box = VBox(children=[trg_btn,self.main_view.trg_lbl,self.main_view.prdtsk_lbl,splt_txt,splt_btn,HBox(children=[widgets.Label(value ='Process Types'),self.main_view.process_types])
-                                ,HBox(children=[scalelbl,scalingacts]),
-                                HBox(children=[imbllbl,balncacts]),HBox(children=[encdlbl,encodingacts]),
-                                HBox(children=[fxctlbl,fxctingacts]),outrmvbtn],layout = sboxxlay)
+        sel_box = VBox(children=[self.selcl,
+                                 HBox(children=[self.main_view.trg_lbl,self.trg_btn,self.main_view.prdtsk_lbl]),
+                                 HBox(children=[self.testratiolbl,self.splt_txt,self.splt_btn]),
+                                 HBox(children=[widgets.Label(value ='Process Types'),self.main_view.process_types,self.ApplyButton]),
+                                 HBox(children=[scalelbl,scalingacts]),
+                                 HBox(children=[imbllbl,balncacts]),HBox(children=[encdlbl,encodingacts]),
+                                 HBox(children=[fxctlbl,fxctingacts]),
+                                 HBox(children=[self.pca_btn,self.pcaselect]),
+                                 self.main_view.vis_page
+                                ],layout = sboxxlay)
 
 
         fbox2alay = widgets.Layout(width = '30%')
@@ -220,7 +314,40 @@ class DataProcessingView:
         vbox2 = VBox(children = [self.main_view.feat_page,self.main_view.process_page],layout = vb2lay)
         tab_3 = HBox(children=[vbox1,vbox2])
         return tab_3
-    
+
+    def PCAView(self,event):
+        global fxctingacts
+
+        
+
+        if fxctingacts.value == "PCA":
+            with self.main_view.vis_page:
+                clear_output()
+            self.pcaselect.options = []
+            self.pca_btn.layout.display = 'block'
+            self.pca_btn.layout.visibility = 'visible'
+            self.pcaselect.layout.display = 'block'
+            self.pcaselect.layout.visibility = 'visible'
+        else: 
+            self.pcaselect.options = []
+            self.pca_btn.layout.visibility = 'hidden'
+            self.pca_btn.layout.display = 'none'
+            self.pcaselect.layout.visibility = 'hidden'
+            self.pcaselect.layout.display = 'none'
+  
+        return
+    def AddftPCA(self,event):
+
+        ftname = self.main_view.dt_features.value
+
+        if not ftname in self.pcaselect.options:
+            newosp = [op for op in self.pcaselect.options]
+            newosp.append(ftname)
+            self.pcaselect.options = newosp
+            
+
+        return
+
     def selectProcess_Type(self,vis_list):
         processtypes = vis_list[0]
         sclblly = vis_list[1]
@@ -241,7 +368,8 @@ class DataProcessingView:
         fxctingacts = vis_list[16]
         fxctblly = vis_list[17]
         fxctlay = vis_list[18]
-    
+
+       
         self.ResetProcessMenu(vis_list)
 
         
@@ -307,6 +435,14 @@ class DataProcessingView:
         fxctingacts = vis_list[16]
         fxctblly = vis_list[17]
         fxctlay = vis_list[18]
+
+        self.pca_btn.layout.visibility = 'hidden'
+        self.pca_btn.layout.display = 'none'
+        self.pcaselect.layout.visibility = 'hidden'
+        self.pcaselect.layout.display = 'none'
+
+       
+    
     
 
         fxctblly.display = 'none'

@@ -50,9 +50,8 @@ class Controller:
         
         return tab_set
 
-    def train_Model(self,tasktype,mytype,results,trmodels):
-        # self.main_view.close_tab(2)
-        self.predictive_modeling_model.train_Model(tasktype,mytype,results,trmodels)
+    def train_Model(self,tasktype,mytype,results,trmodels,params):
+        self.predictive_modeling_model.train_Model(tasktype,mytype,results,trmodels,params)
     
     def make_cleaning(self,featurescl,result2aexp,missacts,dt_features,params):
          self.data_cleaning_model.make_cleaning(featurescl,result2aexp,missacts,dt_features,params)
@@ -60,22 +59,28 @@ class Controller:
     def assign_target(self,trg_lbl,dt_features,prdtsk_lbl,result2exp,trg_btn,predictiontask):
         self.data_processing_model.assign_target(trg_lbl,dt_features,prdtsk_lbl,result2exp,trg_btn,predictiontask)  
 
-    def make_balanced(self,features2,balncacts,ProcssPage):
-        self.data_processing_model. make_balanced(features2,balncacts,ProcssPage)
+    def make_balanced(self,features2,balncacts,ProcssPage,result2exp):
+        self.data_processing_model.make_balanced(features2,balncacts,ProcssPage,result2exp)
 
     def make_encoding(self,features2,encodingacts,result2exp):
         self.data_processing_model.make_encoding(features2,encodingacts,result2exp)
 
-    def make_scaling(self,dt_features,ProcssPage,scalingacts,result2exp):
-        self.data_processing_model.make_scaling(dt_features,ProcssPage,scalingacts,result2exp)
+    def make_scaling(self,dt_features,FeatPage,scalingacts,result2exp):
+        self.data_processing_model.make_scaling(dt_features,FeatPage,scalingacts,result2exp)
 
+    def showCorrHeatMap(self,ProcssPage,fxctingacts,result2exp):
+        self.data_processing_model.showCorrHeatMap(ProcssPage,fxctingacts,result2exp)
+
+    def ApplyPCA(self,features2,pca_features,result2exp):
+        self.data_processing_model.ApplyPCA(features2,pca_features,result2exp)
+        
     def make_split(self,splt_txt,splt_btn,result2exp):
         # self.main_view.close_tab(0)
         # self.main_view.close_tab(1)
         self.data_processing_model.make_split(splt_txt,splt_btn,result2exp)
 
-    def remove_outliers(self):
-        self.data_processing_model.remove_outliers()
+    def remove_outliers(self,dt_features,result2exp):
+        self.data_processing_model.remove_outliers(dt_features,result2exp)
 
     def savedata(self,dataFolder, datasetname):
         self.data_processing_model.savedata(dataFolder, datasetname)
@@ -91,6 +96,17 @@ class Controller:
 
     def get_curr_df(self):
         return self.main_model.curr_df
+
+    def set_curr_df(self,mydf):
+        self.main_model.curr_df = mydf
+        return
+
+    def get_XTrain(self):
+        return self.main_model.Xtrain_df
+
+    def set_XTrain(self,mfdf):
+        self.main_model.Xtrain_df = mydf
+        return
 
     def get_curr_info(self):
         return self.main_model.currinfo

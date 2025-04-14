@@ -37,3 +37,5 @@ class MainView:
     def get_ui(self, login, tabs):
          return widgets.VBox([login, tabs])
     
+    def close_tab(self, index):
+         self.tabs[index].close()

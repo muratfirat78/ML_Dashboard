@@ -51,6 +51,7 @@ class Controller:
         return tab_set
 
     def train_Model(self,tasktype,mytype,results,trmodels):
+        self.main_view.close_tab(2)
         self.predictive_modeling_model.train_Model(tasktype,mytype,results,trmodels)
     
     def make_cleaning(self,featurescl,result2aexp,missacts,dt_features,params):
@@ -69,6 +70,8 @@ class Controller:
         self.data_processing_model.make_scaling(dt_features,ProcssPage,scalingacts,result2exp)
 
     def make_split(self,splt_txt,splt_btn,result2exp):
+        self.main_view.close_tab(0)
+        self.main_view.close_tab(1)
         self.data_processing_model.make_split(splt_txt,splt_btn,result2exp)
 
     def remove_outliers(self):
@@ -107,6 +110,8 @@ class Controller:
     def login(self, userid, terms_checkbox):
         if terms_checkbox:
             if self.login_model.login_correct(userid, self.drive):
+                self.login_view.disable_login_button()
+                self.login_view.show_loading()
                 self.drive.get_performances(userid)
                 self.learning_path_model.set_learning_path(userid)
                 # self.learning_path.get_scores()
@@ -122,3 +127,5 @@ class Controller:
         tabs = self.get_tab_set()
         return self.main_view.get_ui(login_view, tabs)
     
+    def update_percentage_done(self, percentage):
+        self.login_view.update_percentage_done(percentage)

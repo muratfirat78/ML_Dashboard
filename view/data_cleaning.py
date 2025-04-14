@@ -111,14 +111,18 @@ class DataCleaningView:
         else:
             for col in self.controller.main_model.get_XTrain().columns:
                 missings.append((self.controller.main_model.get_XTrain()[col].isnull().sum()+self.controller.main_model.get_XTest()[col].isnull().sum(),col))
-            
-
+        
             new_list = sorted(missings, key=lambda x: x[0], reverse=True)
             Xtrain = self.controller.main_model.get_XTrain()
             Xtrain = Xtrain[[col for (miss,col) in new_list]]
             Xtest = self.controller.main_model.get_XTest()
             Xtest = Xtest[[col for (miss,col) in new_list]]
 
+            for col in self.controller.main_model.getYtrain().to_frame().columns: 
+                missings.append((self.controller.main_model.getYtrain().to_frame()[col].isnull().sum(),col))
+                
+            new_list = sorted(missings, key=lambda x: x[0], reverse=True)
+            
             self.controller.main_model.set_XTest(Xtest)
             self.controller.main_model.set_XTrain(Xtrain)
         
@@ -137,6 +141,7 @@ class DataCleaningView:
                     totalmisses+=curr_miss
 
             else:
+               
                 for col in self.controller.main_model.get_XTrain().columns:
                     curr_miss = self.controller.main_model.get_XTrain()[col].isnull().sum()
                     curr_miss +=  self.controller.main_model.get_XTest()[col].isnull().sum()
@@ -144,6 +149,7 @@ class DataCleaningView:
                     new_df = pd.DataFrame([row])
                     missing_df = pd.concat([missing_df, new_df], axis=0, ignore_index=True)
                     totalmisses+=curr_miss
+                
                 for col in self.controller.main_model.getYtrain().to_frame().columns:   
                     trg_miss = self.controller.main_model.getYtrain().to_frame()[col].isnull().sum()
                     trg_miss +=  self.controller.main_model.get_YTest().to_frame()[col].isnull().sum()
@@ -151,6 +157,7 @@ class DataCleaningView:
                     row = {'feature': self.controller.main_model.targetcolumn , 'missing values':trg_miss}
                     new_df = pd.DataFrame([row])
                     missing_df = pd.concat([missing_df, new_df], axis=0, ignore_index=True)
+                   
 
                 
             #display.display(missing_df.head(20))  

@@ -98,7 +98,7 @@ class DataCleaningModel:
                         if handling == 'Replace-Mode': 
                             ytrain_df[colname].fillna(ytrain_df[colname].mode()[0], inplace=True)
                           
-                            write_log('mode (split) . '+str(Xtrain_df[colname].mode()[0]), result2aexp, 'Data cleaning')
+                            write_log('mode (split) . '+str(ytrain_df[colname].mode()[0]), result2aexp, 'Data cleaning')
                         if handling == 'Remove-Missing': 
                             ytrain_df = ytrain_df.dropna(subset = [colname])
                        

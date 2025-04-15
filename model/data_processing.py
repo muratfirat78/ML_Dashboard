@@ -59,8 +59,16 @@ class DataProcessingModel:
             return
 
         if self.main_model.datasplit:
+
+                  
             Xtest = self.main_model.get_XTest()
             XTrain = self.main_model.get_XTrain()
+
+            for col in pcafeats:
+                if (XTrain[col].dtype == 'object') or (XTrain[col].dtype== 'string'):
+                    write_log('PCA: Returned due to categorical feature selection', 'PCA')
+                    return
+      
             tr_prev_indices = XTrain.index
             write_log('PCA (split): ',result2exp, 'PCA')
 
@@ -125,6 +133,13 @@ class DataProcessingModel:
     
         else:
             current_df = self.main_model.get_curr_df()
+
+            for col in pcafeats:
+                if (current_df[col].dtype == 'object') or (current_df[col].dtype== 'string'):
+                    write_log('PCA: Returned due to categorical feature selection', 'PCA')
+                    return
+            
+            
             write_log('PCA: '+str(pcafeats),result2exp, 'PCA')
             x = current_df.loc[:,pcafeats].values
             x = StandardScaler().fit_transform(x) # normalizing the features

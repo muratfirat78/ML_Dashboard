@@ -99,6 +99,7 @@ class DataSelectionView:
 
         infotxt = str(info)
         self.InfoPage.value=infotxt
+        self.InfoPage.layout.visibility = 'visible'
         return
 
     def on_submit_func(self, event):
@@ -128,7 +129,7 @@ class DataSelectionView:
         fthboxlay = widgets.Layout(height='500px')
 
         self.DFPage = widgets.Output(layout=Layout(width='50%',height='250px',align_items='center',overflow="visible"))
-        self.InfoPage = widgets.Textarea(layout=Layout(width='500px',height='250px',align_items='center',overflow="visible"))
+        self.InfoPage = widgets.Textarea(layout=Layout(width='500px',height='250px',align_items='center',overflow="visible", visibility="hidden"))
 
 
         tab_1 = VBox(children=[

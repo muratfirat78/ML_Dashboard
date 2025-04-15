@@ -51,7 +51,7 @@ class DataSelectionModel:
         
         if online_version:
             abs_file_path = colabpath+'/'+filename
-            abs_info_path = './DataSets/'+infopath
+            abs_info_path = colabpath+'/'+infopath
         else:
             abs_file_path = os.path.join(Path.cwd(), rel_path)
             abs_info_path = os.path.join(Path.cwd(), infopath)
@@ -66,10 +66,13 @@ class DataSelectionModel:
 
        
         try: 
+            print("1")
+            print(abs_info_path)
             f = open(abs_info_path)
             self.main_model.currinfo = f.read()
             f.close()
         except: 
+            print("2")
             self.main_model.currinfo = "No info found for this file"
             
             

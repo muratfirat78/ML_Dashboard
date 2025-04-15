@@ -168,7 +168,7 @@ class DataProcessingView:
             opts =  [col for col in self.controller.main_model.get_curr_df().columns]
         else:
             opts = [col for col in self.controller.main_model.get_XTrain().columns]
-            for col in self.controller.main_model.getYtrain().columns:
+            for col in self.controller.main_model.getYtrain().to_frame().columns:
                 opts.append(col)
           
         self.main_view.dt_features.options = [x for x in opts]

@@ -1,29 +1,97 @@
-2025-04-14 22:45:50,787 - INFO - Application started
-2025-04-14 22:46:02,948 - INFO - Data Selection: Read data setWater Pollution_and_Disease.csv
-2025-04-14 22:46:29,642 - INFO - Data cleaning: col Water Treatment Method, action Replace-Mode, coltype object
-2025-04-14 22:46:29,642 - INFO - Data cleaning: Initial data size3000
-2025-04-14 22:46:29,642 - INFO - Data cleaning: mode.. Boiling
-2025-04-14 22:46:29,645 - INFO - Data cleaning: Cleaning action done..Index(['Country', 'Region', 'Year', 'Water Source Type',
-       'Contaminant Level (ppm)', 'pH Level', 'Turbidity (NTU)',
-       'Dissolved Oxygen (mg/L)', 'Nitrate Level (mg/L)',
-       'Lead Concentration (µg/L)', 'Bacteria Count (CFU/mL)',
-       'Water Treatment Method', 'Access to Clean Water (% of Population)',
-       'Diarrheal Cases per 100,000 people',
-       'Cholera Cases per 100,000 people', 'Typhoid Cases per 100,000 people',
-       'Infant Mortality Rate (per 1,000 live births)', 'GDP per Capita (USD)',
-       'Healthcare Access Index (0-100)', 'Urbanization Rate (%)',
-       'Sanitation Coverage (% of Population)', 'Rainfall (mm per year)',
-       'Temperature (°C)', 'Population Density (people per km²)'],
+2025-04-15 08:43:13,427 - INFO - Application started
+2025-04-15 08:43:19,764 - INFO - Data Selection: Read data setTelecom_Churn.csv
+2025-04-15 08:43:23,676 - INFO - Data cleaning: col state, action Drop Column, coltype object
+2025-04-15 08:43:23,676 - INFO - Data cleaning: Initial data size3333
+2025-04-15 08:43:23,676 - INFO - Data cleaning: Cleaning action done..Index(['account length', 'area code', 'phone number', 'international plan',
+       'voice mail plan', 'number vmail messages', 'total day minutes',
+       'total day calls', 'total day charge', 'total eve minutes',
+       'total eve calls', 'total eve charge', 'total night minutes',
+       'total night calls', 'total night charge', 'total intl minutes',
+       'total intl calls', 'total intl charge', 'customer service calls',
+       'churn'],
       dtype='object')
-2025-04-14 22:46:29,645 - INFO - Data cleaning: Final data size3000
-2025-04-14 22:50:45,728 - INFO - Data processing: Target assigned: Country
-2025-04-14 22:50:47,292 - INFO - Data processing: Split ratio, 0.2
-2025-04-14 22:50:47,298 - INFO - Data processing: Split, XTrain size: 2400
-2025-04-14 22:50:47,300 - INFO - Data processing: Split, XTest size: 600
-2025-04-14 22:50:47,300 - INFO - Data processing: Split, yTrain size: 2400
-2025-04-14 22:50:47,300 - INFO - Data processing: Split, yTrain indices: 2400
-2025-04-14 22:50:47,300 - INFO - Data processing: Split, yTest size: 600
-2025-04-14 22:51:04,343 - INFO - Correlation: Correlation: Correlation
-2025-04-14 22:51:04,343 - INFO - Correlation: Correlation: 3000
-2025-04-14 22:52:01,258 - INFO - Data cleaning: col (split) Water Source Type, action Drop Column, coltype object
-2025-04-14 22:52:01,258 - INFO - Data cleaning: Data size (split) 2400->2400
+2025-04-15 08:43:23,676 - INFO - Data cleaning: Final data size3333
+2025-04-15 08:43:24,137 - INFO - Data cleaning: col account length, action Select, coltype int64
+2025-04-15 08:43:24,137 - INFO - Data cleaning: Initial data size3333
+2025-04-15 08:43:24,138 - INFO - Data cleaning: Improper action is selected.. 
+2025-04-15 08:43:28,823 - INFO - Data cleaning: col phone number, action Drop Column, coltype object
+2025-04-15 08:43:28,823 - INFO - Data cleaning: Initial data size3333
+2025-04-15 08:43:28,827 - INFO - Data cleaning: Cleaning action done..Index(['account length', 'area code', 'international plan', 'voice mail plan',
+       'number vmail messages', 'total day minutes', 'total day calls',
+       'total day charge', 'total eve minutes', 'total eve calls',
+       'total eve charge', 'total night minutes', 'total night calls',
+       'total night charge', 'total intl minutes', 'total intl calls',
+       'total intl charge', 'customer service calls', 'churn'],
+      dtype='object')
+2025-04-15 08:43:28,827 - INFO - Data cleaning: Final data size3333
+2025-04-15 08:43:31,687 - INFO - Data cleaning: col international plan, action Drop Column, coltype object
+2025-04-15 08:43:31,688 - INFO - Data cleaning: Initial data size3333
+2025-04-15 08:43:31,688 - INFO - Data cleaning: Cleaning action done..Index(['account length', 'area code', 'voice mail plan',
+       'number vmail messages', 'total day minutes', 'total day calls',
+       'total day charge', 'total eve minutes', 'total eve calls',
+       'total eve charge', 'total night minutes', 'total night calls',
+       'total night charge', 'total intl minutes', 'total intl calls',
+       'total intl charge', 'customer service calls', 'churn'],
+      dtype='object')
+2025-04-15 08:43:31,689 - INFO - Data cleaning: Final data size3333
+2025-04-15 08:43:34,431 - INFO - Data cleaning: col voice mail plan, action Drop Column, coltype object
+2025-04-15 08:43:34,431 - INFO - Data cleaning: Initial data size3333
+2025-04-15 08:43:34,433 - INFO - Data cleaning: Cleaning action done..Index(['account length', 'area code', 'number vmail messages',
+       'total day minutes', 'total day calls', 'total day charge',
+       'total eve minutes', 'total eve calls', 'total eve charge',
+       'total night minutes', 'total night calls', 'total night charge',
+       'total intl minutes', 'total intl calls', 'total intl charge',
+       'customer service calls', 'churn'],
+      dtype='object')
+2025-04-15 08:43:34,433 - INFO - Data cleaning: Final data size3333
+2025-04-15 08:43:41,030 - INFO - Data processing: Target assigned: churn
+2025-04-15 08:43:41,398 - INFO - Data processing: Split ratio, 0.2
+2025-04-15 08:43:41,407 - INFO - Data processing: Split, XTrain size: 2666
+2025-04-15 08:43:41,407 - INFO - Data processing: Split, XTest size: 667
+2025-04-15 08:43:41,407 - INFO - Data processing: Split, yTrain size: 2666
+2025-04-15 08:43:41,411 - INFO - Data processing: Split, yTrain indices: 2666
+2025-04-15 08:43:41,411 - INFO - Data processing: Split, yTest size: 667
+2025-04-15 08:43:44,513 - INFO - Predictive modeling: Train Model-> Linear Model
+2025-04-15 08:43:44,513 - INFO - Predictive modeling: Train Model-> Xtrain2666
+2025-04-15 08:43:44,513 - INFO - Predictive modeling: Linear Model__Classification
+2025-04-15 08:43:44,513 - INFO - Predictive modeling: []
+2025-04-15 08:43:44,546 - INFO - Predictive modeling: Model.. Type <class 'sklearn.linear_model._stochastic_gradient.SGDClassifier'>
+2025-04-15 08:43:44,547 - INFO - Predictive modeling: *Train Model-> model<class 'model.predictive_modeling.MLModel'>
+2025-04-15 08:43:44,547 - INFO - Predictive modeling: ++Train Model-> 2666
+2025-04-15 08:43:44,547 - INFO - Predictive modeling: Train Model-> trained..
+2025-04-15 08:43:44,551 - INFO - Predictive modeling: >>Train Model-> predcts667, | Prediction Task: Classification
+2025-04-15 08:43:44,558 - INFO - Predictive modeling: **Train Model-> Linear Model
+2025-04-15 08:43:44,558 - INFO - Predictive modeling: Model Performance-> Accuracy: 0.8185907046476761
+2025-04-15 08:43:44,558 - INFO - Predictive modeling: Model Performance-> Precision: 0.39436619718309857
+2025-04-15 08:43:44,558 - INFO - Predictive modeling: Model Performance-> Recall: 0.2641509433962264
+2025-04-15 08:43:51,577 - INFO - Predictive modeling: Train Model-> KNN
+2025-04-15 08:43:51,577 - INFO - Predictive modeling: Train Model-> Xtrain2666
+2025-04-15 08:43:51,577 - INFO - Predictive modeling: KNN__Classification
+2025-04-15 08:43:51,577 - INFO - Predictive modeling: [5, 'minkowski']
+2025-04-15 08:43:51,577 - INFO - Predictive modeling: Model.. Type <class 'sklearn.neighbors._classification.KNeighborsClassifier'>
+2025-04-15 08:43:51,577 - INFO - Predictive modeling: *Train Model-> model<class 'model.predictive_modeling.MLModel'>
+2025-04-15 08:43:51,587 - INFO - Predictive modeling: ++Train Model-> 2666
+2025-04-15 08:43:51,589 - INFO - Predictive modeling: Train Model-> trained..
+2025-04-15 08:43:51,905 - INFO - Predictive modeling: >>Train Model-> predcts667, | Prediction Task: Classification
+2025-04-15 08:43:51,916 - INFO - Predictive modeling: **Train Model-> KNN
+2025-04-15 08:43:51,916 - INFO - Predictive modeling: Model Performance-> Accuracy: 0.8545727136431784
+2025-04-15 08:43:51,918 - INFO - Predictive modeling: Model Performance-> Precision: 0.6363636363636364
+2025-04-15 08:43:51,918 - INFO - Predictive modeling: Model Performance-> Recall: 0.19811320754716982
+2025-04-15 08:44:03,921 - INFO - Predictive modeling: Train Model-> Decision Tree
+2025-04-15 08:44:03,921 - INFO - Predictive modeling: Train Model-> Xtrain2666
+2025-04-15 08:44:03,923 - INFO - Predictive modeling: Decision Tree__Classification
+2025-04-15 08:44:03,923 - INFO - Predictive modeling: [6, 1, 'gini']
+2025-04-15 08:44:03,923 - INFO - Predictive modeling: DT: Classification
+2025-04-15 08:44:03,944 - INFO - Predictive modeling: Model.. Type <class 'sklearn.tree._classes.DecisionTreeClassifier'>
+2025-04-15 08:44:03,944 - INFO - Predictive modeling: *Train Model-> model<class 'model.predictive_modeling.MLModel'>
+2025-04-15 08:44:03,944 - INFO - Predictive modeling: ++Train Model-> 2666
+2025-04-15 08:44:03,945 - INFO - Predictive modeling: Train Model-> trained..
+2025-04-15 08:44:03,949 - INFO - Predictive modeling: >>Train Model-> predcts667, | Prediction Task: Classification
+2025-04-15 08:44:03,957 - INFO - Predictive modeling: **Train Model-> Decision Tree
+2025-04-15 08:44:03,958 - INFO - Predictive modeling: Model Performance-> Accuracy: 0.9070464767616192
+2025-04-15 08:44:03,958 - INFO - Predictive modeling: Model Performance-> Precision: 0.84375
+2025-04-15 08:44:03,958 - INFO - Predictive modeling: Model Performance-> Recall: 0.5094339622641509
+2025-04-15 08:44:27,622 - INFO - Predictive modeling: Train Model-> SVM
+2025-04-15 08:44:27,623 - INFO - Predictive modeling: Train Model-> Xtrain2666
+2025-04-15 08:44:27,623 - INFO - Predictive modeling: SVM__Classification
+2025-04-15 08:44:27,625 - INFO - Predictive modeling: [1.0, 'poly']

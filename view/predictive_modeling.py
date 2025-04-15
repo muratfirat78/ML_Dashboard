@@ -13,6 +13,7 @@ class PredictiveModelingView:
         self.mdplbl = None
         self.mgplbl = None
         self.knnkval = None
+        self.knnmetric = None
         self.rfnrest = None
         self.rfcrit  = None
         self.svcc = None
@@ -26,10 +27,33 @@ class PredictiveModelingView:
 
         for mdl in self.controller.get_trained_models():
             if trmodels.value == mdl.getName():
+                if len(mdl.GetPerformanceDict()) > 0:
+                    model_sumry.value += 'Preformance scores: '+'\n'
                 for prf,val in mdl.GetPerformanceDict().items():
-                    model_sumry.value += 'Performance-> '+prf+': '+str(round(val,3))+'\n'
+                    model_sumry.value += '  > '+prf+': '+str(round(val,3))+'\n'
                     with self.performpage:
                         clear_output()
+                        try: 
+                            roc_fpr,roc_tpr = mymodel.getRoc()
+                            # plot the roc curve for the model
+                            plt.plot(roc_fpr, roc_tpr, marker='.', label=mdl.getName())
+                            # axis labels
+                            plt.xlabel('False Positive Rate')
+                            plt.ylabel('True Positive Rate')
+                            # show the legend
+                            plt.legend()
+                            # show the plot
+                            plt.show()
+
+                        except: 
+                            display.display('ROC curve could not be plotted.')
+                            
+                        if mdl.getType() == "Linear Model":
+                            try: 
+                                display.display(mdl.getSkLearnModel().summary())
+                            except: 
+                                display.display("Sklearn model does not have summary.")
+                            
                         if mdl.getTask() == "Classification":
                             display.display('Confusion Matrix: ')
                             display.display(mdl.getConfMatrix())
@@ -52,6 +76,8 @@ class PredictiveModelingView:
         self.mgplbl.layout.display = 'none'
         self.knnkval.layout.visibility = 'hidden'
         self.knnkval.layout.display = 'none'
+        self.knnmetric.layout.visibility = 'hidden'
+        self.knnmetric.layout.display = 'none'
         self.rfnrest.layout.visibility = 'hidden'
         self.rfnrest.layout.display = 'none'
         self.rfcrit.layout.visibility = 'hidden'
@@ -78,11 +104,14 @@ class PredictiveModelingView:
         if self.t4_models.value == "KNN":
             self.knnkval.layout.display = 'block'
             self.knnkval.layout.visibility = 'visible'
+            self.knnmetric.layout.display = 'block'
+            self.knnmetric.layout.visibility = 'visible'
         if self.t4_models.value == "Random Forest":
             self.rfnrest.layout.display = 'block'
             self.rfnrest.layout.visibility = 'visible'
-            self.rfcrit.layout.display = 'block'
-            self.rfcrit.layout.visibility = 'visible'
+            if self.main_view.prdtsk_lbl.value[self.main_view.prdtsk_lbl.value.find(":")+2:] == 'Classification': 
+                self.rfcrit.layout.display = 'block'
+                self.rfcrit.layout.visibility = 'visible'
         if self.t4_models.value == "SVM":
             self.svcc.layout.display = 'block'
             self.svcc.layout.visibility = 'visible'
@@ -101,7 +130,7 @@ class PredictiveModelingView:
         if self.t4_models.value == "Decision Tree":
             params= [self.dtdepth.value,self.dtminseg.value,self.dtcrit.value]
         if self.t4_models.value == "KNN":
-            params= [self.knnkval.value]
+            params= [self.knnkval.value,self.knnmetric.value]
         if self.t4_models.value == "Random Forest":
             params= [self.rfnrest.value,self.rfcrit.value]
         if self.t4_models.value == "SVM":
@@ -155,6 +184,9 @@ class PredictiveModelingView:
         self.knnkval = widgets.Dropdown(options=[i for i in range(1,15)],description = 'k')
         self.knnkval.layout.width = '125px'
         self.knnkval.layout.display = 'none'
+        self.knnmetric = widgets.Dropdown(options=['minkowski','euclidean','manhattan'],description = 'k')
+        self.knnmetric.layout.width = '125px'
+        self.knnmetric.layout.display = 'none'
 
         self.mdplbl = widgets.Label( value="MaxDepth: ")
         self.mdplbl.layout.visibility = 'hidden'
@@ -177,7 +209,7 @@ class PredictiveModelingView:
       
         sel_box = VBox(children=[HBox(children=[self.main_view.trg_lbl,self.main_view.prdtsk_lbl]),
                                  HBox(children=[self.dtdepth,self.dtminseg,self.dtcrit]),
-                                 HBox(children=[self.knnkval]),
+                                 HBox(children=[self.knnkval,self.knnmetric]),
                                  HBox(children=[self.rfnrest,self.rfcrit]),
                                  HBox(children=[self.svcc,self.svckrnl]),
                                  HBox(children=[self.t4_models,trnml_btn]),

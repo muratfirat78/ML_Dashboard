@@ -613,7 +613,14 @@ class DataProcessingModel:
             ytest_df = self.main_model.get_YTest().to_frame()
     
             if encodingtype == "Label Encoding":
+                
                 if colname in Xtrain_df.columns:
+
+                    
+                    if Xtrain_df[colname].dtype in ['float64','int64','int32']:
+                        write_log('Encoding-> Attempt to encode a numerical feature '+str(colname), result2exp, 'Data processing')
+                        return
+                    
 
                     label_encoder = preprocessing.LabelEncoder() 
                     write_log('Encoding-> '+colname+' (train) current classes: '+str(Xtrain_df[colname].unique()), result2exp, 'Data processing')
@@ -635,7 +642,14 @@ class DataProcessingModel:
             if encodingtype == "One Hot Encoding":
 
                 if colname in Xtrain_df.columns:
+
+                    if Xtrain_df[colname].dtype in ['float64','int64','int32']:
+                        write_log('Encoding-> Attempt to encode a numerical feature '+str(colname), result2exp, 'Data processing')
+                        return
+                    
                     categorical_columns = [colname]
+
+                    
     
                     Xtrain_df = pd.concat([Xtrain_df.drop(categorical_columns, axis = 1), pd.get_dummies(Xtrain_df[categorical_columns])], axis=1)
                     Xtest_df = pd.concat([Xtest_df.drop(categorical_columns, axis = 1), pd.get_dummies(Xtest_df[categorical_columns])], axis=1)
@@ -658,6 +672,10 @@ class DataProcessingModel:
         else: #before split
 
             curr_df = self.main_model.get_curr_df()
+
+            if curr_df[colname].dtype in ['float64','int64','int32']:
+                write_log('Encoding-> Attempt to encode a numerical feature '+str(colname), result2exp, 'Data processing')
+                return
               
             write_log('Encoding-> '+encodingtype+', '+str(encodingacts.value == "One Hot Encoding"), result2exp, 'Data processing')
             write_log('Encoding-> '+colname+' current classes: '+str(len(curr_df)), result2exp, 'Data processing')

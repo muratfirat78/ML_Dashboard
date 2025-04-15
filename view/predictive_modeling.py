@@ -199,7 +199,7 @@ class PredictiveModelingView:
         self.svckrnl = widgets.Dropdown(options=['linear','poly','rbf','sigmoid'],description = 'kernel')
         self.svckrnl.layout.display = 'none'
 
-        self.rfnrest =widgets.Dropdown(options=[i for i in range(0,150,15)],description = 'estimators')
+        self.rfnrest =widgets.Dropdown(options=[i for i in range(15,150,15)],description = 'estimators')
         self.rfnrest.layout.display = 'none'
         self.rfcrit = widgets.Dropdown(options=['entropy','gini'],description = 'criterion')
         self.rfcrit.layout.display = 'none'

@@ -49,6 +49,7 @@ class DataProcessingModel:
 
 
         pcafeats = [ftname for ftname in pca_features.options]
+        self.logger.add_action(['DataProcessing', 'PCA'], pcafeats)
 
         if self.main_model.targetcolumn in pcafeats:
             write_log('PCA: Returned due to inclusion of target in PCA', 'PCA')
@@ -161,6 +162,7 @@ class DataProcessingModel:
 
         colname = dt_features.value
         write_log('Outlier removal: '+colname,result2exp, 'Outlier removal')
+        self.logger.add_action(['DataProcessing', 'outlier'], colname)
       
         
         if self.main_model.datasplit:
@@ -265,7 +267,7 @@ class DataProcessingModel:
 
         prdtsk_lbl.value = "| Prediction Task: "+predictiontask 
         write_log('Target assigned: '+target_column, result2exp, 'Data processing')
-        self.logger.add_action(['ModelDevelopment', 'AssignTarget'], target_column)
+        self.logger.add_action(['DataProcessing', 'AssignTarget'], target_column)
         
 
         return 
@@ -540,7 +542,7 @@ class DataProcessingModel:
             
                     
         logging.info('Data preprocessing, checking and handling unbalancedness')
-        self.logger.add_action(['DataProcessing', 'Unbalancedness'], [colname])
+        self.logger.add_action(['DataProcessing', 'Unbalancedness ' + balancetype ], [colname])
         return
 
     #####################################################################################################################

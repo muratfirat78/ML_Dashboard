@@ -100,12 +100,6 @@ class PredictiveModelingModel:
         ytrain_df = self.main_model.getYtrain()
         ytest_df = self.main_model.get_YTest()
 
-        write_log('Train Model-> '+ mytype, results, 'Predictive modeling')
-        # self.logger.add_action(['ModelDevelopment', 'SelectModel'], mytype)
-        for prf,val in mymodel.GetPerformanceDict().items():
-            write_log('Model Performance-> '+prf+': '+str(val), results, 'Predictive modeling')
-            self.logger.add_action(['ModelDevelopment', 'ModelPerformance'], (mytype, prf, val))
-
         models = [1 for mdl in self.trainedModels if mdl.getName().find(mytype) > -1]
 
         mymodel = MLModel(self.main_model.targetcolumn,tasktype,mytype,results,mytype+"_"+str(len(models)),params)
@@ -132,11 +126,11 @@ class PredictiveModelingModel:
             self.trainedModels.append(mymodel)
     
             write_log('**Train Model-> '+ mytype, results, 'Predictive modeling')
-            self.logger.add_action(['ModelDevelopment', 'SelectModel'], mytype)
+            # self.logger.add_action(['ModelDevelopment', 'SelectModel'], mytype)
             
             for prf,val in mymodel.GetPerformanceDict().items():
                 write_log('Model Performance-> '+prf+': '+str(val), results, 'Predictive modeling')
-                self.logger.add_action(['ModelDevelopment', 'ModelPerformance'], (prf, val))
+                self.logger.add_action(['ModelDevelopment', 'ModelPerformance'], (mytype, prf, val))
     
             trmodels.options = [mdl.getName() for mdl in self.trainedModels]
             

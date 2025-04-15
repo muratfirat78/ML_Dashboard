@@ -127,8 +127,11 @@ class DataCleaningModel:
             write_log('col '+colname+', action '+handling+', coltype '+str(curr_df[colname].dtype), result2aexp, 'Data cleaning')
             write_log('Initial data size'+str(len(curr_df)),  result2aexp, 'Data cleaning')  
     
-            self.logger.add_action(['DataCleaning', handling], [colname])
-    
+
+            if handling == 'Edit Range':
+                self.logger.add_action(['DataCleaning', handling + '(' + params[0].value + '-' + params[1].value +')'], [colname])
+            else:
+                self.logger.add_action(['DataCleaning', handling], [colname])
     
             if handling == 'Edit Range':
     

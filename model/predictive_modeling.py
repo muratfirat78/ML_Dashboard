@@ -116,6 +116,7 @@ class PredictiveModelingModel:
         
         #data = [self.main_model.Xtrain_df,self.main_model.ytrain_df,self.main_model.Xtest_df,self.main_model.ytest_df]
         write_log('Train Model-> '+ mytype,results,'Predictive modeling')
+        
 
         Xtest_df = self.main_model.get_XTest()
         Xtrain_df = self.main_model.get_XTrain()
@@ -128,6 +129,18 @@ class PredictiveModelingModel:
 
         success = False
         try: 
+            if tasktype[tasktype.find(":")+2:] == 'Regression':
+                if mytype == 'Logistic Regression':
+                   if (ytrain_df.to_frame()[self.main_model.targetcolumn].max() > 1) or (ytrain_df.to_frame()[self.main_model.targetcolumn].min() < 0):
+                       write_log('Train Model-> No proper feature range for logit',results,'Predictive modeling')
+                       return
+                    
+            if tasktype[tasktype.find(":")+2:] == 'Classification':
+                if mytype == 'Logistic Regression':
+                    if (len(ytrain_df.to_frame()[self.main_model.targetcolumn].unique()) > 2):
+                        write_log('Train Model-> No binary class case for logit',results,'Predictive modeling')
+                        return
+                       
             mymodel = MLModel(self.main_model.targetcolumn,tasktype,mytype,results,mytype+"_"+str(len(models)),params,Xtrain_df,ytrain_df)
 
             write_log('*Train Model-> model'+str(type(mymodel)),results,'Predictive modeling')

@@ -45,10 +45,10 @@ class MLModel:
                 self.PythonObject.fit(xtrain,ytrain) 
         if self.Type == 'Random Forest':
             if self.myTask == 'Classification': 
-                self.PythonObject = ensemble.RandomForestClassifier(n_estimators=int(params[0]),criterion=params[1])      
+                self.PythonObject = ensemble.RandomForestClassifier(n_estimators=int(params[0]))      
                 self.PythonObject.fit(xtrain,ytrain) 
             if self.myTask == 'Regression': 
-                self.PythonObject = ensemble.RandomForestRegressor(n_estimators=int(params[0]),criterion=params[1], random_state=0,)   # try before standardization..
+                self.PythonObject = ensemble.RandomForestRegressor(n_estimators=int(params[0]), random_state=0,)   # try before standardization..
                 self.PythonObject.fit(xtrain,ytrain) 
         if self.Type == 'SVM':
             if self.myTask == 'Classification': 

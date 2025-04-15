@@ -51,7 +51,7 @@ class DataSelectionModel:
         
         if online_version:
             abs_file_path = colabpath+'/'+filename
-            abs_info_path = colabpath+'/'+infopath
+            abs_info_path = "/colab/ML_Dashboard/DataSets/" +"Info_"+stemfile+".txt"
         else:
             abs_file_path = os.path.join(Path.cwd(), rel_path)
             abs_info_path = os.path.join(Path.cwd(), infopath)

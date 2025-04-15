@@ -418,6 +418,7 @@ class DataProcessingModel:
             fig, (axbox, axhist) = plt.subplots(1,2)
 
             if self.main_model.datasplit:
+                Xtrain_df=  self.main_model.get_XTrain()
                 if colname in Xtrain_df.columns:
 
                     sns.boxplot(x=colname,data=Xtrain_df, ax=axbox)
@@ -426,13 +427,15 @@ class DataProcessingModel:
                     axhist.set_title('Histogram (train)') 
                     plt.legend(['Mean '+str(round(Xtrain_df[colname].mean(),2)),'Stdev '+str(round(Xtrain_df[colname].std(),2))], bbox_to_anchor=(0.6, 0.6))
                     plt.show()
-                if colname in ytrain_df.columns:
-                    sns.boxplot(x=colname,data=ytrain_df, ax=axbox)
-                    axbox.set_title('Box plot (train)') 
-                    sns.distplot(ytrain_df[colname],ax=axhist)
-                    axhist.set_title('Histogram (train)') 
-                    plt.legend(['Mean '+str(round(ytrain_df[colname].mean(),2)),'Stdev '+str(round(ytrain_df[colname].std(),2))], bbox_to_anchor=(0.6, 0.6))
-                    plt.show()
+                else: 
+                    ytrain_df = self.main_model.getYtrain().to_frame()
+                    if colname in ytrain_df.columns:
+                        sns.boxplot(x=colname,data=ytrain_df, ax=axbox)
+                        axbox.set_title('Box plot (train)') 
+                        sns.distplot(ytrain_df[colname],ax=axhist)
+                        axhist.set_title('Histogram (train)') 
+                        plt.legend(['Mean '+str(round(ytrain_df[colname].mean(),2)),'Stdev '+str(round(ytrain_df[colname].std(),2))], bbox_to_anchor=(0.6, 0.6))
+                        plt.show()
                     
             else:
                 sns.boxplot(x=colname,data=curr_df, ax=axbox)

@@ -328,10 +328,7 @@ class DataProcessingModel:
                 if colname in Xtrain_df.columns:
 
                     if (Xtrain_df[colname].dtype == 'object') or (Xtrain_df[colname].dtype== 'string'):
-            
-                        with FeatPage:
-                            clear_output()
-                            display.display('Selected column is not a numerical type..')
+                        write_log('Scaling (split)-> Returned due to non-numerical feature: '+colname, result2exp, 'Data processing')
                         return
                     
                     colmean = Xtrain_df[colname].mean(); colstd = Xtrain_df[colname].std()
@@ -339,6 +336,10 @@ class DataProcessingModel:
                     Xtrain_df[colname] = (Xtrain_df[colname]- colmean)/colstd
                 
                 if colname in ytrain_df.columns:
+                    if (ytrain_df[colname].dtype == 'object') or (ytrain_df[colname].dtype== 'string'):
+                        write_log('Scaling (split)-> Returned due to non-numerical target feature: '+colname, result2exp, 'Data processing')
+                        return
+                        
                     colmean = ytrain_df[colname].mean(); colstd = ytrain_df[colname].std()
                     ytrain_df[colname] = (ytrain_df[colname]- colmean)/colstd
                     ytest_df[colname] = (ytest_df[colname]- colmean)/colstd
@@ -346,10 +347,7 @@ class DataProcessingModel:
                 curr_df = self.main_model.get_curr_df()
                 write_log('Scaling (no split)-> '+': '+str(len(curr_df)), result2exp, 'Data processing')
                 if (curr_df[colname].dtype == 'object') or (curr_df[colname].dtype== 'string'):
-            
-                    with FeatPage:
-                        clear_output()
-                        display.display('Selected column is not a numerical type..')
+                    write_log('Scaling (split)-> Returned due to non-numerical feature: '+colname, result2exp, 'Data processing')
                     return
                 # standardization before splitting data
                 colmean = curr_df[colname].mean();colstd = curr_df[colname].std()

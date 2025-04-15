@@ -15,6 +15,8 @@ from datetime import timedelta,date, datetime
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.preprocessing import StandardScaler
+from imblearn.over_sampling import RandomOverSampler
+from imblearn.under_sampling import RandomUnderSampler
 
 class DataProcessingModel:
     def __init__(self, main_model, logger):
@@ -437,6 +439,15 @@ class DataProcessingModel:
        
         balancetype = balncacts.value
         colname = features2.value
+
+        if not self.main_model.datasplit:
+            write_log('Balancing-> No split, improper balancing ', result2exp, 'Data processing')
+            return
+
+        if colname != self.main_model.targetcolumn:
+            write_log('Balancing-> Non-target feature is attempted for balancing', result2exp, 'Data processing')
+            return
+      
       
         if colname is None:
             return
@@ -444,147 +455,36 @@ class DataProcessingModel:
         write_log('Balancing-> '+balancetype+': '+colname, result2exp, 'Data processing')
 
 
-        if balancetype == 'Upsample':
-
-            if self.main_model.datasplit:
-                Xtrain_df = self.main_model.get_XTrain()
-                ytrain_df = self.main_model.getYtrain().to_frame()
-                prev_size = len(ytrain_df)
-                write_log('Balancing (split)-> '+colname, result2exp, 'Data processing')
-                train = pd.concat([Xtrain_df,ytrain_df],axis=1)
-      
-                if len(train[colname].unique()) == 2: # binary detection
-                    
-                    colvals = train[colname].unique()
-                    ColmFirst = train[train[colname] == colvals[0]]
-                    ColmOther = train[train[colname] == colvals[1]]
-
-                    if len(ColmFirst) == len(ColmOther):
-                        write_log('Balancing: (split)-> Equal size classes ->: '+colname, result2exp, 'Data processing')
-                        return
-
-                    if len(ColmFirst) < len(ColmOther):     
-                        upsampled_First = resample(ColmFirst, replace=True, n_samples=len(ColmOther), random_state=27) 
-                        train_balanced = pd.concat([ColmOther, upsampled_First])
-                    else:
-                        upsampled_Other= resample(ColmOther, replace=True, n_samples=len(ColmFirst), random_state=27) 
-                        train_balanced = pd.concat([ColmFirst, upsampled_Other])
-
-                    Xtrain_df = train_balanced.drop([self.main_model.targetcolumn],axis=1)
-                    ytrain_df = train_balanced[self.main_model.targetcolumn]
-
-                    self.main_model.set_XTrain(Xtrain_df)
-                    self.main_model.set_YTrain(ytrain_df.squeeze())
-
-                    write_log('Balancing: (split)-> '+str(prev_size)+'->'+str(len(ytrain_df))+': '+colname, result2exp, 'Data processing')
-                
+        Xtrain_df = self.main_model.get_XTrain()
+        ytrain_df = self.main_model.getYtrain()
+        prev_size = len(ytrain_df)
+        write_log('Balancing (split)-> '+colname, result2exp, 'Data processing')
     
-                else:
-                    write_log('Balancing (split)-> Feature has more than 2 unique values', result2exp, 'Data processing')
+      
+        if len(train[colname].unique()) == 2: # binary detection      
+
+            if balancetype == 'Upsample':
+                oversampler = RandomOverSampler()
+                X_oversampled, y_oversampled = oversampler.fit_resample(Xtrain_df,ytrain_df)
+                    
+                self.main_model.set_XTrain(X_oversampled)
+                self.main_model.set_YTrain(y_oversampled)
+
+                write_log('Balancing: (split)-> '+str(prev_size)+'->'+str(len(y_oversampled))+': '+colname, result2exp, 'Data processing')
+                
+            if balancetype == 'DownSample':
+                downsampler = RandomUnderSampler(random_state=42)
+                X_res, y_res = rus.fit_resample(Xtrain_df, ytrain_df)
+
+                self.main_model.set_XTrain(X_res)
+                self.main_model.set_YTrain(y_res)
+                write_log('Balancing: (split)-> '+str(prev_size)+'->'+str(len(y_res))+': '+colname, result2exp, 'Data processing')
+    
+        else:
+            write_log('Balancing (split)-> Feature has more than 2 unique values', result2exp, 'Data processing')
                     
       
-            else:
-                curr_df = self.main_model.get_curr_df()
-                prev_size = len(curr_df)
-      
-                if len(curr_df[colname].unique()) == 2: # binary detection
-                        
-                    colvals = curr_df[colname].unique()
-                    ColmFirst = curr_df[curr_df[colname] == colvals[0]]
-                    ColmOther = curr_df[curr_df[colname] == colvals[1]]
-
-                    if len(ColmFirst) == len(ColmOther):
-                        write_log('Balancing: (split)-> Equal size classes ->: '+colname, result2exp, 'Data processing')
-                        return
-                    
-                    if len(ColmFirst) < len(ColmOther):
-                        upsampled_First = resample(ColmFirst, replace=True, n_samples=len(ColmOther), random_state=27) 
-                        curr_df = pd.concat([ColmOther, upsampled_First])
-                    else:
-                        upsampled_Other= resample(ColmOther, replace=True, n_samples=len(ColmFirst), random_state=27) 
-                        curr_df = pd.concat([ColmFirst, upsampled_Other])
-                            
-                    with ProcssPage:
-                        clear_output()
-                        plt.figure(figsize=(6, 2))
-                        ax = sns.countplot(x=colname,data=curr_df, palette="cool_r")
-                        for p in ax.patches:
-                            ax.annotate("{:.1f}".format(p.get_height()), (p.get_x()+0.25, p.get_height()+0.01))
-                        plt.show()
-                    self.main_model.set_curr_df(curr_df)
-    
-                    write_log('Balancing: (no split)-> '+str(prev_size)+'->'+str(len(curr_df))+': '+colname, result2exp, 'Data processing')
-                else:
-                    write_log('Balancing-> Feature has more than 2 unique values', result2exp, 'Data processing')
-
-              
-
-        
-        if balancetype == 'DownSample':
-            if self.main_model.datasplit:
-               
-                Xtrain_df = self.main_model.get_XTrain()
-                ytrain_df = self.main_model.getYtrain().to_frame()
-                prev_size = len(ytrain_df)
-                write_log('Balancing (split)-> '+colname, result2exp, 'Data processing')
-                train = pd.concat([Xtrain_df,ytrain_df],axis=1)
-                
-                if len(train[colname].unique()) == 2: # binary detection
-                    
-                    colvals = train[colname].unique()
-                    ColmFirst = train[train[colname] == colvals[0]]
-                    ColmOther = train[train[colname] == colvals[1]]
-
-                    if len(ColmFirst) == len(ColmOther):
-                        write_log('Balancing: (split)-> Equal size classes ->: '+colname, result2exp, 'Data processing')
-                        return
-
-        
-                    if len(ColmFirst) < len(ColmOther):
-                        class_downsampled = np.random.choice(ColmOther, size=len(ColmFirst), replace=False)
-                        curr_df = pd.concat([ColmFirst, class_downsampled])
-                    else:
-                        class_downsampled = np.random.choice(ColmFirst, size=len(ColmOther), replace=False)
-                        curr_df = pd.concat([ColmOther, class_downsampled])
-    
-                    Xtrain_df = train_balanced.drop([self.main_model.targetcolumn],axis=1)
-                    ytrain_df = train_balanced[self.main_model.targetcolumn]
-    
-                    self.main_model.set_XTrain(Xtrain_df)
-                    self.main_model.set_YTrain(ytrain_df.squeeze())
-    
-                    write_log('Balancing: (split)-> '+str(prev_size)+'->'+str(len(ytrain_df))+': '+colname, result2exp, 'Data processing')
-
-            else:
-                curr_df = self.main_model.get_curr_df()
-                if len(curr_df[colname].unique()) == 2: # binary detection
-                    
-                    colvals = curr_df[colname].unique()
-                    ColmFirst = curr_df[curr_df[colname] == colvals[0]]
-                    ColmOther = curr_df[curr_df[colname] == colvals[1]]
-
-                    if len(ColmFirst) == len(ColmOther):
-                        write_log('Balancing: (split)-> Equal size classes ->: '+colname, result2exp, 'Data processing')
-                        return
-                
-                    if len(ColmFirst) < len(ColmOther):
-                        class_downsampled = np.random.choice(ColmOther, size=len(ColmFirst), replace=False)
-                        curr_df = pd.concat([ColmFirst, class_downsampled])
-                    else:
-                        class_downsampled = np.random.choice(ColmFirst, size=len(ColmOther), replace=False)
-                        curr_df = pd.concat([ColmOther, class_downsampled])
-                        
-                    with ProcssPage:
-                        clear_output()
-                        plt.figure(figsize=(6, 2))
-                        ax = sns.countplot(x=colname,data=curr_df, palette="cool_r")
-                        for p in ax.patches:
-                            ax.annotate("{:.1f}".format(p.get_height()), (p.get_x()+0.25, p.get_height()+0.01))
-                        plt.show()
-                    self.main_model.set_curr_df(curr_df)
-                else:
-                    write_log('Balancing-> Categorical feature has more than 2 classes', result2exp, 'Data processing')
-            
+       
                     
         logging.info('Data preprocessing, checking and handling unbalancedness')
         self.logger.add_action(['DataProcessing', 'Unbalancedness ' + balancetype ], [colname])

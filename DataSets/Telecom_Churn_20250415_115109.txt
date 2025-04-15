@@ -1,0 +1,220 @@
+2025-04-15 09:42:00,065 - INFO - Application started
+2025-04-15 09:42:09,428 - INFO - Data Selection: Read data setTelecom_Churn.csv
+2025-04-15 09:42:35,081 - INFO - Data cleaning: col state, action Drop Column, coltype object
+2025-04-15 09:42:35,082 - INFO - Data cleaning: Initial data size3333
+2025-04-15 09:42:35,084 - INFO - Data cleaning: Cleaning action done..Index(['account length', 'area code', 'phone number', 'international plan',
+       'voice mail plan', 'number vmail messages', 'total day minutes',
+       'total day calls', 'total day charge', 'total eve minutes',
+       'total eve calls', 'total eve charge', 'total night minutes',
+       'total night calls', 'total night charge', 'total intl minutes',
+       'total intl calls', 'total intl charge', 'customer service calls',
+       'churn'],
+      dtype='object')
+2025-04-15 09:42:35,084 - INFO - Data cleaning: Final data size3333
+2025-04-15 09:42:42,520 - INFO - Data cleaning: col phone number, action Drop Column, coltype object
+2025-04-15 09:42:42,521 - INFO - Data cleaning: Initial data size3333
+2025-04-15 09:42:42,524 - INFO - Data cleaning: Cleaning action done..Index(['account length', 'area code', 'international plan', 'voice mail plan',
+       'number vmail messages', 'total day minutes', 'total day calls',
+       'total day charge', 'total eve minutes', 'total eve calls',
+       'total eve charge', 'total night minutes', 'total night calls',
+       'total night charge', 'total intl minutes', 'total intl calls',
+       'total intl charge', 'customer service calls', 'churn'],
+      dtype='object')
+2025-04-15 09:42:42,526 - INFO - Data cleaning: Final data size3333
+2025-04-15 09:43:14,168 - INFO - Correlation: Correlation: Correlation
+2025-04-15 09:43:14,169 - INFO - Correlation: Correlation: 3333
+2025-04-15 09:44:23,348 - INFO - PCA: PCA: ['total day minutes', 'total day charge']
+2025-04-15 09:44:23,368 - INFO - PCA: PCA: explained variance[0.99999998]
+2025-04-15 09:44:23,369 - INFO - PCA: PCA: name of column Princ_Comp_0
+2025-04-15 09:44:23,369 - INFO - PCA: PCA: size of PCA3333
+2025-04-15 09:44:23,375 - INFO - PCA: PCA: size of final df3333
+2025-04-15 09:44:50,145 - INFO - Correlation: Correlation: Correlation
+2025-04-15 09:44:50,145 - INFO - Correlation: Correlation: 3333
+2025-04-15 09:45:05,497 - INFO - PCA: PCA: ['total eve minutes', 'total eve charge']
+2025-04-15 09:45:05,512 - INFO - PCA: PCA: explained variance[0.99999989]
+2025-04-15 09:45:05,512 - INFO - PCA: PCA: name of column Princ_Comp_1
+2025-04-15 09:45:05,514 - INFO - PCA: PCA: size of PCA3333
+2025-04-15 09:45:05,518 - INFO - PCA: PCA: size of final df3333
+2025-04-15 09:45:15,593 - INFO - PCA: PCA: ['total night minutes', 'total night charge']
+2025-04-15 09:45:15,607 - INFO - PCA: PCA: explained variance[0.99999961]
+2025-04-15 09:45:15,608 - INFO - PCA: PCA: name of column Princ_Comp_2
+2025-04-15 09:45:15,610 - INFO - PCA: PCA: size of PCA3333
+2025-04-15 09:45:15,615 - INFO - PCA: PCA: size of final df3333
+2025-04-15 09:45:30,074 - INFO - PCA: PCA: ['total intl minutes', 'total intl charge']
+2025-04-15 09:45:30,093 - INFO - PCA: PCA: explained variance[0.99999637]
+2025-04-15 09:45:30,095 - INFO - PCA: PCA: name of column Princ_Comp_3
+2025-04-15 09:45:30,096 - INFO - PCA: PCA: size of PCA3333
+2025-04-15 09:45:30,099 - INFO - PCA: PCA: size of final df3333
+2025-04-15 09:45:34,751 - INFO - Correlation: Correlation: Correlation
+2025-04-15 09:45:34,752 - INFO - Correlation: Correlation: 3333
+2025-04-15 09:48:36,131 - INFO - Data processing: Encoding.. col international plan
+2025-04-15 09:48:36,131 - INFO - Data processing: Encoding.. col international plan, split False, type Label Encoding
+2025-04-15 09:48:36,132 - INFO - Data processing: Encoding-> Label Encoding, False
+2025-04-15 09:48:36,133 - INFO - Data processing: Encoding-> international plan current classes: 3333
+2025-04-15 09:48:36,134 - INFO - Data processing: Encoding-> international plan current classes: ['no' 'yes']
+2025-04-15 09:48:36,180 - INFO - Data processing: Encoding-> international plan after labeling classes: [0, 1]
+2025-04-15 09:49:05,849 - INFO - Data processing: Encoding.. col voice mail plan
+2025-04-15 09:49:05,851 - INFO - Data processing: Encoding.. col voice mail plan, split False, type Label Encoding
+2025-04-15 09:49:05,852 - INFO - Data processing: Encoding-> Label Encoding, False
+2025-04-15 09:49:05,852 - INFO - Data processing: Encoding-> voice mail plan current classes: 3333
+2025-04-15 09:49:05,853 - INFO - Data processing: Encoding-> voice mail plan current classes: ['yes' 'no']
+2025-04-15 09:49:05,856 - INFO - Data processing: Encoding-> voice mail plan after labeling classes: [1, 0]
+2025-04-15 09:50:44,099 - INFO - Data processing: Target assigned: churn
+2025-04-15 09:50:56,272 - INFO - Data processing: Split ratio, 0.2
+2025-04-15 09:50:56,282 - INFO - Data processing: Split, XTrain size: 2666
+2025-04-15 09:50:56,282 - INFO - Data processing: Split, XTest size: 667
+2025-04-15 09:50:56,284 - INFO - Data processing: Split, yTrain size: 2666
+2025-04-15 09:50:56,285 - INFO - Data processing: Split, yTrain indices: 2666
+2025-04-15 09:50:56,286 - INFO - Data processing: Split, yTest size: 667
+2025-04-15 09:52:31,023 - INFO - Predictive modeling: Train Model-> Decision Tree
+2025-04-15 09:52:31,025 - INFO - Predictive modeling: Train Model-> Xtrain2666
+2025-04-15 09:52:31,026 - INFO - Predictive modeling: Train Model-> taskClassification
+2025-04-15 09:52:31,027 - INFO - Predictive modeling: Decision Tree__Classification
+2025-04-15 09:52:31,027 - INFO - Predictive modeling: [5, 3, 'gini']
+2025-04-15 09:52:31,028 - INFO - Predictive modeling: DT: Classification
+2025-04-15 09:52:31,065 - INFO - Predictive modeling: Model.. Type <class 'sklearn.tree._classes.DecisionTreeClassifier'>
+2025-04-15 09:52:31,066 - INFO - Predictive modeling: *Train Model-> model<class 'model.predictive_modeling.MLModel'>
+2025-04-15 09:52:31,069 - INFO - Predictive modeling: ++Train Model-> 2666
+2025-04-15 09:52:31,069 - INFO - Predictive modeling: Train Model-> trained..
+2025-04-15 09:52:31,075 - INFO - Predictive modeling: >>Train Model-> predcts667, | Prediction Task: Classification
+2025-04-15 09:52:31,100 - INFO - Predictive modeling: **Train Model-> Decision Tree
+2025-04-15 09:52:31,101 - INFO - Predictive modeling: Model Performance-> True-Positive: 75
+2025-04-15 09:52:31,101 - INFO - Predictive modeling: Model Performance-> False-Positive: 11
+2025-04-15 09:52:31,103 - INFO - Predictive modeling: Model Performance-> True-Negative: 550
+2025-04-15 09:52:31,104 - INFO - Predictive modeling: Model Performance-> False-Negative: 31
+2025-04-15 09:52:31,104 - INFO - Predictive modeling: Model Performance-> Accuracy: 0.9370314842578711
+2025-04-15 09:52:31,105 - INFO - Predictive modeling: Model Performance-> Precision: 0.872093023255814
+2025-04-15 09:52:31,105 - INFO - Predictive modeling: Model Performance-> Recall: 0.7075471698113207
+2025-04-15 09:55:35,842 - INFO - Predictive modeling: Train Model-> KNN
+2025-04-15 09:55:35,844 - INFO - Predictive modeling: Train Model-> Xtrain2666
+2025-04-15 09:55:35,845 - INFO - Predictive modeling: Train Model-> taskClassification
+2025-04-15 09:55:35,845 - INFO - Predictive modeling: KNN__Classification
+2025-04-15 09:55:35,846 - INFO - Predictive modeling: [5, 'minkowski']
+2025-04-15 09:55:35,876 - INFO - Predictive modeling: Model.. Type <class 'sklearn.neighbors._classification.KNeighborsClassifier'>
+2025-04-15 09:55:35,879 - INFO - Predictive modeling: *Train Model-> model<class 'model.predictive_modeling.MLModel'>
+2025-04-15 09:55:35,881 - INFO - Predictive modeling: ++Train Model-> 2666
+2025-04-15 09:55:35,883 - INFO - Predictive modeling: Train Model-> trained..
+2025-04-15 09:55:36,007 - INFO - Predictive modeling: >>Train Model-> predcts667, | Prediction Task: Classification
+2025-04-15 09:55:36,025 - INFO - Predictive modeling: **Train Model-> KNN
+2025-04-15 09:55:36,025 - INFO - Predictive modeling: Model Performance-> True-Positive: 3
+2025-04-15 09:55:36,026 - INFO - Predictive modeling: Model Performance-> False-Positive: 13
+2025-04-15 09:55:36,026 - INFO - Predictive modeling: Model Performance-> True-Negative: 548
+2025-04-15 09:55:36,026 - INFO - Predictive modeling: Model Performance-> False-Negative: 103
+2025-04-15 09:55:36,027 - INFO - Predictive modeling: Model Performance-> Accuracy: 0.8260869565217391
+2025-04-15 09:55:36,027 - INFO - Predictive modeling: Model Performance-> Precision: 0.1875
+2025-04-15 09:55:36,028 - INFO - Predictive modeling: Model Performance-> Recall: 0.02830188679245283
+2025-04-15 09:58:35,275 - INFO - Predictive modeling: Train Model-> Random Forest
+2025-04-15 09:58:35,276 - INFO - Predictive modeling: Train Model-> Xtrain2666
+2025-04-15 09:58:35,277 - INFO - Predictive modeling: Train Model-> taskClassification
+2025-04-15 09:58:35,278 - INFO - Predictive modeling: Random Forest__Classification
+2025-04-15 09:58:35,279 - INFO - Predictive modeling: [60, 'gini']
+2025-04-15 09:58:35,948 - INFO - Predictive modeling: Model.. Type <class 'sklearn.ensemble._forest.RandomForestClassifier'>
+2025-04-15 09:58:35,949 - INFO - Predictive modeling: *Train Model-> model<class 'model.predictive_modeling.MLModel'>
+2025-04-15 09:58:35,949 - INFO - Predictive modeling: ++Train Model-> 2666
+2025-04-15 09:58:35,950 - INFO - Predictive modeling: Train Model-> trained..
+2025-04-15 09:58:35,968 - INFO - Predictive modeling: >>Train Model-> predcts667, | Prediction Task: Classification
+2025-04-15 09:58:35,990 - INFO - Predictive modeling: **Train Model-> Random Forest
+2025-04-15 09:58:35,991 - INFO - Predictive modeling: Model Performance-> True-Positive: 67
+2025-04-15 09:58:35,992 - INFO - Predictive modeling: Model Performance-> False-Positive: 4
+2025-04-15 09:58:35,993 - INFO - Predictive modeling: Model Performance-> True-Negative: 557
+2025-04-15 09:58:35,993 - INFO - Predictive modeling: Model Performance-> False-Negative: 39
+2025-04-15 09:58:35,994 - INFO - Predictive modeling: Model Performance-> Accuracy: 0.9355322338830585
+2025-04-15 09:58:35,994 - INFO - Predictive modeling: Model Performance-> Precision: 0.9436619718309859
+2025-04-15 09:58:35,995 - INFO - Predictive modeling: Model Performance-> Recall: 0.6320754716981132
+2025-04-15 09:59:21,151 - INFO - Predictive modeling: Train Model-> Linear Model
+2025-04-15 09:59:21,152 - INFO - Predictive modeling: Train Model-> Xtrain2666
+2025-04-15 09:59:21,154 - INFO - Predictive modeling: Train Model-> taskClassification
+2025-04-15 09:59:21,156 - INFO - Predictive modeling: Linear Model__Classification
+2025-04-15 09:59:21,157 - INFO - Predictive modeling: []
+2025-04-15 09:59:21,211 - INFO - Predictive modeling: Model.. Type <class 'sklearn.linear_model._stochastic_gradient.SGDClassifier'>
+2025-04-15 09:59:21,211 - INFO - Predictive modeling: *Train Model-> model<class 'model.predictive_modeling.MLModel'>
+2025-04-15 09:59:21,212 - INFO - Predictive modeling: ++Train Model-> 2666
+2025-04-15 09:59:21,212 - INFO - Predictive modeling: Train Model-> trained..
+2025-04-15 09:59:21,219 - INFO - Predictive modeling: >>Train Model-> predcts667, | Prediction Task: Classification
+2025-04-15 09:59:21,244 - INFO - Predictive modeling: **Train Model-> Linear Model
+2025-04-15 09:59:21,245 - INFO - Predictive modeling: Model Performance-> True-Positive: 2
+2025-04-15 09:59:21,245 - INFO - Predictive modeling: Model Performance-> False-Positive: 2
+2025-04-15 09:59:21,246 - INFO - Predictive modeling: Model Performance-> True-Negative: 559
+2025-04-15 09:59:21,248 - INFO - Predictive modeling: Model Performance-> False-Negative: 104
+2025-04-15 09:59:21,249 - INFO - Predictive modeling: Model Performance-> Accuracy: 0.841079460269865
+2025-04-15 09:59:21,250 - INFO - Predictive modeling: Model Performance-> Precision: 0.5
+2025-04-15 09:59:21,252 - INFO - Predictive modeling: Model Performance-> Recall: 0.018867924528301886
+2025-04-15 10:00:26,284 - INFO - Data processing: Scaling-> Normalize
+2025-04-15 10:00:26,287 - INFO - Data processing: Scaling-> Normalize: account length
+2025-04-15 10:00:26,295 - INFO - Data preprocessing, feature scaling: normalization of column account length
+2025-04-15 10:00:44,781 - INFO - Data processing: Scaling-> Normalize
+2025-04-15 10:00:44,783 - INFO - Data processing: Scaling-> Normalize: area code
+2025-04-15 10:00:44,789 - INFO - Data preprocessing, feature scaling: normalization of column area code
+2025-04-15 10:01:01,381 - INFO - Data processing: Scaling-> Normalize
+2025-04-15 10:01:01,382 - INFO - Data processing: Scaling-> Normalize: number vmail messages
+2025-04-15 10:01:01,389 - INFO - Data preprocessing, feature scaling: normalization of column number vmail messages
+2025-04-15 10:01:11,634 - INFO - Data processing: Scaling-> Normalize
+2025-04-15 10:01:11,634 - INFO - Data processing: Scaling-> Normalize: total day calls
+2025-04-15 10:01:11,640 - INFO - Data preprocessing, feature scaling: normalization of column total day calls
+2025-04-15 10:01:19,007 - INFO - Data processing: Scaling-> Normalize
+2025-04-15 10:01:19,008 - INFO - Data processing: Scaling-> Normalize: total eve calls
+2025-04-15 10:01:19,012 - INFO - Data preprocessing, feature scaling: normalization of column total eve calls
+2025-04-15 10:01:24,242 - INFO - Data processing: Scaling-> Normalize
+2025-04-15 10:01:24,244 - INFO - Data processing: Scaling-> Normalize: total night calls
+2025-04-15 10:01:24,248 - INFO - Data preprocessing, feature scaling: normalization of column total night calls
+2025-04-15 10:01:32,387 - INFO - Data processing: Scaling-> Normalize
+2025-04-15 10:01:32,388 - INFO - Data processing: Scaling-> Normalize: total intl calls
+2025-04-15 10:01:32,394 - INFO - Data preprocessing, feature scaling: normalization of column total intl calls
+2025-04-15 10:01:41,281 - INFO - Data processing: Scaling-> Normalize
+2025-04-15 10:01:41,282 - INFO - Data processing: Scaling-> Normalize: customer service calls
+2025-04-15 10:01:41,287 - INFO - Data preprocessing, feature scaling: normalization of column customer service calls
+2025-04-15 10:02:07,119 - INFO - Predictive modeling: Train Model-> KNN
+2025-04-15 10:02:07,120 - INFO - Predictive modeling: Train Model-> Xtrain2666
+2025-04-15 10:02:07,121 - INFO - Predictive modeling: Train Model-> taskClassification
+2025-04-15 10:02:07,122 - INFO - Predictive modeling: KNN__Classification
+2025-04-15 10:02:07,123 - INFO - Predictive modeling: [7, 'minkowski']
+2025-04-15 10:02:07,158 - INFO - Predictive modeling: Model.. Type <class 'sklearn.neighbors._classification.KNeighborsClassifier'>
+2025-04-15 10:02:07,161 - INFO - Predictive modeling: *Train Model-> model<class 'model.predictive_modeling.MLModel'>
+2025-04-15 10:02:07,163 - INFO - Predictive modeling: ++Train Model-> 2666
+2025-04-15 10:02:07,164 - INFO - Predictive modeling: Train Model-> trained..
+2025-04-15 10:02:07,259 - INFO - Predictive modeling: >>Train Model-> predcts667, | Prediction Task: Classification
+2025-04-15 10:02:07,284 - INFO - Predictive modeling: **Train Model-> KNN
+2025-04-15 10:02:07,286 - INFO - Predictive modeling: Model Performance-> True-Positive: 26
+2025-04-15 10:02:07,287 - INFO - Predictive modeling: Model Performance-> False-Positive: 1
+2025-04-15 10:02:07,289 - INFO - Predictive modeling: Model Performance-> True-Negative: 560
+2025-04-15 10:02:07,293 - INFO - Predictive modeling: Model Performance-> False-Negative: 80
+2025-04-15 10:02:07,294 - INFO - Predictive modeling: Model Performance-> Accuracy: 0.8785607196401799
+2025-04-15 10:02:07,297 - INFO - Predictive modeling: Model Performance-> Precision: 0.9629629629629629
+2025-04-15 10:02:07,300 - INFO - Predictive modeling: Model Performance-> Recall: 0.24528301886792453
+2025-04-15 10:03:10,899 - INFO - Predictive modeling: Train Model-> Decision Tree
+2025-04-15 10:03:10,901 - INFO - Predictive modeling: Train Model-> Xtrain2666
+2025-04-15 10:03:10,903 - INFO - Predictive modeling: Train Model-> taskClassification
+2025-04-15 10:03:10,906 - INFO - Predictive modeling: Decision Tree__Classification
+2025-04-15 10:03:10,907 - INFO - Predictive modeling: [5, 3, 'gini']
+2025-04-15 10:03:10,907 - INFO - Predictive modeling: DT: Classification
+2025-04-15 10:03:10,953 - INFO - Predictive modeling: Model.. Type <class 'sklearn.tree._classes.DecisionTreeClassifier'>
+2025-04-15 10:03:10,954 - INFO - Predictive modeling: *Train Model-> model<class 'model.predictive_modeling.MLModel'>
+2025-04-15 10:03:10,955 - INFO - Predictive modeling: ++Train Model-> 2666
+2025-04-15 10:03:10,955 - INFO - Predictive modeling: Train Model-> trained..
+2025-04-15 10:03:10,965 - INFO - Predictive modeling: >>Train Model-> predcts667, | Prediction Task: Classification
+2025-04-15 10:03:10,989 - INFO - Predictive modeling: **Train Model-> Decision Tree
+2025-04-15 10:03:10,990 - INFO - Predictive modeling: Model Performance-> True-Positive: 76
+2025-04-15 10:03:10,991 - INFO - Predictive modeling: Model Performance-> False-Positive: 10
+2025-04-15 10:03:10,991 - INFO - Predictive modeling: Model Performance-> True-Negative: 551
+2025-04-15 10:03:10,992 - INFO - Predictive modeling: Model Performance-> False-Negative: 30
+2025-04-15 10:03:10,993 - INFO - Predictive modeling: Model Performance-> Accuracy: 0.9400299850074962
+2025-04-15 10:03:10,996 - INFO - Predictive modeling: Model Performance-> Precision: 0.8837209302325582
+2025-04-15 10:03:10,998 - INFO - Predictive modeling: Model Performance-> Recall: 0.7169811320754716
+2025-04-15 10:03:48,227 - INFO - Predictive modeling: Train Model-> Random Forest
+2025-04-15 10:03:48,228 - INFO - Predictive modeling: Train Model-> Xtrain2666
+2025-04-15 10:03:48,230 - INFO - Predictive modeling: Train Model-> taskClassification
+2025-04-15 10:03:48,231 - INFO - Predictive modeling: Random Forest__Classification
+2025-04-15 10:03:48,232 - INFO - Predictive modeling: [60, 'gini']
+2025-04-15 10:03:48,922 - INFO - Predictive modeling: Model.. Type <class 'sklearn.ensemble._forest.RandomForestClassifier'>
+2025-04-15 10:03:48,923 - INFO - Predictive modeling: *Train Model-> model<class 'model.predictive_modeling.MLModel'>
+2025-04-15 10:03:48,923 - INFO - Predictive modeling: ++Train Model-> 2666
+2025-04-15 10:03:48,923 - INFO - Predictive modeling: Train Model-> trained..
+2025-04-15 10:03:48,949 - INFO - Predictive modeling: >>Train Model-> predcts667, | Prediction Task: Classification
+2025-04-15 10:03:49,003 - INFO - Predictive modeling: **Train Model-> Random Forest
+2025-04-15 10:03:49,005 - INFO - Predictive modeling: Model Performance-> True-Positive: 75
+2025-04-15 10:03:49,006 - INFO - Predictive modeling: Model Performance-> False-Positive: 5
+2025-04-15 10:03:49,007 - INFO - Predictive modeling: Model Performance-> True-Negative: 556
+2025-04-15 10:03:49,008 - INFO - Predictive modeling: Model Performance-> False-Negative: 31
+2025-04-15 10:03:49,009 - INFO - Predictive modeling: Model Performance-> Accuracy: 0.9460269865067467
+2025-04-15 10:03:49,009 - INFO - Predictive modeling: Model Performance-> Precision: 0.9375
+2025-04-15 10:03:49,010 - INFO - Predictive modeling: Model Performance-> Recall: 0.7075471698113207

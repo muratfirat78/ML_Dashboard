@@ -8,6 +8,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.utils import resample
 import pandas as pd
+import numpy as np
 import os
 import shutil
 from datetime import timedelta,date, datetime
@@ -602,7 +603,7 @@ class DataProcessingModel:
         encodingtype = encodingacts.value
 
         write_log('Encoding.. col '+colname+', split '+str(self.main_model.datasplit)+', type '+encodingtype, result2exp, 'Data processing')
-
+       
         # Encode column  
         if self.main_model.datasplit:
 
@@ -629,25 +630,31 @@ class DataProcessingModel:
     
                     self.logger.add_action(['DataProcessing', 'LabelEncoding'], [colname])
                 else: 
-                    write_log('Encoding-> '+colname+', target features..', result2exp, 'Data processing')
+                    write_log('Encoding-> '+colname+', target feature..', result2exp, 'Data processing')
                     
             if encodingtype == "One Hot Encoding":
-                categorical_columns = [colname]
-                
-                encoder = preprocessing.OneHotEncoder(sparse_output=False)  # Initialize OneHotEncoder
-                
-                one_hot_encoded = encoder.fit_transform(Xtrain_df[categorical_columns])  # Fit and transform the categorical columns          
-                one_hot_df = pd.DataFrame(one_hot_encoded,columns=encoder.get_feature_names_out(categorical_columns)) # Create a DataFrame
-                Xtrain_df = pd.concat([Xtrain_df.drop(categorical_columns, axis=1), one_hot_df], axis=1)
-                write_log('One Hot Encoding-> (train) after one-hot features: '+str(Xtrain_df.columns), result2exp, 'Data processing')
 
-                encoder = preprocessing.OneHotEncoder(sparse_output=False)  # Initialize OneHotEncoder
-                one_hot_encoded = encoder.fit_transform(Xtest_df[categorical_columns])  # Fit and transform the categorical columns          
-                one_hot_df = pd.DataFrame(one_hot_encoded,columns=encoder.get_feature_names_out(categorical_columns)) # Create a DataFrame 
-                Xtest_df = pd.concat([Xtest_df.drop(categorical_columns, axis=1), one_hot_df], axis=1)
-                write_log('One Hot Encoding-> (test) after one-hot features: '+str(Xtest_df.columns), result2exp, 'Data processing')
-
-                self.logger.add_action(['DataProcessing', 'OneHotEncoding'], [colname])
+                if colname in Xtrain_df.columns:
+                    categorical_columns = [colname]
+    
+                    Xtrain_df = pd.concat([Xtrain_df.drop(categorical_columns, axis = 1), pd.get_dummies(Xtrain_df[categorical_columns])], axis=1)
+                    Xtest_df = pd.concat([Xtest_df.drop(categorical_columns, axis = 1), pd.get_dummies(Xtest_df[categorical_columns])], axis=1)
+    
+                    
+                    write_log('One Hot Encoding-> (train) after one-hot features: '+str(Xtrain_df.columns), result2exp, 'Data processing')
+                    write_log('One Hot Encoding-> (train) after one-hot size: '+str(len(Xtrain_df)), result2exp, 'Data processing')
+    
+                    write_log('One Hot Encoding-> (test) after one-hot features: '+str(Xtest_df.columns), result2exp, 'Data processing')
+                    write_log('One Hot Encoding-> (test) after one-hot size: '+str(len(Xtest_df)), result2exp, 'Data processing')
+    
+                    self.logger.add_action(['DataProcessing', 'OneHotEncoding'], [colname])
+                else: 
+                    write_log('Encoding-> '+colname+', target feature..', result2exp, 'Data processing')
+                
+            self.main_model.set_XTest(Xtest_df)
+            self.main_model.set_XTrain(Xtrain_df)
+            self.main_model.set_YTrain(ytrain_df.squeeze())
+            self.main_model.set_YTest(ytest_df.squeeze())
         else: #before split
 
             curr_df = self.main_model.get_curr_df()
@@ -676,11 +683,8 @@ class DataProcessingModel:
                 self.logger.add_action(['DataProcessing', 'OneHotEncoding'], [colname])
 
       
-        self.main_model.set_curr_df(curr_df)
-        self.main_model.set_XTest(Xtest_df)
-        self.main_model.set_XTrain(Xtrain_df)
-        self.main_model.set_YTrain(ytrain_df.squeeze())
-        self.main_model.set_YTest(ytest_df.squeeze())
+            self.main_model.set_curr_df(curr_df)
+        
         
         return
 

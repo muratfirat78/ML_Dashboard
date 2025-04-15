@@ -28,6 +28,7 @@ class DataCleaningView:
         for col in display_df.columns:
             curr_miss = display_df[col].isnull().sum()  
             totalmisses+=curr_miss
+        missng_vals = display_df[colname].isnull().sum()
 
 
         if self.controller.main_model.datasplit:
@@ -54,6 +55,7 @@ class DataCleaningView:
                         totalmisses+=curr_miss
                 else: 
                     return
+        
         
  
         

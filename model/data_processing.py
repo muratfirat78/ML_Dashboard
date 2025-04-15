@@ -68,6 +68,9 @@ class DataProcessingModel:
                 if (XTrain[col].dtype == 'object') or (XTrain[col].dtype== 'string'):
                     write_log('PCA: Returned due to categorical feature selection',result2exp, 'PCA')
                     return
+                if XTrain[col].isnull().sum()  > 0:
+                    write_log('PCA: Returned feature '+col+' has missing values',result2exp, 'PCA')
+                    return
       
             tr_prev_indices = XTrain.index
             write_log('PCA (split): ',result2exp, 'PCA')
@@ -137,6 +140,9 @@ class DataProcessingModel:
             for col in pcafeats:
                 if (current_df[col].dtype == 'object') or (current_df[col].dtype== 'string'):
                     write_log('PCA: Returned due to categorical feature selection',result2exp, 'PCA')
+                    return
+                if current_df[col].isnull().sum()  > 0:
+                    write_log('PCA: Returned feature '+col+' has missing values',result2exp, 'PCA')
                     return
             
             

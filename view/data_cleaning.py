@@ -52,13 +52,13 @@ class DataCleaningView:
             if colname in self.controller.get_XTrain().columns: 
                 display_df = self.controller.main_model.get_XTrain()
                 missng_vals = display_df[colname].isnull().sum()
-                missng_vals += self.controller.main_model.get_XTest()[col].isnull().sum() 
+                missng_vals += self.controller.main_model.get_XTest()[colname].isnull().sum() 
                
             else: 
                 ytrain_df = self.controller.main_model.getYtrain().to_frame()
                 if colname in ytrain_df.columns: 
                     missng_vals = ytrain_df[col].isnull().sum()  
-                    missng_vals+= self.controller.main_model.get_YTest().to_frame()[col].isnull().sum()  
+                    missng_vals+= self.controller.main_model.get_YTest().to_frame()[colname].isnull().sum()  
                 else: 
                     return
         

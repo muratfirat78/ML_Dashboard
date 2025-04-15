@@ -9,6 +9,7 @@ class DataCleaningModel:
 
         colname = featurescl.value
         handling = missacts.value
+        prev_size = 0
 
         if self.main_model.datasplit:
             Xtest_df = self.main_model.get_XTest()
@@ -18,6 +19,7 @@ class DataCleaningModel:
             removals_tr = None
             removals_ts = None
 
+            prev_size = len(Xtrain_df)
             if colname in Xtrain_df.columns:
                 write_log('col (split) '+colname+', action '+handling+', coltype '+str(Xtrain_df[colname].dtype), result2aexp, 'Data cleaning')
                 prev_size = 0
@@ -61,7 +63,7 @@ class DataCleaningModel:
                
             if  colname == self.main_model.targetcolumn:
                 write_log('col (split) '+colname+', action '+handling+', coltype '+str(ytrain_df[colname].dtype), result2aexp, 'Data cleaning')
-                
+                prev_size = len(ytrain_df)
                 if handling == 'Edit Range':
                     prev_size = len(ytrain_df)
                     minval = params[0].value; maxval = params[1].value
@@ -96,9 +98,9 @@ class DataCleaningModel:
                     else:
                         
                         if handling == 'Replace-Mode': 
-                            ytrain_df[colname].fillna(ytrain_df[colname].mode()[0], inplace=True)
+                            ytrain_df[colname].fillna(ytrain_df[colname].mode(), inplace=True)
                           
-                            write_log('mode (split) . '+str(ytrain_df[colname].mode()[0]), result2aexp, 'Data cleaning')
+                            write_log('mode (split) . '+str(ytrain_df[colname].mode()), result2aexp, 'Data cleaning')
                         if handling == 'Remove-Missing': 
                             ytrain_df = ytrain_df.dropna(subset = [colname])
                        

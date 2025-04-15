@@ -459,6 +459,10 @@ class DataProcessingModel:
                     ColmFirst = train[train[colname] == colvals[0]]
                     ColmOther = train[train[colname] == colvals[1]]
 
+                    if len(ColmFirst) == len(ColmOther):
+                        write_log('Balancing: (split)-> Equal size classes ->: '+colname, result2exp, 'Data processing')
+                        return
+
                     if len(ColmFirst) < len(ColmOther):     
                         upsampled_First = resample(ColmFirst, replace=True, n_samples=len(ColmOther), random_state=27) 
                         train_balanced = pd.concat([ColmOther, upsampled_First])
@@ -478,23 +482,28 @@ class DataProcessingModel:
                 else:
                     write_log('Balancing (split)-> Feature has more than 2 unique values', result2exp, 'Data processing')
                     
+      
             else:
                 curr_df = self.main_model.get_curr_df()
                 prev_size = len(curr_df)
-  
+      
                 if len(curr_df[colname].unique()) == 2: # binary detection
-                    
+                        
                     colvals = curr_df[colname].unique()
                     ColmFirst = curr_df[curr_df[colname] == colvals[0]]
                     ColmOther = curr_df[curr_df[colname] == colvals[1]]
-                
+
+                    if len(ColmFirst) == len(ColmOther):
+                        write_log('Balancing: (split)-> Equal size classes ->: '+colname, result2exp, 'Data processing')
+                        return
+                    
                     if len(ColmFirst) < len(ColmOther):
                         upsampled_First = resample(ColmFirst, replace=True, n_samples=len(ColmOther), random_state=27) 
                         curr_df = pd.concat([ColmOther, upsampled_First])
                     else:
                         upsampled_Other= resample(ColmOther, replace=True, n_samples=len(ColmFirst), random_state=27) 
                         curr_df = pd.concat([ColmFirst, upsampled_Other])
-                        
+                            
                     with ProcssPage:
                         clear_output()
                         plt.figure(figsize=(6, 2))
@@ -503,7 +512,7 @@ class DataProcessingModel:
                             ax.annotate("{:.1f}".format(p.get_height()), (p.get_x()+0.25, p.get_height()+0.01))
                         plt.show()
                     self.main_model.set_curr_df(curr_df)
-
+    
                     write_log('Balancing: (no split)-> '+str(prev_size)+'->'+str(len(curr_df))+': '+colname, result2exp, 'Data processing')
                 else:
                     write_log('Balancing-> Feature has more than 2 unique values', result2exp, 'Data processing')
@@ -513,7 +522,38 @@ class DataProcessingModel:
         
         if balancetype == 'DownSample':
             if self.main_model.datasplit:
-                pass
+               
+                Xtrain_df = self.main_model.get_XTrain()
+                ytrain_df = self.main_model.getYtrain().to_frame()
+                prev_size = len(ytrain_df)
+                write_log('Balancing (split)-> '+colname, result2exp, 'Data processing')
+                train = pd.concat([Xtrain_df,ytrain_df],axis=1)
+                
+                if len(train[colname].unique()) == 2: # binary detection
+                    
+                    colvals = train[colname].unique()
+                    ColmFirst = train[train[colname] == colvals[0]]
+                    ColmOther = train[train[colname] == colvals[1]]
+
+                    if len(ColmFirst) == len(ColmOther):
+                        write_log('Balancing: (split)-> Equal size classes ->: '+colname, result2exp, 'Data processing')
+                        return
+
+        
+                    if len(ColmFirst) < len(ColmOther):
+                        class_downsampled = np.random.choice(ColmOther, size=len(ColmFirst), replace=False)
+                        curr_df = pd.concat([ColmFirst, class_downsampled])
+                    else:
+                        class_downsampled = np.random.choice(ColmFirst, size=len(ColmOther), replace=False)
+                        curr_df = pd.concat([ColmOther, class_downsampled])
+    
+                    Xtrain_df = train_balanced.drop([self.main_model.targetcolumn],axis=1)
+                    ytrain_df = train_balanced[self.main_model.targetcolumn]
+    
+                    self.main_model.set_XTrain(Xtrain_df)
+                    self.main_model.set_YTrain(ytrain_df.squeeze())
+    
+                    write_log('Balancing: (split)-> '+str(prev_size)+'->'+str(len(ytrain_df))+': '+colname, result2exp, 'Data processing')
 
             else:
                 curr_df = self.main_model.get_curr_df()
@@ -522,6 +562,10 @@ class DataProcessingModel:
                     colvals = curr_df[colname].unique()
                     ColmFirst = curr_df[curr_df[colname] == colvals[0]]
                     ColmOther = curr_df[curr_df[colname] == colvals[1]]
+
+                    if len(ColmFirst) == len(ColmOther):
+                        write_log('Balancing: (split)-> Equal size classes ->: '+colname, result2exp, 'Data processing')
+                        return
                 
                     if len(ColmFirst) < len(ColmOther):
                         class_downsampled = np.random.choice(ColmOther, size=len(ColmFirst), replace=False)

@@ -93,24 +93,12 @@ class DataSelectionView:
 
        
         nrlines = 0
-        with self.InfoPage:
-            clear_output()
-            
-            infotxt = str(info)
-            if len(infotxt) > 0:
-                display.display("Dataset Description:")
-            while infotxt.find("\n") > -1:
-                line = infotxt[:infotxt.find("\n")]
-                infotxt = infotxt[infotxt.find("\n")+1:]
-                if (infotxt == '') or (infotxt == None):
-                    continue
-                display.display(line)
-                nrlines+=1
-            #####################################
-            #####################################
-        self.InfoPage.layout.height = str(18*nrlines)+'px'
 
-    
+        self.InfoPage.value = ''
+        
+
+        infotxt = str(info)
+        self.InfoPage.value=infotxt
         return
 
     def on_submit_func(self, event):
@@ -140,7 +128,8 @@ class DataSelectionView:
         fthboxlay = widgets.Layout(height='500px')
 
         self.DFPage = widgets.Output(layout=Layout(width='50%',height='250px',align_items='center',overflow="visible"))
-        self.InfoPage = widgets.Output(layout=Layout(height='150px',align_items='center',overflow="visible"))
+        self.InfoPage = widgets.Textarea(layout=Layout(width='500px',height='250px',align_items='center',overflow="visible"))
+
 
         tab_1 = VBox(children=[
             HBox(children = [self.datafolder,self.main_view.datasets,wsheets,readfile],layout=filelay),

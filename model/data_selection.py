@@ -66,13 +66,10 @@ class DataSelectionModel:
 
        
         try: 
-            print("1")
-            print(abs_info_path)
             f = open(abs_info_path)
             self.main_model.currinfo = f.read()
             f.close()
         except: 
-            print("2")
             self.main_model.currinfo = "No info found for this file"
             
             

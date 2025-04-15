@@ -187,6 +187,7 @@ class DataProcessingView:
         self.controller.assign_target(self.main_view.trg_lbl,self.main_view.dt_features,self.main_view.prdtsk_lbl,result2exp,self.trg_btn,predictiontask)
         self.trg_btn.layout.visibility = 'hidden'
         self.trg_btn.layout.display = 'none'
+        self.splt_btn.disabled = False
 
 
         return
@@ -241,7 +242,7 @@ class DataProcessingView:
         self.testratiolbl.layout.display = 'none'
         self.splt_txt =widgets.Dropdown(description ='Test Ratio(%): ',options=[20,25,30,35])
         self.splt_txt.layout.width = '160px'
-        self.splt_btn = widgets.Button(description="Split")
+        self.splt_btn = widgets.Button(description="Split",disabled = True)
         self.splt_btn.layout.width = '100px'
         self.splt_btn.on_click(self.makesplit)
 

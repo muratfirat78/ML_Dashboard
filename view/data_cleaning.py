@@ -33,26 +33,32 @@ class DataCleaningView:
 
         if self.controller.main_model.datasplit:
             totalmisses  = 0
+            missng_vals = 0
+
+            for col in self.controller.get_XTrain().columns:
+                totalmisses+= self.controller.get_XTrain()[col].isnull().sum()  
+               
+
+            for col in self.controller.main_model.get_XTest().columns:
+                totalmisses += self.controller.main_model.get_XTest()[col].isnull().sum() 
+
+            for col in self.controller.main_model.getYtrain().to_frame().columns:
+                totalmisses+= self.controller.main_model.getYtrain().to_frame()[col].isnull().sum()  
+     
+            for col in self.controller.main_model.get_YTest().to_frame().columns:
+                totalmisses+= self.controller.main_model.get_YTest().to_frame()[col].isnull().sum()  
+
+            
             if colname in self.controller.get_XTrain().columns: 
                 display_df = self.controller.main_model.get_XTrain()
                 missng_vals = display_df[colname].isnull().sum()
-                missng_vals+= self.controller.main_model.get_XTest()[colname].isnull().sum()
-
-                for col in display_df.columns:
-                    curr_miss = display_df[col].isnull().sum()  
-                    totalmisses+=curr_miss
-
-                for col in self.controller.main_model.get_XTest().columns:
-                    curr_miss = self.controller.main_model.get_XTest()[col].isnull().sum()  
-                    totalmisses+=curr_miss
-
+                missng_vals += self.controller.main_model.get_XTest()[col].isnull().sum() 
+               
             else: 
                 ytrain_df = self.controller.main_model.getYtrain().to_frame()
                 if colname in ytrain_df.columns: 
-                    display_df = ytrain_df
-                    for col in display_df.columns:
-                        curr_miss = display_df[col].isnull().sum()  
-                        totalmisses+=curr_miss
+                    missng_vals = ytrain_df[col].isnull().sum()  
+                    missng_vals+= self.controller.main_model.get_YTest().to_frame()[col].isnull().sum()  
                 else: 
                     return
         

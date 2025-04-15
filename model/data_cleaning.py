@@ -79,30 +79,29 @@ class DataCleaningModel:
                     write_log('Drop target (split) ?? ',  result2aexp, 'Data cleaning')
 
                 else:  
-                    if (Xtrain_df[colname].dtype == 'float64') or (Xtrain_df[colname].dtype == 'int64') or (Xtrain_df[colname].dtype == 'int32'):
+                    if (ytrain_df[colname].dtype == 'float64') or (ytrain_df[colname].dtype == 'int64') or (ytrain_df[colname].dtype == 'int32'):
                         if handling in ['Replace-Mean','Replace-Median','Remove-Missing']:
                             if handling == 'Replace-Mean': 
-                                Xtrain_df[colname].fillna(Xtrain_df[colname].mean(), inplace=True)
-                                Xtest_df[colname].fillna(Xtrain_df[colname].mean(), inplace=True)
+                                ytrain_df[colname].fillna(ytrain_df[colname].mean(), inplace=True)
+                              
                             if handling == 'Replace-Median': 
-                                Xtrain_df[colname].fillna(Xtrain_df[colname].median(), inplace=True)
-                                Xtest_df[colname].fillna(Xtrain_df[colname].median(), inplace=True)
-            
+                                ytrain_df[colname].fillna(ytrain_df[colname].median(), inplace=True)
+                                          
                             if handling == 'Remove-Missing': 
-                                Xtrain_df = Xtrain_df.dropna(subset = [colname])
-                                Xtest_df = Xtest_df.dropna(subset = [colname])
+                                ytrain_df = ytrain_df.dropna(subset = [colname])
+                         
                         else:
                             write_log('Improper action is selected.. ',  result2aexp, 'Data cleaning')
                             return
                     else:
                         
                         if handling == 'Replace-Mode': 
-                            Xtrain_df[colname].fillna(Xtrain_df[colname].mode()[0], inplace=True)
-                            Xtest_df[colname].fillna(Xtrain_df[colname].mode()[0], inplace=True)
+                            ytrain_df[colname].fillna(ytrain_df[colname].mode()[0], inplace=True)
+                          
                             write_log('mode (split) . '+str(Xtrain_df[colname].mode()[0]), result2aexp, 'Data cleaning')
                         if handling == 'Remove-Missing': 
-                            Xtrain_df = Xtrain_df.dropna(subset = [colname])
-                            Xtest_df = Xtest_df.dropna(subset = [colname])
+                            ytrain_df = ytrain_df.dropna(subset = [colname])
+                       
                          
             
             if handling == 'Edit Range':      

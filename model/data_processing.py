@@ -461,7 +461,7 @@ class DataProcessingModel:
         write_log('Balancing (split)-> '+colname, result2exp, 'Data processing')
     
       
-        if len(train[colname].unique()) == 2: # binary detection      
+        if len(ytrain_df.to_frame()[colname].unique()) == 2: # binary detection      
 
             if balancetype == 'Upsample':
                 oversampler = RandomOverSampler()

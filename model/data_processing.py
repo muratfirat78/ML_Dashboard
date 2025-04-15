@@ -474,7 +474,7 @@ class DataProcessingModel:
                 
             if balancetype == 'DownSample':
                 downsampler = RandomUnderSampler(random_state=42)
-                X_res, y_res = rus.fit_resample(Xtrain_df, ytrain_df)
+                X_res, y_res = downsampler.fit_resample(Xtrain_df, ytrain_df)
 
                 self.main_model.set_XTrain(X_res)
                 self.main_model.set_YTrain(y_res)

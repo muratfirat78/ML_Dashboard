@@ -1,6 +1,6 @@
 from log import *
 from sklearn import tree,neighbors,linear_model,ensemble,svm
-from sklearn.metrics import accuracy_score,mean_squared_error,confusion_matrix,roc_curve,precision_score,recall_score
+from sklearn.metrics import accuracy_score,mean_squared_error,confusion_matrix,roc_curve,precision_score,recall_score,mean_absolute_error,r2_score
 import statsmodels.api as sm
 
 class MLModel:
@@ -46,7 +46,7 @@ class MLModel:
         if self.Type == 'Random Forest':
             if self.myTask == 'Classification': 
                 self.PythonObject = ensemble.RandomForestClassifier(n_estimators=int(params[0]),criterion=params[1])      
-                
+                self.PythonObject.fit(xtrain,ytrain) 
             if self.myTask == 'Regression': 
                 self.PythonObject = ensemble.RandomForestRegressor(n_estimators=int(params[0]),criterion=params[1], random_state=0,)   # try before standardization..
                 self.PythonObject.fit(xtrain,ytrain) 
@@ -126,6 +126,8 @@ class PredictiveModelingModel:
 
         models = [1 for mdl in self.trainedModels if mdl.getName().find(mytype) > -1]
 
+        write_log('Train Model-> task'+str(tasktype[tasktype.find(":")+2:]),results,'Predictive modeling')
+
         success = False
         try: 
             mymodel = MLModel(self.main_model.targetcolumn,tasktype,mytype,results,mytype+"_"+str(len(models)),params,Xtrain_df,ytrain_df)
@@ -139,19 +141,28 @@ class PredictiveModelingModel:
             
             y_pred = mymodel.GetPredictions(Xtest_df)
 
-            mymodel.setROC(roc_curve(ytest_df, y_pred))
+            #mymodel.setROC(roc_curve(ytest_df, y_pred))
             
     
             write_log('>>Train Model-> predcts'+str(len(y_pred))+", "+tasktype,results,'Predictive modeling')
     
             if tasktype[tasktype.find(":")+2:] == 'Classification': 
+                mymodel.setConfMatrix(confusion_matrix(ytest_df,y_pred))
+                
+                mymodel.GetPerformanceDict()['True-Positive'] = mymodel.getConfMatrix()[1][1]
+                mymodel.GetPerformanceDict()['False-Positive'] = mymodel.getConfMatrix()[0][1]
+                mymodel.GetPerformanceDict()['True-Negative'] = mymodel.getConfMatrix()[0][0]
+                mymodel.GetPerformanceDict()['False-Negative'] = mymodel.getConfMatrix()[1][0]
                 mymodel.GetPerformanceDict()['Accuracy'] = accuracy_score(ytest_df, y_pred)
                 mymodel.GetPerformanceDict()['Precision'] = precision_score(ytest_df, y_pred)
                 mymodel.GetPerformanceDict()['Recall'] = recall_score(ytest_df, y_pred)
-                mymodel.setConfMatrix(confusion_matrix(ytest_df,y_pred))
+                 
+                
             
             if tasktype[tasktype.find(":")+2:] == 'Regression': 
                 mymodel.GetPerformanceDict()['MSE'] = mean_squared_error(ytest_df, y_pred)
+                mymodel.GetPerformanceDict()['MAE'] = mean_absolute_error(ytest_df, y_pred)
+                mymodel.GetPerformanceDict()['RSquared'] = r2_score(ytest_df, y_pred)
     
             self.trainedModels.append(mymodel)
     

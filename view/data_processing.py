@@ -49,18 +49,20 @@ class DataProcessingView:
             if (display_df[colname].dtype == 'float64') or (display_df[colname].dtype == 'int64') or (display_df[colname].dtype == 'int32'):
 
                 fig, (axbox, axhist) = plt.subplots(1,2)
-        
+
                 sns.boxplot(x=colname,data=display_df, ax=axbox)
                 bxtitle = 'Box plot'
                 if self.controller.main_model.datasplit:
                     bxtitle+=' (train)'
                 axbox.set_title(bxtitle) 
+              
                 sns.distplot(display_df[colname],ax=axhist)
                 title = 'Histogram' 
                 if self.controller.main_model.datasplit:
                     title+=' (train)'
                 axhist.set_title(title) 
                 plt.legend(['Mean '+str(round(display_df[colname].mean(),2)),'Stdev '+str(round(display_df[colname].std(),2))], bbox_to_anchor=(0.6, 0.6))
+
                 plt.show()
         
             if (display_df[colname].dtype == 'object') or (display_df[colname].dtype== 'string') or (display_df[colname].dtype== 'bool')  :
@@ -72,7 +74,8 @@ class DataProcessingView:
                     plt.show()
                 else:
                     display.display('Number of classes: ',nrclasses)
-                    
+
+        
         with ProcssPage:
             clear_output()            
         

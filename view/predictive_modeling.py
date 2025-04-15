@@ -165,7 +165,7 @@ class PredictiveModelingView:
         trmodels.observe(self.models_click, 'value')
      
         model_sumry = widgets.Textarea(options=[],description = '',disabled = True)
-        model_sumry.layout.height = '80px'
+        model_sumry.layout.height = '150px'
        
 
      

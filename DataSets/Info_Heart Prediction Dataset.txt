@@ -10,3 +10,4 @@ Cholesterol: Cholesterol level
 HeartRate: Heart rate in beats per minute
 HeartDisease (Target): 0 (No heart disease), 1 (Heart disease present)
 QuantumPatternFeature: A mathematically derived feature incorporating complex, non-linear patterns, potentially aiding in more advanced pattern recognition (a custom-engineered feature)
+

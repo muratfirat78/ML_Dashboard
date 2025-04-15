@@ -81,6 +81,7 @@ class Controller:
 
     def remove_outliers(self,dt_features,result2exp):
         self.data_processing_model.remove_outliers(dt_features,result2exp)
+        self.refresh_data_processing()
 
     def savedata(self,dataFolder, datasetname):
         self.data_processing_model.savedata(dataFolder, datasetname)
@@ -151,3 +152,6 @@ class Controller:
     
     def update_log_view(self):
         self.learning_path_view.update_actions()
+    
+    def refresh_data_processing(self):
+        self.data_processing_view.featurepr_click(None)

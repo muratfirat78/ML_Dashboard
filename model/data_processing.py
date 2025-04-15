@@ -55,7 +55,7 @@ class DataProcessingModel:
         self.logger.add_action(['DataProcessing', 'PCA'], pcafeats)
 
         if self.main_model.targetcolumn in pcafeats:
-            write_log('PCA: Returned due to inclusion of target in PCA', 'PCA')
+            write_log('PCA: Returned due to inclusion of target in PCA',result2exp, 'PCA')
             return
 
         if self.main_model.datasplit:
@@ -66,7 +66,7 @@ class DataProcessingModel:
 
             for col in pcafeats:
                 if (XTrain[col].dtype == 'object') or (XTrain[col].dtype== 'string'):
-                    write_log('PCA: Returned due to categorical feature selection', 'PCA')
+                    write_log('PCA: Returned due to categorical feature selection',result2exp, 'PCA')
                     return
       
             tr_prev_indices = XTrain.index
@@ -136,7 +136,7 @@ class DataProcessingModel:
 
             for col in pcafeats:
                 if (current_df[col].dtype == 'object') or (current_df[col].dtype== 'string'):
-                    write_log('PCA: Returned due to categorical feature selection', 'PCA')
+                    write_log('PCA: Returned due to categorical feature selection',result2exp, 'PCA')
                     return
             
             

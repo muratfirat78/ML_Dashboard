@@ -5,7 +5,7 @@ from IPython import display
 from pathlib import Path
 import os
 
-colabpath = '/content/ML_Dashboard/Datasets'
+colabpath = '/content/ML_Dashboard/DataSets'
 
 class DataSelectionModel:
     def __init__(self, main_model, logger):

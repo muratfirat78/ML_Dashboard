@@ -20,11 +20,7 @@ class MLModel:
         self.ROCTPR = None
         self.Predictions = None
         
-
-        write_log(self.Type+"__"+self.myTask, report, 'Predictive modeling')
-
-        write_log(str(params), report, 'Predictive modeling')
-
+        
         if self.Type == 'Decision Tree':
             if self.myTask == 'Classification': 
                 write_log('DT: Classification', report, 'Predictive modeling')
@@ -69,7 +65,7 @@ class MLModel:
             self.PythonObject = linear_model.LogisticRegression(random_state=16)   # Initialize the model object 
             self.PythonObject.fit(xtrain,ytrain) 
             
-        write_log('Model.. Type '+str(type(self.PythonObject)), report, 'Predictive modeling')
+       
         return
 
     def getPredictions(self):
@@ -168,14 +164,9 @@ class PredictiveModelingModel:
                        
             mymodel = MLModel(self.main_model.targetcolumn,tasktype,mytype,results,mytype+"_"+str(len(models)),params,Xtrain_df,ytrain_df)
 
-            write_log('*Train Model-> model'+str(type(mymodel)),results,'Predictive modeling')
 
-            write_log('++Train Model-> '+str(len(Xtrain_df)),results,'Predictive modeling')
-            
-            write_log('Train Model-> trained..testing: '+str(len(Xtest_df)),results,'Predictive modeling')
-            
             y_pred = mymodel.GetPredictions(Xtest_df)
-            write_log('Train Model-> trained..predictions: '+str(len(y_pred)),results,'Predictive modeling')
+           
             mymodel.setPredictions(y_pred)
 
     
@@ -196,7 +187,7 @@ class PredictiveModelingModel:
                     fpr,tpr,thrs = roc_curve(ytest_df, y_pred)
                     mymodel.GetPerformanceDict()['ROCFPR'] = fpr
                     mymodel.GetPerformanceDict()['ROCTPR'] = tpr
-                    write_log('Train Model-> ROC info is filled..', results, 'Predictive modeling')
+                   
                 else:
                     mymodel.GetPerformanceDict()['Accuracy'] = accuracy_score(ytest_df, y_pred)
                     mymodel.GetPerformanceDict()['Precision'] = precision_score(ytest_df, y_pred,average ='weighted')
@@ -211,18 +202,13 @@ class PredictiveModelingModel:
               
 
             self.trainedModels.append(mymodel)
-    
-            write_log('**Train Model-> '+ mytype, results, 'Predictive modeling')
-            # self.logger.add_action(['ModelDevelopment', 'SelectModel'], mytype)
-            
-            performance = []
-            for prf,val in mymodel.GetPerformanceDict().items():
-                write_log('Model Performance-> '+prf+': '+str(val), results, 'Predictive modeling')
-                performance += [(prf, val)]
-    
-            self.logger.add_action(['ModelDevelopment', 'ModelPerformance'], (mytype + str(params).replace('[', '(').replace(']', ')'), performance))
 
+            
+            for prf,val in mymodel.GetPerformanceDict().items():
+                self.logger.add_action(['ModelDevelopment', 'ModelPerformance'], (mytype + str(params).replace('[', '(').replace(']', ')'), prf, val))
+    
             trmodels.options = [mdl.getName() for mdl in self.trainedModels]
+            write_log('Train Model-> '+mytype+' is trained.',results,'Predictive modeling')
             
         except Exception as e: 
             write_log('Train Model-> exception raised \"'+str(e)+'\"',results,'Predictive modeling')

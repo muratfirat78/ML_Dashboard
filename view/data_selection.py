@@ -137,5 +137,6 @@ class DataSelectionView:
         tab_1 = VBox(children=[
             HBox(children = [self.datafolder,self.main_view.datasets,wsheets,self.readfile],layout=filelay),
             HBox(children = [self.DFPage,self.InfoPage],layout = fthboxlay)],layout=tablayout)
+        tab_1.layout.height = '700px'
         return tab_1
         

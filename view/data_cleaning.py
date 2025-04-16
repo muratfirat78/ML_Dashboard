@@ -272,4 +272,5 @@ class DataCleaningView:
         tab2_lftbox = VBox(children = [HBox(children=[f2a_box,selcl_box]),result2aexp],layout = tab2a_lay)
 
         tab_2 = HBox(children=[tab2_lftbox,self.main_view.right_page])
+        tab_2.layout.height = '700px'
         return tab_2

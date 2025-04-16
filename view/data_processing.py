@@ -315,11 +315,12 @@ class DataProcessingView:
 
         vb1lay =  widgets.Layout()
         prboxlay = widgets.Layout()
-        vbox1 = VBox(children = [HBox(children=[self.main_view.f_box,sel_box],layout = prboxlay),result2exp,sveprbtn],layout = vb1lay)
+        vbox1 = VBox(children = [HBox(children=[self.main_view.f_box,sel_box],layout = prboxlay),result2exp],layout = vb1lay)
 
         vb2lay =  widgets.Layout()
         vbox2 = VBox(children = [self.main_view.feat_page,self.main_view.process_page],layout = vb2lay)
         tab_3 = HBox(children=[vbox1,vbox2])
+        tab_3.layout.height = '700px'
         return tab_3
 
     def PCAView(self,event):

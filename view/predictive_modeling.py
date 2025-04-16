@@ -1,6 +1,8 @@
 from IPython.display import clear_output
 from IPython import display
 from ipywidgets import *
+from sklearn import tree,metrics
+import matplotlib.pyplot as plt
 
 class PredictiveModelingView:
     def __init__(self, controller, main_view):
@@ -28,38 +30,36 @@ class PredictiveModelingView:
         for mdl in self.controller.get_trained_models():
             if trmodels.value == mdl.getName():
                 if len(mdl.GetPerformanceDict()) > 0:
-                    model_sumry.value += 'Preformance scores: '+'\n'
-                for prf,val in mdl.GetPerformanceDict().items():
-                    model_sumry.value += '  > '+prf+': '+str(round(val,3))+'\n'
-                    with self.performpage:
-                        clear_output()
-                        try: 
-                            roc_fpr,roc_tpr = mymodel.getRoc()
-                            # plot the roc curve for the model
-                            plt.plot(roc_fpr, roc_tpr, marker='.', label=mdl.getName())
-                            # axis labels
-                            plt.xlabel('False Positive Rate')
-                            plt.ylabel('True Positive Rate')
-                            # show the legend
-                            plt.legend()
-                            # show the plot
-                            plt.show()
+                    model_sumry.value += 'Performance scores: '+'\n'
 
-                        except: 
-                            display.display('ROC curve could not be plotted.')
+                for prf,val in mdl.GetPerformanceDict().items():
+                    if (prf == 'ROCFPR') or (prf == 'ROCTPR'):
+                        continue
+                    model_sumry.value += '  > '+prf+': '+str(val)+'\n'
+                    
+                if ('ROCFPR' in mdl.GetPerformanceDict()) and ('ROCTPR' in mdl.GetPerformanceDict()):
+              
+                    try: 
+                        with self.performpage:
                             
-                        if mdl.getType() == "Linear Model":
-                            try: 
-                                display.display(mdl.getSkLearnModel().summary())
-                            except: 
-                                display.display("Sklearn model does not have summary.")
-                            
-                        if mdl.getTask() == "Classification":
-                            display.display('Confusion Matrix: ')
-                            display.display(mdl.getConfMatrix())
+                            clear_output()
+                            if mdl.getTask() == "Classification":
+                                display.display('Confusion Matrix: ')
+                                display.display(mdl.getConfMatrix())
+                             
+                            roc_auc = metrics.auc(mdl.GetPerformanceDict()['ROCFPR'],mdl.GetPerformanceDict()['ROCTPR'])
+                            display0 = metrics.RocCurveDisplay(fpr=mdl.GetPerformanceDict()['ROCFPR'], tpr=mdl.GetPerformanceDict()['ROCTPR'], roc_auc=roc_auc, estimator_name=mdl.getName())
+                            display0.plot()
+                            plt.show()
+                    except Exception as e: 
+                        with self.performpage: 
+                            clear_output()
+                            display.display('Error occured: '+str(e))
+                                
+              
                         
                         
-                break
+                
         return
         
     def ModelChange(self,event):
@@ -184,7 +184,7 @@ class PredictiveModelingView:
         self.knnkval = widgets.Dropdown(options=[i for i in range(1,15)],description = 'k')
         self.knnkval.layout.width = '125px'
         self.knnkval.layout.display = 'none'
-        self.knnmetric = widgets.Dropdown(options=['minkowski','euclidean','manhattan'],description = 'k')
+        self.knnmetric = widgets.Dropdown(options=['minkowski','euclidean','manhattan'],description = 'distance')
         self.knnmetric.layout.width = '125px'
         self.knnmetric.layout.display = 'none'
 
@@ -193,6 +193,11 @@ class PredictiveModelingView:
         self.mdplbl.layout.display = 'none'
         self.mgplbl = widgets.Label( value="MinSeg: ")
         self.mgplbl.layout.display = 'none'
+
+        self.lmlib = widgets.Dropdown(options=['SklearnLR','OLS',],description = 'Library')
+        self.knnmetric.layout.width = '125px'
+        self.knnmetric.layout.display = 'none'
+
 
         self.svcc =widgets.Dropdown(options=[0.1*i for i in range(0,11)],description = 'C')
         self.svcc.layout.display = 'none'

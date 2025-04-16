@@ -296,6 +296,58 @@ class DataProcessingModel:
 
         return 
     ############################################################################################################    
+    def make_featconvert(self,dt_features,result2exp):
+
+        colname = dt_features.value
+                    
+        write_log('Convert Feature Type-> '+colname, result2exp, 'Data processing')
+
+        if self.main_model.datasplit:
+            Xtrain_df = self.main_model.get_XTrain()
+            ytrain_df = self.main_model.getYtrain().to_frame()
+            ytest_df = self.main_model.get_YTest().to_frame()
+            
+            write_log('Convert Feature Type-> (split)-> '+colname, result2exp, 'Data processing')
+                         
+            if colname in Xtrain_df.columns:
+                write_log('Convert Feature Type (split)-> Returned, only target variable can be converted..', result2exp, 'Data processing')
+                return
+            if colname in ytrain_df.columns:
+                if ytrain_df[colname].dtype in ['float64','int64','int32']:
+                    if len(ytrain_df[colname].unique()) == 2:
+                        ytrain_df.iloc[:,ytrain_df.columns.get_loc(colname)] = ytrain_df.iloc[:,ytrain_df.columns.get_loc(colname)].astype(bool)
+                        ytest_df.iloc[:,ytest_df.columns.get_loc(colname)] = ytest_df.iloc[:,ytest_df.columns.get_loc(colname)].astype(bool)
+                        
+                        self.main_model.set_YTrain(ytrain_df.squeeze())
+                        self.main_model.set_YTest(ytest_df.squeeze())
+                    else:
+                        write_log('Convert Feature Type (split)-> Returned, target variable has more than two levels..', result2exp, 'Data processing')
+                        return
+                else:
+                    write_log('Convert Feature Type-> Returned, feature is not convenient for num->bool conversion..', result2exp, 'Data processing')
+                    return
+            else:
+                write_log('Convert Feature Type (split)-> Returned, feature is unknown', result2exp, 'Data processing')
+                return
+                    
+
+        else:
+            curr_df = self.main_model.get_curr_df()
+            write_log('Convert Feature Type (no split)-> '+': '+str(len(curr_df)), result2exp, 'Data processing')
+            if curr_df[colname].dtype in ['float64','int64','int32']:
+                if len(curr_df[colname].unique()) == 2:
+                    curr_df.iloc[:,curr_df.columns.get_loc(colname)] = curr_df.iloc[:,curr_df.columns.get_loc(colname)].astype(bool)
+                    write_log('Convert Feature Type -> done.. '+'  feat type '+str(curr_df[colname].dtype), result2exp, 'Data processing')
+                    self.main_model.set_curr_df(curr_df)
+                else:
+                    write_log('Convert Feature Type-> Returned, feature has more than two levels..', result2exp, 'Data processing')
+                    return 
+            else:
+                write_log('Convert Feature Type-> Returned, feature is not convenient for num->bool conversion..', result2exp, 'Data processing')
+                return
+                
+      
+        return
 
     def make_scaling(self,dt_features,FeatPage,scalingacts,result2exp):
                     

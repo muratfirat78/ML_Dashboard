@@ -164,6 +164,9 @@ class DataProcessingView:
                 self.pcaselect.layout.visibility = 'hidden'
                 self.pcaselect.layout.display = 'none'
             fxctingacts.value = fxctingacts.options[0]
+        if self.main_view.process_types.value == "Convert Feature 0/1->Bool":
+            self.controller.make_featconvert(self.main_view.dt_features,result2exp)
+            
 
         
         opts = []
@@ -227,7 +230,7 @@ class DataProcessingView:
        
         outrmvbtn.layout = outrmvlay
 
-        self.main_view.process_types = widgets.Dropdown( options=['Select Processing','Scaling','Encoding','Feature Extraction','Outlier','Imbalancedness'], description='', disabled=False)
+        self.main_view.process_types = widgets.Dropdown( options=['Select Processing','Scaling','Encoding','Feature Extraction','Outlier','Imbalancedness','Convert Feature 0/1->Bool'], description='', disabled=False)
         self.main_view.process_types.observe(self.selectProcessType,'value')
         self.main_view.process_types.layout.width = '200px'
 

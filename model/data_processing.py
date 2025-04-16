@@ -297,8 +297,8 @@ class DataProcessingModel:
         return 
     ############################################################################################################    
     def make_featconvert(self,dt_features,result2exp):
-
         colname = dt_features.value
+        self.logger.add_action(['DataProcessing', 'ConvertToBoolean'], colname)
                     
         write_log('Convert Feature Type-> '+colname, result2exp, 'Data processing')
 

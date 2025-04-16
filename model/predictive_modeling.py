@@ -187,11 +187,16 @@ class PredictiveModelingModel:
                 mymodel.GetPerformanceDict()['Accuracy'] = accuracy_score(ytest_df, y_pred)
                 mymodel.GetPerformanceDict()['Precision'] = precision_score(ytest_df, y_pred)
                 mymodel.GetPerformanceDict()['Recall'] = recall_score(ytest_df, y_pred)
+                
+                
+                
                 if len(ytrain_df.to_frame()[self.main_model.targetcolumn].unique()) == 2:
+                  
                     fpr,tpr,thrs = roc_curve(ytest_df, y_pred)
                     mymodel.GetPerformanceDict()['ROCFPR'] = fpr
                     mymodel.GetPerformanceDict()['ROCTPR'] = tpr
                     write_log('Train Model-> ROC info is filled..', results, 'Predictive modeling')
+   
                 
             
             if tasktype[tasktype.find(":")+2:] == 'Regression': 

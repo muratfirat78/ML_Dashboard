@@ -3,6 +3,7 @@ from IPython import display
 from ipywidgets import *
 from sklearn import tree,metrics
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 class PredictiveModelingView:
     def __init__(self, controller, main_view):
@@ -36,26 +37,42 @@ class PredictiveModelingView:
                     if (prf == 'ROCFPR') or (prf == 'ROCTPR'):
                         continue
                     model_sumry.value += '  > '+prf+': '+str(val)+'\n'
+
+                with self.performpage:          
+                    clear_output()
                     
-                if ('ROCFPR' in mdl.GetPerformanceDict()) and ('ROCTPR' in mdl.GetPerformanceDict()):
-              
-                    try: 
-                        with self.performpage:
-                            
-                            clear_output()
-                            if mdl.getTask() == "Classification":
-                                display.display('Confusion Matrix: ')
-                                display.display(mdl.getConfMatrix())
-                             
+                    if mdl.getTask() == "Classification":
+                        display.display('Confusion Matrix: ')
+                        display.display(mdl.getConfMatrix())
+
+          
+                        classes = [cls for cls in self.controller.main_model.getYtrain().to_frame()[self.main_model.targetcolumn].unique()]
+
+                        # Normalized confusion matrix
+                        cm = mdl.getConfMatrix() / mdl.getConfMatrix().sum(axis = 1, keepdims = True)
+                        
+                        # Color map
+                        cmap = sns.diverging_palette(220, 20, as_cmap = True)
+                        
+                        # Seaborn Heatmap
+                        sns.heatmap(cm, cmap = cmap, center = 0, annot = mdl.getConfMatrix(), fmt = 'd',
+                                    xticklabels = classes, yticklabels = classes, annot_kws = {'size': 12})
+                        
+                        
+                        plt.xlabel('Predicted Class', fontsize=14)
+                        plt.ylabel('Actual Class', fontsize=14)
+                        plt.title('Confusion Matrix', fontsize=16)
+                        
+            
+                        if len(self.controller.main_model.getYtrain().to_frame()[self.main_model.targetcolumn].unique()) == 2:
                             roc_auc = metrics.auc(mdl.GetPerformanceDict()['ROCFPR'],mdl.GetPerformanceDict()['ROCTPR'])
                             display0 = metrics.RocCurveDisplay(fpr=mdl.GetPerformanceDict()['ROCFPR'], tpr=mdl.GetPerformanceDict()['ROCTPR'], roc_auc=roc_auc, estimator_name=mdl.getName())
                             display0.plot()
                             plt.show()
-                    except Exception as e: 
-                        with self.performpage: 
-                            clear_output()
-                            display.display('Error occured: '+str(e))
-                                
+                        else:
+                            plt.show()
+                            
+                        
               
                         
                         

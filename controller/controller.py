@@ -136,6 +136,7 @@ class Controller:
                 self.learning_path_model.set_learning_path(userid)
                 # self.learning_path.get_scores()
                 self.login_view.hide_login()
+                self.main_view.set_title(4, 'Logging (userid:' + str(userid) + ')')
                 self.main_view.show_tabs()
             else:
                 print("login incorrect")

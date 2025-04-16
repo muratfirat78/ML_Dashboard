@@ -41,3 +41,6 @@ class MainView:
     
     def close_tab(self, index):
          self.tabs[index].close()
+     
+    def set_title(self, index, titlename):
+         self.tab_set.set_title(index, titlename)

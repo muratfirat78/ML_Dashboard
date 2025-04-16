@@ -4,6 +4,9 @@ from ipywidgets import *
 from sklearn import tree,metrics
 import matplotlib.pyplot as plt
 import seaborn as sns
+import pandas as pd
+import numpy as np
+from array import array
 
 class PredictiveModelingView:
     def __init__(self, controller, main_view):
@@ -42,11 +45,8 @@ class PredictiveModelingView:
                     clear_output()
                     
                     if mdl.getTask() == "Classification":
-                        display.display('Confusion Matrix: ')
-                        display.display(mdl.getConfMatrix())
-
-          
-                        classes = [cls for cls in self.controller.main_model.getYtrain().to_frame()[self.main_model.targetcolumn].unique()]
+                      
+                        classes = [cls for cls in self.controller.main_model.getYtrain().to_frame()[self.controller.main_model.targetcolumn].unique()]
 
                         # Normalized confusion matrix
                         cm = mdl.getConfMatrix() / mdl.getConfMatrix().sum(axis = 1, keepdims = True)
@@ -59,19 +59,65 @@ class PredictiveModelingView:
                                     xticklabels = classes, yticklabels = classes, annot_kws = {'size': 12})
                         
                         
-                        plt.xlabel('Predicted Class', fontsize=14)
-                        plt.ylabel('Actual Class', fontsize=14)
-                        plt.title('Confusion Matrix', fontsize=16)
-                        
+                        plt.xlabel('Predicted Class', fontsize=12)
+                        plt.ylabel('Actual Class', fontsize=12)
+                        plt.title('Confusion Matrix', fontsize=14)
+                        plt.show()
+
+                        display.display('__________________________________')                    
             
-                        if len(self.controller.main_model.getYtrain().to_frame()[self.main_model.targetcolumn].unique()) == 2:
+                        if len(self.controller.main_model.getYtrain().to_frame()[self.controller.main_model.targetcolumn].unique()) == 2:
                             roc_auc = metrics.auc(mdl.GetPerformanceDict()['ROCFPR'],mdl.GetPerformanceDict()['ROCTPR'])
                             display0 = metrics.RocCurveDisplay(fpr=mdl.GetPerformanceDict()['ROCFPR'], tpr=mdl.GetPerformanceDict()['ROCTPR'], roc_auc=roc_auc, estimator_name=mdl.getName())
                             display0.plot()
+                            plt.title('ROC Curve', fontsize=14)
                             plt.show()
-                        else:
-                            plt.show()
-                            
+                        display.display('Confusion Matrix: ')
+                        display.display(mdl.getConfMatrix())
+                        
+                    else:
+                        Xtrain_df = self.controller.main_model.get_XTrain()
+                        ytrain_df = self.controller.main_model.getYtrain()
+                        ytest_df = self.controller.main_model.get_YTest()
+                        
+                        
+                        
+                        pred_df = pd.DataFrame(columns = ['y_true','y_pred','tag'])
+
+                        ytest_df = ytest_df.to_list()
+                        preds = mdl.getPredictions().tolist()
+                        pred_df['y_true'] = ytest_df
+                        pred_df['y_pred'] = preds
+                        pred_df['tag'] = ['test' for i in preds]
+
+                        trpred_df = pd.DataFrame(columns = ['y_true','y_pred','tag'])
+
+                        ytr_pred = mdl.GetPredictions(Xtrain_df)
+                        ytr_pred = ytr_pred.tolist()
+                        ytrain_df = ytrain_df.to_list()
+
+                        
+                        trpred_df['y_true'] = ytrain_df
+                        trpred_df['y_pred'] = ytr_pred
+                        trpred_df['tag'] = ['train' for i in ytr_pred]
+
+                        pred_df = pd.concat([pred_df, trpred_df], ignore_index=True)
+
+                        
+                        #for valind in range(len(ytrain_df)):
+                            #newrow = pd.DataFrame({'y_true':ytrain_df[valind], 'y_pred':mdl.getPredictions()[valind],'tag':'train'})
+                        model_sumry.value +=str(ytest_df) +'\n'
+                        model_sumry.value +=str(type(preds))+'\n'
+                        model_sumry.value +=str(preds)+'\n'
+
+                        
+                     
+                  
+                        g = sns.lmplot(x='y_true', y ='y_pred', data=pred_df, hue='tag')
+                        g.fig.suptitle('True Vs Pred', y= 1.02)
+                        g.set_axis_labels('y_true', 'y_pred');
+                        plt.show()  
+
                         
               
                         

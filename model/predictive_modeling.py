@@ -18,6 +18,7 @@ class MLModel:
         self.modelinfo = dict()
         self.ROCFPR = None
         self.ROCTPR = None
+        self.Predictions = None
         
 
         write_log(self.Type+"__"+self.myTask, report, 'Predictive modeling')
@@ -71,11 +72,11 @@ class MLModel:
         write_log('Model.. Type '+str(type(self.PythonObject)), report, 'Predictive modeling')
         return
 
-    def getROCFPR(self):
-        return self.ROCFPR
+    def getPredictions(self):
+        return self.Predictions
 
-    def setROCFPR(self,iytm):
-        self.ROCFPR = iytm   
+    def setPredictions(self,iytm):
+        self.Predictions = iytm   
         return
 
     def getROCTPR(self):
@@ -174,28 +175,32 @@ class PredictiveModelingModel:
             write_log('Train Model-> trained..testing: '+str(len(Xtest_df)),results,'Predictive modeling')
             
             y_pred = mymodel.GetPredictions(Xtest_df)
+            write_log('Train Model-> trained..predictions: '+str(len(y_pred)),results,'Predictive modeling')
+            mymodel.setPredictions(y_pred)
 
     
-            write_log('>>Train Model-> predcts'+str(len(y_pred))+", "+tasktype,results,'Predictive modeling')
+            write_log('>>Train Model-> predcts'+str(len(y_pred))+"??"+str(len(ytest_df))+", "+tasktype,results,'Predictive modeling')
     
             if tasktype[tasktype.find(":")+2:] == 'Classification': 
                 mymodel.setConfMatrix(confusion_matrix(ytest_df,y_pred))      
-                mymodel.GetPerformanceDict()['True-Positive'] = mymodel.getConfMatrix()[1][1]
-                mymodel.GetPerformanceDict()['False-Positive'] = mymodel.getConfMatrix()[0][1]
-                mymodel.GetPerformanceDict()['True-Negative'] = mymodel.getConfMatrix()[0][0]
-                mymodel.GetPerformanceDict()['False-Negative'] = mymodel.getConfMatrix()[1][0]
-                mymodel.GetPerformanceDict()['Accuracy'] = accuracy_score(ytest_df, y_pred)
-                mymodel.GetPerformanceDict()['Precision'] = precision_score(ytest_df, y_pred)
-                mymodel.GetPerformanceDict()['Recall'] = recall_score(ytest_df, y_pred)
-                
-                
                 
                 if len(ytrain_df.to_frame()[self.main_model.targetcolumn].unique()) == 2:
+                    mymodel.GetPerformanceDict()['True-Positive'] = mymodel.getConfMatrix()[1][1]
+                    mymodel.GetPerformanceDict()['False-Positive'] = mymodel.getConfMatrix()[0][1]
+                    mymodel.GetPerformanceDict()['True-Negative'] = mymodel.getConfMatrix()[0][0]
+                    mymodel.GetPerformanceDict()['False-Negative'] = mymodel.getConfMatrix()[1][0]
+                    mymodel.GetPerformanceDict()['Accuracy'] = accuracy_score(ytest_df, y_pred)
+                    mymodel.GetPerformanceDict()['Precision'] = precision_score(ytest_df, y_pred)
+                    mymodel.GetPerformanceDict()['Recall'] = recall_score(ytest_df, y_pred)
                   
                     fpr,tpr,thrs = roc_curve(ytest_df, y_pred)
                     mymodel.GetPerformanceDict()['ROCFPR'] = fpr
                     mymodel.GetPerformanceDict()['ROCTPR'] = tpr
                     write_log('Train Model-> ROC info is filled..', results, 'Predictive modeling')
+                else:
+                    mymodel.GetPerformanceDict()['Accuracy'] = accuracy_score(ytest_df, y_pred)
+                    mymodel.GetPerformanceDict()['Precision'] = precision_score(ytest_df, y_pred,average ='weighted')
+                    mymodel.GetPerformanceDict()['Recall'] = recall_score(ytest_df, y_pred,average ='weighted')
    
                 
             

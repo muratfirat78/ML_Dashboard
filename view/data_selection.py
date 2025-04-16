@@ -100,6 +100,8 @@ class DataSelectionView:
         infotxt = str(info)
         self.InfoPage.value=infotxt
         self.InfoPage.layout.visibility = 'visible'
+
+        self.readfile.disabled = True
         return
 
     def on_submit_func(self, event):
@@ -117,11 +119,11 @@ class DataSelectionView:
 
         butlay = Layout(width='75px')
         butlay.display = 'none'
-        readfile = widgets.Button(description="Read",layout = butlay)
+        self.readfile = widgets.Button(description="Read",layout = butlay)
 
         self.datafolder.on_submit(self.on_submit_func)
         self.main_view.datasets.observe(self.fileClick,'value')
-        readfile.on_click(self.read_dataset)
+        self.readfile.on_click(self.read_dataset)
 
 
         filelay =  widgets.Layout(height = '60px',width='99%')
@@ -133,7 +135,7 @@ class DataSelectionView:
 
 
         tab_1 = VBox(children=[
-            HBox(children = [self.datafolder,self.main_view.datasets,wsheets,readfile],layout=filelay),
+            HBox(children = [self.datafolder,self.main_view.datasets,wsheets,self.readfile],layout=filelay),
             HBox(children = [self.DFPage,self.InfoPage],layout = fthboxlay)],layout=tablayout)
         return tab_1
         

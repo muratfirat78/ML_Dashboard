@@ -20,3 +20,35 @@ Includes 5 regions per country (e.g., North, South, East, West, Central).
 Spans 26 years (2000-2025).
 
 Features 3,000 unique records representing various water sources and pollution conditions.
+
+Features: 
+
+Diarrheal Cases per 100,000 people (target)
+Cholera Cases per 100,000 people (target)
+Typhoid Cases per 100,000 people (target)
+
+
+Water Treatment Method                         2253 non-null   object 
+Country:                                        3000 non-null   object 
+Region                                        3000 non-null   object 
+Year                                           3000 non-null   int64  
+Water Source Type                              3000 non-null   object 
+Contaminant Level (ppm)                        3000 non-null   float64
+pH Level                                       3000 non-null   float64
+Turbidity (NTU)                                3000 non-null   float64
+Dissolved Oxygen (mg/L)                        3000 non-null   float64
+Nitrate Level (mg/L)                           3000 non-null   float64
+Lead Concentration (µg/L)                      3000 non-null   float64
+Bacteria Count (CFU/mL)                        3000 non-null   int64  
+Access to Clean Water (% of Population)        3000 non-null   float64
+Diarrheal Cases per 100,000 people             3000 non-null   int64  
+Cholera Cases per 100,000 people               3000 non-null   int64  
+Typhoid Cases per 100,000 people               3000 non-null   int64  
+Infant Mortality Rate (per 1,000 live births)  3000 non-null   float64
+GDP per Capita (USD)                           3000 non-null   int64  
+Healthcare Access Index (0-100)                3000 non-null   float64
+Urbanization Rate (%)                          3000 non-null   float64
+Sanitation Coverage (% of Population)          3000 non-null   float64
+Rainfall (mm per year)                         3000 non-null   int64  
+Temperature (°C)                               3000 non-null   float64
+Population Density (people per km²)            3000 non-null   int6

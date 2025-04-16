@@ -4,6 +4,8 @@ This dataset contains 4,000 entries with 24 columns related to happiness, econom
 Columns Overview:
 Country: Name of the country.
 
+Life_Satisfaction: Target
+
 Year: The year of the record.
 Happiness_Score: A numerical value indicating the happiness level.
 GDP_per_Capita: Economic output per person.

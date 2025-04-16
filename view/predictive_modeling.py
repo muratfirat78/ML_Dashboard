@@ -107,12 +107,6 @@ class PredictiveModelingView:
                         #for valind in range(len(ytrain_df)):
                             #newrow = pd.DataFrame({'y_true':ytrain_df[valind], 'y_pred':mdl.getPredictions()[valind],'tag':'train'})
 
-                        
-                        model_sumry.value +=str(ytest_df) +'\n'
-                        model_sumry.value +=str(type(preds))+'\n'
-                        model_sumry.value +=str(preds)+'\n'
-
-                  
                         g = sns.lmplot(x='y_true', y ='y_pred', data=pred_df, hue='tag')
                         g.fig.suptitle('True Vs Pred', y= 1.02)
                         g.set_axis_labels('y_true', 'y_pred');

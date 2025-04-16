@@ -2,7 +2,12 @@ About this file
 Filename: Heart Prediction Quantum Dataset.csv
 Rows: 500
 Columns: 7
+
+
 Features:
+
+HeartDisease: Target
+
 Age: Patient's age in years
 Gender: 0 (Female), 1 (Male)
 BloodPressure: Blood pressure level

@@ -2,7 +2,10 @@ Student Performance & Behavior Dataset
 This dataset is real data of 5,000 records collected from a private learning provider.
 The dataset includes key attributes necessary for exploring patterns, correlations, and insights related to academic performance.
 
-Columns:
+
+Features:
+
+Total_Score: Target
 
 Student_ID: Unique identifier for each student.
 First_Name: Student’s first name.
@@ -28,7 +31,6 @@ Family_Income_Level: Low, Medium, High.
 Stress_Level (1-10): Self-reported stress level (1: Low, 10: High).
 Sleep_Hours_per_Night: Average hours of sleep per night.
 
-Target variable: Total_Score
 
 Dataset contains:
 Missing values (nulls): in some records (e.g., Attendance, Assignments, or Parent Education Level).

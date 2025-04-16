@@ -106,12 +106,12 @@ class PredictiveModelingView:
                         
                         #for valind in range(len(ytrain_df)):
                             #newrow = pd.DataFrame({'y_true':ytrain_df[valind], 'y_pred':mdl.getPredictions()[valind],'tag':'train'})
+
+                        
                         model_sumry.value +=str(ytest_df) +'\n'
                         model_sumry.value +=str(type(preds))+'\n'
                         model_sumry.value +=str(preds)+'\n'
 
-                        
-                     
                   
                         g = sns.lmplot(x='y_true', y ='y_pred', data=pred_df, hue='tag')
                         g.fig.suptitle('True Vs Pred', y= 1.02)
@@ -244,10 +244,10 @@ class PredictiveModelingView:
         self.dtminseg.layout.width = '125px'
         self.dtminseg.layout.display = 'none'
 
-        self.knnkval = widgets.Dropdown(options=[i for i in range(1,15)],description = 'k')
+        self.knnkval = widgets.Dropdown(options=[i for i in range(1,15)],description = 'Neigh.Size')
         self.knnkval.layout.width = '125px'
         self.knnkval.layout.display = 'none'
-        self.knnmetric = widgets.Dropdown(options=['minkowski','euclidean','manhattan'],description = 'distance')
+        self.knnmetric = widgets.Dropdown(options=['minkowski','euclidean','manhattan'],description = 'Dist.')
         self.knnmetric.layout.width = '125px'
         self.knnmetric.layout.display = 'none'
 
@@ -262,7 +262,7 @@ class PredictiveModelingView:
         self.knnmetric.layout.display = 'none'
 
 
-        self.svcc =widgets.Dropdown(options=[0.1*i for i in range(0,11)],description = 'C')
+        self.svcc =widgets.Dropdown(options=[0.1*i for i in range(10,1,-1)],description = 'C')
         self.svcc.layout.display = 'none'
         self.svckrnl = widgets.Dropdown(options=['linear','poly','rbf','sigmoid'],description = 'kernel')
         self.svckrnl.layout.display = 'none'

@@ -40,7 +40,8 @@ class DataProcessingModel:
 
             with ProcssPage:
                 clear_output()
-                axis_corr = sns.heatmap( current_df[corrcols].corr(), vmin=-1, vmax=1, center=0,cmap=sns.diverging_palette(50, 500, n=500),square=True)
+                fig, ax = plt.subplots(figsize=(5,5))     
+                sns.heatmap( current_df[corrcols].corr(), vmin=-1, vmax=1, center=0,cmap=sns.diverging_palette(50, 500, n=500),square=True,ax=ax)
                 plt.show()
 
 

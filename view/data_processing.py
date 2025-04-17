@@ -320,7 +320,7 @@ class DataProcessingView:
         vb2lay =  widgets.Layout()
         vbox2 = VBox(children = [self.main_view.feat_page,self.main_view.process_page],layout = vb2lay)
         tab_3 = HBox(children=[vbox1,vbox2])
-        tab_3.layout.height = '700px'
+        #tab_3.layout.height = '700px'
         return tab_3
 
     def PCAView(self,event):

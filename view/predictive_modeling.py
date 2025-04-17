@@ -238,7 +238,7 @@ class PredictiveModelingView:
         self.dtminseg.layout.width = '125px'
         self.dtminseg.layout.display = 'none'
 
-        self.knnkval = widgets.Dropdown(options=[i for i in range(1,15)],description = 'N.Size')
+        self.knnkval = widgets.Dropdown(options=[i for i in range(1,15)],description = 'k')
         self.knnkval.layout.width = '125px'
         self.knnkval.layout.display = 'none'
         self.knnmetric = widgets.Dropdown(options=['minkowski','euclidean','manhattan'],description = 'Dist.')

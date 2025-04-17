@@ -203,7 +203,7 @@ class PredictiveModelingView:
         global t4_results,trmodels, model_sumry
  
         trnml_btn = widgets.Button(description="Train")
-        trnml_btn.layout.width = '150px'
+        #trnml_btn.layout.width = '150px'
         trnml_btn.on_click(self.TrainModel)
 
         t4_rslay = widgets.Layout(height='150x', width="99%")
@@ -213,7 +213,7 @@ class PredictiveModelingView:
 
         
         self.t4_models = widgets.Dropdown(options=['Select','Decision Tree','KNN','Random Forest','SVM','Logistic Regression','Linear Model'],description = '')
-        self.t4_models.layout.width = '200px'
+        #self.t4_models.layout.width = '200px'
         self.t4_models.observe(self.ModelChange)
        
 
@@ -238,7 +238,7 @@ class PredictiveModelingView:
         self.dtminseg.layout.width = '125px'
         self.dtminseg.layout.display = 'none'
 
-        self.knnkval = widgets.Dropdown(options=[i for i in range(1,15)],description = 'k')
+        self.knnkval = widgets.Dropdown(options=[i for i in range(1,15)],description = 'N.Size')
         self.knnkval.layout.width = '125px'
         self.knnkval.layout.display = 'none'
         self.knnmetric = widgets.Dropdown(options=['minkowski','euclidean','manhattan'],description = 'Dist.')

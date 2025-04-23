@@ -10,6 +10,7 @@ class LoginView:
         self.login_button = None
         self.register_display = None
         self.register_button = None
+        self.register_label = None
         self.loading_spinner = None
         self.loading_text = None
         self.hbox = None
@@ -30,6 +31,12 @@ class LoginView:
                                                 disabled=False)
         self.login_button = widgets.Button(description="Login")
         self.register_button = widgets.Button(description="Register")
+        
+        register_text = "If you don't have a userid yet, please click register to get a userid."
+        self.register_label = widgets.HTML(value = f"<b><font color='red'>{register_text}</b>")
+        # widgets.Label(
+        #     value = r'\(\color{red} {' + register_text  + '}\)'
+        # )
 
         self.loading_text = widgets.Label(
             value="Downloading user data..."
@@ -47,7 +54,7 @@ class LoginView:
         self.hbox = widgets.HBox([self.loading_spinner, self.loading_text])
         self.hbox.layout.display = 'none'
 
-        self.vbox = widgets.VBox([self.login_input,self.terms_text, self.copyright_text, self.terms_checkbox, widgets.HBox([self.login_button, self.register_button]), self.hbox])
+        self.vbox = widgets.VBox([self.login_input,self.terms_text, widgets.HBox([self.terms_checkbox, self.login_button]),self.register_label, self.register_button,self.copyright_text, self.hbox])
 
     def login(self, event):
         self.controller.login(self.login_input.value, self.terms_checkbox.value)

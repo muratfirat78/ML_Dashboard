@@ -5,9 +5,7 @@ Columns: 7
 
 
 Features:
-
 target: HeartDisease
-difficulty: [('Data cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)]
 
 Age: Patient's age in years
 Gender: 0 (Female), 1 (Male)

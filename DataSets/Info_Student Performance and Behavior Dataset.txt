@@ -2,11 +2,9 @@ Student Performance & Behavior Dataset
 This dataset is real data of 5,000 records collected from a private learning provider.
 The dataset includes key attributes necessary for exploring patterns, correlations, and insights related to academic performance.
 
+Total_Score: Target
 
 Features:
-
-target: Total_Score
-difficulty: [('Data cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)]
 
 Student_ID: Unique identifier for each student.
 First_Name: Student’s first name.

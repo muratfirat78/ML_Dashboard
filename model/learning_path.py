@@ -119,3 +119,5 @@ class LearningPathModel:
                 print(dataset_info)
                 print(self.stats)
 
+    def get_stats(self):
+        return self.stats

@@ -134,9 +134,10 @@ class Controller:
                 self.login_view.show_loading()
                 self.drive.get_performances(userid)
                 self.learning_path_model.set_learning_path(userid)
-                # self.learning_path_model.set_performance_data()
-                # self.learning_path_model.set_dataset_info()
-                # self.learning_path_model.set_performance_statistics()
+                self.learning_path_model.set_performance_data()
+                self.learning_path_model.set_dataset_info()
+                self.learning_path_model.set_performance_statistics()
+                self.learning_path_view.set_stats(self.get_stats())
                 self.login_view.hide_login()
                 self.main_view.set_title(4, 'Log (userid:' + str(userid) + ')')
                 self.main_view.show_tabs()
@@ -164,3 +165,6 @@ class Controller:
     
     def refresh_data_processing(self):
         self.data_processing_view.featurepr_click(None)
+    
+    def get_stats(self):
+        return self.learning_path_model.get_stats()

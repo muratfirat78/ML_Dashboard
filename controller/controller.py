@@ -133,11 +133,7 @@ class Controller:
                 self.login_view.disable_login_button()
                 self.login_view.show_loading()
                 self.drive.get_performances(userid)
-                self.learning_path_model.set_learning_path(userid)
-                self.learning_path_model.set_performance_data()
-                self.learning_path_model.set_dataset_info()
-                self.learning_path_model.set_performance_statistics()
-                self.learning_path_view.set_stats(self.get_stats())
+                self.update_learning_path()
                 self.login_view.hide_login()
                 self.main_view.set_title(4, 'Log (userid:' + str(userid) + ')')
                 self.main_view.show_tabs()
@@ -168,3 +164,11 @@ class Controller:
     
     def get_stats(self):
         return self.learning_path_model.get_stats()
+    
+    def update_learning_path(self):
+        userid = self.login_model.get_userid()
+        self.learning_path_model.set_learning_path(userid)
+        self.learning_path_model.set_performance_data()
+        self.learning_path_model.set_dataset_info()
+        self.learning_path_model.set_performance_statistics()
+        self.learning_path_view.set_stats(self.get_stats())

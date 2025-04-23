@@ -11,6 +11,7 @@ class LearningPathModel:
         self.stats = []
 
     def set_learning_path(self,userid):
+        self.learning_path = []
         path = os.path.join('drive', str(userid))
         for filename in os.listdir(path):
             with open(os.path.join(path,filename),'r') as file:
@@ -23,8 +24,8 @@ class LearningPathModel:
                         print("Error reading performance")
 
     def set_performance_data(self):
+        self.performance_data = []
         performance_data = self.performance_data
-
         for performance in self.learning_path:
             results = performance.get_results()
 
@@ -67,6 +68,7 @@ class LearningPathModel:
 
 
     def set_dataset_info(self):
+        self.dataset_info = []
         path = './DataSets'
         for filename in os.listdir(path):
             if filename.startswith('Info'):
@@ -89,16 +91,15 @@ class LearningPathModel:
                 return info
     
     def set_performance_statistics(self):
-        
+        self.stats = []
         sorted_performance_data = sorted(self.performance_data, key=lambda x: x['date'][0])
-        # print(self.dataset_info)
         for performance in sorted_performance_data:
             dataset_info = self.get_dataset_info(performance['dataset'].replace('.csv',''), performance['target'])
             if dataset_info:
                 #todo calculate score
-                score = 0.5
+                score = 0.1
 
-                if len(self.stats) > 1:
+                if len(self.stats) >= 1:
                     stat = copy.copy(self.stats[-1])
                 else:
                     stat = {}
@@ -107,17 +108,12 @@ class LearningPathModel:
                 for difficulty in dataset_info['difficulty']:
                     increase = score * difficulty[1]
                     if difficulty[0] in stat:
-                        stat[difficulty[0]] = stat[difficulty[0]] + increase
+                        stat[difficulty[0]] += increase
+                        if stat[difficulty[0]] > 100:
+                            stat[difficulty[0]] = 100
                     else:
                         stat[difficulty[0]] = increase
-                
                 self.stats += [stat]
-
-                # self.performance_statistics += [{'date': performance['date'], }]
-
-                print(performance)
-                print(dataset_info)
-                print(self.stats)
 
     def get_stats(self):
         return self.stats

@@ -47,12 +47,12 @@ class LearningPathView:
     def update_bar_chart(self):
         self.bar_chart.clear_output()
         with self.bar_chart:
-            task_data = self.stats[-1].copy()
-            del task_data['date']
-            df = pd.DataFrame(list(task_data.items()), columns=['Task', 'Value'])
+            stat_data = self.stats[-1].copy()
+            del stat_data['date']
+            df = pd.DataFrame(list(stat_data.items()), columns=['Skill', 'Value'])
             
             plt.figure(figsize=(10, 6))
-            sns.barplot(data=df, x='Task', y='Value', palette='viridis')
+            sns.barplot(data=df, x='Skill', y='Value', palette='viridis')
             plt.ylim(0, 100)
             plt.title('Skill level distribution')
             plt.xticks(rotation=45)
@@ -65,12 +65,13 @@ class LearningPathView:
         with self.line_chart:
             df = pd.DataFrame(self.stats)
             df['date'] = df['date'].apply(lambda d: d[0] if isinstance(d, tuple) else d)
-            df_melted = df.melt(id_vars='date', var_name='Task', value_name='Value')
+            df_melted = df.melt(id_vars='date', var_name='Skill', value_name='Value')
 
             plt.figure(figsize=(12, 6))
-            sns.lineplot(data=df_melted, x='date', y='Value', hue='Task', marker='o')
+            sns.lineplot(data=df_melted, x='date', y='Value', hue='Skill', marker='o', palette='viridis')
             plt.ylim(0, 100)
             plt.title('Skill level over time')
+            plt.gca().xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%d-%m-%Y'))
             plt.xticks(rotation=45)
             plt.tight_layout()
             plt.show()

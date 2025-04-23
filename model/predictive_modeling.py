@@ -217,6 +217,7 @@ class PredictiveModelingModel:
             write_log('Train Model-> unsuccessful trial',results,'Predictive modeling')
         
         self.controller.upload_log()
+        self.controller.update_learning_path()
     
     def get_trained_models(self):
         return self.trainedModels

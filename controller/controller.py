@@ -145,6 +145,9 @@ class Controller:
         else:
             print("You must agree to the terms before continuing")
     
+    def register(self):
+        print(self.drive.register())
+    
     def get_ui(self):
         login_view = self.login_view.get_login_view()
         tabs = self.get_tab_set()

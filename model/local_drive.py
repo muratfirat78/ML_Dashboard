@@ -1,4 +1,5 @@
 import os
+import random
 from datetime import datetime
 
 class GoogleDrive():
@@ -18,3 +19,14 @@ class GoogleDrive():
     def get_performances(self, userid):
        None
        #This function is not neccesary for the local drive, since the files are already stored locally
+    
+    def register(self):
+      folders = set(os.listdir('./drive'))
+      userid = None
+      while True:
+         userid = str(random.randint(10000, 99999))
+         if userid not in folders:
+            os.makedirs('./drive/' + userid)
+            break
+      
+      return userid

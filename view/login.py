@@ -8,6 +8,8 @@ class LoginView:
         self.copyright_text = None
         self.terms_checkbox = None
         self.login_button = None
+        self.register_display = None
+        self.register_button = None
         self.loading_spinner = None
         self.loading_text = None
         self.hbox = None
@@ -27,6 +29,7 @@ class LoginView:
                                                 description='I agree to the terms above',
                                                 disabled=False)
         self.login_button = widgets.Button(description="Login")
+        self.register_button = widgets.Button(description="Register")
 
         self.loading_text = widgets.Label(
             value="Downloading user data..."
@@ -40,13 +43,17 @@ class LoginView:
                                               height=25)
 
         self.login_button.on_click(self.login)
+        self.register_button.on_click(self.register)
         self.hbox = widgets.HBox([self.loading_spinner, self.loading_text])
         self.hbox.layout.display = 'none'
 
-        self.vbox = widgets.VBox([self.login_input,self.terms_text, self.copyright_text, self.terms_checkbox, self.login_button, self.hbox])
+        self.vbox = widgets.VBox([self.login_input,self.terms_text, self.copyright_text, self.terms_checkbox, widgets.HBox([self.login_button, self.register_button]), self.hbox])
 
     def login(self, event):
         self.controller.login(self.login_input.value, self.terms_checkbox.value)
+    
+    def register(self, event):
+        self.controller.register()
 
     def get_login_view(self):
         return self.vbox

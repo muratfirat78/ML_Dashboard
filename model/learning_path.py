@@ -1,5 +1,6 @@
 import os
 import ast
+import copy
 from model.student_performance import StudentPerformance
 
 class LearningPathModel:
@@ -7,7 +8,7 @@ class LearningPathModel:
         self.learning_path = []
         self.performance_data = []
         self.dataset_info = []
-        self.performance_statistics = []
+        self.stats = []
 
     def set_learning_path(self,userid):
         path = os.path.join('drive', str(userid))
@@ -88,11 +89,33 @@ class LearningPathModel:
                 return info
     
     def set_performance_statistics(self):
+        
         sorted_performance_data = sorted(self.performance_data, key=lambda x: x['date'][0])
         # print(self.dataset_info)
         for performance in sorted_performance_data:
             dataset_info = self.get_dataset_info(performance['dataset'].replace('.csv',''), performance['target'])
             if dataset_info:
+                #todo calculate score
+                score = 0.5
+
+                if len(self.stats) > 1:
+                    stat = copy.copy(self.stats[-1])
+                else:
+                    stat = {}
+                    
+                stat['date'] = performance['date']
+                for difficulty in dataset_info['difficulty']:
+                    increase = score * difficulty[1]
+                    if difficulty[0] in stat:
+                        stat[difficulty[0]] = stat[difficulty[0]] + increase
+                    else:
+                        stat[difficulty[0]] = increase
+                
+                self.stats += [stat]
+
+                # self.performance_statistics += [{'date': performance['date'], }]
+
                 print(performance)
                 print(dataset_info)
+                print(self.stats)
 

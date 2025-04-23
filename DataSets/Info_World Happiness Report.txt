@@ -4,7 +4,8 @@ This dataset contains 4,000 entries with 24 columns related to happiness, econom
 Columns Overview:
 Country: Name of the country.
 
-Life_Satisfaction: Target
+target: Life_Satisfaction
+difficulty: [('Data cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)]
 
 Year: The year of the record.
 Happiness_Score: A numerical value indicating the happiness level.

@@ -3,7 +3,8 @@ from datetime import datetime
 
 class StudentPerformance:
     def __init__(self):
-        self.performance = {            
+        self.performance = { 
+            'General':{},           
             'SelectData': {},
             'DataCleaning': {},
             'DataProcessing': {},
@@ -32,8 +33,9 @@ class StudentPerformance:
         
         self.index += 1
 
-    def string_to_student_performance(self, input_str):
+    def string_to_student_performance(self, input_str, date):
         data_dict = ast.literal_eval(input_str)
+        self.addAction(['General','Date'], datetime.strptime(date, "%d-%m-%Y %H-%M-%S"))
         for category, actions in data_dict.items():
             for action_type, value in actions.items():
                 if isinstance(value, list):
@@ -48,8 +50,13 @@ class StudentPerformance:
     def get_timestamp(self):
         return self.timestamp
     
-    def printperformances(self):
-        print(self.performance['ModelDevelopment']['ModelPerformance'])
+    def get_results(self):
+        if self.performance.get('General', {}).get('Date') and self.performance.get('ModelDevelopment', {}).get('ModelPerformance') and self.performance.get('SelectData', {}).get('DataSet') and self.performance.get('DataProcessing', {}).get('AssignTarget'):
+            return (self.performance.get('SelectData', {}).get('DataSet')
+                    ,self.performance.get('DataProcessing', {}).get('AssignTarget')
+                    ,self.performance.get('ModelDevelopment', {}).get('ModelPerformance')
+                    ,self.performance.get('General', {}).get('Date')
+                    )
 
     def get_list_of_actions(self):
         actions = []
@@ -62,3 +69,5 @@ class StudentPerformance:
                     actions.append((category, action_str, idx))
         actions.sort(key=lambda x: x[2])
         return actions
+    
+        

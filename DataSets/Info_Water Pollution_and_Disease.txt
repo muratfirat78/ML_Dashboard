@@ -27,6 +27,9 @@ Diarrheal Cases per 100,000 people (target)
 Cholera Cases per 100,000 people (target)
 Typhoid Cases per 100,000 people (target)
 
+target: Diarrheal Cases per 100,000 people
+difficulty: [('Data cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)]
+
 
 Water Treatment Method                         2253 non-null   object 
 Country:                                        3000 non-null   object 

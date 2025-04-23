@@ -1,6 +1,7 @@
 Content
 
-quality: Target
+target: quality
+difficulty: [('Data cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)]
 
 For more information, read [Cortez et al., 2009].
 Input variables (based on physicochemical tests):

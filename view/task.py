@@ -5,23 +5,40 @@ from IPython.display import HTML, display
 class TaskView:
     def __init__(self, controller=None):
         self.controller = controller
+        if self.controller.get_online_version():
+            display(HTML("""
+            <style>
+            .status-todo .lm-Widget.jupyter-widget-Collapse-header {
+                background-color: lightyellow; 
+            }
+                    
+            .status-done .lm-Widget.jupyter-widget-Collapse-header {
+                background-color: lightgreen;
+            }             
+                        
+            .status-inprogress .lm-Widget.jupyter-widget-Collapse-header {
+                background-color: lightgreen;
+            }             
 
-        display(HTML("""
-        <style>
-        .status-todo .lm-Widget.jupyter-widget-Collapse-header {
-            background-color: lightyellow; 
-        }
-                
-        .status-done .lm-Widget.jupyter-widget-Collapse-header {
-            background-color: lightgreen;
-        }             
-                     
-        .status-inprogress .lm-Widget.jupyter-widget-Collapse-header {
-            background-color: lightgreen;
-        }             
+            </style>
+            """))
+        else:
+            display(HTML("""
+            <style>
+            .status-todo .lm-Widget.jupyter-widget-Collapse-header {
+                background-color: lightyellow; 
+            }
+                    
+            .status-done .lm-Widget.jupyter-widget-Collapse-header {
+                background-color: lightgreen;
+            }             
+                        
+            .status-inprogress .lm-Widget.jupyter-widget-Collapse-header {
+                background-color: lightgreen;
+            }             
 
-        </style>
-        """))
+            </style>
+            """))
 
         self.vbox = widgets.VBox([])
         self.vbox.layout.display = 'none'

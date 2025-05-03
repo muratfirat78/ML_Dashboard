@@ -24,22 +24,21 @@ class TaskView:
             """))
         else:
             display(HTML("""
-                    <style>
-                    /* Specifieke selector voor de status op de collapse headers */
-                    .lm-Widget.jupyter-widget-Accordion .status-todo .lm-Widget.jupyter-widget-Collapse-header {
-                        background-color: lightyellow; 
-                    }
+            <style>
+            .status-todo .lm-Widget .jupyter-widget-Collapse-header {
+                background-color: lightyellow; 
+            }
+                    
+            .status-done .lm-Widget .jupyter-widget-Collapse-header {
+                background-color: lightgreen;
+            }             
+                        
+            .status-inprogress .lm-Widget .jupyter-widget-Collapse-header {
+                background-color: lightgreen;
+            }             
 
-                    .lm-Widget.jupyter-widget-Accordion .status-done .lm-Widget.jupyter-widget-Collapse-header {
-                        background-color: lightgreen;
-                    }             
-
-                    .lm-Widget.jupyter-widget-Accordion .status-inprogress .lm-Widget.jupyter-widget-Collapse-header {
-                        background-color: lightgreen;
-                    }             
-
-                    </style>
-                    """))
+            </style>
+            """))
 
         self.vbox = widgets.VBox([])
         self.vbox.layout.display = 'none'

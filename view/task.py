@@ -23,22 +23,7 @@ class TaskView:
             </style>
             """))
         else:
-            display(HTML("""
-            <style>
-            .status-todo .lm-Widget.p-Widget.p-Collapse-header {
-                background-color: lightyellow; 
-            }
-                    
-            .status-done .lm-Widget .jupyter-widget-Collapse-header {
-                background-color: lightgreen;
-            }             
-                        
-            .status-inprogress .lm-Widget .jupyter-widget-Collapse-header {
-                background-color: lightgreen;
-            }             
-
-            </style>
-            """))
+            None
 
         self.vbox = widgets.VBox([])
         self.vbox.layout.display = 'none'

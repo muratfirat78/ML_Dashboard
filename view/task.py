@@ -25,7 +25,7 @@ class TaskView:
         else:
             display(HTML("""
             <style>
-            .status-todo .lm-Widget .jupyter-widget-Collapse-header {
+            .status-todo .lm-Widget.p-Widget.p-Collapse-header {
                 background-color: lightyellow; 
             }
                     

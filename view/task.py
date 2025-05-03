@@ -22,22 +22,7 @@ class TaskView:
 
             </style>
             """))
-        else:
-            display(HTML("""
-            <style>
-            .status-todo .p-Collapse-header {
-                background-color: lightyellow;
-            }
 
-            .status-done .p-Collapse-header {
-                background-color: lightgreen;
-            }
-                         
-            .status-inprogress .p-Collapse-header {
-                background-color: lightskyblue;
-            }
-            </style>
-            """))
 
         self.vbox = widgets.VBox([])
         self.vbox.layout.display = 'none'

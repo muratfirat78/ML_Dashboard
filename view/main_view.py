@@ -36,8 +36,8 @@ class MainView:
     def get_tabs(self):
          return self.tab_set
 
-    def get_ui(self, login, tabs):
-         return widgets.VBox([login, tabs])
+    def get_ui(self, login, tabs, task, task_selection):
+         return widgets.HBox([task,widgets.VBox([login, task_selection, tabs])])
     
     def close_tab(self, index):
          self.tabs[index].close()

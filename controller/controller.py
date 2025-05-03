@@ -1,3 +1,4 @@
+from model.task import TaskModel
 from model.data_cleaning import DataCleaningModel
 from model.data_processing import DataProcessingModel
 from model.data_selection import DataSelectionModel
@@ -14,6 +15,8 @@ from view.learning_path import LearningPathView
 from view.main_view import MainView
 from view.predictive_modeling import PredictiveModelingView
 from view.login import LoginView
+from view.task import TaskView
+from view.task_selection import TaskSelectionView
 
 class Controller:
     def __init__(self, drive, online_version):
@@ -30,7 +33,10 @@ class Controller:
         self.data_processing_model = DataProcessingModel(self.main_model, self.logger)
         self.predictive_modeling_view = PredictiveModelingView(self, self.main_view)
         self.predictive_modeling_model = PredictiveModelingModel(self.main_model, self, self.logger)
-        self.learning_path_model = LearningPathModel()
+        self.task_model = TaskModel(self)
+        self.task_view = TaskView(self)
+        self.task_selection_view = TaskSelectionView(self)
+        self.learning_path_model = LearningPathModel(self)
         self.learning_path_view = LearningPathView(self)
         self.learning_path = None
         if drive != None:
@@ -136,19 +142,31 @@ class Controller:
                 self.update_learning_path()
                 self.login_view.hide_login()
                 self.main_view.set_title(4, 'Log (userid:' + str(userid) + ')')
-                self.main_view.show_tabs()
+                self.task_selection_view.show_task_selection()
+
             else:
                 print("login incorrect")
         else:
             print("You must agree to the terms before continuing")
+    
+    def set_task_model(self,task):
+        self.task_model.set_current_task(task)
+        self.task_view.set_task(self.task_model.get_current_task())
+
+    def hide_task_selection_and_show_tabs(self):
+        self.task_selection_view.hide_task_selection()
+        self.task_view.show_task()
+        self.main_view.show_tabs()
     
     def register(self):
         print(self.drive.register())
     
     def get_ui(self):
         login_view = self.login_view.get_login_view()
+        task_selection_view = self.task_selection_view.get_task_selection_view()
+        task_view = self.task_view.get_task_view()
         tabs = self.get_tab_set()
-        return self.main_view.get_ui(login_view, tabs)
+        return self.main_view.get_ui(login_view, tabs, task_view, task_selection_view)
     
     def update_percentage_done(self, percentage):
         self.login_view.update_percentage_done(percentage)
@@ -172,3 +190,7 @@ class Controller:
         self.learning_path_model.set_dataset_info()
         self.learning_path_model.set_performance_statistics()
         self.learning_path_view.set_stats(self.get_stats())
+
+    def update_task_view(self, action, value):
+        self.task_model.update_task(action, value)
+        self.task_view.update_task_statuses(self.task_model.get_current_task())

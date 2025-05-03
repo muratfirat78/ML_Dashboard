@@ -4,7 +4,8 @@ import copy
 from model.student_performance import StudentPerformance
 
 class LearningPathModel:
-    def __init__(self):
+    def __init__(self, controller):
+        self.controller = controller
         self.learning_path = []
         self.performance_data = []
         self.dataset_info = []
@@ -17,7 +18,7 @@ class LearningPathModel:
             with open(os.path.join(path,filename),'r') as file:
                 for line in file:
                     try:
-                        performance = StudentPerformance()
+                        performance = StudentPerformance(self.controller)
                         performance.string_to_student_performance(line, filename.replace('.txt', ''))
                         self.learning_path.append(performance)
                     except:

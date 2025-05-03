@@ -2,7 +2,8 @@ import ast
 from datetime import datetime
 
 class StudentPerformance:
-    def __init__(self):
+    def __init__(self, controller):
+        self.controller = controller
         self.performance = { 
             'General':{},           
             'SelectData': {},
@@ -32,6 +33,8 @@ class StudentPerformance:
             self.performance[category] = {action_type: value}
         
         self.index += 1
+
+        self.controller.update_task_view(action, value)
 
     def string_to_student_performance(self, input_str, date):
         data_dict = ast.literal_eval(input_str)

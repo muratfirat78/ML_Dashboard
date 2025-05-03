@@ -3,7 +3,7 @@ from model.student_performance import StudentPerformance
 
 class Logger:
     def __init__(self, controller):
-        self.student_performance = StudentPerformance()
+        self.student_performance = StudentPerformance(controller)
         self.controller = controller
         # clear log
         with open('output.log', 'w'):

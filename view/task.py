@@ -56,8 +56,17 @@ class TaskView:
         for sub in subtasks:
             description = sub.get("Description", "")
             status = sub.get("status", "todo")
-
-            vbox = widgets.VBox([widgets.HTML(f"<b>Description:</b> {description}")])
+            hints = sub.get("Hints", [])
+            hint_index = [-1]
+            
+            def on_hint_click(b, hints=hints, hint_index=hint_index):
+                hint_index[0] += 1
+                if hint_index[0] < len(hints):
+                    print(hints[hint_index[0]])
+                        
+            hint_button = widgets.Button(description = "Hint", button_style='success')
+            hint_button.on_click(on_hint_click)
+            vbox = widgets.VBox([widgets.HTML(f"<b>Description:</b> {description}"),hint_button])
             collapse = widgets.Accordion(children=[vbox])
             collapse.set_title(0, sub["Title"])
             self.apply_status_class(collapse, status)

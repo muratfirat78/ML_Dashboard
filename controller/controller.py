@@ -152,7 +152,7 @@ class Controller:
     def set_task_model(self,task):
         self.task_model.set_current_task(task)
         self.task_view.set_task(self.task_model.get_current_task())
-        
+        self.task_model.update_statusses_and_set_current_tasks()
         self.task_view.update_task_statuses(self.task_model.get_current_task())
         self.task_view.set_active_accordion()
 
@@ -195,6 +195,7 @@ class Controller:
         self.learning_path_view.set_stats(self.get_stats())
 
     def update_task_view(self, action, value):
-        self.task_model.update_task(action, value)
+        self.task_model.perform_action(action, value)
+        self.task_model.update_statusses_and_set_current_tasks()
         self.task_view.update_task_statuses(self.task_model.get_current_task())
         self.task_view.set_active_accordion()

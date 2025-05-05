@@ -152,6 +152,9 @@ class Controller:
     def set_task_model(self,task):
         self.task_model.set_current_task(task)
         self.task_view.set_task(self.task_model.get_current_task())
+        
+        self.task_view.update_task_statuses(self.task_model.get_current_task())
+        self.task_view.set_active_accordion()
 
     def hide_task_selection_and_show_tabs(self):
         self.task_selection_view.hide_task_selection()
@@ -194,3 +197,4 @@ class Controller:
     def update_task_view(self, action, value):
         self.task_model.update_task(action, value)
         self.task_view.update_task_statuses(self.task_model.get_current_task())
+        self.task_view.set_active_accordion()

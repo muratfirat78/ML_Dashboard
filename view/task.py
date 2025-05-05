@@ -5,10 +5,10 @@ from IPython.display import HTML, display
 class TaskView:
     def __init__(self, controller=None):
         self.controller = controller
-        if self.controller.get_online_version():
+        if not self.controller.get_online_version():
             display(HTML("""
             <style>
-            .status-todo .lm-Widget.jupyter-widget-Collapse-header {
+            .status-ready .lm-Widget.jupyter-widget-Collapse-header {
                 background-color: lightyellow; 
             }
                     
@@ -17,7 +17,7 @@ class TaskView:
             }             
                         
             .status-inprogress .lm-Widget.jupyter-widget-Collapse-header {
-                background-color: lightgreen;
+                background-color: lightblue;
             }             
 
             </style>
@@ -26,12 +26,12 @@ class TaskView:
 
         self.vbox = widgets.VBox([])
         self.vbox.layout.display = 'none'
-        self.outer_wrappers = []
-        self.inner_wrappers = []
+        self.outer_accordions = []
+        self.inner_accordions = []
 
     def set_task(self, task):
-        self.outer_wrappers = []
-        self.inner_wrappers = []
+        self.outer_accordions = []
+        self.inner_accordions = []
 
         outer_sections = []
 
@@ -43,8 +43,8 @@ class TaskView:
             outer_collapse.set_title(0, subtask["Title"])
             self.apply_status_class(outer_collapse, status)
 
-            self.outer_wrappers.append(outer_collapse)
-            self.inner_wrappers.append(inner_items)
+            self.outer_accordions.append(outer_collapse)
+            self.inner_accordions.append(inner_items)
             outer_sections.append(outer_collapse)
 
         self.vbox.children = outer_sections
@@ -82,13 +82,22 @@ class TaskView:
         widget._dom_classes = tuple(current_classes)
 
     def update_task_statuses(self, updated_task_data):
+        print(updated_task_data)
         self.task_data = updated_task_data
         for i, subtask in enumerate(updated_task_data["SubTasks"]):
-            self.apply_status_class(self.outer_wrappers[i], subtask["status"])
+            self.apply_status_class(self.outer_accordions[i], subtask["status"])
             if "SubTasks" in subtask:
                 for j, inner_subtask in enumerate(subtask["SubTasks"]):
-                    self.apply_status_class(self.inner_wrappers[i][j], inner_subtask["status"])
-
+                    self.apply_status_class(self.inner_accordions[i][j], inner_subtask["status"])
+    
+    def set_active_accordion(self):
+        for i, accordion in enumerate(self.outer_accordions):
+            status_classes = accordion._dom_classes
+            if any(cls == "status-ready" for cls in status_classes):
+                accordion.selected_index = 0 
+            else:
+                accordion.selected_index = None  
+                
     def get_task_view(self):
         return self.vbox
 

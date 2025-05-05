@@ -7,23 +7,15 @@ class TaskModel:
     self.current_subsubtask = 1
     
   def update_task(self, action, value):
-      print(action)
-      print(value)
-      #set ready tasks
-      for subtask in self.current_task["SubTasks"]:
-        for subsubtask in subtask["SubTasks"]:
-          if subsubtask["order"] == self.current_subsubtask:
-            subsubtask["status"] = "ready"
+      if action[1] == "ModelPerformance":
+        value = value[0]
 
       #set applied values
       for subtask in self.current_task["SubTasks"]:
         if subtask["order"] == self.current_subtask:
-          print(1)
           for subsubtask in subtask["SubTasks"]:
             if subsubtask["order"] == self.current_subsubtask:
-              print(2)
               if action == subsubtask["action"]:
-                print("set!")
                 if isinstance(value[0], list) and value:
                   subsubtask["applied_values"] += [value[0][0]]
                 else:
@@ -35,15 +27,11 @@ class TaskModel:
           correct = True
           partiallycorrect = False
           for value in subsubtask["value"]:
-            print(value + "not in:")
-            print(subsubtask["applied_values"])
             if value not in subsubtask["applied_values"]:
-              print("Nee!")
               correct = False
             if value in subsubtask["applied_values"]:
               partiallycorrect = True
           if correct:
-            print("correct!@")
             subsubtask["status"] = "done"
           else:
             if partiallycorrect:
@@ -78,9 +66,15 @@ class TaskModel:
                 break
         self.current_subsubtask = current_subsubtask
 
-        print(self.current_task)
+        #set ready tasks
+        for subtask in self.current_task["SubTasks"]:
+          if subtask["order"] == current_subtask and subtask["status"] not in ["done", "inprogress"]:
+            subtask["status"] = "ready"
+            for subsubtask in subtask["SubTasks"]:
+              if subsubtask["order"] == self.current_subsubtask and subsubtask["status"] not in ["done", "inprogress"]:           
+                subsubtask["status"] = "ready"
 
-
+  # def perform_action(self, action, value)
 
   def set_current_task(self,task):
     self.current_task = task

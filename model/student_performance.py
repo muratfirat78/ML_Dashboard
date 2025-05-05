@@ -15,6 +15,9 @@ class StudentPerformance:
         self.timestamp = datetime.now().strftime("%d-%m-%Y %H-%M-%S")
 
     def addAction(self, action, value):
+        print("hier!")
+        print(action)
+        print(value)
         value = (value, self.index)
         category, action_type = action[0], action[1]
         

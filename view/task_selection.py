@@ -134,7 +134,7 @@ class TaskSelectionView:
                                     "Hints": ["Use LogisticRegression", "Check confusion matrix"],
                                     "status": "todo",
                                     "action": ["ModelDevelopment", "ModelPerformance"],
-                                    "value": ["20%"],
+                                    "value": ["Logistic Regression()"],
                                     "applied_values": [],  
                                     "order": 3
                                 }

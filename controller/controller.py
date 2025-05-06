@@ -1,3 +1,4 @@
+from model.convert_performance_to_task import ConvertPerformanceToTask
 from model.task import TaskModel
 from model.data_cleaning import DataCleaningModel
 from model.data_processing import DataProcessingModel
@@ -39,6 +40,9 @@ class Controller:
         self.learning_path_model = LearningPathModel(self)
         self.learning_path_view = LearningPathView(self)
         self.learning_path = None
+        self.convertPerformanceToTask = ConvertPerformanceToTask()
+        performance = {'General': {}, 'SelectData': {'DataSet': ('titanic.csv', 0)}, 'DataCleaning': {'Drop Column': [(['Fare'], 1), (['Ticket'], 2), (['Parch'], 3), (['SibSp'], 4), (['Name'], 5), (['Pclass'], 6), (['PassengerId'], 7), (['Cabin'], 9)], 'Remove-Missing': (['Embarked'], 8), 'Replace-Median': (['Age'], 10)}, 'DataProcessing': {'LabelEncoding': [(['Embarked'], 11), (['Sex'], 12)], 'ConvertToBoolean': ('Survived', 13), 'AssignTarget': ('Survived', 14), 'Split': ('20%', 15)}, 'ModelDevelopment': {'ModelPerformance': (('Logistic Regression()', [('True-Positive', 56), ('False-Positive', 16), ('True-Negative', 86), ('False-Negative', 20), ('Accuracy', 0.797752808988764), ('Precision', 0.7777777777777778), ('Recall', 0.7368421052631579), ('ROCFPR', ([0.        , 0.15686275, 1.        ])), ('ROCTPR',([0.        , 0.73684211, 1.        ]))]), 16)}}
+        self.convertPerformanceToTask.convert_performance_to_task(performance)
         if drive != None:
             self.drive = drive
         else:
@@ -58,6 +62,7 @@ class Controller:
 
     def train_Model(self,tasktype,mytype,results,trmodels,params):
         self.predictive_modeling_model.train_Model(tasktype,mytype,results,trmodels,params)
+        self.logger.get_task()
     
     def make_cleaning(self,featurescl,result2aexp,missacts,dt_features,params):
          self.data_cleaning_model.make_cleaning(featurescl,result2aexp,missacts,dt_features,params)
@@ -199,3 +204,5 @@ class Controller:
         self.task_model.update_statusses_and_set_current_tasks()
         self.task_view.update_task_statuses(self.task_model.get_current_task())
         self.task_view.set_active_accordion()
+
+    

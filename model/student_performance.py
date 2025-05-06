@@ -63,9 +63,15 @@ class StudentPerformance:
                     ,self.performance.get('ModelDevelopment', {}).get('ModelPerformance')
                     ,self.performance.get('General', {}).get('Date')
                     )
+        
+    def get_task(self):
+        for step in self.get_list_of_actions():
+            print(step)
 
     def get_list_of_actions(self):
         actions = []
+        print("performance")
+        print(self.performance)
         for category, action_dict in self.performance.items():
             for action_type, value in action_dict.items():
                 values = value if isinstance(value, list) else [value]

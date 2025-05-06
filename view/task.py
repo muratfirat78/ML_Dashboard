@@ -35,12 +35,12 @@ class TaskView:
 
         outer_sections = []
 
-        for subtask in task["SubTasks"]:
-            inner_accordion, inner_items = self.create_inner_accordion(subtask["SubTasks"])
+        for subtask in task["subtasks"]:
+            inner_accordion, inner_items = self.create_inner_accordion(subtask["subtasks"])
             status = subtask.get("status", "todo")
 
             outer_collapse = widgets.Accordion(children=[inner_accordion])
-            outer_collapse.set_title(0, subtask["Title"])
+            outer_collapse.set_title(0, subtask["title"])
             self.apply_status_class(outer_collapse, status)
 
             self.outer_accordions.append(outer_collapse)
@@ -54,9 +54,9 @@ class TaskView:
         wrappers = []
 
         for sub in subtasks:
-            description = sub.get("Description", "")
+            description = sub.get("description", "")
             status = sub.get("status", "todo")
-            hints = sub.get("Hints", [])
+            hints = sub.get("hints", [])
             hint_index = [-1]
             hint_output = widgets.HTML("")
 
@@ -69,13 +69,13 @@ class TaskView:
             hint_button.on_click(on_hint_click)
 
             vbox = widgets.VBox([
-                widgets.HTML(f"<b>Description:</b> {description}"),
+                widgets.HTML(f"<b>description:</b> {description}"),
                 hint_button,
                 hint_output
             ])
 
             collapse = widgets.Accordion(children=[vbox])
-            collapse.set_title(0, sub["Title"])
+            collapse.set_title(0, sub["title"])
             self.apply_status_class(collapse, status)
 
             wrappers.append(collapse)
@@ -98,12 +98,11 @@ class TaskView:
         widget._dom_classes = tuple(current_classes)
 
     def update_task_statuses(self, updated_task_data):
-        print(updated_task_data)
         self.task_data = updated_task_data
-        for i, subtask in enumerate(updated_task_data["SubTasks"]):
+        for i, subtask in enumerate(updated_task_data["subtasks"]):
             self.apply_status_class(self.outer_accordions[i], subtask["status"])
-            if "SubTasks" in subtask:
-                for j, inner_subtask in enumerate(subtask["SubTasks"]):
+            if "subtasks" in subtask:
+                for j, inner_subtask in enumerate(subtask["subtasks"]):
                     self.apply_status_class(self.inner_accordions[i][j], inner_subtask["status"])
     
     def set_active_accordion(self):

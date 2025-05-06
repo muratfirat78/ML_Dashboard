@@ -34,3 +34,6 @@ class Logger:
     
     def get_list_of_actions(self):
         return self.student_performance.get_list_of_actions()
+    
+    def get_task(self):
+        return self.student_performance.get_task()

@@ -51,7 +51,15 @@ class TaskView:
             self.inner_accordions.append(inner_items)
             outer_sections.append(outer_collapse)
 
-        self.vbox.children = outer_sections
+        info_box = widgets.VBox([
+            widgets.HTML(f"<h2>{task.get('title', '')}</h2>"),
+            widgets.HTML(f"<p>{task.get('description', '')}</p>")
+        ])
+        info_box.layout = widgets.Layout(max_width='200px')
+        info_accordion = widgets.Accordion(children=[info_box])
+        info_accordion.set_title(0, "ℹ️ Task information")
+
+        self.vbox.children = [info_accordion] + outer_sections
 
     def create_inner_accordion(self, subtasks):
         children = []

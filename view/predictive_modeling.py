@@ -265,9 +265,6 @@ class PredictiveModelingView:
         self.rfnrest.layout.display = 'none'
         self.rfcrit = widgets.Dropdown(options=['entropy','gini'],description = 'criterion')
         self.rfcrit.layout.display = 'none'
-
-
-        
       
         sel_box = VBox(children=[HBox(children=[self.main_view.trg_lbl,self.main_view.prdtsk_lbl]),
                                  HBox(children=[self.dtdepth,self.dtminseg,self.dtcrit]),

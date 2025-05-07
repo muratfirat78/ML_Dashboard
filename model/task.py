@@ -41,7 +41,7 @@ class TaskModel:
           if subtask["order"] == current_subtask and subtask["status"] not in ["done", "inprogress"]:
             subtask["status"] = "ready"
             for subsubtask in subtask["subtasks"]:
-              if subsubtask["order"] == self.current_subsubtask and subsubtask["status"] not in ["done", "inprogress"]:           
+              if subsubtask["order"] == self.current_subsubtask and subsubtask["status"] not in ["done", "inprogress", "incorrect"]:           
                 subsubtask["status"] = "ready"
 
   def perform_action(self, action, value):
@@ -64,16 +64,31 @@ class TaskModel:
       for subsubtask in subtask["subtasks"]:
         correct = True
         partiallycorrect = False
+        incorrect = False
+
+        #check correct
         for value in subsubtask["value"]:
           if value not in subsubtask["applied_values"]:
             correct = False
+        
+        #check partially correct
+        for value in subsubtask["value"]:
           if value in subsubtask["applied_values"]:
             partiallycorrect = True
+
+          
+        #check incorrect
+        for value in subsubtask["applied_values"]:
+          if value not in subsubtask["value"]:
+            incorrect = True
+
         if correct:
-          subsubtask["status"] = "done"
-        else:
-          if partiallycorrect:
+            subsubtask["status"] = "done"
+        elif partiallycorrect:
             subsubtask["status"] = "inprogress"
+
+        if incorrect:
+            subsubtask["status"] = "incorrect"
 
   def set_current_task(self,task):
     self.current_task = task

@@ -287,4 +287,3 @@ class ConvertPerformanceToTask:
         task["title"] = "todo"
         task["description"] = "todo"
         task["subtasks"] = subtasks
-        print(task) 

@@ -206,9 +206,6 @@ class PredictiveModelingModel:
             performance = []
             for prf,val in mymodel.GetPerformanceDict().items():
                 performance += [(prf, val)]
-            print("hier123")
-            print(mytype)
-            print((mytype + str(params).replace('[', '(').replace(']', ')'), performance))
             self.logger.add_action(['ModelDevelopment', 'ModelPerformance'], (mytype + str(params).replace('[', '(').replace(']', ')'), performance))
             
             trmodels.options = [mdl.getName() for mdl in self.trainedModels]

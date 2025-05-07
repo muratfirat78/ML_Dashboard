@@ -19,6 +19,10 @@ class TaskView:
             .status-inprogress .lm-Widget.jupyter-widget-Collapse-header {
                 background-color: lightblue;
             }             
+                         
+            .status-incorrect .lm-Widget.jupyter-widget-Collapse-header {
+                background-color: #FF6666;
+            }             
 
             </style>
             """))
@@ -86,7 +90,7 @@ class TaskView:
 
     def apply_status_class(self, widget, status):
         current_classes = list(widget._dom_classes)
-        for s in ["todo", "ready", "inprogress", "done"]:
+        for s in ["todo", "ready", "inprogress", "done", "incorrect"]:
             class_name = f"status-{s}"
             if class_name in current_classes:
                 current_classes.remove(class_name)

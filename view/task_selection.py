@@ -38,9 +38,6 @@ class TaskSelectionView:
 
     def get_description(self, title):
         task = self.task_map.get(title, {})
-        print("---")
-        print(task)
-        print("---")
         return f"<i>{task['description']}</i>" if task else ""
 
     def update_description(self, change):

@@ -4,6 +4,7 @@ class TaskSelectionView:
     def __init__(self, controller):
         self.controller = controller
         self.task_dropdown = None
+        self.mode_dropdown = None
         self.select_button = None
         self.vbox = None
 
@@ -153,11 +154,23 @@ class TaskSelectionView:
             disabled=False
         )
 
+        self.mode_dropdown = widgets.Dropdown(
+            options=list(["Guided mode","Monitored mode"]),
+            description='Select mode:',
+            disabled=False
+        )
+
+        self.title_label = widgets.HTML(
+            value="<h3>" + self.task_dropdown.value+ "</h3>"
+        )
+
         self.description_label = widgets.HTML(
             value=self.get_description(self.task_dropdown.value)
         )
+        self.description_label.layout = widgets.Layout(max_width='500px')
 
-        self.task_dropdown.observe(self.update_description, names='value')
+        self.task_dropdown.observe(self.update_title_and_description, names='value')
+        self.mode_dropdown.observe(self.on_mode_change, names='value')
 
         self.select_button = widgets.Button(
             description='Start Task',
@@ -165,25 +178,37 @@ class TaskSelectionView:
         )
         self.select_button.on_click(self.start_task)
 
-        self.vbox = widgets.VBox([
+        self.guided_mode_items = widgets.VBox([
             self.task_dropdown,
-            self.description_label,
-            self.select_button
+            self.title_label,
+            self.description_label
+        ])
+
+        self.vbox = widgets.VBox([
+            widgets.HBox([self.mode_dropdown,widgets.VBox([self.guided_mode_items, self.select_button])]),
+
         ])
         self.vbox.layout.display = 'none'
+
+        self.on_mode_change({'new': self.mode_dropdown.value})
 
     def get_description(self, title):
         task = self.task_map.get(title, {})
         return f"<i>{task['description']}</i>" if task else ""
 
-    def update_description(self, change):
+    def update_title_and_description(self, change):
         new_title = change['new']
+        self.title_label.value = "<h3>" + new_title + "</h3>"
         self.description_label.value = self.get_description(new_title)
 
     def start_task(self, event):
+        if self.mode_dropdown.value == "Monitored mode":
+            monitored_mode = True
+        elif self.mode_dropdown.value == "Guided mode":
+            monitored_mode = False
         selected_title = self.task_dropdown.value
         selected_task = self.task_map[selected_title]
-        self.controller.set_task_model(selected_task)
+        self.controller.set_task_model(selected_task, monitored_mode)
         self.controller.hide_task_selection_and_show_tabs()
 
     def get_task_selection_view(self):
@@ -199,3 +224,12 @@ class TaskSelectionView:
         self.task_dropdown.disabled = True
         self.select_button.disabled = True
 
+
+    def on_mode_change(self, change):
+        mode = change['new']
+        if mode == "Guided mode":
+            self.guided_mode_items.layout.display = 'flex'
+            self.select_button.description = 'Start Task'
+        else: 
+            self.guided_mode_items.layout.display = 'none'
+            self.select_button.description = 'Start'

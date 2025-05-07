@@ -21,6 +21,7 @@ from view.task_selection import TaskSelectionView
 
 class Controller:
     def __init__(self, drive, online_version):
+        self.monitored_mode = None
         self.main_model = MainModel(online_version)
         self.main_view = MainView()
         self.logger = Logger(self)
@@ -154,12 +155,23 @@ class Controller:
         else:
             print("You must agree to the terms before continuing")
     
-    def set_task_model(self,task):
-        self.task_model.set_current_task(task)
-        self.task_view.set_task(self.task_model.get_current_task())
-        self.task_model.update_statusses_and_set_current_tasks()
-        self.task_view.update_task_statuses(self.task_model.get_current_task())
-        self.task_view.set_active_accordion()
+    def set_task_model(self,task, monitored_mode):
+        self.monitored_mode = monitored_mode
+        self.task_view.set_monitored_mode(monitored_mode)
+
+        if self.monitored_mode:
+            task = self.convertPerformanceToTask.convert_performance_to_task(self.logger.get_result())
+            print("Gegenereerde task:", task)
+            self.task_model.set_current_task(task)
+            self.task_view.set_task(self.task_model.get_current_task())
+            self.task_model.update_statusses_and_set_current_tasks()
+            self.task_view.set_active_accordion()
+        else:
+            self.task_model.set_current_task(task)
+            self.task_view.set_task(self.task_model.get_current_task())
+            self.task_model.update_statusses_and_set_current_tasks()
+            self.task_view.update_task_statuses(self.task_model.get_current_task())
+            self.task_view.set_active_accordion()
 
     def hide_task_selection_and_show_tabs(self):
         self.task_selection_view.hide_task_selection()
@@ -200,9 +212,14 @@ class Controller:
         self.learning_path_view.set_stats(self.get_stats())
 
     def update_task_view(self, action, value):
-        self.task_model.perform_action(action, value)
-        self.task_model.update_statusses_and_set_current_tasks()
-        self.task_view.update_task_statuses(self.task_model.get_current_task())
-        self.task_view.set_active_accordion()
+        if self.monitored_mode:
+            task = self.convertPerformanceToTask.convert_performance_to_task(self.logger.get_result())
+            self.task_model.set_current_task(task)
+            self.task_view.set_task(self.task_model.get_current_task())
+        else:
+            self.task_model.perform_action(action, value)
+            self.task_model.update_statusses_and_set_current_tasks()
+            self.task_view.update_task_statuses(self.task_model.get_current_task())
+            self.task_view.set_active_accordion()
 
     

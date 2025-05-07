@@ -5,6 +5,7 @@ from IPython.display import HTML, display
 class TaskView:
     def __init__(self, controller=None):
         self.controller = controller
+        self.monitored_mode = None
         if not self.controller.get_online_version():
             display(HTML("""
             <style>
@@ -33,6 +34,9 @@ class TaskView:
         self.outer_accordions = []
         self.inner_accordions = []
 
+    def set_monitored_mode(self,monitored_mode):
+        self.monitored_mode = monitored_mode
+
     def set_task(self, task):
         self.outer_accordions = []
         self.inner_accordions = []
@@ -59,7 +63,14 @@ class TaskView:
         info_accordion = widgets.Accordion(children=[info_box])
         info_accordion.set_title(0, "ℹ️ Task information")
 
-        self.vbox.children = [info_accordion] + outer_sections
+        if self.monitored_mode:
+            if len(outer_sections) == 0:
+                print("hoi")
+                self.vbox.children = [widgets.HTML("<p>No subtasks available.</p>")]
+            else:
+                self.vbox.children = outer_sections
+        else:
+            self.vbox.children = [info_accordion] + outer_sections
 
     def create_inner_accordion(self, subtasks):
         children = []
@@ -67,6 +78,7 @@ class TaskView:
 
         for sub in subtasks:
             description = sub.get("description", "")
+            values = sub.get("value", "")
             status = sub.get("status", "todo")
             hints = sub.get("hints", [])
             hint_index = [-1]
@@ -80,15 +92,24 @@ class TaskView:
             hint_button = widgets.Button(description="Hint", button_style='success')
             hint_button.on_click(on_hint_click)
 
-            vbox = widgets.VBox([
-                widgets.HTML(f"<b>description:</b> {description}"),
-                hint_button,
-                hint_output
-            ])
+            if self.monitored_mode:
+                des = widgets.HTML(f"<b>description:</b> {description}")
+                val= widgets.HTML(f"<b>applied values:</b> {values}")
+                vbox = widgets.VBox([des,val])
+
+            else:
+                vbox = widgets.VBox([
+                    widgets.HTML(f"<b>description:</b> {description}"),
+                    hint_button,
+                    hint_output
+                ])
 
             collapse = widgets.Accordion(children=[vbox])
             collapse.set_title(0, sub["title"])
-            self.apply_status_class(collapse, status)
+
+            if not self.monitored_mode: 
+                print("Hier")
+                self.apply_status_class(collapse, status)
 
             wrappers.append(collapse)
             children.append(collapse)

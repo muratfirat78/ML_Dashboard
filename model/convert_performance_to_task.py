@@ -1,8 +1,5 @@
 class ConvertPerformanceToTask:
     def get_action_category(self,action):
-        if action == "DataSet":
-            return "Data Selection"
-        
         if action in ["Replace-Median", "Replace-Mean", "Replace-Mode", "Remove-Missing", "Drop Column", "Edit Range"]:
             return "Data Cleaning"
         
@@ -226,6 +223,7 @@ class ConvertPerformanceToTask:
         subtasks = []
         task = {}
         actions = []
+        dataset = ""
 
         for category, action_dict in performance.items():
             for action_type, value in action_dict.items():
@@ -237,6 +235,19 @@ class ConvertPerformanceToTask:
         actions.sort(key=lambda x: x[2])
 
         for action in actions:
+            action_str = ""
+            if isinstance(action[1], list):
+                action_str = action[1][0]
+            if isinstance(action[1], str):
+                action_str = action[1]
+            if isinstance(action[1], tuple):
+                action_str = action[1][0]
+
+            if action[0][1] == "DataSet":
+                dataset = action_str
+                continue
+            
+
             subtask = self.get_subtask(subtasks, action[0][1])
 
             if subtask is None:
@@ -257,14 +268,6 @@ class ConvertPerformanceToTask:
                 subsubtask["value"] = []
                 subtask["subtasks"].append(subsubtask)
 
-            action_str = ""
-
-            if isinstance(action[1], list):
-                action_str = action[1][0]
-            if isinstance(action[1], str):
-                action_str = action[1]
-            if isinstance(action[1], tuple):
-                action_str = action[1][0]
             subsubtask["value"].append(action_str)
 
 
@@ -286,5 +289,6 @@ class ConvertPerformanceToTask:
 
         task["title"] = "todo"
         task["description"] = "todo"
+        task["dataset"] = dataset
         task["subtasks"] = subtasks
         return task

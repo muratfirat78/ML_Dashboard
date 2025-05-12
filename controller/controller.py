@@ -63,7 +63,6 @@ class Controller:
 
     def train_Model(self,tasktype,mytype,results,trmodels,params):
         self.predictive_modeling_model.train_Model(tasktype,mytype,results,trmodels,params)
-        self.logger.get_task()
     
     def make_cleaning(self,featurescl,result2aexp,missacts,dt_features,params):
          self.data_cleaning_model.make_cleaning(featurescl,result2aexp,missacts,dt_features,params)
@@ -230,3 +229,6 @@ class Controller:
         self.main_view.datasets.options = [dataset]
         self.main_view.datasets.value = dataset
         self.data_selection_view.read_dataset(None)
+
+    def show_completion_popup(self):
+        self.task_view.show_completion_popup()

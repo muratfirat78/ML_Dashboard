@@ -1,6 +1,8 @@
 import ipywidgets as widgets
-from IPython.display import HTML, display
+from IPython.display import HTML, display, clear_output
 
+modal_output = widgets.Output()
+display(modal_output)
 
 class TaskView:
     def __init__(self, controller=None):
@@ -151,3 +153,7 @@ class TaskView:
 
     def show_task(self):
         self.vbox.layout = widgets.Layout(visibility='visible')
+
+    def show_completion_popup(self):
+        None
+        # todo

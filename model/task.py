@@ -90,6 +90,16 @@ class TaskModel:
         if incorrect:
             subsubtask["status"] = "incorrect"
 
+    #check if task is finished
+    finished = True
+    for subtask in self.current_task["subtasks"]:
+      if subtask["status"] != "done":
+        finished = False
+        
+    if finished:
+      self.controller.show_completion_popup()
+        
+
   def set_current_task(self,task):
     self.current_task = task
     

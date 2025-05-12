@@ -108,3 +108,6 @@ class DataSelectionModel:
     
     def get_datafolder(self):
         return self.datafolder
+    
+    def set_datafolder(self, foldername):
+        self.datafolder = foldername

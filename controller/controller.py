@@ -133,6 +133,9 @@ class Controller:
     def get_datafolder(self):
         return self.data_selection_model.get_datafolder()
     
+    def set_datafolder(self, datafolder):
+        self.data_selection_model.set_datafolder(datafolder)
+    
     def get_online_version(self):
         return self.main_model.get_online_version()
     
@@ -222,4 +225,8 @@ class Controller:
             self.task_view.update_task_statuses(self.task_model.get_current_task())
             self.task_view.set_active_accordion()
 
-    
+    def read_dataset_view(self, dataset):
+        self.set_datafolder("DataSets")
+        self.main_view.datasets.options = [dataset]
+        self.main_view.datasets.value = dataset
+        self.data_selection_view.read_dataset(None)

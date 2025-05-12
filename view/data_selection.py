@@ -36,9 +36,6 @@ class DataSelectionView:
         self.main_view.dt_ftslay.height = str(rowheight*len(df.columns))+'px'
         self.main_view.dt_features.layout = self.main_view.dt_ftslay
 
-     
-
-
         self.main_view.ftlaycl.display = 'block'
         self.main_view.ftlaycl.height = str(rowheight*len(df.columns))+'px'
         self.main_view.featurescl.layout = self.main_view.ftlaycl

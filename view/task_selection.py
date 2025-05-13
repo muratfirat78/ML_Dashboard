@@ -24,7 +24,7 @@ class TaskSelectionView:
         )
 
         self.mode_dropdown = widgets.Dropdown(
-            options=list(["Guided mode","Monitored mode"]),
+            options=list(["Guide me","Monitor my performance"]),
             description='Select mode:',
             disabled=False
         )
@@ -94,10 +94,10 @@ class TaskSelectionView:
             if change["new"] == "All tasks":
                 self.alltasks = True
 
-            if change["new"] == "Guided mode":
+            if change["new"] == "Guide me":
                 self.guided_mode = True
 
-            if change["new"] == "Monitored mode":
+            if change["new"] == "Monitor my performance":
                 self.guided_mode = False
         
         if self.guided_mode:
@@ -114,9 +114,9 @@ class TaskSelectionView:
 
 
     def start_task(self, event):
-        if self.mode_dropdown.value == "Monitored mode":
+        if self.mode_dropdown.value == "Monitor my performance":
             monitored_mode = True
-        elif self.mode_dropdown.value == "Guided mode":
+        elif self.mode_dropdown.value == "Guide me":
             monitored_mode = False
         selected_title = self.task_dropdown.value
         selected_task = self.task_map[selected_title]

@@ -66,25 +66,32 @@ class LearningPathModel:
                             "metrics": dict(metrics)
                         }]
 
-
-
     def set_dataset_info(self):
         self.dataset_info = []
-        path = './DataSets'
-        for filename in os.listdir(path):
-            if filename.startswith('Info'):
-                with open(os.path.join(path,filename),'r') as file:
-                    target = None
-                    difficulty_vector = None
-                    for line in file:
-                        if line.startswith('target:'):
-                            target = line.replace('target: ', '').rstrip()
+        tasks_data = self.controller.get_tasks_data()
+        tasks_data_filtered = [task for task in tasks_data if task.get("mode") == "monitored"]
+        for task in tasks_data_filtered:
+            target = task["target"]
+            dataset = task["dataset"].replace(".csv", "")
+            difficulty_vector = task["difficulty"]
 
-                        if line.startswith('difficulty:'):
-                            difficulty_vector = ast.literal_eval(line.replace('difficulty: ', ''))
+            self.dataset_info.append({"dataset": dataset,"target": target, "difficulty": difficulty_vector})
+        
+        # path = './DataSets'
+        # for filename in os.listdir(path):
+        #     if filename.startswith('Info'):
+        #         with open(os.path.join(path,filename),'r') as file:
+        #             target = None
+        #             difficulty_vector = None
+        #             for line in file:
+        #                 if line.startswith('target:'):
+        #                     target = line.replace('target: ', '').rstrip()
 
-                    if target != None and difficulty_vector != None:
-                        self.dataset_info.append({"dataset": filename.replace('Info_','').replace('.txt',''),"target": target, "difficulty": difficulty_vector})
+        #                 if line.startswith('difficulty:'):
+        #                     difficulty_vector = ast.literal_eval(line.replace('difficulty: ', ''))
+
+        #             if target != None and difficulty_vector != None:
+        #                 self.dataset_info.append({"dataset": filename.replace('Info_','').replace('.txt',''),"target": target, "difficulty": difficulty_vector})
 
     def get_dataset_info(self, dataset, target):
         for info in self.dataset_info:

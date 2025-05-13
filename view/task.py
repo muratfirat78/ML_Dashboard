@@ -67,10 +67,9 @@ class TaskView:
 
         if self.monitored_mode:
             if len(outer_sections) == 0:
-                print("hoi")
-                self.vbox.children = [widgets.HTML("<p>No subtasks available.</p>")]
+                self.vbox.children = [info_accordion] + [widgets.HTML("<p>No subtasks available.</p>")]
             else:
-                self.vbox.children = outer_sections
+                self.vbox.children = [info_accordion] + outer_sections
         else:
             self.vbox.children = [info_accordion] + outer_sections
 

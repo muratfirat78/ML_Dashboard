@@ -22,7 +22,7 @@ class LearningPathView:
         self.line_chart = widgets.Output()
         self.update_bar_chart()
         self.update_line_chart()
-        self.hbox =  widgets.VBox([widgets.HBox([self.bar_chart, self.line_chart]),self.label,self.list])
+        self.hbox =  widgets.VBox([self.bar_chart, self.line_chart, self.label,self.list])
 
     def get_icon(self, category):
         if category == 'SelectData':

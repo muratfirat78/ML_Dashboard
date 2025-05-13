@@ -219,7 +219,7 @@ class ConvertPerformanceToTask:
 
         return hints
 
-    def convert_performance_to_task(self, performance):
+    def convert_performance_to_task(self, performance, title, description):
         subtasks = []
         task = {}
         actions = []
@@ -287,8 +287,8 @@ class ConvertPerformanceToTask:
 
         
 
-        task["title"] = "todo"
-        task["description"] = "todo"
+        task["title"] = title
+        task["description"] = description
         task["dataset"] = dataset
         task["subtasks"] = subtasks
         return task

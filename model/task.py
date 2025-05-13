@@ -106,4 +106,8 @@ class TaskModel:
   def get_current_task(self):
     return self.current_task
   
-  
+  def get_title(self):
+    return self.current_task["title"]
+
+  def get_description(self):
+    return self.current_task["description"]

@@ -37,9 +37,9 @@ class Controller:
         self.predictive_modeling_model = PredictiveModelingModel(self.main_model, self, self.logger)
         self.task_model = TaskModel(self)
         self.task_view = TaskView(self)
-        self.task_selection_view = TaskSelectionView(self)
         self.learning_path_model = LearningPathModel(self)
         self.learning_path_view = LearningPathView(self)
+        self.task_selection_view = TaskSelectionView(self)
         self.learning_path = None
         self.convertPerformanceToTask = ConvertPerformanceToTask()
         # performance = {'General': {}, 'SelectData': {'DataSet': ('titanic.csv', 0)}, 'DataCleaning': {'Drop Column': [(['Fare'], 1), (['Ticket'], 2), (['Parch'], 3), (['SibSp'], 4), (['Name'], 5), (['Pclass'], 6), (['PassengerId'], 7), (['Cabin'], 9)], 'Remove-Missing': (['Embarked'], 8), 'Replace-Median': (['Age'], 10)}, 'DataProcessing': {'LabelEncoding': [(['Embarked'], 11), (['Sex'], 12)], 'ConvertToBoolean': ('Survived', 13), 'AssignTarget': ('Survived', 14), 'Split': ('20%', 15)}, 'ModelDevelopment': {'ModelPerformance': (('Logistic Regression()', [('True-Positive', 56), ('False-Positive', 16), ('True-Negative', 86), ('False-Negative', 20), ('Accuracy', 0.797752808988764), ('Precision', 0.7777777777777778), ('Recall', 0.7368421052631579), ('ROCFPR', ([0.        , 0.15686275, 1.        ])), ('ROCTPR',([0.        , 0.73684211, 1.        ]))]), 16)}}
@@ -232,3 +232,6 @@ class Controller:
 
     def show_completion_popup(self):
         self.task_view.show_completion_popup()
+
+    def get_learning_path_view(self):
+        return self.learning_path_view.get_learning_path_tab()

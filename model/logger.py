@@ -24,6 +24,7 @@ class Logger:
 
     def add_action(self, action, value):
         self.student_performance.addAction(action, value)
+        self.controller.update_task_view(action, value)
         self.controller.update_log_view()
     
     def get_result(self):

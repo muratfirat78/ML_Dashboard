@@ -1,5 +1,6 @@
 import ast
 from datetime import datetime
+import re
 
 class StudentPerformance:
     def __init__(self, controller):
@@ -34,9 +35,8 @@ class StudentPerformance:
         
         self.index += 1
 
-        self.controller.update_task_view(action, value)
-
     def string_to_student_performance(self, input_str, date):
+        input_str = re.sub(r'array\((\[.*?\])\)', r'\1', input_str)
         data_dict = ast.literal_eval(input_str)
         self.addAction(['General','Date'], datetime.strptime(date, "%d-%m-%Y %H-%M-%S"))
         for category, actions in data_dict.items():

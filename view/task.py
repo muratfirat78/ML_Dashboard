@@ -110,7 +110,6 @@ class TaskView:
             collapse.set_title(0, sub["title"])
 
             if not self.monitored_mode: 
-                print("Hier")
                 self.apply_status_class(collapse, status)
 
             wrappers.append(collapse)

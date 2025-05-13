@@ -3,15 +3,21 @@ from ipywidgets import *
 class TaskSelectionView:
     def __init__(self, controller):
         self.controller = controller
+        self.recommmended_radio_buttons = None
         self.task_dropdown = None
         self.mode_dropdown = None
         self.select_button = None
         self.vbox = None
+        self.vbox2 = None
+        self.tab_set = None
+        self.alltasks = False
+        self.guided_mode = True
 
-        tasks_data = [{
+        self.tasks_data = [{
                             "title": "Titanic survival chance prediction",
                             "description": "It’s the year 1912. The RMS Titanic has tragically struck an iceberg and begun sinking. As a data scientist in a secret rescue agency, you've been granted access to passenger data from the ship’s manifest. Your mission? Build a model that predicts who had the highest chance of survival.",
                             "dataset": "titanic.csv",
+                            "mode": "guided",
                             "subtasks": [
                             {
                                 "id": 3,
@@ -126,10 +132,104 @@ class TaskSelectionView:
                                 ]
                             }
                             ]
-                        },{'title': 'todo', 'description': 'todo', "dataset": "titanic.csv",'subtasks': [{'title': 'Data Cleaning', 'status': 'todo', 'subtasks': [{'status': 'todo', 'action': ['DataCleaning', 'Drop Column'], 'value': ['Fare', 'Ticket', 'Parch', 'SibSp', 'Name', 'Pclass', 'PassengerId', 'Cabin'], 'title': 'Drop Columns', 'description': 'Remove columns that are irrelevant or redundant for the model.', 'hints': ["Go to the Data Cleaning tab. Select the column(s), choose 'drop column', then click apply.", 'Drop the following column(s): Fare, Ticket, Parch, SibSp, Name, Pclass, PassengerId, Cabin.'], 'applied_values': [], 'order': 1}, {'status': 'todo', 'action': ['DataCleaning', 'Remove-Missing'], 'value': ['Embarked'], 'title': 'Remove Rows with Missing Values', 'description': 'Remove rows that contain missing values in the column.', 'hints': ["Go to the Data Cleaning tab. Select the column, choose 'remove missing', then click apply.", 'Remove rows with missing values in Embarked.'], 'applied_values': [], 'order': 1}, {'status': 'todo', 'action': ['DataCleaning', 'Replace-Median'], 'value': ['Age'], 'title': 'Replace Missing Values (Median)', 'description': 'Replace missing values in a column using the median.', 'hints': ["Go to the Data Cleaning tab. Select the column, choose 'replace median', then click apply.", 'Apply replace median to Age.'], 'applied_values': [], 'order': 1}], 'applied_values': [], 'order': 2}, {'title': 'Data Translation', 'status': 'todo', 'subtasks': [{'status': 'todo', 'action': ['DataProcessing', 'LabelEncoding'], 'value': ['Embarked', 'Sex'], 'title': 'Label Encoding', 'description': 'Convert categorical columns into numeric codes.', 'hints': ["Go to the Data Processing tab. Choose the column, select 'encoding', choose 'Label Encoding', then click apply.", 'Apply label encoding to Embarked, Sex.'], 'applied_values': [], 'order': 1}, {'status': 'todo', 'action': ['DataProcessing', 'ConvertToBoolean'], 'value': ['Survived'], 'title': 'Convert to Boolean', 'description': 'Convert 1 and 0 values in the column to boolean (True/False).', 'hints': ["Go to the Data Processing tab. Choose the column, select 'Convert to Boolean', then click apply.", "Convert 'Survived' to boolean (True/False)."], 'applied_values': [], 'order': 1}], 'applied_values': [], 'order': 3}, {'title': 'Model Training', 'status': 'todo', 'subtasks': [{'status': 'todo', 'action': ['DataProcessing', 'AssignTarget'], 'value': ['Survived'], 'title': 'Assign Target Variable', 'description': 'Assign the column as the target variable for model training.', 'hints': ["Go to the Data Processing tab. Choose the column, select 'Assign Target', then click apply.", "Assign 'Survived' as the target column."], 'applied_values': [], 'order': 1}, {'status': 'todo', 'action': ['DataProcessing', 'Split'], 'value': ['20%'], 'title': 'Train/Test Split', 'description': 'Split dataset into training and testing sets.', 'hints': ['Go to the Data Processing tab. Choose the column, assign the target, set the test ratio, then click split.', 'Use a test ratio of 20% for splitting the dataset.'], 'applied_values': [], 'order': 2}, {'status': 'todo', 'action': ['ModelDevelopment', 'ModelPerformance'], 'value': ['Logistic Regression()'], 'title': 'Model Training & Evaluation', 'description': 'Train a model and evaluate its performance.', 'hints': ['Go to the Predictive Modeling tab. Select the model type, adjust parameters if needed, then click train.', 'Train the model using the selected parameters and evaluate its performance.'], 'applied_values': [], 'order': 3}], 'applied_values': [], 'order': 7}]}]
-        self.task_map = {
-            task["title"]: task for task in tasks_data
-        }
+                        },{'title': 'todo', 'description': 'todo',
+                        "dataset": "titanic.csv","mode": "guided",'subtasks': [
+                            {'title': 'Data Cleaning', 'status': 'todo', 'subtasks': [
+                                    {'status': 'todo', 'action': ['DataCleaning', 'Drop Column'
+                                        ], 'value': ['Fare', 'Ticket', 'Parch', 'SibSp', 'Name', 'Pclass', 'PassengerId', 'Cabin'
+                                        ], 'title': 'Drop Columns', 'description': 'Remove columns that are irrelevant or redundant for the model.', 'hints': [
+                                            "Go to the Data Cleaning tab. Select the column(s), choose 'drop column', then click apply.", 'Drop the following column(s): Fare, Ticket, Parch, SibSp, Name, Pclass, PassengerId, Cabin.'
+                                        ], 'applied_values': [], 'order': 1
+                                    },
+                                    {'status': 'todo', 'action': ['DataCleaning', 'Remove-Missing'
+                                        ], 'value': ['Embarked'
+                                        ], 'title': 'Remove Rows with Missing Values', 'description': 'Remove rows that contain missing values in the column.', 'hints': [
+                                            "Go to the Data Cleaning tab. Select the column, choose 'remove missing', then click apply.", 'Remove rows with missing values in Embarked.'
+                                        ], 'applied_values': [], 'order': 1
+                                    },
+                                    {'status': 'todo', 'action': ['DataCleaning', 'Replace-Median'
+                                        ], 'value': ['Age'
+                                        ], 'title': 'Replace Missing Values (Median)', 'description': 'Replace missing values in a column using the median.', 'hints': [
+                                            "Go to the Data Cleaning tab. Select the column, choose 'replace median', then click apply.", 'Apply replace median to Age.'
+                                        ], 'applied_values': [], 'order': 1
+                                    }
+                                ], 'applied_values': [], 'order': 2
+                            },
+                            {'title': 'Data Translation', 'status': 'todo', 'subtasks': [
+                                    {'status': 'todo', 'action': ['DataProcessing', 'LabelEncoding'
+                                        ], 'value': ['Embarked', 'Sex'
+                                        ], 'title': 'Label Encoding', 'description': 'Convert categorical columns into numeric codes.', 'hints': [
+                                            "Go to the Data Processing tab. Choose the column, select 'encoding', choose 'Label Encoding', then click apply.", 'Apply label encoding to Embarked, Sex.'
+                                        ], 'applied_values': [], 'order': 1
+                                    },
+                                    {'status': 'todo', 'action': ['DataProcessing', 'ConvertToBoolean'
+                                        ], 'value': ['Survived'
+                                        ], 'title': 'Convert to Boolean', 'description': 'Convert 1 and 0 values in the column to boolean (True/False).', 'hints': [
+                                            "Go to the Data Processing tab. Choose the column, select 'Convert to Boolean', then click apply.",
+                                            "Convert 'Survived' to boolean (True/False)."
+                                        ], 'applied_values': [], 'order': 1
+                                    }
+                                ], 'applied_values': [], 'order': 3
+                            },
+                            {'title': 'Model Training', 'status': 'todo', 'subtasks': [
+                                    {'status': 'todo', 'action': ['DataProcessing', 'AssignTarget'
+                                        ], 'value': ['Survived'
+                                        ], 'title': 'Assign Target Variable', 'description': 'Assign the column as the target variable for model training.', 'hints': [
+                                            "Go to the Data Processing tab. Choose the column, select 'Assign Target', then click apply.",
+                                            "Assign 'Survived' as the target column."
+                                        ], 'applied_values': [], 'order': 1
+                                    },
+                                    {'status': 'todo', 'action': ['DataProcessing', 'Split'
+                                        ], 'value': ['20%'
+                                        ], 'title': 'Train/Test Split', 'description': 'Split dataset into training and testing sets.', 'hints': ['Go to the Data Processing tab. Choose the column, assign the target, set the test ratio, then click split.', 'Use a test ratio of 20% for splitting the dataset.'
+                                        ], 'applied_values': [], 'order': 2
+                                    },
+                                    {'status': 'todo', 'action': ['ModelDevelopment', 'ModelPerformance'
+                                        ], 'value': ['Logistic Regression()'
+                                        ], 'title': 'Model Training & Evaluation', 'description': 'Train a model and evaluate its performance.', 'hints': ['Go to the Predictive Modeling tab. Select the model type, adjust parameters if needed, then click train.', 'Train the model using the selected parameters and evaluate its performance.'
+                                        ], 'applied_values': [], 'order': 3
+                                    }
+                                ], 'applied_values': [], 'order': 7
+                            }
+                        ]
+                    },
+                    {
+                        "title":"World happiness report",
+                        "mode": "monitored",
+                        "description":"""
+                                        <b>About Dataset</b><br>
+                                        This dataset contains 4,000 entries with 24 columns related to happiness, economic, social, and political indicators for different countries across multiple years.<br><br>
+
+                                        <b>Columns Overview:</b><br>
+                                        <b>Country</b>: Name of the country.<br>
+                                        <b>target</b>: Life_Satisfaction<br>
+                                        <b>Year</b>: The year of the record.<br>
+                                        <b>Happiness_Score</b>: A numerical value indicating the happiness level.<br>
+                                        <b>GDP_per_Capita</b>: Economic output per person.<br>
+                                        <b>Social_Support</b>: Level of social connections and support.<br>
+                                        <b>Healthy_Life_Expectancy</b>: Average life expectancy with good health.<br>
+                                        <b>Freedom</b>: Perceived freedom in decision-making.<br>
+                                        <b>Generosity</b>: A measure of charitable behavior.<br>
+                                        <b>Corruption_Perception</b>: Perception of corruption in society.<br>
+                                        <b>Unemployment_Rate</b>: Percentage of unemployed individuals.<br>
+                                        <b>Education_Index</b>: A measure of education quality.<br>
+                                        <b>Population</b>: Total population of the country.<br>
+                                        <b>Urbanization_Rate</b>: Percentage of people living in urban areas.<br>
+                                        <b>Life_Satisfaction (Target)</b>: A subjective measure of well-being.<br>
+                                        <b>Public_Trust</b>: Confidence in public institutions.<br>
+                                        <b>Mental_Health_Index</b>: A measure of overall mental health.<br>
+                                        <b>Income_Inequality</b>: Economic disparity metric.<br>
+                                        <b>Public_Health_Expenditure</b>: Government spending on health.<br>
+                                        <b>Climate_Index</b>: A measure of climate conditions.<br>
+                                        <b>Work_Life_Balance</b>: An index measuring work-life balance.<br>
+                                        <b>Internet_Access</b>: Percentage of population with internet.<br>
+                                        <b>Crime_Rate</b>: Reported crime level.<br>
+                                        <b>Political_Stability</b>: A measure of political security.<br>
+                                        <b>Employment_Rate</b>: Percentage of employed individuals.
+                                        """
+                    }]
+        
+        self.filter_task_selection(None)
 
         self.task_dropdown = widgets.Dropdown(
             options=list(self.task_map.keys()),
@@ -153,7 +253,16 @@ class TaskSelectionView:
         self.description_label.layout = widgets.Layout(max_width='500px')
 
         self.task_dropdown.observe(self.update_title_and_description, names='value')
-        self.mode_dropdown.observe(self.on_mode_change, names='value')
+        self.mode_dropdown.observe(self.filter_task_selection, names='value')
+
+        self.recommmended_radio_buttons = widgets.RadioButtons(
+            options=[
+                'Recommended tasks only', 
+                'All tasks'
+            ],
+            layout={'width': 'max-content'}
+        )
+        self.recommmended_radio_buttons.observe(self.filter_task_selection, names='value')
 
         self.select_button = widgets.Button(
             description='Start Task',
@@ -162,18 +271,25 @@ class TaskSelectionView:
         self.select_button.on_click(self.start_task)
 
         self.guided_mode_items = widgets.VBox([
-            self.task_dropdown,
             self.title_label,
             self.description_label
         ])
 
+        learning_path_view = self.controller.get_learning_path_view()
+
         self.vbox = widgets.VBox([
-            widgets.HBox([self.mode_dropdown,widgets.VBox([self.guided_mode_items, self.select_button])]),
-
+            self.mode_dropdown, self.recommmended_radio_buttons,self.task_dropdown,self.guided_mode_items, self.select_button
         ])
-        self.vbox.layout.display = 'none'
 
-        self.on_mode_change({'new': self.mode_dropdown.value})
+        self.vbox2 = widgets.VBox([learning_path_view])
+        # self.vbox.layout.display = 'none'
+
+        tabs = [self.vbox, self.vbox2]
+        tab_set = widgets.Tab(tabs)
+        tab_set.set_title(0, 'Task selection')
+        tab_set.set_title(1, 'Learning path')
+        tab_set.layout.display = 'none'
+        self.tab_set = tab_set
 
     def get_description(self, title):
         task = self.task_map.get(title, {})
@@ -183,6 +299,33 @@ class TaskSelectionView:
         new_title = change['new']
         self.title_label.value = "<h3>" + new_title + "</h3>"
         self.description_label.value = self.get_description(new_title)
+
+    def filter_task_selection(self, change):
+        if change != None:
+            if change["new"] == "Recommended tasks only":
+                self.alltasks = False
+                
+            if change["new"] == "All tasks":
+                self.alltasks = True
+
+            if change["new"] == "Guided mode":
+                self.guided_mode = True
+
+            if change["new"] == "Monitored mode":
+                self.guided_mode = False
+        
+        if self.guided_mode:
+            filtered_tasks = [task for task in self.tasks_data if task["mode"] == "guided"]
+        else:
+            filtered_tasks = [task for task in self.tasks_data if task["mode"] == "monitored"]
+
+        self.task_map = {
+            task["title"]: task for task in filtered_tasks
+        }
+        
+        if self.task_dropdown != None:
+            self.task_dropdown.options=list(self.task_map.keys())
+
 
     def start_task(self, event):
         if self.mode_dropdown.value == "Monitored mode":
@@ -197,24 +340,14 @@ class TaskSelectionView:
         self.controller.hide_task_selection_and_show_tabs()
 
     def get_task_selection_view(self):
-        return self.vbox
+        return self.tab_set
 
     def hide_task_selection(self):
-        self.vbox.layout.display = 'none'
+        self.tab_set.layout.display = 'none'
     
     def show_task_selection(self):
-        self.vbox.layout = widgets.Layout(visibility = 'visible')
+        self.tab_set.layout = widgets.Layout(visibility = 'visible')
 
     def disable_selection(self):
         self.task_dropdown.disabled = True
         self.select_button.disabled = True
-
-
-    def on_mode_change(self, change):
-        mode = change['new']
-        if mode == "Guided mode":
-            self.guided_mode_items.layout.display = 'flex'
-            self.select_button.description = 'Start Task'
-        else: 
-            self.guided_mode_items.layout.display = 'none'
-            self.select_button.description = 'Start'

@@ -54,7 +54,7 @@ class LearningPathModel:
                             "metrics": dict(metrics)
                         }]
                 else:
-                        model_info = result[0]
+                        model_info = res[0]
                         model_name = model_info[0][0].split('(')[0]
                         metrics = res[0][0][1]
                         date = results[3]

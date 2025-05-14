@@ -191,6 +191,7 @@ class MainModel:
                         "dataset": "World Happiness Report.csv",
                         "difficulty": [('Data cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)],
                         "target": "Life_Satisfaction",
+                        "subtasks": [],
                         "description":"""
                                         <b>About Dataset</b><br>
                                         This dataset contains 4,000 entries with 24 columns related to happiness, economic, social, and political indicators for different countries across multiple years.<br><br>
@@ -227,10 +228,176 @@ class MainModel:
                         "mode": "monitored",
                         "dataset": "titanic.csv",
                         "difficulty": [('Data cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)],
-                        "target": "Survived",
                         "description":"""
                                         "It’s the year 1912. The RMS Titanic has tragically struck an iceberg and begun sinking. As a data scientist in a secret rescue agency, you've been granted access to passenger data from the ship’s manifest. Your mission? Build a model that predicts who had the highest chance of survival."
-                                        """
+                                        """,
+                        "subtasks": [
+                            {
+                                "title": "Data Cleaning",
+                                "status": "todo",
+                                "order": 1,
+                                "subtasks": [
+                                {
+                                    "title": "Replace missing Age with median",
+                                    "description": "Fill in missing 'Age' values using the median age.",
+                                    "hints": ["Use median() function", "Apply to Age column"],
+                                    "status": "todo",
+                                    "action": ["DataCleaning", "Replace-Median"],
+                                    "value": ["Age"],    
+                                    "applied_values": [],   
+                                    "order": 1
+                                },
+                                {
+                                    "title": "Remove rows with missing 'Embarked'",
+                                    "description": "Remove rows where 'Embarked' is missing.",
+                                    "hints": ["", ""],
+                                    "status": "todo",
+                                    "action": ["DataCleaning", "Remove-Missing"],
+                                    "value": ["Embarked"],   
+                                    "applied_values": [],                                   
+                                    "order": 1
+                                },
+                                {
+                                    "title": "Drop unnecessary columns",
+                                    "description": "Drop columns not useful for modeling.",
+                                    "hints": ["Look for ID-like, ticket, or name-based columns"],
+                                    "status": "todo",
+                                    "action": ["DataCleaning", "Drop Column"],
+                                    "value": ["Cabin", "PassengerId", "Pclass", "Name", "SibSp", "Parch", "Ticket", "Fare"],
+                                    "applied_values": [],  
+                                    "order": 1
+                                }
+                                ]
+                            },
+                            {
+                                "title": "Data Translation",
+                                "status": "todo",
+                                "order": 2,
+                                "subtasks": [
+                                {
+                                    "title": "Encode categorical columns",
+                                    "description": "Convert categorical variables into numeric form.",
+                                    "hints": ["Use LabelEncoder for 'Sex' and 'Embarked'"],
+                                    "status": "todo",
+                                    "action": ["DataProcessing", "LabelEncoding"],
+                                    "value": ["Sex", "Embarked"],
+                                    "applied_values": [],  
+                                    "order": 1
+                                },
+                                {
+                                    "title": "Convert Survived to Boolean",
+                                    "description": "Change the Survived column to boolean values.",
+                                    "hints": ["True if survived, False if not"],
+                                    "status": "todo",
+                                    "action": ["DataProcessing", "ConvertToBoolean"],
+                                    "value": ["Survived"],
+                                    "applied_values": [],  
+                                    "order": 1
+                                }
+                                ]
+                            },
+                            {
+                                "title": "Model Training",
+                                "status": "todo",
+                                "order": 3,
+                                "subtasks": [
+                                {
+                                    "title": "Assign Target",
+                                    "description": "Assign 'Survived' as the target variable for the model.",
+                                    "hints": ["Separate X and y"],
+                                    "status": "todo",
+                                    "action": ["DataProcessing", "AssignTarget"],
+                                    "value": ["Survived"],
+                                    "applied_values": [],  
+                                    "order": 1
+                                },
+                                {
+                                    "title": "Train/Test Split",
+                                    "description": "Split the dataset into training and testing sets.",
+                                    "hints": ["Use 80/20 split"],
+                                    "status": "todo",
+                                    "action": ["DataProcessing", "Split"],
+                                    "value": ["20%"],
+                                    "applied_values": [],  
+                                    "order": 2
+                                },
+                                {
+                                    "title": "Train Logistic Regression",
+                                    "description": "Train a logistic regression model and evaluate performance.",
+                                    "hints": ["Use LogisticRegression", "Check confusion matrix"],
+                                    "status": "todo",
+                                    "action": ["ModelDevelopment", "ModelPerformance"],
+                                    "value": ["Logistic Regression()"],
+                                    "applied_values": [],  
+                                    "order": 3
+                                }
+                                ]
+                            }
+                            ]
+                        },{'title': 'todo'
+                           , 'description': 'todo'
+                           ,"dataset": "titanic.csv"
+                            ,"mode": "guided"
+                            ,"difficulty": [('Data cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)]
+                           ,'subtasks': [
+                            {'title': 'Data Cleaning', 'status': 'todo', 'subtasks': [
+                                    {'status': 'todo', 'action': ['DataCleaning', 'Drop Column'
+                                        ], 'value': ['Fare', 'Ticket', 'Parch', 'SibSp', 'Name', 'Pclass', 'PassengerId', 'Cabin'
+                                        ], 'title': 'Drop Columns', 'description': 'Remove columns that are irrelevant or redundant for the model.', 'hints': [
+                                            "Go to the Data Cleaning tab. Select the column(s), choose 'drop column', then click apply.", 'Drop the following column(s): Fare, Ticket, Parch, SibSp, Name, Pclass, PassengerId, Cabin.'
+                                        ], 'applied_values': [], 'order': 1
+                                    },
+                                    {'status': 'todo', 'action': ['DataCleaning', 'Remove-Missing'
+                                        ], 'value': ['Embarked'
+                                        ], 'title': 'Remove Rows with Missing Values', 'description': 'Remove rows that contain missing values in the column.', 'hints': [
+                                            "Go to the Data Cleaning tab. Select the column, choose 'remove missing', then click apply.", 'Remove rows with missing values in Embarked.'
+                                        ], 'applied_values': [], 'order': 1
+                                    },
+                                    {'status': 'todo', 'action': ['DataCleaning', 'Replace-Median'
+                                        ], 'value': ['Age'
+                                        ], 'title': 'Replace Missing Values (Median)', 'description': 'Replace missing values in a column using the median.', 'hints': [
+                                            "Go to the Data Cleaning tab. Select the column, choose 'replace median', then click apply.", 'Apply replace median to Age.'
+                                        ], 'applied_values': [], 'order': 1
+                                    }
+                                ], 'applied_values': [], 'order': 2
+                            },
+                            {'title': 'Data Translation', 'status': 'todo', 'subtasks': [
+                                    {'status': 'todo', 'action': ['DataProcessing', 'LabelEncoding'
+                                        ], 'value': ['Embarked', 'Sex'
+                                        ], 'title': 'Label Encoding', 'description': 'Convert categorical columns into numeric codes.', 'hints': [
+                                            "Go to the Data Processing tab. Choose the column, select 'encoding', choose 'Label Encoding', then click apply.", 'Apply label encoding to Embarked, Sex.'
+                                        ], 'applied_values': [], 'order': 1
+                                    },
+                                    {'status': 'todo', 'action': ['DataProcessing', 'ConvertToBoolean'
+                                        ], 'value': ['Survived'
+                                        ], 'title': 'Convert to Boolean', 'description': 'Convert 1 and 0 values in the column to boolean (True/False).', 'hints': [
+                                            "Go to the Data Processing tab. Choose the column, select 'Convert to Boolean', then click apply.",
+                                            "Convert 'Survived' to boolean (True/False)."
+                                        ], 'applied_values': [], 'order': 1
+                                    }
+                                ], 'applied_values': [], 'order': 3
+                            },
+                            {'title': 'Model Training', 'status': 'todo', 'subtasks': [
+                                    {'status': 'todo', 'action': ['DataProcessing', 'AssignTarget'
+                                        ], 'value': ['Survived'
+                                        ], 'title': 'Assign Target Variable', 'description': 'Assign the column as the target variable for model training.', 'hints': [
+                                            "Go to the Data Processing tab. Choose the column, select 'Assign Target', then click apply.",
+                                            "Assign 'Survived' as the target column."
+                                        ], 'applied_values': [], 'order': 1
+                                    },
+                                    {'status': 'todo', 'action': ['DataProcessing', 'Split'
+                                        ], 'value': ['20%'
+                                        ], 'title': 'Train/Test Split', 'description': 'Split dataset into training and testing sets.', 'hints': ['Go to the Data Processing tab. Choose the column, assign the target, set the test ratio, then click split.', 'Use a test ratio of 20% for splitting the dataset.'
+                                        ], 'applied_values': [], 'order': 2
+                                    },
+                                    {'status': 'todo', 'action': ['ModelDevelopment', 'ModelPerformance'
+                                        ], 'value': ['Logistic Regression()'
+                                        ], 'title': 'Model Training & Evaluation', 'description': 'Train a model and evaluate its performance.', 'hints': ['Go to the Predictive Modeling tab. Select the model type, adjust parameters if needed, then click train.', 'Train the model using the selected parameters and evaluate its performance.'
+                                        ], 'applied_values': [], 'order': 3
+                                    }
+                                ], 'applied_values': [], 'order': 7
+                            }
+                        ]
                     },
                     {
                         "title":"Red Wine Quality",
@@ -238,6 +405,7 @@ class MainModel:
                         "dataset": "Red Wine Quality.csv",
                         "difficulty": [('Data cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)],
                         "target": "quality",
+                        "subtasks": [],
                         "description":"""
                                         <b>target:</b> quality<br>
 
@@ -272,6 +440,7 @@ class MainModel:
                         "dataset": "Student Performance and Behavior Dataset.csv",
                         "difficulty": [('Data cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)],
                         "target": "Total_Score",
+                        "subtasks": [],
                         "description":"""
                                         <b>Student Performance & Behavior Dataset</b><br><br>
 
@@ -323,6 +492,7 @@ class MainModel:
                         "dataset": "Heart Prediction Dataset.csv",
                         "difficulty": [('Data cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)],
                         "target": "HeartDisease",
+                        "subtasks": [],
                         "description":"""
                                         <b>About this file</b><br><br>
 
@@ -350,6 +520,7 @@ class MainModel:
                         "dataset": "Water Pollution_and_Disease.csv",
                         "difficulty": [('Data cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)],
                         "target": "Diarrheal Cases per 100,000 people",
+                        "subtasks": [],
                         "description":"""
                                         <b>About the Dataset</b><br><br>
                                             This dataset explores the relationship between water pollution and the prevalence of waterborne diseases worldwide. It includes water quality indicators, pollution levels, disease rates, and socio-economic factors that influence health outcomes. The dataset provides information on different countries and regions, spanning the years <b>2000–2025</b>.<br><br>

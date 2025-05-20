@@ -76,4 +76,12 @@ class StudentPerformance:
         actions.sort(key=lambda x: x[2])
         return actions
     
+    def get_accuracy(self):
+        try:
+            for metric in self.performance.get('ModelDevelopment', {}).get('ModelPerformance')[0][1]:
+                if metric[0] == 'Accuracy':
+                    return metric[1]
+        except:
+            return None
+
         

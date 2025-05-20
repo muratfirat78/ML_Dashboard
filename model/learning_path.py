@@ -9,8 +9,8 @@ class LearningPathModel:
         self.learning_path = []
         self.performance_data = []
         self.dataset_info = []
-        self.stats = []
-        self.scores = []
+        self.skills = []
+        self.current_skill_vector = None
 
     def set_learning_path(self,userid):
         self.learning_path = []
@@ -73,7 +73,7 @@ class LearningPathModel:
         return False
 
             
-    def get_score(self, reference_task, current_task):
+    def get_overlap(self, reference_task, current_task):
         result = {}
         for subtask in reference_task["subtasks"]:
             amount_of_subsubtasks = 0
@@ -88,34 +88,52 @@ class LearningPathModel:
             result[subtask["title"]] = score
         return result
 
-    
+    def get_maximum_score(self, reference_task, current_performance):
+        reference_metric = reference_task["model_metric"]
+        
+        if reference_metric[0] == "accuracy":
+            current_accuracy = current_performance.get_accuracy()
+            if current_accuracy != None:
+                return 1-((reference_metric[1] - current_accuracy)/reference_metric[1])*100
+                        
+        return 0
+
 
     def set_performance_statistics(self):
         self.learning_path.sort(key=lambda x: x.performance['General']['Date'][0])
 
-        for performance_entry in self.learning_path:
-            current_task = self.controller.convert_performance_to_task(performance_entry.performance, "", "")
+        for performance in self.learning_path:
+            current_task = self.controller.convert_performance_to_task(performance.performance, "", "")
             target_column = self.get_target(current_task)
             dataset_name = current_task["dataset"].replace(".csv", "")
             reference_task = self.get_reference_task(target_column, dataset_name)
 
             if not reference_task:
                 continue
+            
+            #calculate overlap
+            overlap = self.get_overlap(reference_task, current_task)
+            overlap.update({"dataset": dataset_name, "target": target_column})
 
-            score = self.get_score(reference_task, current_task)
-            score.update({"dataset": dataset_name, "target": target_column})
-            self.scores.append(score)
+            #add date for graph
+            skill_vector = copy.copy(self.skills[-1]) if self.skills else {}
+            skill_vector['date'] = performance.performance['General']['Date'][0]
+            
 
-            stat = copy.copy(self.stats[-1]) if self.stats else {}
-            stat['date'] = performance_entry.performance['General']['Date'][0]
+            for skill, difficulty in reference_task['difficulty']:
+                # Overlap score is the overlap between the reference task and the current performance
+                # Maximum score is the predictive modeling score
+                # previous skill level
+                overlap_score = overlap.get(skill, 0) * difficulty
+                maximum_score = self.get_maximum_score(reference_task, performance) * difficulty
+                previous_skill_level = skill_vector.get(skill, 0)
+                
+                # update skill vector
+                skill_vector[skill] = max(overlap_score, maximum_score, previous_skill_level)
 
-            for difficulty_name, difficulty_weight in reference_task['difficulty']:
-                base_score = score.get(difficulty_name, 0)
-                weighted_score = base_score * difficulty_weight
-
-                stat[difficulty_name] = max(stat.get(difficulty_name, 0), weighted_score)
-
-            self.stats.append(stat)
+            self.skills.append(skill_vector)
+            self.current_skill_vector = skill_vector
+        print(self.skills)
 
     def get_stats(self):
-        return self.stats
+        return self.skills

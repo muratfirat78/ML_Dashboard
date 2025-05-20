@@ -227,6 +227,7 @@ class MainModel:
                         "title":"Titanic",
                         "mode": "monitored",
                         "dataset": "titanic.csv",
+                        "model_metric": ("accuracy", 0.8),
                         "difficulty": [('Data Cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)],
                         "description":"""
                                         "It’s the year 1912. The RMS Titanic has tragically struck an iceberg and begun sinking. As a data scientist in a secret rescue agency, you've been granted access to passenger data from the ship’s manifest. Your mission? Build a model that predicts who had the highest chance of survival."

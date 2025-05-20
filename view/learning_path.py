@@ -90,8 +90,8 @@ class LearningPathView:
             stat_data = self.stats[-1].copy()
             del stat_data['date'] 
             df = pd.DataFrame(list(stat_data.items()), columns=['Skill', 'Value'])
-            max_value = df['Value'].max()
-            min_value = df['Value'].min()
+            max_value = 100
+            min_value = 0
 
             if max_value != min_value:  
                 df['Value'] = 5 * (df['Value'] - min_value) / (max_value - min_value)
@@ -120,8 +120,8 @@ class LearningPathView:
                 df = df[['date', value]]
 
             df_melted = df.melt(id_vars='date', var_name='Competence', value_name='Value')
-            max_value = df_melted['Value'].max()
-            min_value = df_melted['Value'].min()
+            max_value = 100
+            min_value = 0
             df_melted['Value'] = 5 * (df_melted['Value'] - min_value) / (max_value - min_value)
             plt.figure(figsize=(12, 6))
             sns.lineplot(data=df_melted, x='date', y='Value', hue='Competence', marker='o', palette='viridis')

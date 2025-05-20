@@ -144,7 +144,8 @@ class LearningPathView:
     
     def set_stats(self, stats):
         self.stats = stats
-        stat_data = stats[-1].copy()
-        self.skill_dropdown.options = ["All"] + [item[0] for item in list(stat_data.items())[1:]]
-        self.update_bar_chart()
-        self.update_line_chart({"new": "All"})
+        if len(stats) > 0:
+            stat_data = stats[-1].copy()
+            self.skill_dropdown.options = ["All"] + [item[0] for item in list(stat_data.items())[1:]]
+            self.update_bar_chart()
+            self.update_line_chart({"new": "All"})

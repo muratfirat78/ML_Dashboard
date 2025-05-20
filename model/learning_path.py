@@ -92,48 +92,84 @@ class LearningPathModel:
         reference_metric = reference_task["model_metric"]
         
         if reference_metric[0] == "accuracy":
-            current_accuracy = current_performance.get_accuracy()
+            current_accuracy = current_performance.get_metric("Accuracy")
             if current_accuracy != None:
                 return 1-((reference_metric[1] - current_accuracy)/reference_metric[1])*100
                         
         return 0
 
+    def validate_performance(self, reference_task, current_performance):
+        # Check data size
+        data_size = current_performance.get_metric("data_size")
+        min_data_size = reference_task["data_size"] * 0.9
+        max_data_size = reference_task["data_size"] * 1.1
+
+        # Data size smaller than the minimum or larger than the maximum data size
+        if data_size < min_data_size or data_size > max_data_size:
+            return False
+        
+        # Missing values
+        missing_values= current_performance.get_metric("missing_values")
+        if missing_values > 0:
+            return False
+        
+        # Type
+        type = current_performance.get_metric("type")
+        if type != reference_task["type"]:
+            return False
+        
+        # Range
+        range = current_performance.get_metric("range")
+        if range != reference_task["range"]:
+            return False
+
+        return True
 
     def set_performance_statistics(self):
         self.learning_path.sort(key=lambda x: x.performance['General']['Date'][0])
 
         for performance in self.learning_path:
-            current_task = self.controller.convert_performance_to_task(performance.performance, "", "")
-            target_column = self.get_target(current_task)
-            dataset_name = current_task["dataset"].replace(".csv", "")
-            reference_task = self.get_reference_task(target_column, dataset_name)
+            try:
+                current_task = self.controller.convert_performance_to_task(performance.performance, "", "")
+                target_column = self.get_target(current_task)
+                dataset_name = current_task["dataset"].replace(".csv", "")
+                reference_task = self.get_reference_task(target_column, dataset_name)
 
-            if not reference_task:
-                continue
-            
-            #calculate overlap
-            overlap = self.get_overlap(reference_task, current_task)
-            overlap.update({"dataset": dataset_name, "target": target_column})
-
-            #add date for graph
-            skill_vector = copy.copy(self.skills[-1]) if self.skills else {}
-            skill_vector['date'] = performance.performance['General']['Date'][0]
-            
-
-            for skill, difficulty in reference_task['difficulty']:
-                # Overlap score is the overlap between the reference task and the current performance
-                # Maximum score is the predictive modeling score
-                # previous skill level
-                overlap_score = overlap.get(skill, 0) * difficulty
-                maximum_score = self.get_maximum_score(reference_task, performance) * difficulty
-                previous_skill_level = skill_vector.get(skill, 0)
+                if not reference_task:
+                    continue
                 
-                # update skill vector
-                skill_vector[skill] = max(overlap_score, maximum_score, previous_skill_level)
+                #calculate overlap
+                overlap = self.get_overlap(reference_task, current_task)
+                overlap.update({"dataset": dataset_name, "target": target_column})
 
-            self.skills.append(skill_vector)
-            self.current_skill_vector = skill_vector
-        print(self.skills)
+
+                if len(self.skills) >= 1:
+                    skill_vector = copy.copy(self.skills[-1])
+                else:
+                    skill_vector = {}
+
+                # skill_vector = copy.copy(self.skills[-1]) if self.skills else {}
+                #add date for graph
+                skill_vector['date'] = performance.performance['General']['Date'][0]
+                
+                valid_performance = self.validate_performance(reference_task, performance)
+
+                if valid_performance:
+                    for skill, difficulty in reference_task['difficulty']:
+                        # Overlap score is the overlap between the reference task and the current performance
+                        # Maximum score is the predictive modeling score
+                        # previous skill level
+                        overlap_score = overlap.get(skill, 0) * difficulty
+                        maximum_score = self.get_maximum_score(reference_task, performance) * difficulty
+                        previous_skill_level = skill_vector.get(skill, 0)
+                        
+                        # update skill vector
+                        skill_vector[skill] = max(overlap_score, maximum_score, previous_skill_level)
+
+                    self.skills.append(skill_vector)
+                    self.current_skill_vector = skill_vector
+            except:
+                continue
 
     def get_stats(self):
         return self.skills

@@ -214,7 +214,7 @@ class PredictiveModelingModel:
             
             performance += [("data_size", ytrain_df.size)]
             performance += [("missing_values", ytrain_df.isnull().sum())]
-            performance += [("type", ytrain_df.dtype)]
+            performance += [("type", str(ytrain_df.dtype))]
             performance += [("range", str(ytrain_df.min()) + "-" + str(ytrain_df.max()))]
                 
             self.logger.add_action(['ModelDevelopment', 'ModelPerformance'], (mytype + str(params).replace('[', '(').replace(']', ')'), performance))

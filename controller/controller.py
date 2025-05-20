@@ -160,10 +160,8 @@ class Controller:
     def set_task_model(self,task, monitored_mode):
         self.monitored_mode = monitored_mode
         self.task_view.set_monitored_mode(monitored_mode)
-
         if self.monitored_mode:
             task = self.convertPerformanceToTask.convert_performance_to_task(self.logger.get_result(), task["title"],task["description"])
-            print("Gegenereerde task:", task)
             self.task_model.set_current_task(task)
             self.task_view.set_task(self.task_model.get_current_task())
             self.task_model.update_statusses_and_set_current_tasks()

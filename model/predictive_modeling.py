@@ -206,6 +206,17 @@ class PredictiveModelingModel:
             performance = []
             for prf,val in mymodel.GetPerformanceDict().items():
                 performance += [(prf, val)]
+            
+            print(ytrain_df.size)
+            print(ytrain_df.dtype)
+            print(ytrain_df.isnull().sum())
+
+            
+            performance += [("data_size", ytrain_df.size)]
+            performance += [("missing_values", ytrain_df.isnull().sum())]
+            performance += [("type", ytrain_df.dtype)]
+            performance += [("range", str(ytrain_df.min()) + "-" + str(ytrain_df.max()))]
+                
             self.logger.add_action(['ModelDevelopment', 'ModelPerformance'], (mytype + str(params).replace('[', '(').replace(']', ')'), performance))
             
             trmodels.options = [mdl.getName() for mdl in self.trainedModels]

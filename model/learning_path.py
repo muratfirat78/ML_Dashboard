@@ -28,8 +28,6 @@ class LearningPathModel:
     def get_target(self, student_performance):
         for subtask in student_performance["subtasks"]:
             for subsubtask in subtask["subtasks"]:
-                # print(subsubtask["action"][0])
-                # print(subsubtask["action"][1])
                 if subsubtask["action"][0] == "DataProcessing" and subsubtask["action"][1]== "AssignTarget":
                     return subsubtask["value"][0]
         return None
@@ -46,21 +44,11 @@ class LearningPathModel:
         tasks = self.controller.get_tasks_data()
         
         for task in tasks:
-            # print(0)
-            # print(task["dataset"])
-            # print(task["mode"])
-            # print(task["dataset"] + "==" + dataset.replace('.csv',''))
             if task["dataset"].replace('.csv','') == dataset and task["mode"] == "monitored":
                 for subtask in task["subtasks"]:
-                    # print(1)
                     for subsubtask in subtask["subtasks"]:
-                        
                         if subsubtask["action"][0] == "DataProcessing" and subsubtask["action"][1]== "AssignTarget":
-                            # print("ja!")
-                            # print(subsubtask["value"][0])
-                            # print(target_column)
                             if subsubtask["value"][0] == target_column:
-                                # print("return")
                                 return task
         return None
 

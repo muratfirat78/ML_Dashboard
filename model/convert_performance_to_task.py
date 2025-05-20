@@ -209,7 +209,7 @@ class ConvertPerformanceToTask:
             if action in action_hint_map:
                 hints.append(action_hint_map[action])
                 break
-
+        
         for action in actions:
             if action in action_description_map:
                 val = ', '.join(values)
@@ -268,7 +268,10 @@ class ConvertPerformanceToTask:
                 subsubtask["value"] = []
                 subtask["subtasks"].append(subsubtask)
 
-            subsubtask["value"].append(action_str)
+            if isinstance(action_str, list):
+                subsubtask["value"].append(action_str[0])
+            elif isinstance(action_str, str):
+                subsubtask["value"].append(action_str)
 
 
         #subtasks created, now set order, hints, descriptions
@@ -284,8 +287,6 @@ class ConvertPerformanceToTask:
                     subsubtask["order"] = i+1
                 else:
                     subsubtask["order"] = 1
-
-        
 
         task["title"] = title
         task["description"] = description

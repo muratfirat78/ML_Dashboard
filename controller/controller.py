@@ -206,8 +206,7 @@ class Controller:
     def update_learning_path(self):
         userid = self.login_model.get_userid()
         self.learning_path_model.set_learning_path(userid)
-        self.learning_path_model.set_performance_data()
-        self.learning_path_model.set_dataset_info()
+        # self.learning_path_model.set_performance_data()
         self.learning_path_model.set_performance_statistics()
         self.learning_path_view.set_stats(self.get_stats())
 
@@ -236,3 +235,6 @@ class Controller:
     
     def get_tasks_data(self):
         return self.main_model.get_tasks_data()
+    
+    def convert_performance_to_task(self,performance, title, description):
+        return self.convertPerformanceToTask.convert_performance_to_task(performance, title, description)

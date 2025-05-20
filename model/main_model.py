@@ -16,7 +16,7 @@ class MainModel:
                             "description": "It’s the year 1912. The RMS Titanic has tragically struck an iceberg and begun sinking. As a data scientist in a secret rescue agency, you've been granted access to passenger data from the ship’s manifest. Your mission? Build a model that predicts who had the highest chance of survival.",
                             "dataset": "titanic.csv",
                             "mode": "guided",
-                            "difficulty": [('Data cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)],
+                            "difficulty": [('Data Cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)],
                             "subtasks": [
                             {
                                 "title": "Data Cleaning",
@@ -124,7 +124,7 @@ class MainModel:
                            , 'description': 'todo'
                            ,"dataset": "titanic.csv"
                             ,"mode": "guided"
-                            ,"difficulty": [('Data cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)]
+                            ,"difficulty": [('Data Cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)]
                            ,'subtasks': [
                             {'title': 'Data Cleaning', 'status': 'todo', 'subtasks': [
                                     {'status': 'todo', 'action': ['DataCleaning', 'Drop Column'
@@ -189,7 +189,7 @@ class MainModel:
                         "title":"World happiness report",
                         "mode": "monitored",
                         "dataset": "World Happiness Report.csv",
-                        "difficulty": [('Data cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)],
+                        "difficulty": [('Data Cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)],
                         "target": "Life_Satisfaction",
                         "subtasks": [],
                         "description":"""
@@ -227,7 +227,7 @@ class MainModel:
                         "title":"Titanic",
                         "mode": "monitored",
                         "dataset": "titanic.csv",
-                        "difficulty": [('Data cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)],
+                        "difficulty": [('Data Cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)],
                         "description":"""
                                         "It’s the year 1912. The RMS Titanic has tragically struck an iceberg and begun sinking. As a data scientist in a secret rescue agency, you've been granted access to passenger data from the ship’s manifest. Your mission? Build a model that predicts who had the highest chance of survival."
                                         """,
@@ -338,7 +338,7 @@ class MainModel:
                            , 'description': 'todo'
                            ,"dataset": "titanic.csv"
                             ,"mode": "guided"
-                            ,"difficulty": [('Data cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)]
+                            ,"difficulty": [('Data Cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)]
                            ,'subtasks': [
                             {'title': 'Data Cleaning', 'status': 'todo', 'subtasks': [
                                     {'status': 'todo', 'action': ['DataCleaning', 'Drop Column'
@@ -403,7 +403,7 @@ class MainModel:
                         "title":"Red Wine Quality",
                         "mode": "monitored",
                         "dataset": "Red Wine Quality.csv",
-                        "difficulty": [('Data cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)],
+                        "difficulty": [('Data Cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)],
                         "target": "quality",
                         "subtasks": [],
                         "description":"""
@@ -438,7 +438,7 @@ class MainModel:
                         "title":"Student Performance & Behavior Dataset",
                         "mode": "monitored",
                         "dataset": "Student Performance and Behavior Dataset.csv",
-                        "difficulty": [('Data cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)],
+                        "difficulty": [('Data Cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)],
                         "target": "Total_Score",
                         "subtasks": [],
                         "description":"""
@@ -490,7 +490,7 @@ class MainModel:
                         "title":"Heart Prediction Dataset",
                         "mode": "monitored",
                         "dataset": "Heart Prediction Dataset.csv",
-                        "difficulty": [('Data cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)],
+                        "difficulty": [('Data Cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)],
                         "target": "HeartDisease",
                         "subtasks": [],
                         "description":"""
@@ -518,7 +518,7 @@ class MainModel:
                         "title":"Water Pollution and Disease",
                         "mode": "monitored",
                         "dataset": "Water Pollution_and_Disease.csv",
-                        "difficulty": [('Data cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)],
+                        "difficulty": [('Data Cleaning',60), ('Data Translation',80), ('Data Transformation', 70), ('Statistics', 65), ('Feature Selection', 50), ('Model Training', 30)],
                         "target": "Diarrheal Cases per 100,000 people",
                         "subtasks": [],
                         "description":"""

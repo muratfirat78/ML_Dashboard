@@ -160,7 +160,6 @@ class ConvertPerformanceToTask:
 
         actions = subsubtask.get("action", [])
         values = subsubtask.get("value", [])
-        print(values)
 
         action_hint_map = {
             "Edit Range": "Go to the Data Cleaning tab. Select a column, choose 'edit range', set the desired min and max values, then click apply.",
@@ -293,5 +292,4 @@ class ConvertPerformanceToTask:
         task["description"] = description
         task["dataset"] = dataset
         task["subtasks"] = subtasks
-        print(task)
         return task

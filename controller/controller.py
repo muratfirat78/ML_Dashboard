@@ -163,7 +163,6 @@ class Controller:
 
         if self.monitored_mode:
             task = self.convertPerformanceToTask.convert_performance_to_task(self.logger.get_result(), task["title"],task["description"])
-            print("Gegenereerde task:", task)
             self.task_model.set_current_task(task)
             self.task_view.set_task(self.task_model.get_current_task())
             self.task_model.update_statusses_and_set_current_tasks()
@@ -209,9 +208,8 @@ class Controller:
         userid = self.login_model.get_userid()
         self.learning_path_model.set_learning_path(userid)
         # self.learning_path_model.set_performance_data()
-        self.learning_path_model.set_dataset_info()
         self.learning_path_model.set_performance_statistics()
-        # self.learning_path_view.set_stats(self.get_stats())
+        self.learning_path_view.set_stats(self.get_stats())
 
     def update_task_view(self, action, value):
         if self.monitored_mode:

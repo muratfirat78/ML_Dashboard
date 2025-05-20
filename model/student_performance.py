@@ -43,15 +43,12 @@ class StudentPerformance:
             for action_type, value in actions.items():
                 if isinstance(value, list):
                     for item in value:
-                        print([category, action_type])
-                        print(item[0][0])
                         self.addAction([category, action_type], [item[0][0]])
                 elif isinstance(value, tuple):
                     self.addAction([category, action_type], value[0])
                 else:
                     self.addAction([category, action_type], value)
-        print("perf")
-        print(self.performance)
+                
 
     def get_score(self):
         return self.performance

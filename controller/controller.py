@@ -1,4 +1,5 @@
 from model.convert_performance_to_task import ConvertPerformanceToTask
+from model.learning_path_manager import LearningPathManagerModel
 from model.task import TaskModel
 from model.data_cleaning import DataCleaningModel
 from model.data_processing import DataProcessingModel
@@ -40,6 +41,7 @@ class Controller:
         self.task_view = TaskView(self)
         self.learning_path_model = LearningPathModel(self)
         self.learning_path_view = LearningPathView(self)
+        self.learning_path_manager_model = LearningPathManagerModel(self)
         self.task_selection_model = TaskSelectionModel(self)
         self.task_selection_view = TaskSelectionView(self)
         self.learning_path = None
@@ -204,15 +206,15 @@ class Controller:
     def refresh_data_processing(self):
         self.data_processing_view.featurepr_click(None)
     
-    def get_stats(self):
-        return self.learning_path_model.get_stats()
+    def get_graph_data(self):
+        return self.learning_path_model.get_graph_data()
     
     def update_learning_path(self):
         userid = self.login_model.get_userid()
         self.learning_path_model.set_learning_path(userid)
         # self.learning_path_model.set_performance_data()
-        self.learning_path_model.set_performance_statistics()
-        self.learning_path_view.set_stats(self.get_stats())
+        self.learning_path_manager_model.set_skill_vectors()
+        self.learning_path_view.set_graph_data(self.get_graph_data())
 
     def update_task_view(self, action, value):
         if self.monitored_mode:
@@ -258,3 +260,9 @@ class Controller:
     
     def get_model_performance(self, task):
         return self.task_model.get_model_performance(task)
+    
+    def get_learning_path(self):
+        return self.learning_path_model.get_learning_path()
+    
+    def add_skill_vector(self, skill_vector):
+        self.learning_path_model.add_skill_vector(skill_vector)

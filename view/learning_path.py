@@ -8,7 +8,7 @@ import datetime
 class LearningPathView:
     def __init__(self, controller):
         self.controller = controller
-        self.stats = [{"date":None}]
+        self.graph_data = [{"date":None}]
         self.label = widgets.Label(value="Log current model:")
         self.list = widgets.SelectMultiple(
             options=[],
@@ -91,7 +91,7 @@ class LearningPathView:
     def update_bar_chart(self):
         self.bar_chart.clear_output()
         with self.bar_chart:
-            stat_data = self.stats[-1].copy()
+            stat_data = self.graph_data[-1].copy()
             del stat_data['date'] 
             df = pd.DataFrame(list(stat_data.items()), columns=['Skill', 'Value'])
             max_value = 100
@@ -117,7 +117,7 @@ class LearningPathView:
         value = value["new"]
         self.line_chart.clear_output()
         with self.line_chart:
-            df = pd.DataFrame(self.stats)
+            df = pd.DataFrame(self.graph_data)
             df['date'] = df['date'].apply(lambda d: d[0] if isinstance(d, tuple) else d)
 
             if value and value != "All":
@@ -146,10 +146,10 @@ class LearningPathView:
     def get_learning_path_tab(self):
         return self.hbox
     
-    def set_stats(self, stats):
-        self.stats = stats
-        if len(stats) > 0:
-            stat_data = stats[-1].copy()
-            self.skill_dropdown.options = ["All"] + [item[0] for item in list(stat_data.items())[1:]]
+    def set_graph_data(self, graph_data):
+        self.graph_data = graph_data
+        if len(graph_data) > 0:
+            graph_data = graph_data[-1].copy()
+            self.skill_dropdown.options = ["All"] + [item[0] for item in list(graph_data.items())[1:]]
             self.update_bar_chart()
             self.update_line_chart({"new": "All"})

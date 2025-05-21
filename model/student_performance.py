@@ -77,11 +77,9 @@ class StudentPerformance:
         return actions
     
     def get_metric(self, metric_name):
-        try:
-            for metric in self.performance.get('ModelDevelopment', {}).get('ModelPerformance')[0][1]:
-                if metric[0] == metric_name:
-                    return metric[1]
-        except:
-            return None
+        for metric in self.performance.get('ModelDevelopment', {}).get('ModelPerformance')[0][1]:
+            if metric[0] == metric_name:
+                return metric[1]
+       
 
         

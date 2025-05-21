@@ -26,7 +26,7 @@ class LearningPathView:
         self.display_dropdown.observe(self.display_dropdown_change, names='value')
 
         self.skill_dropdown = widgets.Dropdown(
-            options=list(["Currect competence level", "Competence level over time", "Current log"]),
+            options=list([]),
             description='Select skill:',
             disabled=False
         )

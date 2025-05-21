@@ -101,11 +101,11 @@ class LearningPathModel:
     def validate_performance(self, reference_task, current_performance):
         # Check data size
         data_size = current_performance.get_metric("data_size")
-        min_data_size = reference_task["data_size"] * 0.9
-        max_data_size = reference_task["data_size"] * 1.1
+        min_data_size_threshold = reference_task["data_size"] * 0.9
+        max_data_size_threshold = reference_task["data_size"] * 1.1
 
         # Data size smaller than the minimum or larger than the maximum data size
-        if data_size < min_data_size or data_size > max_data_size:
+        if data_size < min_data_size_threshold or data_size > max_data_size_threshold:
             return False
         
         # Missing values
@@ -114,15 +114,38 @@ class LearningPathModel:
             return False
         
         # Type
-        type = current_performance.get_metric("type")
-        if type != reference_task["type"]:
-            return False
-        
-        # Range
-        range = current_performance.get_metric("range")
-        if range != reference_task["range"]:
+        d_type = current_performance.get_metric("type")
+        if d_type != reference_task["type"]:
             return False
 
+        # Range
+        range = current_performance.get_metric("range")
+        
+        try:
+            # check number range
+            min_max = range.split("-")
+            min_val = int(min_max[0])
+            max_val = int(min_max[1])
+
+            ref_range = reference_task["range"]
+            min_max_ref = ref_range.split("-")
+            ref_min = int(min_max_ref[0])
+            ref_max = int(min_max_ref[1])
+
+
+            min_threshold = ref_min * 0.9
+            max_threshold = ref_max * 1.1
+
+            if min_val < min_threshold or min_val > max_threshold:
+                return False
+            
+            if max_val < min_threshold or max_val > max_threshold:
+                return False
+        except:
+            # If parsing fails, fall back to simple string comparison
+            if range != reference_task["range"]:
+                return False
+            
         return True
 
     def set_performance_statistics(self):
@@ -141,7 +164,7 @@ class LearningPathModel:
                 #calculate overlap
                 overlap = self.get_overlap(reference_task, current_task)
                 overlap.update({"dataset": dataset_name, "target": target_column})
-
+        
 
                 if len(self.skills) >= 1:
                     skill_vector = copy.copy(self.skills[-1])
@@ -153,7 +176,6 @@ class LearningPathModel:
                 skill_vector['date'] = performance.performance['General']['Date'][0]
                 
                 valid_performance = self.validate_performance(reference_task, performance)
-
                 if valid_performance:
                     for skill, difficulty in reference_task['difficulty']:
                         # Overlap score is the overlap between the reference task and the current performance
@@ -168,7 +190,8 @@ class LearningPathModel:
 
                     self.skills.append(skill_vector)
                     self.current_skill_vector = skill_vector
-            except:
+            except Exception as e:
+                # print(e)
                 continue
 
     def get_stats(self):

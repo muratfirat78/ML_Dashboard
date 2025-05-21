@@ -9,7 +9,7 @@ class LearningPathModel:
         self.learning_path = []
         self.performance_data = []
         self.dataset_info = []
-        self.skills = []
+        self.skill_vectors = []
         self.current_skill_vector = None
 
     def set_learning_path(self,userid):
@@ -88,13 +88,16 @@ class LearningPathModel:
             result[subtask["title"]] = score
         return result
 
-    def get_maximum_score(self, reference_task, current_performance):
+    def get_predictive_modeling_score(self, reference_task, current_performance):
         reference_metric = reference_task["model_metric"]
         
         if reference_metric[0] == "accuracy":
             current_accuracy = current_performance.get_metric("Accuracy")
             if current_accuracy != None:
-                return 1-((reference_metric[1] - current_accuracy)/reference_metric[1])*100
+                reference_accuracy = reference_metric[1]
+                percentage_of_reference = (100/reference_accuracy)*current_accuracy
+                result = min(100, percentage_of_reference)
+                return result
                         
         return 0
 
@@ -166,14 +169,18 @@ class LearningPathModel:
                 overlap.update({"dataset": dataset_name, "target": target_column})
         
 
-                if len(self.skills) >= 1:
-                    skill_vector = copy.copy(self.skills[-1])
+                if len(self.skill_vectors) >= 1:
+                    skill_vector = copy.copy(self.skill_vectors[-1])
                 else:
                     skill_vector = {}
-
-                # skill_vector = copy.copy(self.skills[-1]) if self.skills else {}
+                    
                 #add date for graph
                 skill_vector['date'] = performance.performance['General']['Date'][0]
+
+                # predictive_modeling score
+                #add predictive modeling score to the skill vector
+                pred_modeling_score = self.get_predictive_modeling_score(reference_task, performance)
+                skill_vector['Predictive Modeling'] = pred_modeling_score
                 
                 valid_performance = self.validate_performance(reference_task, performance)
                 if valid_performance:
@@ -182,17 +189,17 @@ class LearningPathModel:
                         # Maximum score is the predictive modeling score
                         # previous skill level
                         overlap_score = overlap.get(skill, 0) * difficulty
-                        maximum_score = self.get_maximum_score(reference_task, performance) * difficulty
+                        maximum_score = (pred_modeling_score/100) * difficulty
                         previous_skill_level = skill_vector.get(skill, 0)
                         
                         # update skill vector
                         skill_vector[skill] = max(overlap_score, maximum_score, previous_skill_level)
 
-                    self.skills.append(skill_vector)
+                    self.skill_vectors.append(skill_vector)
                     self.current_skill_vector = skill_vector
             except Exception as e:
                 # print(e)
                 continue
 
     def get_stats(self):
-        return self.skills
+        return self.skill_vectors

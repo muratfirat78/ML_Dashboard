@@ -19,14 +19,14 @@ class LearningPathView:
         )
         
         self.display_dropdown = widgets.Dropdown(
-            options=list(["Currect competence level", "Competence level over time", "Current log"]),
+            options=list(["Current competence", "Learning path", "Current log"]),
             description='Graph:',
             disabled=False
         )
         self.display_dropdown.observe(self.display_dropdown_change, names='value')
 
         self.skill_dropdown = widgets.Dropdown(
-            options=list([]),
+            options=list(["All"]),
             description='Select skill:',
             disabled=False
         )
@@ -46,13 +46,13 @@ class LearningPathView:
     def display_dropdown_change(self, value):
         selection = value["new"]
 
-        if selection == "Competence level over time":
+        if selection == "Learning path":
             self.line_chart.layout.display = 'block'
             self.skill_dropdown.layout.display = 'block'
             self.bar_chart.layout.display = 'none'
             self.list.layout.display = 'none'
 
-        elif selection == "Currect competence level":
+        elif selection == "Current competence":
             self.line_chart.layout.display = 'none'
             self.skill_dropdown.layout.display = 'none'
             self.bar_chart.layout.display = 'block'
@@ -102,7 +102,7 @@ class LearningPathView:
             sns.barplot(data=df, x='Skill', y='Value', palette='viridis')
             plt.ylim(0, 5)
             plt.yticks([0, 1, 2, 3, 4, 5], ['Beginner', 'Basic Knowledge', 'Intermediate', 'Experienced', 'Expert', 'Master'])
-            plt.title('Skill level distribution')
+            plt.title('Current competence')
             plt.xticks(rotation=45)
             plt.tight_layout()
             plt.show()
@@ -129,7 +129,7 @@ class LearningPathView:
             plt.yticks([0, 1, 2, 3, 4, 5], ['Beginner', 'Basic Knowledge', 'Intermediate', 'Experienced', 'Expert', 'Master'])
 
             if value == "All":
-                plt.title('Competence level over time')
+                plt.title('Learning path')
             else:
                 plt.title('Competence level of ' + value + ' over time')
 

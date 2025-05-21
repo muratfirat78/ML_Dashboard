@@ -73,7 +73,7 @@ class TaskSelectionView:
         tabs = [self.vbox, self.vbox2]
         tab_set = widgets.Tab(tabs)
         tab_set.set_title(0, 'Task selection')
-        tab_set.set_title(1, 'Learning path')
+        tab_set.set_title(1, 'Learning statistics')
         tab_set.layout.display = 'none'
         self.tab_set = tab_set
 

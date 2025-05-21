@@ -8,6 +8,7 @@ from model.local_drive import GoogleDrive
 from model.logger import Logger
 from model.login import LoginModel
 from model.predictive_modeling import PredictiveModelingModel
+from model.task_selection import TaskSelectionModel
 from view.data_cleaning import DataCleaningView
 from view.data_processing import DataProcessingView
 from view.data_selection import DataSelectionView
@@ -39,6 +40,7 @@ class Controller:
         self.task_view = TaskView(self)
         self.learning_path_model = LearningPathModel(self)
         self.learning_path_view = LearningPathView(self)
+        self.task_selection_model = TaskSelectionModel(self)
         self.task_selection_view = TaskSelectionView(self)
         self.learning_path = None
         self.convertPerformanceToTask = ConvertPerformanceToTask()
@@ -63,6 +65,8 @@ class Controller:
 
     def train_Model(self,tasktype,mytype,results,trmodels,params):
         self.predictive_modeling_model.train_Model(tasktype,mytype,results,trmodels,params)
+        print(self.logger.get_result())
+        print(self.convertPerformanceToTask.convert_performance_to_task(self.logger.get_result(), 'todo', 'todo'))
     
     def make_cleaning(self,featurescl,result2aexp,missacts,dt_features,params):
          self.data_cleaning_model.make_cleaning(featurescl,result2aexp,missacts,dt_features,params)
@@ -238,3 +242,7 @@ class Controller:
     
     def convert_performance_to_task(self,performance, title, description):
         return self.convertPerformanceToTask.convert_performance_to_task(performance, title, description)
+    
+    def get_filtered_tasks(self, tasks, guided_mode, all_tasks):
+        current_skill_vector = self.learning_path_model.get_current_skill_vector()
+        return self.task_selection_model.get_filtered_tasks(tasks, guided_mode, all_tasks, current_skill_vector)

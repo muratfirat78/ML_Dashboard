@@ -40,7 +40,8 @@ class LearningPathView:
         self.bar_chart.layout.display = 'block'
         self.skill_dropdown.layout.display = 'none'
         self.line_chart.layout.display = 'none'
-        self.list.layout.display = 'none'       
+        self.list.layout.display = 'none' 
+        self.label.layout.display = 'none'  
         self.hbox =  widgets.VBox([self.display_dropdown,self.skill_dropdown, self.bar_chart, self.line_chart, self.label,self.list])
 
     def display_dropdown_change(self, value):
@@ -50,18 +51,21 @@ class LearningPathView:
             self.line_chart.layout.display = 'block'
             self.skill_dropdown.layout.display = 'block'
             self.bar_chart.layout.display = 'none'
+            self.label.layout.display = 'none'  
             self.list.layout.display = 'none'
 
         elif selection == "Current competence":
             self.line_chart.layout.display = 'none'
             self.skill_dropdown.layout.display = 'none'
             self.bar_chart.layout.display = 'block'
+            self.label.layout.display = 'none'  
             self.list.layout.display = 'none'
 
         elif selection == "Current log":
             self.line_chart.layout.display = 'none'
             self.skill_dropdown.layout.display = 'none'
             self.bar_chart.layout.display = 'none'
+            self.label.layout.display = 'block'  
             self.list.layout.display = 'block'
 
     def get_icon(self, category):

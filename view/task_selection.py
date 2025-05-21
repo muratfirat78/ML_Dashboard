@@ -43,8 +43,8 @@ class TaskSelectionView:
 
         self.recommmended_radio_buttons = widgets.RadioButtons(
             options=[
-                'Recommended tasks only', 
-                'All tasks'
+                'Recommend me tasks', 
+                'Show me all tasks'
             ],
             layout={'width': 'max-content'}
         )
@@ -88,10 +88,10 @@ class TaskSelectionView:
 
     def filter_task_selection(self, change):
         if change != None:
-            if change["new"] == "Recommended tasks only":
+            if change["new"] == "Recommend me tasks":
                 self.alltasks = False
                 
-            if change["new"] == "All tasks":
+            if change["new"] == "Show me all tasks":
                 self.alltasks = True
 
             if change["new"] == "Guide me":
@@ -99,11 +99,13 @@ class TaskSelectionView:
 
             if change["new"] == "Monitor my performance":
                 self.guided_mode = False
-        
+
         if self.guided_mode:
             filtered_tasks = [task for task in self.tasks_data if task["mode"] == "guided"]
         else:
             filtered_tasks = [task for task in self.tasks_data if task["mode"] == "monitored"]
+
+        filtered_tasks = self.controller.get_filtered_tasks(self.tasks_data, self.guided_mode, self.alltasks)
 
         self.task_map = {
             task["title"]: task for task in filtered_tasks
@@ -111,7 +113,6 @@ class TaskSelectionView:
         
         if self.task_dropdown != None:
             self.task_dropdown.options=list(self.task_map.keys())
-
 
     def start_task(self, event):
         if self.mode_dropdown.value == "Monitor my performance":

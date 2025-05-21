@@ -79,11 +79,12 @@ class LearningPathModel:
             amount_of_subsubtasks = 0
             correct = 0
             for subsubtask in subtask["subtasks"]:
+                print(subsubtask)
                 for value in subsubtask["value"]:
                     amount_of_subsubtasks += 1
                     if self.subsubtask_in_current_task(subsubtask["action"],value, current_task):
                         correct += 1
-
+            print(amount_of_subsubtasks)
             score = correct / amount_of_subsubtasks
             result[subtask["title"]] = score
         return result
@@ -135,9 +136,10 @@ class LearningPathModel:
             ref_min = int(min_max_ref[0])
             ref_max = int(min_max_ref[1])
 
+            deviation_margin = 10
 
-            min_threshold = ref_min * 0.9
-            max_threshold = ref_max * 1.1
+            min_threshold = ref_min * (1 - (deviation_margin/100))
+            max_threshold = ref_max * (1 + (deviation_margin/100))
 
             if min_val < min_threshold or min_val > max_threshold:
                 return False
@@ -163,12 +165,11 @@ class LearningPathModel:
 
                 if not reference_task:
                     continue
-                
+
                 #calculate overlap
                 overlap = self.get_overlap(reference_task, current_task)
                 overlap.update({"dataset": dataset_name, "target": target_column})
         
-
                 if len(self.skill_vectors) >= 1:
                     skill_vector = copy.copy(self.skill_vectors[-1])
                 else:
@@ -179,8 +180,8 @@ class LearningPathModel:
 
                 # predictive_modeling score
                 pred_modeling_score = self.get_predictive_modeling_score(reference_task, performance)
-                
                 valid_performance = self.validate_performance(reference_task, performance)
+
                 if valid_performance:
                     for skill, difficulty in reference_task['difficulty']:
                         # Overlap score is the overlap between the reference task and the current performance
@@ -194,7 +195,7 @@ class LearningPathModel:
                         skill_vector[skill] = max(overlap_score, maximum_score, previous_skill_level)
                     #add predictive modeling score to the skill vector
                     skill_vector['Predictive Modeling'] = pred_modeling_score
-                    
+
                     self.skill_vectors.append(skill_vector)
                     self.current_skill_vector = skill_vector
             except Exception as e:
@@ -203,3 +204,6 @@ class LearningPathModel:
 
     def get_stats(self):
         return self.skill_vectors
+
+    def get_current_skill_vector(self):
+        return self.current_skill_vector

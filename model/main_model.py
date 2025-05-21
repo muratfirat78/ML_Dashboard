@@ -624,3 +624,15 @@ class MainModel:
     
     def get_tasks_data(self):
         return self.tasks_data
+    
+    def get_reference_task(self, target_column, dataset):
+        tasks = self.tasks_data
+        
+        for task in tasks:
+            if task["dataset"].replace('.csv','') == dataset and task["mode"] == "monitored":
+                for subtask in task["subtasks"]:
+                    for subsubtask in subtask["subtasks"]:
+                        if subsubtask["action"][0] == "DataProcessing" and subsubtask["action"][1]== "AssignTarget":
+                            if subsubtask["value"][0] == target_column:
+                                return task
+        return None

@@ -65,8 +65,8 @@ class Controller:
 
     def train_Model(self,tasktype,mytype,results,trmodels,params):
         self.predictive_modeling_model.train_Model(tasktype,mytype,results,trmodels,params)
-        print(self.logger.get_result())
-        print(self.convertPerformanceToTask.convert_performance_to_task(self.logger.get_result(), 'todo', 'todo'))
+        # print(self.logger.get_result())
+        # print(self.convertPerformanceToTask.convert_performance_to_task(self.logger.get_result(), 'todo', 'todo'))
     
     def make_cleaning(self,featurescl,result2aexp,missacts,dt_features,params):
          self.data_cleaning_model.make_cleaning(featurescl,result2aexp,missacts,dt_features,params)
@@ -246,3 +246,15 @@ class Controller:
     def get_filtered_tasks(self, tasks, guided_mode, all_tasks):
         current_skill_vector = self.learning_path_model.get_current_skill_vector()
         return self.task_selection_model.get_filtered_tasks(tasks, guided_mode, all_tasks, current_skill_vector)
+    
+    def get_target_task(self, task):
+        return self.task_model.get_target(task)
+    
+    def get_dataset_task(self, task):
+        return self.task_model.get_dataset(task)
+    
+    def get_reference_task(self, target_column, dataset):
+        return self.main_model.get_reference_task(target_column, dataset)
+    
+    def get_model_performance(self, task):
+        return self.task_model.get_model_performance(task)

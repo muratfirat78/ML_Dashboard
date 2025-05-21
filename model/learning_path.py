@@ -8,7 +8,6 @@ class LearningPathModel:
         self.controller = controller
         self.learning_path = []
         self.performance_data = []
-        self.dataset_info = []
         self.skill_vectors = []
         self.current_skill_vector = None
 
@@ -25,44 +24,6 @@ class LearningPathModel:
                     except:
                         print("Error reading performance")
 
-    def get_target(self, student_performance):
-        for subtask in student_performance["subtasks"]:
-            for subsubtask in subtask["subtasks"]:
-                if subsubtask["action"][0] == "DataProcessing" and subsubtask["action"][1]== "AssignTarget":
-                    return subsubtask["value"][0]
-        return None
-
-    def get_dataset(self, student_performance):
-        for subtask in student_performance["subtasks"]:
-            for subsubtask in subtask["subtasks"]:
-                if subsubtask["action"][0] == "DataProcessing" and subsubtask["action"][1]== "AssignTarget":
-                    return subsubtask["value"][0]
-        return None
-
-     
-    def get_reference_task(self, target_column, dataset):
-        tasks = self.controller.get_tasks_data()
-        
-        for task in tasks:
-            if task["dataset"].replace('.csv','') == dataset and task["mode"] == "monitored":
-                for subtask in task["subtasks"]:
-                    for subsubtask in subtask["subtasks"]:
-                        if subsubtask["action"][0] == "DataProcessing" and subsubtask["action"][1]== "AssignTarget":
-                            if subsubtask["value"][0] == target_column:
-                                return task
-        return None
-
-    def get_model_performance(self, task):
-        for subtask in task["subtasks"]:
-            for subsubtask in subtask["subtasks"]:
-                if subsubtask["action"][0] == "ModelDevelopment"and subsubtask["action"][1]=="ModelPerformance":
-                    return subsubtask
-        return None
-
-    def get_dataset_info(self, dataset, target):
-        for info in self.dataset_info:
-            if info['dataset'] == dataset and info['target'] == target:
-                return info
             
     def subsubtask_in_current_task(self, action, value, current_task):
         for subtask in current_task["subtasks"]:
@@ -79,12 +40,10 @@ class LearningPathModel:
             amount_of_subsubtasks = 0
             correct = 0
             for subsubtask in subtask["subtasks"]:
-                print(subsubtask)
                 for value in subsubtask["value"]:
                     amount_of_subsubtasks += 1
                     if self.subsubtask_in_current_task(subsubtask["action"],value, current_task):
                         correct += 1
-            print(amount_of_subsubtasks)
             score = correct / amount_of_subsubtasks
             result[subtask["title"]] = score
         return result
@@ -159,9 +118,9 @@ class LearningPathModel:
         for performance in self.learning_path:
             try:
                 current_task = self.controller.convert_performance_to_task(performance.performance, "", "")
-                target_column = self.get_target(current_task)
+                target_column = self.controller.get_target_task(current_task)
                 dataset_name = current_task["dataset"].replace(".csv", "")
-                reference_task = self.get_reference_task(target_column, dataset_name)
+                reference_task = self.controller.get_reference_task(target_column, dataset_name)
 
                 if not reference_task:
                     continue
@@ -199,7 +158,7 @@ class LearningPathModel:
                     self.skill_vectors.append(skill_vector)
                     self.current_skill_vector = skill_vector
             except Exception as e:
-                # print(e)
+                print(e)
                 continue
 
     def get_stats(self):

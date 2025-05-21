@@ -111,3 +111,24 @@ class TaskModel:
 
   def get_description(self):
     return self.current_task["description"]
+  
+  def get_target(self, task):
+    for subtask in task["subtasks"]:
+        for subsubtask in subtask["subtasks"]:
+            if subsubtask["action"][0] == "DataProcessing" and subsubtask["action"][1]== "AssignTarget":
+                return subsubtask["value"][0]
+    return None
+
+  def get_dataset(self, task):
+    for subtask in task["subtasks"]:
+        for subsubtask in subtask["subtasks"]:
+            if subsubtask["action"][0] == "DataProcessing" and subsubtask["action"][1]== "AssignTarget":
+                return subsubtask["value"][0]
+    return None
+  
+  def get_model_performance(self, task):
+        for subtask in task["subtasks"]:
+            for subsubtask in subtask["subtasks"]:
+                if subsubtask["action"][0] == "ModelDevelopment"and subsubtask["action"][1]=="ModelPerformance":
+                    return subsubtask
+        return None

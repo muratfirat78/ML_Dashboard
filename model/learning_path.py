@@ -178,9 +178,7 @@ class LearningPathModel:
                 skill_vector['date'] = performance.performance['General']['Date'][0]
 
                 # predictive_modeling score
-                #add predictive modeling score to the skill vector
                 pred_modeling_score = self.get_predictive_modeling_score(reference_task, performance)
-                skill_vector['Predictive Modeling'] = pred_modeling_score
                 
                 valid_performance = self.validate_performance(reference_task, performance)
                 if valid_performance:
@@ -194,7 +192,9 @@ class LearningPathModel:
                         
                         # update skill vector
                         skill_vector[skill] = max(overlap_score, maximum_score, previous_skill_level)
-
+                    #add predictive modeling score to the skill vector
+                    skill_vector['Predictive Modeling'] = pred_modeling_score
+                    
                     self.skill_vectors.append(skill_vector)
                     self.current_skill_vector = skill_vector
             except Exception as e:

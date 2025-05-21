@@ -216,9 +216,9 @@ class PredictiveModelingModel:
             performance += [("missing_values", ytrain_df.isnull().sum())]
             performance += [("type", str(ytrain_df.dtype))]
             performance += [("range", str(ytrain_df.min()) + "-" + str(ytrain_df.max()))]
-                
-            self.logger.add_action(['ModelDevelopment', 'ModelPerformance'], (mytype + str(params).replace('[', '(').replace(']', ')'), performance))
-            
+            self.logger.add_action(['ModelDevelopment', 'ModelFinetuning'], mytype + str(params).replace('[', '(').replace(']', ')'))                
+            self.logger.add_action(['ModelDevelopment', 'ModelPerformance'], performance)
+
             trmodels.options = [mdl.getName() for mdl in self.trainedModels]
             write_log('Train Model-> '+mytype+' is trained.',results,'Predictive modeling')
             

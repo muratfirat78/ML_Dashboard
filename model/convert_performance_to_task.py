@@ -9,8 +9,11 @@ class ConvertPerformanceToTask:
         if action in ["Normalize", "Standardize", "outlier", "Unbalancedness Upsample", "Unbalancedness DownSample"]:
             return "Data Transformation"
         
-        if action in ["AssignTarget", "Split", "ModelPerformance"]:
+        if action in ["AssignTarget", "Split", "ModelFinetuning"]:
             return "Model Training"
+        
+        if action in ["ModelPerformance"]:
+            return "Predictive Modeling"
     
     def get_subtask(self, subtasks, action):
         for subtask in subtasks:
@@ -46,7 +49,8 @@ class ConvertPerformanceToTask:
             "LabelEncoding": "Label Encoding",
             "OneHotEncoding": "One-Hot Encoding",
             "DataSet": "Load Dataset",
-            "ModelPerformance": "Model Training & Evaluation"
+            "ModelPerformance": "Model Training & Evaluation",
+            "ModelFinetuning": "Model finetuning"
         }
 
         return title_map.get(action, "Unknown Task")        
@@ -154,6 +158,8 @@ class ConvertPerformanceToTask:
             return 6
         elif subtask["title"] == "Model Training":
             return 7
+        elif subtask["title"] == "Predictive Modeling":
+            return 8
     
     def get_hints_subsubtask(self, subsubtask):
         hints = []
@@ -180,7 +186,7 @@ class ConvertPerformanceToTask:
             "LabelEncoding": "Go to the Data Processing tab. Choose the column, select 'encoding', choose 'Label Encoding', then click apply.",
             "OneHotEncoding": "Go to the Data Processing tab. Choose the column, select 'encoding', choose 'One Hot Encoding', then click apply.",
             "DataSet": "Go to the Data Selection tab. Choose the dataset from the list and click read.",
-            "ModelPerformance": "Go to the Predictive Modeling tab. Select the model type, adjust parameters if needed, then click train."
+            # "ModelPerformance": "Go to the Predictive Modeling tab. Select the model type, adjust parameters if needed, then click train."
         }
 
         action_description_map = {
@@ -202,7 +208,7 @@ class ConvertPerformanceToTask:
             "LabelEncoding": "Apply label encoding to {}.",
             "OneHotEncoding": "Apply one-hot encoding to {}.",
             "DataSet": "Select the dataset: {}.",
-            "ModelPerformance": "Train the model using the selected parameters and evaluate its performance."
+            # "ModelPerformance": "Train the model using the selected parameters and evaluate its performance."
         }
 
         for action in actions:
@@ -211,7 +217,7 @@ class ConvertPerformanceToTask:
                 break
         
         for action in actions:
-            if action in action_description_map:
+            if action in action_description_map and type(values):
                 val = ', '.join(values)
                 desc = action_description_map[action]
                 hints.append(desc.format(val))
@@ -225,6 +231,7 @@ class ConvertPerformanceToTask:
         actions = []
         dataset = ""
 
+        #sort actions
         for category, action_dict in performance.items():
             for action_type, value in action_dict.items():
                 values = value if isinstance(value, list) else [value]
@@ -237,6 +244,10 @@ class ConvertPerformanceToTask:
         for action in actions:
             action_str = ""
             if isinstance(action[1], list):
+                print("action")
+                print(action)
+                print("action str")
+                print(action[1][0])
                 action_str = action[1][0]
             if isinstance(action[1], str):
                 action_str = action[1]
@@ -272,6 +283,10 @@ class ConvertPerformanceToTask:
                 subsubtask["value"].append(action_str[0])
             elif isinstance(action_str, str):
                 subsubtask["value"].append(action_str)
+            elif isinstance(action_str, tuple):
+                print(action_str)
+                subsubtask["value"].append(action_str)
+            print(type(action_str))
 
 
         #subtasks created, now set order, hints, descriptions

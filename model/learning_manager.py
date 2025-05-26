@@ -32,23 +32,25 @@ class LearningManagerModel:
                     if value in subsubtask["value"]:
                         return True
         return False
-    
-    def subsubtask_in_current_performance(self, action, value, current_performance):
-        for action in current_performance:
-            print(action)
-
             
-    def get_overlap_score(self, reference_task, current_task, skill):
+    def get_overlap_score(self, reference_task, current_task, skill, current_performance):
         for subtask in reference_task["subtasks"]:
             if subtask["title"] == skill:
                 amount_of_subsubtasks = 0
                 correct = 0
+                correct1 = 0
                 for subsubtask in subtask["subtasks"]:
                     for value in subsubtask["value"]:
                         amount_of_subsubtasks += 1
                         if self.subsubtask_in_current_task(subsubtask["action"],value, current_task):
                             correct += 1
+                        # if current_performance.action_in_performance(subsubtask["action"],value):
+                        #     correct1 += 1
                 score = correct / amount_of_subsubtasks
+                print("----")
+                print(correct)
+                print(correct1)
+                print("----")
                 return score
         return 0
 
@@ -119,25 +121,31 @@ class LearningManagerModel:
     def set_skill_vectors(self):
         learning_path = self.learning_path
         learning_path.sort(key=lambda x: x.performance['General']['Date'][0])
-
+        
         for performance in learning_path:
                 try:
                     current_task = self.controller.convert_performance_to_task(performance.performance, "", "")
                     target_column = self.controller.get_target_task(current_task)
                     dataset_name = current_task["dataset"].replace(".csv", "")
                     reference_task = self.controller.get_reference_task(target_column, dataset_name)       
+                    print("1")
 
                     if not reference_task:
                         # reference task not found
                         continue
+                    print("2")
                     valid_performance = self.validate_performance(reference_task, performance)
+                    print("3")
                     if valid_performance:
+                        print("4")
                         competency_vector = {}
                         competency_vector['date'] = performance.performance['General']['Date'][0]
                         for skill, difficulty in reference_task['difficulty']:  
+                            print("5")
                             # Overlap score is the overlap between the reference task and the current performance
                             # Maximum score is the predictive modeling score
-                            overlap_score = self.get_overlap_score(reference_task, current_task, skill) * difficulty
+                            overlap_score = self.get_overlap_score(reference_task, current_task, skill, performance) * difficulty
+                            print("6")
                             maximum_score = self.get_maximum_score(reference_task, performance) * difficulty
                             competency_vector[skill] = max(overlap_score, maximum_score)
                         

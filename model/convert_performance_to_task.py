@@ -11,6 +11,7 @@ class ConvertPerformanceToTask:
         
         if action in ["AssignTarget", "Split", "ModelPerformance"]:
             return "Model Training"
+        
     
     def get_subtask(self, subtasks, action):
         for subtask in subtasks:

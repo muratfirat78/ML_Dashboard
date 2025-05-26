@@ -16,6 +16,10 @@ class StudentPerformance:
         self.timestamp = datetime.now().strftime("%d-%m-%Y %H-%M-%S")
 
     def addAction(self, action, value):
+        
+        if isinstance(value, list):
+            value = value[0]
+
         value = (value, self.index)
         category, action_type = action[0], action[1]
         
@@ -34,6 +38,7 @@ class StudentPerformance:
             self.performance[category] = {action_type: value}
         
         self.index += 1
+        print(self.performance)
 
     def string_to_student_performance(self, input_str, date):
         input_str = re.sub(r'array\((\[.*?\])\)', r'\1', input_str)
@@ -80,6 +85,18 @@ class StudentPerformance:
         for metric in self.performance.get('ModelDevelopment', {}).get('ModelPerformance')[0][1]:
             if metric[0] == metric_name:
                 return metric[1]
-       
+    
+    def action_in_performance(self, category, value):
+        print(category)
+        print(value)
+        for value in self.performance[category[0]][category[1]]:
+            value = value[0]
 
-        
+            # if value ==  
+            # print(action)
+            # if action == category[1]:
+            #     print(action)
+        # print(self.performance)
+        # for action in self.performance:
+        #     print(action)
+        #     print("1")

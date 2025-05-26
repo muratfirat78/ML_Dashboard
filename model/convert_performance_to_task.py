@@ -1,5 +1,24 @@
 class ConvertPerformanceToTask:
     def get_action_category(self,action):
+        #         if action in ["Replace-Median", "Replace-Mean", "Replace-Mode", "Remove-Missing", "Drop Column", "Edit Range"]:
+        #     return "Data Cleaning"
+        
+        # if action in ["LabelEncoding", "OneHotEncoding", "ConvertToBoolean"]:
+        #     return "Data Translation"
+        
+        # if action in ["Normalize", "Unbalancedness Upsample", "Unbalancedness DownSample"]:
+        #     return "Data Transformation"
+        
+        # if action in ["PCA", "outliers", "Standardize"]:
+        #     return "statistics"
+        
+        
+        # if action in ["AssignTarget", "Split", , "parameter finetuning"]:
+        #     return "Model Training"
+        
+        # if action in "ModelPerformance":
+        #     predictive modeling
+
         if action in ["Replace-Median", "Replace-Mean", "Replace-Mode", "Remove-Missing", "Drop Column", "Edit Range"]:
             return "Data Cleaning"
         

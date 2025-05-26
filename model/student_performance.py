@@ -38,8 +38,7 @@ class StudentPerformance:
             self.performance[category] = {action_type: value}
         
         self.index += 1
-        print(self.performance)
-
+        
     def string_to_student_performance(self, input_str, date):
         input_str = re.sub(r'array\((\[.*?\])\)', r'\1', input_str)
         data_dict = ast.literal_eval(input_str)
@@ -87,16 +86,18 @@ class StudentPerformance:
                 return metric[1]
     
     def action_in_performance(self, category, value):
-        print(category)
-        print(value)
-        for value in self.performance[category[0]][category[1]]:
-            value = value[0]
-
-            # if value ==  
-            # print(action)
-            # if action == category[1]:
-            #     print(action)
-        # print(self.performance)
-        # for action in self.performance:
-        #     print(action)
-        #     print("1")
+        for cat in self.performance:
+            #find category
+            if cat == category[0]:
+                #find category found, find action
+                for action in self.performance.get(cat):
+                    if action == category[1]:
+                        for val in self.performance.get(cat).get(action):
+                            #category and action found, check values
+                            if isinstance(val, str):
+                                if val == value:
+                                    return True
+                            if isinstance(val, tuple):
+                                if val[0] == value:
+                                    return True
+        return False

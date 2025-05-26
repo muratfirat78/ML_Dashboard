@@ -32,6 +32,10 @@ class LearningManagerModel:
                     if value in subsubtask["value"]:
                         return True
         return False
+    
+    def subsubtask_in_current_performance(self, action, value, current_performance):
+        for action in current_performance:
+            print(action)
 
             
     def get_overlap_score(self, reference_task, current_task, skill):
@@ -113,7 +117,7 @@ class LearningManagerModel:
         return True
 
     def set_skill_vectors(self):
-        learning_path = self.controller.get_learning_path()
+        learning_path = self.learning_path
         learning_path.sort(key=lambda x: x.performance['General']['Date'][0])
 
         for performance in learning_path:

@@ -56,6 +56,8 @@ class TaskModel:
             if action == subsubtask["action"]:
               if isinstance(value[0], list) and value:
                 subsubtask["applied_values"] += [value[0][0]]
+              elif isinstance(value, str) and value:
+                 subsubtask["applied_values"] += [value]
               else:
                 subsubtask["applied_values"] += [value[0]]
     
@@ -78,6 +80,8 @@ class TaskModel:
 
           
         #check incorrect
+        print("value: " + str(value))
+        print("applied values:" + str(subsubtask["applied_values"]))
         for value in subsubtask["applied_values"]:
           if value not in subsubtask["value"]:
             incorrect = True

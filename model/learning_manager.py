@@ -1,8 +1,29 @@
 import copy
+import os
 
-class LearningPathManagerModel:
+from model.student_performance import StudentPerformance
+
+class LearningManagerModel:
     def __init__(self, controller):
         self.controller = controller
+        self.learning_path = []
+
+    def get_learning_path(self):
+        return self.learning_path
+
+    def set_learning_path(self,userid):
+        self.learning_path = []
+        path = os.path.join('drive', str(userid))
+        for filename in os.listdir(path):
+            with open(os.path.join(path,filename),'r') as file:
+                for line in file:
+                    try:
+                        performance = StudentPerformance(self.controller)
+                        performance.string_to_student_performance(line, filename.replace('.txt', ''))
+                        self.learning_path.append(performance)
+                    except:
+                        print("Error reading performance")
+
 
     def subsubtask_in_current_task(self, action, value, current_task):
         for subtask in current_task["subtasks"]:

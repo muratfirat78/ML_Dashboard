@@ -33,7 +33,7 @@ class LearningManagerModel:
                         return True
         return False
             
-    def get_overlap_score(self, reference_task, current_task, skill, current_performance):
+    def get_overlap_score(self, reference_task, skill, current_performance):
         for subtask in reference_task["subtasks"]:
             if subtask["title"] == skill:
                 amount_of_subsubtasks = 0
@@ -44,10 +44,19 @@ class LearningManagerModel:
                         if current_performance.action_in_performance(subsubtask["action"],value):
                             correct += 1
                 score = correct / amount_of_subsubtasks
+                print(score)
                 return score
         return 0
+    
+    def get_overlap_scores(self, reference_task, current_performance):
+        result = {}
+        for skill, difficulty in reference_task['difficulty']:
+            result[skill] = self.get_overlap_score(reference_task, skill, current_performance)
+        return result
 
-    def get_maximum_score(self, reference_task, performance):
+
+
+    def get_overall_score(self, reference_task, performance):
         reference_metric = reference_task["model_metric"]
         
         if reference_metric[0] == "accuracy":
@@ -59,6 +68,17 @@ class LearningManagerModel:
                 return result
                         
         return 0
+    
+    def get_competence_vector(self, overlap_score, overall_score, task_difficulty, date):
+        final_score = {}
+        final_score['date'] = date
+        for skill, difficulty in task_difficulty:
+            overlap = overlap_score.get(skill, 0.0) * difficulty
+            overall = overall_score * difficulty
+            final_score[skill] = max(overlap,overall)
+        return final_score
+
+
 
     def validate_performance(self, reference_task, current_performance):
         # Check data size
@@ -127,23 +147,10 @@ class LearningManagerModel:
                     
                     valid_performance = self.validate_performance(reference_task, performance)
                     if valid_performance:
-                        competence_vector = {}
-                        competence_vector['date'] = performance.performance['General']['Date'][0]
-
-                        #overlap_scores = get_overlap_scores (0.3, 0.5, 0.9)
-                        #get_final_scores(overlap_scores) (0.9,0.9,0.9) = (max(0.3, 0.9), max(0.5,0.9), 0.9) 
-
-                        
-                        
-                        # final_scores = (max(0.3, 0.9), max(0.5,0.9), 0.9) 
-
-                        for skill, difficulty in reference_task['difficulty']:  
-                            # Overlap score is the overlap between the reference task and the current performance
-                            # Maximum score is the predictive modeling score
-                            overlap_score = self.get_overlap_score(reference_task, current_task, skill, performance) * difficulty
-                            maximum_score = self.get_maximum_score(reference_task, performance) * difficulty
-                            competence_vector[skill] = max(overlap_score, maximum_score)
-                        
+                        date = performance.performance['General']['Date'][0]
+                        overlap_score = self.get_overlap_scores(reference_task, performance) #for example: {data_cleaning: 0.3,...}
+                        overall_score = self.get_overall_score(reference_task, performance) # for example: 0.3
+                        competence_vector = self.get_competence_vector(overlap_score, overall_score, reference_task['difficulty'], date)
                         self.controller.add_skill_vector(competence_vector)
 
                 except Exception as e:

@@ -51,10 +51,10 @@ class LearningManagerModel:
         result = {}
         for skill, difficulty in reference_task['difficulty']:
             result[skill] = self.get_overlap_score(reference_task, skill, current_performance)
-        #todo calculate predictive modeling score
+        result['Predictive Modeling'] = self.get_predictive_modeling_score(reference_task,current_performance)
         return result
 
-    def get_overall_score(self, reference_task, performance):
+    def get_predictive_modeling_score(self, reference_task, performance):
         reference_metric = reference_task["model_metric"]
         
         if reference_metric[0] == "accuracy":
@@ -67,15 +67,15 @@ class LearningManagerModel:
                         
         return 0
     
-    def get_competence_vector(self, overlap_score, overall_score, task_difficulty, date):
+    def get_competence_vector(self, overlap_score, task_difficulty, date):
         final_score = {}
         final_score['date'] = date
 
-        #predictive modeling score = overalap_score[predictive mdoeling]
+        predictive_modeling_score = overlap_score["Predictive Modeling"]
         for skill, difficulty in task_difficulty:
             overlap = overlap_score.get(skill, 0.0) * difficulty
-            overall = overall_score * difficulty
-            final_score[skill] = max(overlap,overall)
+            predictive_modeling = predictive_modeling_score * difficulty
+            final_score[skill] = max(overlap,predictive_modeling)
         
         return final_score
 
@@ -148,8 +148,7 @@ class LearningManagerModel:
                     if valid_performance:
                         date = performance.performance['General']['Date'][0]
                         overlap_score = self.get_overlap_scores(reference_task, performance) #for example: {data_cleaning: 0.3,...}
-                        overall_score = self.get_overall_score(reference_task, performance) # for example: 0.3
-                        competence_vector = self.get_competence_vector(overlap_score, overall_score, reference_task['difficulty'], date)
+                        competence_vector = self.get_competence_vector(overlap_score, reference_task['difficulty'], date)
                         self.controller.add_skill_vector(competence_vector)
 
                 except Exception as e:

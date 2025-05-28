@@ -67,8 +67,8 @@ class Controller:
 
     def train_Model(self,tasktype,mytype,results,trmodels,params):
         self.predictive_modeling_model.train_Model(tasktype,mytype,results,trmodels,params)
-        # print(self.logger.get_result())
-        # print(self.convertPerformanceToTask.convert_performance_to_task(self.logger.get_result(), 'todo', 'todo'))
+        print(self.logger.get_result())
+        print(self.convertPerformanceToTask.convert_performance_to_task(self.logger.get_performance(), 'todo', 'todo'))
     
     def make_cleaning(self,featurescl,result2aexp,missacts,dt_features,params):
          self.data_cleaning_model.make_cleaning(featurescl,result2aexp,missacts,dt_features,params)
@@ -167,7 +167,7 @@ class Controller:
         self.monitored_mode = monitored_mode
         self.task_view.set_monitored_mode(monitored_mode)
         if self.monitored_mode:
-            task = self.convertPerformanceToTask.convert_performance_to_task(self.logger.get_result(), task["title"],task["description"])
+            task = self.convertPerformanceToTask.convert_performance_to_task(self.logger.get_performance(), task["title"],task["description"])
             self.task_model.set_current_task(task)
             self.task_view.set_task(self.task_model.get_current_task())
             self.task_model.update_statusses_and_set_current_tasks()
@@ -218,7 +218,7 @@ class Controller:
 
     def update_task_view(self, action, value):
         if self.monitored_mode:
-            task = self.convertPerformanceToTask.convert_performance_to_task(self.logger.get_result(), self.task_model.get_title(), self.task_model.get_description())
+            task = self.convertPerformanceToTask.convert_performance_to_task(self.logger.get_performance(), self.task_model.get_title(), self.task_model.get_description())
             self.task_model.set_current_task(task)
             self.task_view.set_task(self.task_model.get_current_task())
         else:

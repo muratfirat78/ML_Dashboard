@@ -130,9 +130,9 @@ class DataCleaningModel:
     
 
             if handling == 'Edit Range':
-                self.logger.add_action(['DataCleaning', handling + '(' + params[0].value + '-' + params[1].value +')'], [colname])
+                self.logger.add_action(['DataCleaning', handling], colname + '(' + params[0].value + '-' + params[1].value +')')
             else:
-                self.logger.add_action(['DataCleaning', handling], [colname])
+                self.logger.add_action(['DataCleaning', handling], colname)
     
             if handling == 'Edit Range':
     

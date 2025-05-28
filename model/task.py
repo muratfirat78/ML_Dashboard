@@ -54,12 +54,8 @@ class TaskModel:
         for subsubtask in subtask["subtasks"]:
           if subsubtask["order"] == self.current_subsubtask:
             if action == subsubtask["action"]:
-              if isinstance(value[0], list) and value:
-                subsubtask["applied_values"] += [value[0][0]]
-              elif isinstance(value, str) and value:
+              if value:
                  subsubtask["applied_values"] += [value]
-              else:
-                subsubtask["applied_values"] += [value[0]]
     
     #set done/inprogress
     for subtask in self.current_task["subtasks"]:
@@ -70,7 +66,15 @@ class TaskModel:
 
         #check correct
         for value in subsubtask["value"]:
+          print("..")
+          print(value)
+          print("in")
+          print(subsubtask["value"])
+          print("applied_values =", subsubtask["applied_values"])
+          # value: ['Logistic Regression']
+          # applied values:['Logistic Regression']
           if value not in subsubtask["applied_values"]:
+            print("not in !")
             correct = False
         
         #check partially correct
@@ -102,6 +106,8 @@ class TaskModel:
         
     if finished:
       self.controller.show_completion_popup()
+    print("task")
+    print(self.current_task)
         
 
   def set_current_task(self,task):

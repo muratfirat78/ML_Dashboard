@@ -383,7 +383,7 @@ class DataProcessingModel:
                 curr_df[colname] = (curr_df[colname]- colmean)/colstd
 
            
-            self.logger.add_action(['DataProcessing', 'Standardize'], [colname])
+            self.logger.add_action(['DataProcessing', 'Standardize'], colname)
             logging.info('Data preprocessing, feature scaling: standardization of column '+ colname)
 
 
@@ -431,7 +431,7 @@ class DataProcessingModel:
                 else:
                     curr_df[colname] = (curr_df[colname]-col_min)/denominator
 
-            self.logger.add_action(['DataProcessing', 'Normalize'], [colname])
+            self.logger.add_action(['DataProcessing', 'Normalize'], colname)
             logging.info('Data preprocessing, feature scaling: normalization of column '+ colname)
 
         with FeatPage:
@@ -527,7 +527,7 @@ class DataProcessingModel:
                     
             
         logging.info('Data preprocessing, checking and handling unbalancedness')
-        self.logger.add_action(['DataProcessing', 'Unbalancedness ' + balancetype ], [colname])
+        self.logger.add_action(['DataProcessing', 'Unbalancedness ' + balancetype ], colname)
         return
 
     #####################################################################################################################
@@ -615,7 +615,7 @@ class DataProcessingModel:
                     Xtest_df[colname] = Xtest_df[colname].apply(np.int64)
 
                     write_log('Encoding (split) -> '+colname+' done.', result2exp, 'Data processing')
-                    self.logger.add_action(['DataProcessing', 'LabelEncoding'], [colname])
+                    self.logger.add_action(['DataProcessing', 'LabelEncoding'], colname)
                 else: 
                     write_log('Encoding (split) -> '+colname+'| Returned due to target feature ', result2exp, 'Data processing')
                     return
@@ -633,7 +633,7 @@ class DataProcessingModel:
                     Xtrain_df = pd.concat([Xtrain_df.drop(categorical_columns, axis = 1), pd.get_dummies(Xtrain_df[categorical_columns])], axis=1)
                     Xtest_df = pd.concat([Xtest_df.drop(categorical_columns, axis = 1), pd.get_dummies(Xtest_df[categorical_columns])], axis=1)
   
-                    self.logger.add_action(['DataProcessing', 'OneHotEncoding'], [colname])
+                    self.logger.add_action(['DataProcessing', 'OneHotEncoding'], colname)
                     write_log('Encoding (split) -> '+encodingtype+', col '+colname+' done.', result2exp, 'Data processing')
                 else: 
                     write_log('Encoding (split) ->'+encodingtype+', col '+colname+', | Returned due to target feature ', result2exp, 'Data processing')
@@ -660,7 +660,7 @@ class DataProcessingModel:
                 curr_df[colname] = label_encoder.transform(curr_df[colname]) 
                 curr_df[colname] = curr_df[colname].apply(np.int64)
   
-                self.logger.add_action(['DataProcessing', 'LabelEncoding'], [colname])
+                self.logger.add_action(['DataProcessing', 'LabelEncoding'], colname)
                 
                 write_log('Encoding->'+encodingtype+', col '+colname+', done. ', result2exp, 'Data processing')
                 
@@ -671,7 +671,7 @@ class DataProcessingModel:
                 one_hot_df = pd.DataFrame(one_hot_encoded,columns=encoder.get_feature_names_out(categorical_columns)) # Create a DataFrame
                 curr_df = pd.concat([curr_df.drop(categorical_columns, axis=1), one_hot_df], axis=1)
 
-                self.logger.add_action(['DataProcessing', 'OneHotEncoding'], [colname])
+                self.logger.add_action(['DataProcessing', 'OneHotEncoding'], colname)
                 write_log('Encoding->'+encodingtype+', col '+colname+', done. ', result2exp, 'Data processing')
                 
             self.main_model.set_curr_df(curr_df)

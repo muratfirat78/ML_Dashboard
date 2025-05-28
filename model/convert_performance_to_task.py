@@ -13,7 +13,7 @@ class ConvertPerformanceToTask:
         #     return "statistics"
         
         
-        # if action in ["AssignTarget", "Split", , "parameter finetuning"]:
+        # if action in ["AssignTarget", "Split", , "ParameterFinetuning"]:
         #     return "Model Training"
         
         # if action in "ModelPerformance":
@@ -25,11 +25,17 @@ class ConvertPerformanceToTask:
         if action in ["LabelEncoding", "OneHotEncoding", "ConvertToBoolean"]:
             return "Data Translation"
         
-        if action in ["Normalize", "Standardize", "outlier", "Unbalancedness Upsample", "Unbalancedness DownSample"]:
+        if action in ["Normalize", "Unbalancedness Upsample", "Unbalancedness DownSample"]:
             return "Data Transformation"
         
-        if action in ["AssignTarget", "Split", "ModelPerformance"]:
+        if action in ["Standardize", "outlier","PCA"]:
+            return "Statistics"
+        
+        if action in ["AssignTarget", "Split", "ParameterFinetuning"]:
             return "Model Training"
+        
+        if action in ["ModelPerformance"]:
+            return "Predictive Modeling"
         
     
     def get_subtask(self, subtasks, action):
@@ -66,7 +72,8 @@ class ConvertPerformanceToTask:
             "LabelEncoding": "Label Encoding",
             "OneHotEncoding": "One-Hot Encoding",
             "DataSet": "Load Dataset",
-            "ModelPerformance": "Model Training & Evaluation"
+            "ParameterFinetuning": "Parameter Finetuning", 
+            "ModelPerformance": "Model Training"
         }
 
         return title_map.get(action, "Unknown Task")        
@@ -140,6 +147,8 @@ class ConvertPerformanceToTask:
             return onehot_encode
         if action == "DataSet":
             return "Load a dataset."
+        if action == "ParameterFinetuning":
+            return "Optimize model performance by modifying the parameters of the model."
         if action == "ModelPerformance":
             return "Train a model and evaluate its performance."
 
@@ -200,7 +209,7 @@ class ConvertPerformanceToTask:
             "LabelEncoding": "Go to the Data Processing tab. Choose the column, select 'encoding', choose 'Label Encoding', then click apply.",
             "OneHotEncoding": "Go to the Data Processing tab. Choose the column, select 'encoding', choose 'One Hot Encoding', then click apply.",
             "DataSet": "Go to the Data Selection tab. Choose the dataset from the list and click read.",
-            "ModelPerformance": "Go to the Predictive Modeling tab. Select the model type, adjust parameters if needed, then click train."
+            "ParameterFinetuning": "Go to the Predictive Modeling tab. Select the model type, adjust parameters if needed, then click train.",
         }
 
         action_description_map = {
@@ -222,7 +231,7 @@ class ConvertPerformanceToTask:
             "LabelEncoding": "Apply label encoding to {}.",
             "OneHotEncoding": "Apply one-hot encoding to {}.",
             "DataSet": "Select the dataset: {}.",
-            "ModelPerformance": "Train the model using the selected parameters and evaluate its performance."
+            "ParameterFinetuning": "Train the model using the following parameters: {}."
         }
 
         for action in actions:
@@ -232,7 +241,10 @@ class ConvertPerformanceToTask:
         
         for action in actions:
             if action in action_description_map:
-                val = ', '.join(values)
+                if isinstance(values[0], str):
+                    val = ', '.join(values)
+                else:
+                    val = str(values)
                 desc = action_description_map[action]
                 hints.append(desc.format(val))
                 break
@@ -244,8 +256,9 @@ class ConvertPerformanceToTask:
         task = {}
         actions = []
         dataset = ""
+        performance_dict = performance.performance
 
-        for category, action_dict in performance.items():
+        for category, action_dict in performance_dict.items():
             for action_type, value in action_dict.items():
                 values = value if isinstance(value, list) else [value]
                 for v in values:
@@ -257,7 +270,7 @@ class ConvertPerformanceToTask:
         for action in actions:
             action_str = ""
             if isinstance(action[1], list):
-                action_str = action[1][0]
+                action_str = action[1]
             if isinstance(action[1], str):
                 action_str = action[1]
             if isinstance(action[1], tuple):
@@ -288,11 +301,7 @@ class ConvertPerformanceToTask:
                 subsubtask["value"] = []
                 subtask["subtasks"].append(subsubtask)
 
-            if isinstance(action_str, list):
-                subsubtask["value"].append(action_str[0])
-            elif isinstance(action_str, str):
-                subsubtask["value"].append(action_str)
-
+            subsubtask["value"].append(action_str)
 
         #subtasks created, now set order, hints, descriptions
         for subtask in subtasks:
@@ -310,6 +319,13 @@ class ConvertPerformanceToTask:
 
         task["title"] = title
         task["description"] = description
+        task["mode"] = "monitored"
+        task["model_metric"] = ("accuracy", 0.0)
+        task["data_size"] = performance.get_metric("data_size")
+        task["missing_values"] = performance.get_metric("missing_values")
+        task["type"] = performance.get_metric("type")
+        task["range"] = performance.get_metric("range")
+        task["difficulty"] = [('Data Cleaning',60), ('Data Translation',80),("Data Transformation", 0),("Statistics", 0),("Model Training", 0), ("Predictive Modeling", 0)]
         task["dataset"] = dataset
         task["subtasks"] = subtasks
         return task

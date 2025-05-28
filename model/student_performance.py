@@ -16,10 +16,7 @@ class StudentPerformance:
         self.timestamp = datetime.now().strftime("%d-%m-%Y %H-%M-%S")
 
     def addAction(self, action, value):
-        
-        if isinstance(value, list):
-            value = value[0]
-
+        #value can be a string or list
         value = (value, self.index)
         category, action_type = action[0], action[1]
         
@@ -47,11 +44,9 @@ class StudentPerformance:
             for action_type, value in actions.items():
                 if isinstance(value, list):
                     for item in value:
-                        self.addAction([category, action_type], [item[0][0]])
-                elif isinstance(value, tuple):
-                    self.addAction([category, action_type], value[0])
+                        self.addAction([category, action_type], [item[0]])
                 else:
-                    self.addAction([category, action_type], value)
+                    self.addAction([category, action_type], value[0])
                 
 
     def get_score(self):
@@ -81,9 +76,12 @@ class StudentPerformance:
         return actions
     
     def get_metric(self, metric_name):
-        for metric in self.performance.get('ModelDevelopment', {}).get('ModelPerformance')[0][1]:
-            if metric[0] == metric_name:
-                return metric[1]
+        try:
+            for metric in self.performance.get('ModelDevelopment', {}).get('ModelPerformance', {})[0]:
+                if metric[0] == metric_name:
+                    return metric[1]
+        except:
+            return None
     
     def action_in_performance(self, category, value):
         for cat in self.performance:
@@ -101,3 +99,4 @@ class StudentPerformance:
                                 if val[0] == value:
                                     return True
         return False
+    

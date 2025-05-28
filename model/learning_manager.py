@@ -44,7 +44,6 @@ class LearningManagerModel:
                         if current_performance.action_in_performance(subsubtask["action"],value):
                             correct += 1
                 score = correct / amount_of_subsubtasks
-                print(score)
                 return score
         return 0
     
@@ -52,9 +51,8 @@ class LearningManagerModel:
         result = {}
         for skill, difficulty in reference_task['difficulty']:
             result[skill] = self.get_overlap_score(reference_task, skill, current_performance)
+        #todo calculate predictive modeling score
         return result
-
-
 
     def get_overall_score(self, reference_task, performance):
         reference_metric = reference_task["model_metric"]
@@ -72,13 +70,14 @@ class LearningManagerModel:
     def get_competence_vector(self, overlap_score, overall_score, task_difficulty, date):
         final_score = {}
         final_score['date'] = date
+
+        #predictive modeling score = overalap_score[predictive mdoeling]
         for skill, difficulty in task_difficulty:
             overlap = overlap_score.get(skill, 0.0) * difficulty
             overall = overall_score * difficulty
             final_score[skill] = max(overlap,overall)
+        
         return final_score
-
-
 
     def validate_performance(self, reference_task, current_performance):
         # Check data size
@@ -137,7 +136,7 @@ class LearningManagerModel:
         
         for performance in learning_path:
                 try:
-                    current_task = self.controller.convert_performance_to_task(performance.performance, "", "")
+                    current_task = self.controller.convert_performance_to_task(performance, "", "")
                     target_column = self.controller.get_target_task(current_task)
                     dataset_name = current_task["dataset"].replace(".csv", "")
                     reference_task = self.controller.get_reference_task(target_column, dataset_name)       

@@ -95,6 +95,9 @@ class StudentPerformance:
                             if isinstance(val, str):
                                 if val == value:
                                     return True
+                            if isinstance(val, list):
+                                if sorted(val,key=str) == sorted(value,key=str):
+                                    return True
                             if isinstance(val, tuple):
                                 if val[0] == value:
                                     return True

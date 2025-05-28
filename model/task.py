@@ -44,6 +44,53 @@ class TaskModel:
               if subsubtask["order"] == self.current_subsubtask and subsubtask["status"] not in ["done", "inprogress", "incorrect"]:           
                 subsubtask["status"] = "ready"
 
+  def list_in_lists(self, list, lists):
+    for list_to_check in lists:
+      if sorted(list,key=str) == sorted(list_to_check,key=str):
+        return True
+    return False
+        
+
+  def get_correct(self, subsubtask):
+        correct = True
+        for value in subsubtask["value"]:
+          #check string
+          if isinstance(value, str):
+            if value not in subsubtask["applied_values"]:
+              correct = False
+          #check list
+          if isinstance(value, list):
+             if not self.list_in_lists(value, subsubtask["applied_values"]):
+                correct = False
+        return correct
+
+  def get_partially_correct(self, subsubtask):
+        partiallycorrect = False
+        # check string
+        for value in subsubtask["value"]:
+          #check string
+          if isinstance(value,str):
+            if value in subsubtask["applied_values"]:
+              partiallycorrect = True
+          #check list
+          if isinstance(value,list):
+             if self.list_in_lists(value, subsubtask["applied_values"]):
+                partiallycorrect = True
+        return partiallycorrect
+
+  def get_incorrect(self, subsubtask):
+        incorrect = False
+        for value in subsubtask["applied_values"]:
+          #check string
+          if isinstance(value,str):
+            if value not in subsubtask["value"]:
+              incorrect = True
+          #check list
+          if isinstance(value,list):
+             if not self.list_in_lists(value, subsubtask["value"]):
+                incorrect = True
+        return incorrect
+
   def perform_action(self, action, value):
     if action[1] == "ModelPerformance":
             value = value[0]
@@ -60,25 +107,9 @@ class TaskModel:
     #set done/inprogress
     for subtask in self.current_task["subtasks"]:
       for subsubtask in subtask["subtasks"]:
-        correct = True
-        partiallycorrect = False
         incorrect = False
-
-        #check correct
-        for value in subsubtask["value"]:
-          if value not in subsubtask["applied_values"]:
-            correct = False
-        
-        #check partially correct
-        for value in subsubtask["value"]:
-          if value in subsubtask["applied_values"]:
-            partiallycorrect = True
-
-          
-        #check incorrect
-        for value in subsubtask["applied_values"]:
-          if value not in subsubtask["value"]:
-            incorrect = True
+        partiallycorrect = False
+        correct = True
 
         if action[1] == "ModelPerformance":
            #predictive modeling, compare the model to the reference task
@@ -91,6 +122,10 @@ class TaskModel:
               else:
                  correct = False
                  incorrect = True
+        else:
+          correct = self.get_correct(subsubtask)
+          partiallycorrect = self.get_partially_correct(subsubtask)
+          incorrect = self.get_incorrect(subsubtask)
 
         if correct:
             subsubtask["status"] = "done"

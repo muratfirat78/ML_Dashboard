@@ -35,7 +35,7 @@ class LearningPathModel:
     
     def add_skill_vector(self,vector):
         self.skill_vectors.append(vector)
-        print(self.skill_vectors)
+        # print(self.skill_vectors)
 
     def get_current_skill_vector(self):
         return self.current_skill_vector

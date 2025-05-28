@@ -61,10 +61,11 @@ class LearningManagerModel:
             current_accuracy = performance.get_metric("Accuracy")
             if current_accuracy != None:
                 reference_accuracy = reference_metric[1]
-                percentage_of_reference = (100/reference_accuracy) * current_accuracy
-                result = (min(100, percentage_of_reference)/100)
-                return result
-                        
+                print(reference_metric)
+                if reference_accuracy != 0:
+                    percentage_of_reference = (100/reference_accuracy) * current_accuracy
+                    result = (min(100, percentage_of_reference)/100)
+                    return result   
         return 0
     
     def get_competence_vector(self, overlap_score, task_difficulty, date):

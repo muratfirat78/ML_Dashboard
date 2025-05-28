@@ -66,15 +66,7 @@ class TaskModel:
 
         #check correct
         for value in subsubtask["value"]:
-          print("..")
-          print(value)
-          print("in")
-          print(subsubtask["value"])
-          print("applied_values =", subsubtask["applied_values"])
-          # value: ['Logistic Regression']
-          # applied values:['Logistic Regression']
           if value not in subsubtask["applied_values"]:
-            print("not in !")
             correct = False
         
         #check partially correct
@@ -84,11 +76,21 @@ class TaskModel:
 
           
         #check incorrect
-        print("value: " + str(value))
-        print("applied values:" + str(subsubtask["applied_values"]))
         for value in subsubtask["applied_values"]:
           if value not in subsubtask["value"]:
             incorrect = True
+
+        if action[1] == "ModelPerformance":
+           #predictive modeling, compare the model to the reference task
+           if self.controller.validate_performance(self.current_task):
+              score = self.controller.get_predictive_modeling_score(self.current_task)
+              #score is higher than 80% of the reference task
+              if score > 0.8:
+                 correct = True
+                 incorrect = False
+              else:
+                 correct = False
+                 incorrect = True
 
         if correct:
             subsubtask["status"] = "done"
@@ -106,8 +108,6 @@ class TaskModel:
         
     if finished:
       self.controller.show_completion_popup()
-    print("task")
-    print(self.current_task)
         
 
   def set_current_task(self,task):

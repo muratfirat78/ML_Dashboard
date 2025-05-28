@@ -67,8 +67,8 @@ class Controller:
 
     def train_Model(self,tasktype,mytype,results,trmodels,params):
         self.predictive_modeling_model.train_Model(tasktype,mytype,results,trmodels,params)
-        print(self.logger.get_result())
-        print(self.convertPerformanceToTask.convert_performance_to_task(self.logger.get_performance(), 'todo', 'todo'))
+        # print(self.logger.get_result())
+        # print(self.convertPerformanceToTask.convert_performance_to_task(self.logger.get_performance(), 'todo', 'todo'))
     
     def make_cleaning(self,featurescl,result2aexp,missacts,dt_features,params):
          self.data_cleaning_model.make_cleaning(featurescl,result2aexp,missacts,dt_features,params)
@@ -266,3 +266,9 @@ class Controller:
     
     def add_skill_vector(self, skill_vector):
         self.learning_path_model.add_skill_vector(skill_vector)
+
+    def validate_performance(self, reference_task):
+        return self.learning_manager_model.validate_performance(reference_task, self.logger.get_performance())
+    
+    def get_predictive_modeling_score(self, reference_task):
+        return self.learning_manager_model.get_predictive_modeling_score(reference_task, self.logger.get_performance())

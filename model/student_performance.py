@@ -84,30 +84,28 @@ class StudentPerformance:
             return None
     
     def action_in_performance(self, category, value):
-        for cat in self.performance:
-            #find category
-            if cat == category[0]:
-                #category found, find action
-                for action in self.performance.get(cat):
-                    if action == category[1]:
-                        for val in self.performance.get(cat).get(action):
-                            # loop through val(answer) in task
-                            if isinstance(val,tuple):
-                                # val(answer) is a tuple, get the value
-                                val = val[0]
+        category, action = category
 
-                            #category and action found, check values
-                            if isinstance(val, str):
-                                if val == value:
-                                    return True
-                            if isinstance(val, list):
-                                #If the applied value is a int or string, check if it is in the list
-                                if isinstance(value, str) or isinstance(value, int):
-                                    #answer is a list and applied value is a string or int
-                                    return value in val
-                                if isinstance(value, list):
-                                    # answer and applied values are lists
-                                    if sorted(val,key=str) == sorted(value,key=str):
-                                        return True
+        actions = self.performance.get(category)
+        if not actions:
+            return False
+
+        values = actions.get(action)
+        if not values:
+            return False
+
+        for val in values:
+            if isinstance(val, tuple):
+                val = val[0]
+
+            if isinstance(val, str) and val == value:
+                return True
+
+            if isinstance(val, list):
+                if isinstance(value, (str, int)) and value in val:
+                    return True
+                if isinstance(value, list) and sorted(val, key=str) == sorted(value, key=str):
+                    return True
+
         return False
     

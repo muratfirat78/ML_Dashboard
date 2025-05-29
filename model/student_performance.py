@@ -44,7 +44,7 @@ class StudentPerformance:
             for action_type, value in actions.items():
                 if isinstance(value, list):
                     for item in value:
-                        self.addAction([category, action_type], [item[0]])
+                        self.addAction([category, action_type], item[0])
                 else:
                     self.addAction([category, action_type], value[0])
                 
@@ -91,21 +91,23 @@ class StudentPerformance:
                 for action in self.performance.get(cat):
                     if action == category[1]:
                         for val in self.performance.get(cat).get(action):
-                            print(val)
+                            # loop through val(answer) in task
+                            if isinstance(val,tuple):
+                                # val(answer) is a tuple, get the value
+                                val = val[0]
+
                             #category and action found, check values
                             if isinstance(val, str):
                                 if val == value:
                                     return True
                             if isinstance(val, list):
-                                print(category[1])
-                                print("------")
-                                print(sorted(val,key=str))
-                                print("==")
-                                print(sorted(value,key=str))
-                                if sorted(val,key=str) == sorted(value,key=str):
-                                    return True
-                            if isinstance(val, tuple):
-                                if val[0] == value:
-                                    return True
+                                #If the applied value is a int or string, check if it is in the list
+                                if isinstance(value, str) or isinstance(value, int):
+                                    #answer is a list and applied value is a string or int
+                                    return value in val
+                                if isinstance(value, list):
+                                    # answer and applied values are lists
+                                    if sorted(val,key=str) == sorted(value,key=str):
+                                        return True
         return False
     

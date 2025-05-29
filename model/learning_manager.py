@@ -40,9 +40,17 @@ class LearningManagerModel:
                 correct = 0
                 for subsubtask in subtask["subtasks"]:
                     for value in subsubtask["value"]:
-                        amount_of_subsubtasks += 1
-                        if current_performance.action_in_performance(subsubtask["action"],value):
-                            correct += 1
+                        if subsubtask["action"][1] == 'ParameterFinetuning':
+                            #parameter finetuning is one point for each correct parameter
+                            for parameter in value:
+                                amount_of_subsubtasks += 1
+                                if current_performance.action_in_performance(subsubtask["action"],parameter):
+                                    correct += 1
+                        else:
+                            amount_of_subsubtasks += 1
+                            print(value)
+                            if current_performance.action_in_performance(subsubtask["action"],value):
+                                correct += 1
                 score = correct / amount_of_subsubtasks
                 print("correct: " +str(correct))
                 print("total: " + str(amount_of_subsubtasks))
@@ -63,7 +71,7 @@ class LearningManagerModel:
             current_accuracy = performance.get_metric("Accuracy")
             if current_accuracy != None:
                 reference_accuracy = reference_metric[1]
-                print(reference_metric)
+
                 if reference_accuracy != 0:
                     percentage_of_reference = (100/reference_accuracy) * current_accuracy
                     result = (min(100, percentage_of_reference)/100)

@@ -87,15 +87,21 @@ class StudentPerformance:
         for cat in self.performance:
             #find category
             if cat == category[0]:
-                #find category found, find action
+                #category found, find action
                 for action in self.performance.get(cat):
                     if action == category[1]:
                         for val in self.performance.get(cat).get(action):
+                            print(val)
                             #category and action found, check values
                             if isinstance(val, str):
                                 if val == value:
                                     return True
                             if isinstance(val, list):
+                                print(category[1])
+                                print("------")
+                                print(sorted(val,key=str))
+                                print("==")
+                                print(sorted(value,key=str))
                                 if sorted(val,key=str) == sorted(value,key=str):
                                     return True
                             if isinstance(val, tuple):

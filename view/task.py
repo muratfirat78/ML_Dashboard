@@ -11,6 +11,7 @@ display(modal_output)
 
 class TaskView:
     def __init__(self, controller=None):
+        self.task_data = None
         self.controller = controller
         self.monitored_mode = None
         if not self.controller.get_online_version():
@@ -46,7 +47,7 @@ class TaskView:
         self.monitored_mode = monitored_mode
 
     def set_task(self, task):
-        print("override?")
+        self.task_data = task
         self.outer_accordions = []
         self.inner_accordions = []
 
@@ -163,49 +164,61 @@ class TaskView:
         self.vbox.layout = widgets.Layout(visibility='visible')
 
     def finished_task(self, competence_vector):
-        difficulty_data = dict(self.task_data["difficulty"])
+        print("monitored mode? " + str(self.monitored_mode))
+        if self.monitored_mode:
+            # Monitored mode, show graph of results
+            difficulty_data = dict(self.task_data["difficulty"])
+            skills = list(difficulty_data.keys())
+            scores = [competence_vector.get(skill, 0) for skill in skills]
+            difficulties = [difficulty_data[skill] for skill in skills]
+            y_pos = np.arange(len(skills))
 
-        skills = list(difficulty_data.keys())
-        scores = [competence_vector.get(skill, 0) for skill in skills]
-        difficulties = [difficulty_data[skill] for skill in skills]
-        y_pos = np.arange(len(skills))
+            fig, ax = plt.subplots(figsize=(3, 2.5))
+            bars = ax.barh(y_pos, scores, color='steelblue', label='Your score')
 
-        fig, ax = plt.subplots(figsize=(3, 2.5))
-        bars = ax.barh(y_pos, scores, color='steelblue', label='Your score')
+            for i, diff in enumerate(difficulties):
+                ax.plot([diff, diff], [i - 0.4, i + 0.4], color='red', linewidth=2)
 
-        for i, diff in enumerate(difficulties):
-            ax.plot([diff, diff], [i - 0.4, i + 0.4], color='red', linewidth=2)
+            ax.set_yticks(y_pos)
+            ax.set_yticklabels(skills, fontsize=8)
+            ax.set_xlim(0, 100)
+            ax.set_xlabel("Score", fontsize=9)
+            ax.set_title("Results", fontsize=10)
+            ax.invert_yaxis()
 
-        ax.set_yticks(y_pos)
-        ax.set_yticklabels(skills, fontsize=8)
-        ax.set_xlim(0, 100)
-        ax.set_xlabel("Score", fontsize=9)
-        ax.set_title("Results", fontsize=10)
-        ax.invert_yaxis()
+            handles = [
+                plt.Line2D([], [], color='red', linewidth=2, label='Difficulty (max score)'),
+                plt.Rectangle((0, 0), 1, 1, color='steelblue', label='Your score')
+            ]
+            fig.legend(
+                handles=handles,
+                loc='lower center',
+                bbox_to_anchor=(0.5, -0.15),
+                ncol=2,
+                fontsize=7
+            )
 
-        handles = [
-            plt.Line2D([], [], color='red', linewidth=2, label='Difficulty (max score)'),
-            plt.Rectangle((0, 0), 1, 1, color='steelblue', label='Your score')
-        ]
-        fig.legend(
-            handles=handles,
-            loc='lower center',
-            bbox_to_anchor=(0.5, -0.15),
-            ncol=2,
-            fontsize=7
-        )
+            plt.tight_layout()
 
-        plt.tight_layout()
+            buf = BytesIO()
+            plt.savefig(buf, format='png', bbox_inches='tight')
+            buf.seek(0)
+            img_widget = widgets.Image(value=buf.getvalue(), format='png', width=300)
 
-        buf = BytesIO()
-        plt.savefig(buf, format='png', bbox_inches='tight')
-        buf.seek(0)
-        img_widget = widgets.Image(value=buf.getvalue(), format='png', width=300)
-
-        finished_box = widgets.VBox([img_widget])
-        finished_box.layout = widgets.Layout(max_width='300px')
-        finished_accordion = widgets.Accordion(children=[finished_box])
-        finished_accordion.set_title(0, "🎉 Task completed")
-        finished_accordion.selected_index = 0
-        self.vbox.children = tuple(list(self.vbox.children) + [finished_accordion])
-        plt.close(fig)
+            finished_box = widgets.VBox([img_widget])
+            finished_box.layout = widgets.Layout(max_width='300px')
+            finished_accordion = widgets.Accordion(children=[finished_box])
+            finished_accordion.set_title(0, "🎉 Task completed")
+            finished_accordion.selected_index = 0
+            self.vbox.children = tuple(list(self.vbox.children) + [finished_accordion])
+            plt.close(fig)
+        else:
+            # Guided mode, show completed message
+            finished_box = widgets.VBox([
+                widgets.HTML(f"<h2>Congratulations, you have completed the task!</h2>"),
+            ])
+            finished_box.layout = widgets.Layout(max_width='200px')
+            finished_accordion = widgets.Accordion(children=[finished_box])
+            finished_accordion.set_title(0, "🎉 Task completed")
+            finished_accordion.selected_index = 0
+            self.vbox.children = tuple(list(self.vbox.children) + [finished_accordion])

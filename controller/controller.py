@@ -68,8 +68,11 @@ class Controller:
 
     def train_Model(self,tasktype,mytype,results,trmodels,params):
         self.predictive_modeling_model.train_Model(tasktype,mytype,results,trmodels,params)
-        print(self.logger.get_result())
-        print(self.convertPerformanceToTask.convert_performance_to_task(self.logger.get_performance(), 'todo', 'todo'))
+        # print(self.logger.get_result())
+        # print(self.convertPerformanceToTask.convert_performance_to_task(self.logger.get_performance(), 'todo', 'todo'))
+        if self.monitored_mode:
+            # Only try to finish the task in monitored mode, in guided mode the task finished when all tasks are complete
+            self.finished_task()
     
     def make_cleaning(self,featurescl,result2aexp,missacts,dt_features,params):
          self.data_cleaning_model.make_cleaning(featurescl,result2aexp,missacts,dt_features,params)
@@ -235,13 +238,14 @@ class Controller:
         self.data_selection_view.read_dataset(None)
 
     def finished_task(self):
-        print("Hier123")
         current_performance = self.logger.get_performance()
         current_task = self.task_model.get_current_task()
         current_datetime = datetime.now()
-        print("hier321")
         competence_vector = self.calculate_competence_vector(current_performance,current_task, current_datetime)
-        self.task_view.finished_task(competence_vector)
+        if self.monitored_mode and competence_vector != None:
+            self.task_view.finished_task(competence_vector)
+        elif not self.monitored_mode:
+            self.task_view.finished_task(competence_vector)
 
     def get_learning_path_view(self):
         return self.learning_path_view.get_learning_path_tab()
@@ -281,6 +285,4 @@ class Controller:
         return self.learning_manager_model.get_predictive_modeling_score(reference_task, self.logger.get_performance())
     
     def calculate_competence_vector(self, performance, reference_task, date):
-        print("ref task")
-        print(reference_task)
         return self.learning_manager_model.calculate_competence_vector(performance, reference_task, date)

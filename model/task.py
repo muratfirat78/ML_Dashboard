@@ -44,14 +44,15 @@ class TaskModel:
           if subsubtask["order"] == self.current_subsubtask and subsubtask["status"] not in ["done", "inprogress", "incorrect"]:           
             subsubtask["status"] = "ready"
 
-    #check if task is finished
-    finished = True
-    for subtask in self.current_task["subtasks"]:
-      if subtask["status"] != "done":
-        finished = False
-        
-    if finished:
-      self.controller.finished_task()
+    if not self.controller.monitored_mode:
+      #check if task is finished
+      finished = True
+      for subtask in self.current_task["subtasks"]:
+        if subtask["status"] != "done":
+          finished = False
+          
+      if finished:
+        self.controller.finished_task()
 
   def list_in_lists(self, list, lists):
     for list_to_check in lists:

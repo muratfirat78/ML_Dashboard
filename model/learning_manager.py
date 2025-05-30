@@ -143,28 +143,46 @@ class LearningManagerModel:
                 return False
             
         return True
+    
+    def calculate_competence_vector(self, performance, reference_task, date):
+        try:
+            print(1)
+            current_task = self.controller.convert_performance_to_task(performance, "", "")
+            target_column = self.controller.get_target_task(current_task)
+            dataset_name = current_task["dataset"].replace(".csv", "")
+            print(2)
+            if reference_task == None:
+                reference_task = self.controller.get_reference_task(target_column, dataset_name)       
+                if not reference_task:
+                    print("return none")
+                    # reference task not found
+                    return None
+            print(3)
+            valid_performance = self.validate_performance(reference_task, performance)
+            print(valid_performance)
+            if valid_performance:
+                print(4)
+                if not date:
+                    date = performance.performance['General']['Date'][0]
+                print(date)
+                overlap_score = self.get_overlap_scores(reference_task, performance) #for example: {data_cleaning: 0.3,...}
+                print(5)
+                competence_vector = self.get_competence_vector(overlap_score, reference_task['difficulty'], date)
+                print(6)
+                print(competence_vector)
+                return competence_vector
 
-    def set_skill_vectors(self):
+        except Exception as e:
+            print("error:")
+            print(e)
+            return None
+
+
+    def set_competence_vectors(self):
         learning_path = self.learning_path
         learning_path.sort(key=lambda x: x.performance['General']['Date'][0])
         
         for performance in learning_path:
-                try:
-                    current_task = self.controller.convert_performance_to_task(performance, "", "")
-                    target_column = self.controller.get_target_task(current_task)
-                    dataset_name = current_task["dataset"].replace(".csv", "")
-                    reference_task = self.controller.get_reference_task(target_column, dataset_name)       
-                    if not reference_task:
-                        # reference task not found
-                        continue
-                    
-                    valid_performance = self.validate_performance(reference_task, performance)
-                    if valid_performance:
-                        date = performance.performance['General']['Date'][0]
-                        overlap_score = self.get_overlap_scores(reference_task, performance) #for example: {data_cleaning: 0.3,...}
-                        competence_vector = self.get_competence_vector(overlap_score, reference_task['difficulty'], date)
-                        self.controller.add_skill_vector(competence_vector)
-
-                except Exception as e:
-                    print(e)
-                    continue
+            competence_vector = self.calculate_competence_vector(performance, None, None)
+            if competence_vector != None:
+                self.controller.add_competence_vector(competence_vector)

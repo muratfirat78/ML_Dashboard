@@ -1,9 +1,11 @@
 import logging
+from datetime import datetime
 from model.student_performance import StudentPerformance
 
 class Logger:
     def __init__(self, controller):
         self.student_performance = StudentPerformance(controller)
+        # self.student_performance.addAction(['General','Date'], datetime.now())
         self.controller = controller
         # clear log
         with open('output.log', 'w'):

@@ -7,42 +7,51 @@ class TaskModel:
     self.current_subsubtask = 1
     
   def update_statusses_and_set_current_tasks(self):
-        #set finished subtasks
-        for subtask in self.current_task["subtasks"]:
-          correct = True
-          for subsubtask in subtask["subtasks"]:
-            if subsubtask["status"] != "done":
-              correct = False
-          
-          if correct:
-            subtask["status"] = "done"
+    #set finished subtasks
+    for subtask in self.current_task["subtasks"]:
+      correct = True
+      for subsubtask in subtask["subtasks"]:
+        if subsubtask["status"] != "done":
+          correct = False
+      
+      if correct:
+        subtask["status"] = "done"
 
-        # set current_subtask
-        current_subtask = 1
-        for subtask in self.current_task["subtasks"]:
-          if subtask["status"] != "done":
-            current_subtask = subtask["order"]
+    # set current_subtask
+    current_subtask = 1
+    for subtask in self.current_task["subtasks"]:
+      if subtask["status"] != "done":
+        current_subtask = subtask["order"]
+        break
+    self.current_subtask = current_subtask
+    
+    # set current_subsubtask
+    current_subsubtask = 1
+    for subtask in self.current_task["subtasks"]:
+      if subtask["order"] == current_subtask:
+        #todo handle multiple currnet subtasks
+        for subsubtask in subtask["subtasks"]:
+          if subsubtask["status"] != "done":
+            current_subsubtask = subsubtask["order"]
             break
-        self.current_subtask = current_subtask
-        
-        # set current_subsubtask
-        current_subsubtask = 1
-        for subtask in self.current_task["subtasks"]:
-          if subtask["order"] == current_subtask:
-            #todo handle multiple currnet subtasks
-            for subsubtask in subtask["subtasks"]:
-              if subsubtask["status"] != "done":
-                current_subsubtask = subsubtask["order"]
-                break
-        self.current_subsubtask = current_subsubtask
+    self.current_subsubtask = current_subsubtask
 
-        #set ready tasks
-        for subtask in self.current_task["subtasks"]:
-          if subtask["order"] == current_subtask and subtask["status"] not in ["done", "inprogress"]:
-            subtask["status"] = "ready"
-            for subsubtask in subtask["subtasks"]:
-              if subsubtask["order"] == self.current_subsubtask and subsubtask["status"] not in ["done", "inprogress", "incorrect"]:           
-                subsubtask["status"] = "ready"
+    #set ready tasks
+    for subtask in self.current_task["subtasks"]:
+      if subtask["order"] == current_subtask and subtask["status"] not in ["done", "inprogress"]:
+        subtask["status"] = "ready"
+        for subsubtask in subtask["subtasks"]:
+          if subsubtask["order"] == self.current_subsubtask and subsubtask["status"] not in ["done", "inprogress", "incorrect"]:           
+            subsubtask["status"] = "ready"
+
+    #check if task is finished
+    finished = True
+    for subtask in self.current_task["subtasks"]:
+      if subtask["status"] != "done":
+        finished = False
+        
+    if finished:
+      self.controller.finished_task()
 
   def list_in_lists(self, list, lists):
     for list_to_check in lists:
@@ -114,6 +123,7 @@ class TaskModel:
         if action[1] == "ModelPerformance":
            #predictive modeling, compare the model to the reference task
            if self.controller.validate_performance(self.current_task):
+              print(1)
               score = self.controller.get_predictive_modeling_score(self.current_task)
               #score is higher than 80% of the reference task
               if score > 0.8:
@@ -128,21 +138,13 @@ class TaskModel:
           incorrect = self.get_incorrect(subsubtask)
 
         if correct:
+            print("set " + subsubtask["title"] + "op done")
             subsubtask["status"] = "done"
         elif partiallycorrect:
             subsubtask["status"] = "inprogress"
 
         if incorrect:
             subsubtask["status"] = "incorrect"
-
-    #check if task is finished
-    finished = True
-    for subtask in self.current_task["subtasks"]:
-      if subtask["status"] != "done":
-        finished = False
-        
-    if finished:
-      self.controller.show_completion_popup()
         
 
   def set_current_task(self,task):

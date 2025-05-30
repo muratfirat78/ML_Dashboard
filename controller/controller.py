@@ -1,3 +1,4 @@
+from datetime import datetime
 from model.convert_performance_to_task import ConvertPerformanceToTask
 from model.learning_manager import LearningManagerModel
 from model.task import TaskModel
@@ -213,7 +214,7 @@ class Controller:
         userid = self.login_model.get_userid()
         self.learning_manager_model.set_learning_path(userid)
         # self.learning_path_model.set_performance_data()
-        self.learning_manager_model.set_skill_vectors()
+        self.learning_manager_model.set_competence_vectors()
         self.learning_path_view.set_graph_data(self.get_graph_data())
 
     def update_task_view(self, action, value):
@@ -233,8 +234,14 @@ class Controller:
         self.main_view.datasets.value = dataset
         self.data_selection_view.read_dataset(None)
 
-    def show_completion_popup(self):
-        self.task_view.show_completion_popup()
+    def finished_task(self):
+        print("Hier123")
+        current_performance = self.logger.get_performance()
+        current_task = self.task_model.get_current_task()
+        current_datetime = datetime.now()
+        print("hier321")
+        competence_vector = self.calculate_competence_vector(current_performance,current_task, current_datetime)
+        self.task_view.finished_task(competence_vector)
 
     def get_learning_path_view(self):
         return self.learning_path_view.get_learning_path_tab()
@@ -246,8 +253,8 @@ class Controller:
         return self.convertPerformanceToTask.convert_performance_to_task(performance, title, description)
     
     def get_filtered_tasks(self, tasks, guided_mode, all_tasks):
-        current_skill_vector = self.learning_path_model.get_current_skill_vector()
-        return self.task_selection_model.get_filtered_tasks(tasks, guided_mode, all_tasks, current_skill_vector)
+        current_competence_vector = self.learning_path_model.get_current_competence_vector()
+        return self.task_selection_model.get_filtered_tasks(tasks, guided_mode, all_tasks, current_competence_vector)
     
     def get_target_task(self, task):
         return self.task_model.get_target(task)
@@ -264,11 +271,16 @@ class Controller:
     def get_learning_path(self):
         return self.learning_manager_model.get_learning_path()
     
-    def add_skill_vector(self, skill_vector):
-        self.learning_path_model.add_skill_vector(skill_vector)
+    def add_competence_vector(self, competence_vector):
+        self.learning_path_model.add_competence_vector(competence_vector)
 
     def validate_performance(self, reference_task):
         return self.learning_manager_model.validate_performance(reference_task, self.logger.get_performance())
     
     def get_predictive_modeling_score(self, reference_task):
         return self.learning_manager_model.get_predictive_modeling_score(reference_task, self.logger.get_performance())
+    
+    def calculate_competence_vector(self, performance, reference_task, date):
+        print("ref task")
+        print(reference_task)
+        return self.learning_manager_model.calculate_competence_vector(performance, reference_task, date)

@@ -1,5 +1,6 @@
 import ipywidgets as widgets
 from IPython.display import HTML, display, clear_output
+import plotly.graph_objs as go
 
 modal_output = widgets.Output()
 display(modal_output)
@@ -36,10 +37,12 @@ class TaskView:
         self.outer_accordions = []
         self.inner_accordions = []
 
+
     def set_monitored_mode(self,monitored_mode):
         self.monitored_mode = monitored_mode
 
     def set_task(self, task):
+        print("override?")
         self.outer_accordions = []
         self.inner_accordions = []
 
@@ -72,6 +75,7 @@ class TaskView:
                 self.vbox.children = [info_accordion] + outer_sections
         else:
             self.vbox.children = [info_accordion] + outer_sections
+
 
     def create_inner_accordion(self, subtasks):
         children = []
@@ -137,14 +141,16 @@ class TaskView:
             if "subtasks" in subtask:
                 for j, inner_subtask in enumerate(subtask["subtasks"]):
                     self.apply_status_class(self.inner_accordions[i][j], inner_subtask["status"])
+
     
     def set_active_accordion(self):
-        for i, accordion in enumerate(self.outer_accordions):
-            status_classes = accordion._dom_classes
-            if any(cls == "status-ready" for cls in status_classes):
+        for index, accordion in enumerate(self.outer_accordions):
+            dom_classes = accordion._dom_classes
+            if "status-ready" in dom_classes:
                 accordion.selected_index = 0 
             else:
-                accordion.selected_index = None  
+                accordion.selected_index = None
+
                 
     def get_task_view(self):
         return self.vbox
@@ -152,6 +158,62 @@ class TaskView:
     def show_task(self):
         self.vbox.layout = widgets.Layout(visibility='visible')
 
-    def show_completion_popup(self):
-        None
-        # todo
+    def finished_task(self, competence_vector):
+        difficulty_data = dict(self.task_data["difficulty"])
+
+        skills = list(difficulty_data.keys())
+        scores = [competence_vector.get(skill, 0) for skill in skills]
+        difficulties = [difficulty_data[skill] for skill in skills]
+
+        fig = go.Figure()
+
+        # add barr
+        fig.add_trace(go.Bar(
+            x=scores,
+            y=skills,
+            orientation='h',
+            name='Your score',
+            marker_color='steelblue'
+        ))
+
+        # max score
+        fig.add_trace(go.Scatter(
+            x=[None], y=[None],
+            mode='lines',
+            line=dict(color="red", width=2),
+            name='Difficulty (max score)'
+        ))
+
+        for i, (skill, diff) in enumerate(zip(skills, difficulties)):
+            fig.add_shape(
+                type="line",
+                x0=diff,
+                y0=i - 0.4,
+                x1=diff,
+                y1=i + 0.4,
+                line=dict(color="red", width=2),
+            )
+
+        fig.update_layout(
+            height=300,
+            width=300,
+            margin=dict(l=0, r=0, t=30, b=30),
+            title="Results",
+            barmode='overlay',
+            xaxis=dict(title="Score", range=[0, 100]),
+            yaxis=dict(title=""),
+            showlegend=True,
+            legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1)
+        )
+
+        plot_widget = go.FigureWidget(fig)
+        plot_widget._config = {'displayModeBar': False}
+
+        finished_box = widgets.VBox([
+            plot_widget
+        ])
+        finished_box.layout = widgets.Layout(max_width='300px')
+        finished_accordion = widgets.Accordion(children=[finished_box])
+        finished_accordion.set_title(0, "🎉 Task completed")
+        finished_accordion.selected_index = 0
+        self.vbox.children = tuple(list(self.vbox.children) + [finished_accordion])

@@ -1,6 +1,10 @@
 import ipywidgets as widgets
 from IPython.display import HTML, display, clear_output
-import plotly.graph_objs as go
+import matplotlib.pyplot as plt
+import ipywidgets as widgets
+from io import BytesIO
+from PIL import Image
+import numpy as np
 
 modal_output = widgets.Output()
 display(modal_output)
@@ -164,56 +168,44 @@ class TaskView:
         skills = list(difficulty_data.keys())
         scores = [competence_vector.get(skill, 0) for skill in skills]
         difficulties = [difficulty_data[skill] for skill in skills]
+        y_pos = np.arange(len(skills))
 
-        fig = go.Figure()
+        fig, ax = plt.subplots(figsize=(3, 2.5))
+        bars = ax.barh(y_pos, scores, color='steelblue', label='Your score')
 
-        # add barr
-        fig.add_trace(go.Bar(
-            x=scores,
-            y=skills,
-            orientation='h',
-            name='Your score',
-            marker_color='steelblue'
-        ))
+        for i, diff in enumerate(difficulties):
+            ax.plot([diff, diff], [i - 0.4, i + 0.4], color='red', linewidth=2)
 
-        # max score
-        fig.add_trace(go.Scatter(
-            x=[None], y=[None],
-            mode='lines',
-            line=dict(color="red", width=2),
-            name='Difficulty (max score)'
-        ))
+        ax.set_yticks(y_pos)
+        ax.set_yticklabels(skills, fontsize=8)
+        ax.set_xlim(0, 100)
+        ax.set_xlabel("Score", fontsize=9)
+        ax.set_title("Results", fontsize=10)
+        ax.invert_yaxis()
 
-        for i, (skill, diff) in enumerate(zip(skills, difficulties)):
-            fig.add_shape(
-                type="line",
-                x0=diff,
-                y0=i - 0.4,
-                x1=diff,
-                y1=i + 0.4,
-                line=dict(color="red", width=2),
-            )
-
-        fig.update_layout(
-            height=300,
-            width=300,
-            margin=dict(l=0, r=0, t=30, b=30),
-            title="Results",
-            barmode='overlay',
-            xaxis=dict(title="Score", range=[0, 100]),
-            yaxis=dict(title=""),
-            showlegend=True,
-            legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1)
+        handles = [
+            plt.Line2D([], [], color='red', linewidth=2, label='Difficulty (max score)'),
+            plt.Rectangle((0, 0), 1, 1, color='steelblue', label='Your score')
+        ]
+        fig.legend(
+            handles=handles,
+            loc='lower center',
+            bbox_to_anchor=(0.5, -0.15),
+            ncol=2,
+            fontsize=7
         )
 
-        plot_widget = go.FigureWidget(fig)
-        plot_widget._config = {'displayModeBar': False}
+        plt.tight_layout()
 
-        finished_box = widgets.VBox([
-            plot_widget
-        ])
+        buf = BytesIO()
+        plt.savefig(buf, format='png', bbox_inches='tight')
+        buf.seek(0)
+        img_widget = widgets.Image(value=buf.getvalue(), format='png', width=300)
+
+        finished_box = widgets.VBox([img_widget])
         finished_box.layout = widgets.Layout(max_width='300px')
         finished_accordion = widgets.Accordion(children=[finished_box])
         finished_accordion.set_title(0, "🎉 Task completed")
         finished_accordion.selected_index = 0
         self.vbox.children = tuple(list(self.vbox.children) + [finished_accordion])
+        plt.close(fig)

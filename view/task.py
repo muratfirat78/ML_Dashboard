@@ -95,6 +95,7 @@ class TaskView:
             hint_output = widgets.HTML("")
 
             def on_hint_click(b, hints=hints, hint_index=hint_index, hint_output=hint_output):
+                self.controller.undo()
                 hint_index[0] += 1
                 if hint_index[0] < len(hints):
                     hint_output.value += f"<p><b>Hint {hint_index[0]+1}:</b> {hints[hint_index[0]]}</p>"

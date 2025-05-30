@@ -1,4 +1,5 @@
 from datetime import datetime
+import copy
 from model.convert_performance_to_task import ConvertPerformanceToTask
 from model.learning_manager import LearningManagerModel
 from model.task import TaskModel
@@ -23,7 +24,7 @@ from view.task import TaskView
 from view.task_selection import TaskSelectionView
 
 class Controller:
-    def __init__(self, drive, online_version):
+    def __init__(self, drive, online_version, redraw_ui):
         self.monitored_mode = None
         self.main_model = MainModel(online_version)
         self.main_view = MainView()
@@ -53,6 +54,17 @@ class Controller:
             self.drive = drive
         else:
             self.drive = GoogleDrive()
+        self.redraw_ui = redraw_ui
+        self.previous_state = None
+
+    def save_state(self):
+        self.previous_state = copy.copy(self)
+    
+    def undo(self):
+        print("undo")
+        print(self.logger.get_performance().performance)
+        self.redraw_ui(self.previous_state)
+        print(self.logger.get_performance().performance)
 
     def get_tab_set(self):
         tab_1 = self.data_selection_view.get_data_selection_tab()

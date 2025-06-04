@@ -117,11 +117,11 @@ class TaskView:
 
         if self.monitored_mode:
             html = f"""
-            <div class='subtask-section {status_class}' style='margin-left: 10px;'>
-                <p><b>{subtask['title']}</b></p>
+            <details id="{uid}" class='subtask-section {status_class}' style='margin-left: 10px;' {open_attr}>
+                <summary><b>{subtask['title']}</b></summary>
                 <p><b>Description:</b> {subtask.get('description', '')}</p>
                 <p><b>Applied values:</b> {subtask.get('value', '')}</p>
-            </div>
+            </details>
             """
         else:
             html = f"""
@@ -194,18 +194,20 @@ class TaskView:
             buf = BytesIO()
             plt.savefig(buf, format='png', bbox_inches='tight')
             buf.seek(0)
-            img_widget = widgets.Image(value=buf.getvalue(), format='png', width=300)
-            display(img_widget)
+            import base64
+            img_b64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+            img_html = f'<img src="data:image/png;base64,{img_b64}" width="300"/>'
             plt.close(fig)
 
-            self.vbox.value += """
-            <details open style='max-width: 300px;'>
+            self.vbox.value += f"""
+            <details open class='task-box' style='max-width: 300px;'>
                 <summary><b>🎉 Task completed</b></summary>
+                {img_html}
             </details>
             """
         else:
             self.vbox.value += """
-            <details open class='task-box'>
+            <details open class='task-box status-done'>
                 <summary><b>🎉 Task completed</b></summary>
                 <p>Congratulations, you have completed the task!</p>
             </details>

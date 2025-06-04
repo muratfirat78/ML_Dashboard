@@ -14,40 +14,40 @@ class TaskView:
         self.open_ids = set()
         self.hint_counters = {}
 
-        if not self.controller.get_online_version():
-            display(HTML("""
-            <style>
-                .task-box, .subtask-section {
-                    max-width: 200px;
-                    margin: 10px 0;
-                    padding: 10px;
-                    border: 1px solid #ccc;
-                    border-radius: 5px;
-                    font-size: 14px;
-                }
-                .status-todo { background-color: #f8f8f8; }
-                .status-ready { background-color: lightyellow; }
-                .status-inprogress { background-color: lightblue; }
-                .status-done { background-color: lightgreen; }
-                .status-incorrect { background-color: #FF6666; }
-                .hint-box { margin-top: 5px; font-style: italic; color: #333; }
-                .hint-button {
-                    background-color: #28a745;
-                    color: white;
-                    border: none;
-                    padding: 5px 10px;
-                    border-radius: 4px;
-                    cursor: pointer;
-                    margin-top: 5px;
-                }
-                .hint-button:hover {
-                    background-color: #218838;
-                }
-                details > summary {
-                    cursor: pointer;
-                }
-            </style>
-            """))
+
+        display(HTML("""
+        <style>
+            .task-box, .subtask-section {
+                max-width: 200px;
+                margin: 10px 0;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                font-size: 14px;
+            }
+            .status-todo { background-color: #f8f8f8; }
+            .status-ready { background-color: lightyellow; }
+            .status-inprogress { background-color: lightblue; }
+            .status-done { background-color: lightgreen; }
+            .status-incorrect { background-color: #FF6666; }
+            .hint-box { margin-top: 5px; font-style: italic; color: #333; }
+            .hint-button {
+                background-color: #28a745;
+                color: white;
+                border: none;
+                padding: 5px 10px;
+                border-radius: 4px;
+                cursor: pointer;
+                margin-top: 5px;
+            }
+            .hint-button:hover {
+                background-color: #218838;
+            }
+            details > summary {
+                cursor: pointer;
+            }
+        </style>
+        """))
 
         self.vbox = widgets.HTML("")
 

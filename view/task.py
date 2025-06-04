@@ -14,11 +14,10 @@ class TaskView:
         self.open_ids = set()
         self.hint_counters = {}
 
-
         display(HTML("""
         <style>
             .task-box, .subtask-section {
-                max-width: 200px;
+                max-width: 300px;
                 margin: 10px 0;
                 padding: 10px;
                 border: 1px solid #ccc;
@@ -59,8 +58,9 @@ class TaskView:
         html = ""
         self.open_ids = self.capture_open_details()
 
+        # Top-level task box collapsed by default (no open)
         html += f"""
-        <details open class='task-box'>
+        <details class='task-box'>
             <summary><strong>{task.get('title', '')}</strong></summary>
             <p>{task.get('description', '')}</p>
         </details>
@@ -70,13 +70,18 @@ class TaskView:
             html += self.render_outer_section(subtask, f"outer-{i}")
 
         self.vbox.value = html
-        self.restore_open_details()
 
     def render_outer_section(self, subtask, uid_prefix):
         status_class = f"status-{subtask.get('status', 'todo')}"
         outer_uid = f"{uid_prefix}-{uuid.uuid4().hex[:6]}"
+
+        # Outer accordions open if status is ready or inprogress, else collapsed
+        open_attr = ""
+        if subtask.get("status") in ["ready", "inprogress"]:
+            open_attr = "open"
+
         html = f"""
-        <details id="{outer_uid}" class='task-box {status_class}'>
+        <details id="{outer_uid}" class='task-box {status_class}' {open_attr}>
             <summary><b>{subtask['title']}</b></summary>
         """
 
@@ -88,10 +93,13 @@ class TaskView:
 
     def render_inner_section(self, subtask, uid):
         status_class = f"status-{subtask.get('status', 'todo')}"
+        # Always open inner accordions
+        open_attr = "closed"
+
         hint_id = f"hint-{uid}"
         self.hint_counters[hint_id] = {"index": -1, "hints": subtask.get("hints", [])}
         hints_json = json.dumps(self.hint_counters[hint_id]["hints"])
-        
+
         hint_script = f"""
         <script>
         if (!window.hintState) {{ window.hintState = {{}}; }}
@@ -117,7 +125,7 @@ class TaskView:
             """
         else:
             html = f"""
-            <details id="{uid}" class='subtask-section {status_class}' style='margin-left: 10px;'>
+            <details id="{uid}" class='subtask-section {status_class}' style='margin-left: 10px;' {open_attr}>
                 <summary><b>{subtask['title']}</b></summary>
                 <p><b>Description:</b> {subtask.get('description', '')}</p>
                 <button class="hint-button" onclick="showHint_{hint_id}()">Hint</button>
@@ -155,22 +163,6 @@ class TaskView:
         """
         display(HTML(js))
         return set()
-
-    def restore_open_details(self):
-        # Add JS to re-open specific detail IDs
-        if self.open_ids:
-            js_restore = f"""
-            <script>
-            (function() {{
-                const openIds = {json.dumps(list(self.open_ids))};
-                openIds.forEach(id => {{
-                    const el = document.getElementById(id);
-                    if (el) el.open = true;
-                }});
-            }})();
-            </script>
-            """
-            display(HTML(js_restore))
 
     def finished_task(self, competence_vector):
         if self.monitored_mode:

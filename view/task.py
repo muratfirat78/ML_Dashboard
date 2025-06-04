@@ -119,6 +119,8 @@ class TaskView:
             collapse.set_title(0, sub["title"])
 
             if not self.monitored_mode: 
+                print("----")
+                print("title:")
                 print(sub["title"])
                 self.apply_status_class(collapse, status)
 
@@ -143,6 +145,8 @@ class TaskView:
             current_classes.append(new_class)
 
         widget._dom_classes = tuple(current_classes)
+        print(current_classes)
+        print("-----")
 
     def update_task_statuses(self, updated_task_data):
         self.task_data = updated_task_data

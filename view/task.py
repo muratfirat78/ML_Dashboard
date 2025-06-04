@@ -1,181 +1,179 @@
-import ipywidgets as widgets
 from IPython.display import HTML, display, clear_output
 import matplotlib.pyplot as plt
 import ipywidgets as widgets
 from io import BytesIO
-from PIL import Image
 import numpy as np
-
-modal_output = widgets.Output()
-display(modal_output)
+import uuid
+import json
 
 class TaskView:
     def __init__(self, controller=None):
         self.task_data = None
         self.controller = controller
         self.monitored_mode = None
+        self.open_ids = set()
+        self.hint_counters = {}
+
         if not self.controller.get_online_version():
             display(HTML("""
             <style>
-            .status-ready .lm-Widget.jupyter-widget-Collapse-header {
-                background-color: lightyellow; 
-            }
-                    
-            .status-done .lm-Widget.jupyter-widget-Collapse-header {
-                background-color: lightgreen;
-            }             
-                        
-            .status-inprogress .lm-Widget.jupyter-widget-Collapse-header {
-                background-color: lightblue;
-            }             
-                         
-            .status-incorrect .lm-Widget.jupyter-widget-Collapse-header {
-                background-color: #FF6666;
-            }             
-
+                .task-box, .subtask-section {
+                    max-width: 200px;
+                    margin: 10px 0;
+                    padding: 10px;
+                    border: 1px solid #ccc;
+                    border-radius: 5px;
+                    font-size: 14px;
+                }
+                .status-todo { background-color: #f8f8f8; }
+                .status-ready { background-color: lightyellow; }
+                .status-inprogress { background-color: lightblue; }
+                .status-done { background-color: lightgreen; }
+                .status-incorrect { background-color: #FF6666; }
+                .hint-box { margin-top: 5px; font-style: italic; color: #333; }
+                .hint-button {
+                    background-color: #28a745;
+                    color: white;
+                    border: none;
+                    padding: 5px 10px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    margin-top: 5px;
+                }
+                .hint-button:hover {
+                    background-color: #218838;
+                }
+                details > summary {
+                    cursor: pointer;
+                }
             </style>
             """))
 
+        self.vbox = widgets.HTML("")
 
-        self.vbox = widgets.VBox([])
-        self.vbox.layout.display = 'none'
-        self.outer_accordions = []
-        self.inner_accordions = []
-        
-
-
-    def set_monitored_mode(self,monitored_mode):
+    def set_monitored_mode(self, monitored_mode):
         self.monitored_mode = monitored_mode
 
     def set_task(self, task):
         self.task_data = task
-        self.outer_accordions = []
-        self.inner_accordions = []
+        html = ""
+        self.open_ids = self.capture_open_details()
 
-        outer_sections = []
+        html += f"""
+        <details open class='task-box'>
+            <summary><strong>{task.get('title', '')}</strong></summary>
+            <p>{task.get('description', '')}</p>
+        </details>
+        """
 
-        for subtask in task["subtasks"]:
-            inner_accordion, inner_items = self.create_inner_accordion(subtask["subtasks"])
-            status = subtask.get("status", "todo")
+        for i, subtask in enumerate(task["subtasks"]):
+            html += self.render_outer_section(subtask, f"outer-{i}")
 
-            outer_collapse = widgets.Accordion(children=[inner_accordion])
-            outer_collapse.set_title(0, subtask["title"])
-            self.apply_status_class(outer_collapse, status)
+        self.vbox.value = html
+        self.restore_open_details()
 
-            self.outer_accordions.append(outer_collapse)
-            self.inner_accordions.append(inner_items)
-            outer_sections.append(outer_collapse)
+    def render_outer_section(self, subtask, uid_prefix):
+        status_class = f"status-{subtask.get('status', 'todo')}"
+        outer_uid = f"{uid_prefix}-{uuid.uuid4().hex[:6]}"
+        html = f"""
+        <details id="{outer_uid}" class='task-box {status_class}'>
+            <summary><b>{subtask['title']}</b></summary>
+        """
 
-        info_box = widgets.VBox([
-            widgets.HTML(f"<h2>{task.get('title', '')}</h2>"),
-            widgets.HTML(f"<p>{task.get('description', '')}</p>")
-        ])
-        info_box.layout = widgets.Layout(max_width='200px')
-        info_accordion = widgets.Accordion(children=[info_box])
-        info_accordion.set_title(0, "ℹ️ Task information")
+        for j, inner in enumerate(subtask.get("subtasks", [])):
+            html += self.render_inner_section(inner, f"{outer_uid}-inner-{j}")
+
+        html += "</details>"
+        return html
+
+    def render_inner_section(self, subtask, uid):
+        status_class = f"status-{subtask.get('status', 'todo')}"
+        hint_id = f"hint-{uid}"
+        self.hint_counters[hint_id] = {"index": -1, "hints": subtask.get("hints", [])}
+        hints_json = json.dumps(self.hint_counters[hint_id]["hints"])
+        
+        hint_script = f"""
+        <script>
+        if (!window.hintState) {{ window.hintState = {{}}; }}
+        window.hintState["{hint_id}"] = {{index: -1, hints: {hints_json} }};
+        function showHint_{hint_id}() {{
+            const state = window.hintState["{hint_id}"];
+            state.index++;
+            const output = document.getElementById("{hint_id}");
+            if (state.index < state.hints.length) {{
+                output.innerHTML += `<p><b>Hint ${'{'}state.index + 1{'}'}:</b> ${'{'}state.hints[state.index]{'}'}</p>`;
+            }}
+        }}
+        </script>
+        """
 
         if self.monitored_mode:
-            if len(outer_sections) == 0:
-                self.vbox.children = [info_accordion] + [widgets.HTML("<p>No subtasks available.</p>")]
-            else:
-                self.vbox.children = [info_accordion] + outer_sections
+            html = f"""
+            <div class='subtask-section {status_class}' style='margin-left: 10px;'>
+                <p><b>{subtask['title']}</b></p>
+                <p><b>Description:</b> {subtask.get('description', '')}</p>
+                <p><b>Applied values:</b> {subtask.get('value', '')}</p>
+            </div>
+            """
         else:
-            self.vbox.children = [info_accordion] + outer_sections
-
-
-    def create_inner_accordion(self, subtasks):
-        children = []
-        wrappers = []
-
-        for sub in subtasks:
-            description = sub.get("description", "")
-            values = sub.get("value", "")
-            status = sub.get("status", "todo")
-            hints = sub.get("hints", [])
-            hint_index = [-1]
-            hint_output = widgets.HTML("")
-
-            def on_hint_click(b, hints=hints, hint_index=hint_index, hint_output=hint_output):
-                hint_index[0] += 1
-                if hint_index[0] < len(hints):
-                    hint_output.value += f"<p><b>Hint {hint_index[0]+1}:</b> {hints[hint_index[0]]}</p>"
-
-            hint_button = widgets.Button(description="Hint", button_style='success')
-            hint_button.on_click(on_hint_click)
-
-            if self.monitored_mode:
-                des = widgets.HTML(f"<b>description:</b> {description}")
-                val= widgets.HTML(f"<b>applied values:</b> {values}")
-                vbox = widgets.VBox([des,val])
-
-            else:
-                vbox = widgets.VBox([
-                    widgets.HTML(f"<b>description:</b> {description}"),
-                    hint_button,
-                    hint_output
-                ])
-
-            collapse = widgets.Accordion(children=[vbox])
-            collapse.set_title(0, sub["title"])
-
-            if not self.monitored_mode: 
-                print("----")
-                print("title:")
-                print(sub["title"])
-                self.apply_status_class(collapse, status)
-
-            wrappers.append(collapse)
-            children.append(collapse)
-
-        accordion_vbox = widgets.VBox(children)
-        return accordion_vbox, wrappers
+            html = f"""
+            <details id="{uid}" class='subtask-section {status_class}' style='margin-left: 10px;'>
+                <summary><b>{subtask['title']}</b></summary>
+                <p><b>Description:</b> {subtask.get('description', '')}</p>
+                <button class="hint-button" onclick="showHint_{hint_id}()">Hint</button>
+                <div id="{hint_id}" class="hint-box"></div>
+                {hint_script}
+            </details>
+            """
+        return html
 
     def apply_status_class(self, widget, status):
-        current_classes = list(widget._dom_classes)
-        print(current_classes)
-
-        for s in ["todo", "ready", "inprogress", "done", "incorrect"]:
-            class_name = f"status-{s}"
-            if class_name in current_classes:
-                current_classes.remove(class_name)
-
-        new_class = f"status-{status.replace(' ', '').lower()}"
-        if new_class not in current_classes:
-            print("append: " + new_class)
-            current_classes.append(new_class)
-
-        widget._dom_classes = tuple(current_classes)
-        print(current_classes)
-        print("-----")
+        # Not used in HTML-only version
+        pass
 
     def update_task_statuses(self, updated_task_data):
-        self.task_data = updated_task_data
-        for i, subtask in enumerate(updated_task_data["subtasks"]):
-            self.apply_status_class(self.outer_accordions[i], subtask["status"])
-            if "subtasks" in subtask:
-                for j, inner_subtask in enumerate(subtask["subtasks"]):
-                    self.apply_status_class(self.inner_accordions[i][j], inner_subtask["status"])
+        self.set_task(updated_task_data)
 
-    
     def set_active_accordion(self):
-        for index, accordion in enumerate(self.outer_accordions):
-            dom_classes = accordion._dom_classes
-            if "status-ready" in dom_classes:
-                accordion.selected_index = 0 
-            else:
-                accordion.selected_index = None
+        # Not needed in HTML-only version
+        pass
 
-                
     def get_task_view(self):
         return self.vbox
 
     def show_task(self):
-        self.vbox.layout = widgets.Layout(visibility='visible')
+        display(self.vbox)
+
+    def capture_open_details(self):
+        # JS to remember which <details> are open using DOM IDs
+        js = """
+        <script>
+        window.getOpenDetails = function() {
+            return Array.from(document.querySelectorAll("details[id]")).filter(d => d.open).map(d => d.id);
+        };
+        </script>
+        """
+        display(HTML(js))
+        return set()
+
+    def restore_open_details(self):
+        # Add JS to re-open specific detail IDs
+        if self.open_ids:
+            js_restore = f"""
+            <script>
+            (function() {{
+                const openIds = {json.dumps(list(self.open_ids))};
+                openIds.forEach(id => {{
+                    const el = document.getElementById(id);
+                    if (el) el.open = true;
+                }});
+            }})();
+            </script>
+            """
+            display(HTML(js_restore))
 
     def finished_task(self, competence_vector):
-        print("monitored mode? " + str(self.monitored_mode))
         if self.monitored_mode:
-            # Monitored mode, show graph of results
             difficulty_data = dict(self.task_data["difficulty"])
             skills = list(difficulty_data.keys())
             scores = [competence_vector.get(skill, 0) for skill in skills]
@@ -183,8 +181,7 @@ class TaskView:
             y_pos = np.arange(len(skills))
 
             fig, ax = plt.subplots(figsize=(3, 2.5))
-            bars = ax.barh(y_pos, scores, color='steelblue', label='Your score')
-
+            ax.barh(y_pos, scores, color='steelblue', label='Your score')
             for i, diff in enumerate(difficulties):
                 ax.plot([diff, diff], [i - 0.4, i + 0.4], color='red', linewidth=2)
 
@@ -199,35 +196,25 @@ class TaskView:
                 plt.Line2D([], [], color='red', linewidth=2, label='Difficulty (max score)'),
                 plt.Rectangle((0, 0), 1, 1, color='steelblue', label='Your score')
             ]
-            fig.legend(
-                handles=handles,
-                loc='lower center',
-                bbox_to_anchor=(0.5, -0.15),
-                ncol=2,
-                fontsize=7
-            )
-
+            fig.legend(handles=handles, loc='lower center', bbox_to_anchor=(0.5, -0.15), ncol=2, fontsize=7)
             plt.tight_layout()
 
             buf = BytesIO()
             plt.savefig(buf, format='png', bbox_inches='tight')
             buf.seek(0)
             img_widget = widgets.Image(value=buf.getvalue(), format='png', width=300)
-
-            finished_box = widgets.VBox([img_widget])
-            finished_box.layout = widgets.Layout(max_width='300px')
-            finished_accordion = widgets.Accordion(children=[finished_box])
-            finished_accordion.set_title(0, "🎉 Task completed")
-            finished_accordion.selected_index = 0
-            self.vbox.children = tuple(list(self.vbox.children) + [finished_accordion])
+            display(img_widget)
             plt.close(fig)
+
+            self.vbox.value += """
+            <details open style='max-width: 300px;'>
+                <summary><b>🎉 Task completed</b></summary>
+            </details>
+            """
         else:
-            # Guided mode, show completed message
-            finished_box = widgets.VBox([
-                widgets.HTML(f"<h2>Congratulations, you have completed the task!</h2>"),
-            ])
-            finished_box.layout = widgets.Layout(max_width='200px')
-            finished_accordion = widgets.Accordion(children=[finished_box])
-            finished_accordion.set_title(0, "🎉 Task completed")
-            finished_accordion.selected_index = 0
-            self.vbox.children = tuple(list(self.vbox.children) + [finished_accordion])
+            self.vbox.value += """
+            <details open class='task-box'>
+                <summary><b>🎉 Task completed</b></summary>
+                <p>Congratulations, you have completed the task!</p>
+            </details>
+            """

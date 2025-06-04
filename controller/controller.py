@@ -228,7 +228,7 @@ class Controller:
         else:
             self.task_model.perform_action(action, value)
             self.task_model.update_statusses_and_set_current_tasks()
-            self.task_view.update_task_statuses(self.task_model.get_current_task())
+            self.task_view.set_task(self.task_model.get_current_task())
             self.task_view.set_active_accordion()
 
     def read_dataset_view(self, dataset):

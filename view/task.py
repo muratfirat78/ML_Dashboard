@@ -41,6 +41,7 @@ class TaskView:
         self.vbox.layout.display = 'none'
         self.outer_accordions = []
         self.inner_accordions = []
+        
 
 
     def set_monitored_mode(self,monitored_mode):
@@ -118,6 +119,7 @@ class TaskView:
             collapse.set_title(0, sub["title"])
 
             if not self.monitored_mode: 
+                print(sub["title"])
                 self.apply_status_class(collapse, status)
 
             wrappers.append(collapse)
@@ -128,6 +130,8 @@ class TaskView:
 
     def apply_status_class(self, widget, status):
         current_classes = list(widget._dom_classes)
+        print(current_classes)
+
         for s in ["todo", "ready", "inprogress", "done", "incorrect"]:
             class_name = f"status-{s}"
             if class_name in current_classes:
@@ -135,6 +139,7 @@ class TaskView:
 
         new_class = f"status-{status.replace(' ', '').lower()}"
         if new_class not in current_classes:
+            print("append: " + new_class)
             current_classes.append(new_class)
 
         widget._dom_classes = tuple(current_classes)

@@ -15,6 +15,28 @@ class TaskView:
         self.hint_counters = {}
 
         display(HTML("""
+        <script>
+        function showHint(event) {
+            const btn = event.target;
+            const uid = btn.dataset.uid;
+            const hints = JSON.parse(btn.dataset.hints);
+            let index = parseInt(btn.dataset.index);
+
+            const container = document.getElementById("hint-container-" + uid);
+
+            if (index < hints.length) {
+                const hintHTML = `<p><b>Hint ${index + 1}:</b> ${hints[index]}</p>`;
+                container.insertAdjacentHTML('beforeend', hintHTML);
+                btn.dataset.index = index + 1;
+            } else {
+                container.insertAdjacentHTML('beforeend', "<p><i>No more hints available.</i></p>");
+                btn.disabled = true;
+                btn.style.opacity = 0.6;
+            }
+        }
+        </script>
+        """))
+        display(HTML("""
         <style>
             .task-box, .subtask-section {
                 max-width: 300px;
@@ -49,6 +71,7 @@ class TaskView:
         """))
 
         self.vbox = widgets.HTML("")
+        self.hint_widgets = {}
 
     def set_monitored_mode(self, monitored_mode):
         self.monitored_mode = monitored_mode
@@ -57,8 +80,8 @@ class TaskView:
         self.task_data = task
         html = ""
         self.open_ids = self.capture_open_details()
+        self.hint_widgets.clear()
 
-        # Top-level task box collapsed by default (no open)
         html += f"""
         <details class='task-box'>
             <summary><strong>{task.get('title', '')}</strong></summary>
@@ -70,12 +93,14 @@ class TaskView:
             html += self.render_outer_section(subtask, f"outer-{i}")
 
         self.vbox.value = html
+        clear_output(wait=True)
+        display(self.vbox)
+        self.display_hint_widgets()
 
     def render_outer_section(self, subtask, uid_prefix):
         status_class = f"status-{subtask.get('status', 'todo')}"
         outer_uid = f"{uid_prefix}-{uuid.uuid4().hex[:6]}"
 
-        # Outer accordions open if status is ready or inprogress, else collapsed
         open_attr = ""
         if subtask.get("status") in ["ready", "inprogress"]:
             open_attr = "open"
@@ -93,27 +118,14 @@ class TaskView:
 
     def render_inner_section(self, subtask, uid):
         status_class = f"status-{subtask.get('status', 'todo')}"
-        # Always open inner accordions
         open_attr = "closed"
-
-        hint_id = f"hint-{uid}"
-        self.hint_counters[hint_id] = {"index": -1, "hints": subtask.get("hints", [])}
-        hints_json = json.dumps(self.hint_counters[hint_id]["hints"])
-
-        hint_script = f"""
-        <script>
-        if (!window.hintState) {{ window.hintState = {{}}; }}
-        window.hintState["{hint_id}"] = {{index: -1, hints: {hints_json} }};
-        function showHint_{hint_id}() {{
-            const state = window.hintState["{hint_id}"];
-            state.index++;
-            const output = document.getElementById("{hint_id}");
-            if (state.index < state.hints.length) {{
-                output.innerHTML += `<p><b>Hint ${'{'}state.index + 1{'}'}:</b> ${'{'}state.hints[state.index]{'}'}</p>`;
-            }}
-        }}
-        </script>
-        """
+        hints_raw = json.dumps(subtask.get("hints", []))
+        hints_json = (hints_raw
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace('"', "&quot;")
+            .replace("'", "&#x27;"))
 
         if self.monitored_mode:
             html = f"""
@@ -123,27 +135,51 @@ class TaskView:
                 <p><b>Applied values:</b> {subtask.get('value', '')}</p>
             </details>
             """
-        else:
-            html = f"""
-            <details id="{uid}" class='subtask-section {status_class}' style='margin-left: 10px;' {open_attr}>
-                <summary><b>{subtask['title']}</b></summary>
-                <p><b>Description:</b> {subtask.get('description', '')}</p>
-                <button class="hint-button" onclick="showHint_{hint_id}()">Hint</button>
-                <div id="{hint_id}" class="hint-box"></div>
-                {hint_script}
-            </details>
-            """
+            return html
+        
+        html = f"""
+        <details id="{uid}" class='subtask-section {status_class}' style='margin-left: 10px;' {open_attr}>
+            <summary><b>{subtask['title']}</b></summary>
+            <p><b>Description:</b> {subtask.get('description', '')}</p>
+        <div id="hint-container-{uid}" style="margin-top:5px; font-style: italic; color: #333;"></div>
+        <button class="hint-button" data-uid="{uid}" data-hints='{hints_json}' data-index="0" onclick="showHint(event)">Hint</button>
+    </details>
+    """
+
+        hint_button = widgets.Button(description="Hint", button_style='success', layout=widgets.Layout(width='70px'))
+        hint_output = widgets.HTML(layout=widgets.Layout(margin='5px 0 0 0', font_style='italic', color='#333'))
+
+        hints = subtask.get("hints", [])
+        self.hint_counters[uid] = {"index": -1, "hints": hints}
+
+        def on_hint_button_clicked(b):
+            state = self.hint_counters[uid]
+            state["index"] += 1
+            if state["index"] < len(state["hints"]):
+                new_hint = f"<p><b>Hint {state['index'] + 1}:</b> {state['hints'][state['index']]}</p>"
+                hint_output.value += new_hint
+            else:
+                hint_output.value += "<p><i>No more hints available.</i></p>"
+                hint_button.disabled = True
+
+        hint_button.on_click(on_hint_button_clicked)
+
+        self.hint_widgets[uid] = widgets.VBox([hint_button, hint_output],
+                                              layout=widgets.Layout(margin='0 0 10px 30px'))
+
         return html
 
+    def display_hint_widgets(self):
+        for uid, widget in self.hint_widgets.items():
+            display(widget)
+
     def apply_status_class(self, widget, status):
-        # Not used in HTML-only version
         pass
 
     def update_task_statuses(self, updated_task_data):
         self.set_task(updated_task_data)
 
     def set_active_accordion(self):
-        # Not needed in HTML-only version
         pass
 
     def get_task_view(self):
@@ -151,9 +187,9 @@ class TaskView:
 
     def show_task(self):
         display(self.vbox)
+        self.display_hint_widgets()
 
     def capture_open_details(self):
-        # JS to remember which <details> are open using DOM IDs
         js = """
         <script>
         window.getOpenDetails = function() {

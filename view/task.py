@@ -94,8 +94,8 @@ class TaskView:
         for i, subtask in enumerate(task["subtasks"]):
             html += self.render_outer_section(subtask, f"outer-{i}")
         self.vbox.value = html
-        clear_output(wait=True)
-        display(self.vbox)
+        # clear_output(wait=True)
+        # display(self.vbox)
         # self.display_hint_widgets()
     
     def set_reference_task(self, task):
@@ -123,13 +123,13 @@ class TaskView:
     def render_inner_section(self, subtask, uid):
         status_class = f"status-{subtask.get('status', 'todo')}"
         open_attr = "closed"
-        hints_raw = json.dumps(subtask.get("hints", []))
-        hints_json = (hints_raw
-            .replace("&", "&amp;")
-            .replace("<", "&lt;")
-            .replace(">", "&gt;")
-            .replace('"', "&quot;")
-            .replace("'", "&#x27;"))
+        # hints_raw = json.dumps(subtask.get("hints", []))
+        # hints_json = (hints_raw
+        #     .replace("&", "&amp;")
+        #     .replace("<", "&lt;")
+        #     .replace(">", "&gt;")
+        #     .replace('"', "&quot;")
+        #     .replace("'", "&#x27;"))
 
         if self.monitored_mode:
             html = f"""

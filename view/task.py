@@ -142,33 +142,13 @@ class TaskView:
             return html
         
         html = f"""
-        <details id="{uid}" class='subtask-section {status_class}' style='margin-left: 10px;' {open_attr}>
-            <summary><b>{subtask['title']}</b></summary>
-            <p><b>Description:</b> {subtask.get('description', '')}</p>
-    </details>
-    """
-
-        hint_button = widgets.Button(description="Hint", button_style='success', layout=widgets.Layout(width='70px'))
-        hint_output = widgets.HTML(layout=widgets.Layout(margin='5px 0 0 0', font_style='italic', color='#333'))
-
-        hints = subtask.get("hints", [])
-        self.hint_counters[uid] = {"index": -1, "hints": hints}
-
-        def on_hint_button_clicked(b):
-            state = self.hint_counters[uid]
-            state["index"] += 1
-            if state["index"] < len(state["hints"]):
-                new_hint = f"<p><b>Hint {state['index'] + 1}:</b> {state['hints'][state['index']]}</p>"
-                hint_output.value += new_hint
-            else:
-                hint_output.value += "<p><i>No more hints available.</i></p>"
-                hint_button.disabled = True
-
-        hint_button.on_click(on_hint_button_clicked)
-
-        self.hint_widgets[uid] = widgets.VBox([hint_button, hint_output],
-                                              layout=widgets.Layout(margin='0 0 10px 30px'))
-
+            <details id="{uid}" class='subtask-section {status_class}' style='margin-left: 10px;' {open_attr}>
+                <summary><b>{subtask['title']}</b></summary>
+                <p><b>Description:</b> {subtask.get('description', '')}</p>
+                <div id="hint-container-{uid}" class="hint-box"></div>
+                <button class="hint-button" data-uid="{uid}" data-hints='{hints_json}' data-index="0" onclick="showHint(event)">Hint</button>
+            </details>
+            """
         return html
 
     def display_hint_widgets(self):

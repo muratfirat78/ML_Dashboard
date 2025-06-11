@@ -145,6 +145,8 @@ class TaskView:
             <details id="{uid}" class='subtask-section {status_class}' style='margin-left: 10px;' {open_attr}>
                 <summary><b>{subtask['title']}</b></summary>
                 <p><b>Description:</b> {subtask.get('description', '')}</p>
+                <div id="hint-container-{uid}" class="hint-box"></div>
+                <button class="hint-button" data-uid="{uid}" data-hints='{hints_json}' data-index="0" onclick="showHint(event)">Hint</button>
             </details>
             """
         return html

@@ -178,17 +178,14 @@ class Controller:
             self.task_view.set_current_task(self.task_model.get_current_task())
             self.task_view.set_reference_task(reference_task)
             self.task_model.update_statusses_and_set_current_tasks()
-            self.task_view.set_active_accordion()
         else:
             self.task_model.set_current_task(reference_task) # current task is what is displayed on the left side, so set current task to reference task in guided mode
             self.task_view.set_current_task(self.task_model.get_current_task())
             self.task_model.update_statusses_and_set_current_tasks()
             self.task_view.update_task_statuses(self.task_model.get_current_task())
-            self.task_view.set_active_accordion()
 
     def hide_task_selection_and_show_tabs(self):
         self.task_selection_view.hide_task_selection()
-        self.task_view.show_task()
         self.main_view.show_tabs()
     
     def register(self):
@@ -232,7 +229,6 @@ class Controller:
             self.task_model.perform_action(action, value)
             self.task_model.update_statusses_and_set_current_tasks()
             self.task_view.update_task_statuses(self.task_model.get_current_task())
-            self.task_view.set_active_accordion()
             if self.task_finished == True:
                 self.task_view.finished_task(None)
 

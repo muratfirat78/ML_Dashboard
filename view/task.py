@@ -12,10 +12,9 @@ class TaskView:
         self.reference_task = None
         self.controller = controller
         self.monitored_mode = None
-        self.open_ids = set()
         self.hint_counters = {}
 
-        # # Hints scripting
+        # Hints scripting
         display(HTML("""
         <script>
         function showHint(event) {
@@ -81,7 +80,6 @@ class TaskView:
     def set_current_task(self, task):
         self.current_task = task
         html = ""
-        self.open_ids = self.capture_open_details()
         self.hint_widgets.clear()
 
         html += f"""
@@ -94,9 +92,6 @@ class TaskView:
         for i, subtask in enumerate(task["subtasks"]):
             html += self.render_outer_section(subtask, f"outer-{i}")
         self.vbox.value = html
-        # clear_output(wait=True) breaks
-        # display(self.vbox)
-        # self.display_hint_widgets()
     
     def set_reference_task(self, task):
         self.reference_task = task
@@ -151,36 +146,11 @@ class TaskView:
             """
         return html
 
-    # def display_hint_widgets(self):
-    #     for uid, widget in self.hint_widgets.items():
-    #         display(widget)
-
-    def apply_status_class(self, widget, status):
-        pass
-
     def update_task_statuses(self, updated_task_data):
         self.set_current_task(updated_task_data)
 
-    def set_active_accordion(self):
-        pass
-
     def get_task_view(self):
         return self.vbox
-
-    def show_task(self):
-        display(self.vbox)
-        # self.display_hint_widgets()
-
-    def capture_open_details(self):
-        js = """
-        <script>
-        window.getOpenDetails = function() {
-            return Array.from(document.querySelectorAll("details[id]")).filter(d => d.open).map(d => d.id);
-        };
-        </script>
-        """
-        display(HTML(js))
-        return set()
 
     def finished_task(self, competence_vector):
         if self.monitored_mode:

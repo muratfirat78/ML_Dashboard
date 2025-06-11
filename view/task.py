@@ -16,28 +16,28 @@ class TaskView:
         self.hint_counters = {}
 
         # # Hints scripting
-        # display(HTML("""
-        # <script>
-        # function showHint(event) {
-        #     const btn = event.target;
-        #     const uid = btn.dataset.uid;
-        #     const hints = JSON.parse(btn.dataset.hints);
-        #     let index = parseInt(btn.dataset.index);
+        display(HTML("""
+        <script>
+        function showHint(event) {
+            const btn = event.target;
+            const uid = btn.dataset.uid;
+            const hints = JSON.parse(btn.dataset.hints);
+            let index = parseInt(btn.dataset.index);
 
-        #     const container = document.getElementById("hint-container-" + uid);
+            const container = document.getElementById("hint-container-" + uid);
 
-        #     if (index < hints.length) {
-        #         const hintHTML = `<p><b>Hint ${index + 1}:</b> ${hints[index]}</p>`;
-        #         container.insertAdjacentHTML('beforeend', hintHTML);
-        #         btn.dataset.index = index + 1;
-        #     } else {
-        #         container.insertAdjacentHTML('beforeend', "<p><i>No more hints available.</i></p>");
-        #         btn.disabled = true;
-        #         btn.style.opacity = 0.6;
-        #     }
-        # }
-        # </script>
-        # """))
+            if (index < hints.length) {
+                const hintHTML = `<p><b>Hint ${index + 1}:</b> ${hints[index]}</p>`;
+                container.insertAdjacentHTML('beforeend', hintHTML);
+                btn.dataset.index = index + 1;
+            } else {
+                container.insertAdjacentHTML('beforeend', "<p><i>No more hints available.</i></p>");
+                btn.disabled = true;
+                btn.style.opacity = 0.6;
+            }
+        }
+        </script>
+        """))
         # Accordions styling
         display(HTML("""
         <style>
@@ -94,7 +94,7 @@ class TaskView:
         for i, subtask in enumerate(task["subtasks"]):
             html += self.render_outer_section(subtask, f"outer-{i}")
         self.vbox.value = html
-        # clear_output(wait=True)
+        # clear_output(wait=True) breaks
         # display(self.vbox)
         # self.display_hint_widgets()
     

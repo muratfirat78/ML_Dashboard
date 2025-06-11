@@ -96,7 +96,7 @@ class TaskView:
         self.vbox.value = html
         clear_output(wait=True)
         display(self.vbox)
-        self.display_hint_widgets()
+        # self.display_hint_widgets()
     
     def set_reference_task(self, task):
         self.reference_task = task
@@ -149,9 +149,9 @@ class TaskView:
             """
         return html
 
-    def display_hint_widgets(self):
-        for uid, widget in self.hint_widgets.items():
-            display(widget)
+    # def display_hint_widgets(self):
+    #     for uid, widget in self.hint_widgets.items():
+    #         display(widget)
 
     def apply_status_class(self, widget, status):
         pass
@@ -167,7 +167,7 @@ class TaskView:
 
     def show_task(self):
         display(self.vbox)
-        self.display_hint_widgets()
+        # self.display_hint_widgets()
 
     def capture_open_details(self):
         js = """

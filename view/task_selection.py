@@ -19,13 +19,13 @@ class TaskSelectionView:
 
         self.task_dropdown = widgets.Dropdown(
             options=list(self.task_map.keys()),
-            description='Select Task:',
+            description='Let me work on...',
             disabled=False
         )
 
         self.mode_dropdown = widgets.Dropdown(
-            options=list(["Guide me","Monitor my performance"]),
-            description='Select mode:',
+            options=list(["Guidance for a task","My performance monitored"]),
+            description='I want...',
             disabled=False
         )
 
@@ -50,6 +50,8 @@ class TaskSelectionView:
         )
         self.recommmended_radio_buttons.observe(self.filter_task_selection, names='value')
 
+        self.recommmended_radio_buttons.layout.display = 'none'
+
         self.select_button = widgets.Button(
             description='Start Task',
             button_style='success'
@@ -72,8 +74,8 @@ class TaskSelectionView:
 
         tabs = [self.vbox, self.vbox2]
         tab_set = widgets.Tab(tabs)
-        tab_set.set_title(0, 'Task selection')
-        tab_set.set_title(1, 'Learning statistics')
+        tab_set.set_title(0, 'Selecting task')
+        tab_set.set_title(1, 'My competence')
         tab_set.layout.display = 'none'
         self.tab_set = tab_set
 
@@ -94,11 +96,13 @@ class TaskSelectionView:
             if change["new"] == "Show me all tasks":
                 self.alltasks = True
 
-            if change["new"] == "Guide me":
+            if change["new"] == "Guidance for a task":
                 self.guided_mode = True
+                self.hide_recommmended_radio_buttons()
 
-            if change["new"] == "Monitor my performance":
+            if change["new"] == "My performance monitored":
                 self.guided_mode = False
+                self.show_recommmended_radio_buttons()
 
         if self.guided_mode:
             filtered_tasks = [task for task in self.tasks_data if task["mode"] == "guided"]
@@ -115,15 +119,23 @@ class TaskSelectionView:
             self.task_dropdown.options=list(self.task_map.keys())
 
     def start_task(self, event):
-        if self.mode_dropdown.value == "Monitor my performance":
+        if self.mode_dropdown.value == "My performance monitored":
             monitored_mode = True
-        elif self.mode_dropdown.value == "Guide me":
+        elif self.mode_dropdown.value == "Guidance for a task":
             monitored_mode = False
         selected_title = self.task_dropdown.value
         selected_task = self.task_map[selected_title]
         self.controller.set_task_model(selected_task, monitored_mode)
         self.controller.read_dataset_view(selected_task["dataset"])
         self.controller.hide_task_selection_and_show_tabs()
+
+    def hide_recommmended_radio_buttons(self):
+        self.recommmended_radio_buttons.layout.display = 'none'
+        
+    def show_recommmended_radio_buttons(self):
+        # Todo: implenment recommendation of exercises
+        # self.recommmended_radio_buttons.layout = widgets.Layout(visibility = 'visible')
+        self.recommmended_radio_buttons.layout.display = 'none'
 
     def get_task_selection_view(self):
         return self.tab_set

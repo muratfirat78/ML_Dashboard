@@ -94,8 +94,8 @@ class TaskView:
         for i, subtask in enumerate(task["subtasks"]):
             html += self.render_outer_section(subtask, f"outer-{i}")
         self.vbox.value = html
-        clear_output(wait=True)
-        display(self.vbox)
+        # clear_output(wait=True)
+        # display(self.vbox)
         # self.display_hint_widgets()
     
     def set_reference_task(self, task):

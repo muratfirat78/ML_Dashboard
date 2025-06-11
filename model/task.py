@@ -60,7 +60,6 @@ class TaskModel:
       if sorted(list,key=str) == sorted(list_to_check,key=str):
         return True
     return False
-        
 
   def get_correct(self, subsubtask):
         correct = True

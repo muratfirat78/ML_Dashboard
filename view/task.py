@@ -72,7 +72,6 @@ class TaskView:
             }
         </style>
         """))
-
         self.vbox = widgets.HTML("")
         self.hint_widgets = {}
 
@@ -94,7 +93,6 @@ class TaskView:
 
         for i, subtask in enumerate(task["subtasks"]):
             html += self.render_outer_section(subtask, f"outer-{i}")
-
         self.vbox.value = html
         clear_output(wait=True)
         display(self.vbox)
@@ -240,7 +238,6 @@ class TaskView:
             img_b64 = base64.b64encode(buf.getvalue()).decode('utf-8')
             img_html = f'<img src="data:image/png;base64,{img_b64}" width="300"/>'
             plt.close(fig)
-
             self.vbox.value += f"""
             <details open class='task-box' style='max-width: 300px;'>
                 <summary><b>🎉 Task completed</b></summary>
@@ -248,7 +245,7 @@ class TaskView:
             </details>
             """
         else:
-            self.vbox.value += """
+            self.vbox.value += f"""
             <details open class='task-box status-done'>
                 <summary><b>🎉 Task completed</b></summary>
                 <p>Congratulations, you have completed the task!</p>

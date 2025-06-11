@@ -47,6 +47,7 @@ class Controller:
         self.task_selection_view = TaskSelectionView(self)
         self.learning_path = None
         self.convertPerformanceToTask = ConvertPerformanceToTask()
+        self.task_finished = False
         # performance = {'General': {}, 'SelectData': {'DataSet': ('titanic.csv', 0)}, 'DataCleaning': {'Drop Column': [(['Fare'], 1), (['Ticket'], 2), (['Parch'], 3), (['SibSp'], 4), (['Name'], 5), (['Pclass'], 6), (['PassengerId'], 7), (['Cabin'], 9)], 'Remove-Missing': (['Embarked'], 8), 'Replace-Median': (['Age'], 10)}, 'DataProcessing': {'LabelEncoding': [(['Embarked'], 11), (['Sex'], 12)], 'ConvertToBoolean': ('Survived', 13), 'AssignTarget': ('Survived', 14), 'Split': ('20%', 15)}, 'ModelDevelopment': {'ModelPerformance': (('Logistic Regression()', [('True-Positive', 56), ('False-Positive', 16), ('True-Negative', 86), ('False-Negative', 20), ('Accuracy', 0.797752808988764), ('Precision', 0.7777777777777778), ('Recall', 0.7368421052631579), ('ROCFPR', ([0.        , 0.15686275, 1.        ])), ('ROCTPR',([0.        , 0.73684211, 1.        ]))]), 16)}}
         # self.convertPerformanceToTask.convert_performance_to_task(performance)
         if drive != None:
@@ -232,6 +233,9 @@ class Controller:
             self.task_model.update_statusses_and_set_current_tasks()
             self.task_view.update_task_statuses(self.task_model.get_current_task())
             self.task_view.set_active_accordion()
+            if self.task_finished == True:
+                self.task_view.finished_task(None)
+
 
     def read_dataset_view(self, dataset):
         self.set_datafolder("DataSets")
@@ -245,9 +249,11 @@ class Controller:
         current_datetime = datetime.now()
         competence_vector = self.calculate_competence_vector(current_performance,reference_task, current_datetime)
         if self.monitored_mode and competence_vector != None:
+            self.task_finished = True
             self.task_view.finished_task(competence_vector)
         elif not self.monitored_mode:
-            self.task_view.finished_task(competence_vector)
+            self.task_finished = True
+            
 
     def get_learning_path_view(self):
         return self.learning_path_view.get_learning_path_tab()

@@ -3,6 +3,7 @@ class TaskModel:
   def __init__(self, controller):
     self.controller = controller
     self.current_task = {}
+    self.reference_task = {}
     self.current_subtask = 1
     self.current_subsubtask = 1
     
@@ -124,7 +125,6 @@ class TaskModel:
         if action[1] == "ModelPerformance":
            #predictive modeling, compare the model to the reference task
            if self.controller.validate_performance(self.current_task):
-              print(1)
               score = self.controller.get_predictive_modeling_score(self.current_task)
               #score is higher than 80% of the reference task
               if score > 0.8:
@@ -139,7 +139,6 @@ class TaskModel:
           incorrect = self.get_incorrect(subsubtask)
 
         if correct:
-            print("set " + subsubtask["title"] + "op done")
             subsubtask["status"] = "done"
         elif partiallycorrect:
             subsubtask["status"] = "inprogress"
@@ -150,6 +149,12 @@ class TaskModel:
 
   def set_current_task(self,task):
     self.current_task = task
+
+  def set_reference_task(self,task):
+     self.reference_task = task
+
+  def get_reference_task(self):
+     return self.reference_task
     
   def get_current_task(self):
     return self.current_task
@@ -159,6 +164,9 @@ class TaskModel:
 
   def get_description(self):
     return self.current_task["description"]
+  
+  def get_difficulty(self):
+     return self.current_task["difficulty"]
   
   def get_target(self, task):
     for subtask in task["subtasks"]:

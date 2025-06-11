@@ -167,18 +167,20 @@ class Controller:
         else:
             print("You must agree to the terms before continuing")
     
-    def set_task_model(self,task, monitored_mode):
+    def set_task_model(self,reference_task, monitored_mode):
         self.monitored_mode = monitored_mode
         self.task_view.set_monitored_mode(monitored_mode)
         if self.monitored_mode:
-            task = self.convertPerformanceToTask.convert_performance_to_task(self.logger.get_performance(), task["title"],task["description"])
-            self.task_model.set_current_task(task)
-            self.task_view.set_task(self.task_model.get_current_task())
+            current_task = self.convertPerformanceToTask.convert_performance_to_task(self.logger.get_performance(), reference_task["title"],reference_task["description"])
+            self.task_model.set_current_task(current_task)
+            self.task_model.set_reference_task(reference_task)
+            self.task_view.set_current_task(self.task_model.get_current_task())
+            self.task_view.set_reference_task(reference_task)
             self.task_model.update_statusses_and_set_current_tasks()
             self.task_view.set_active_accordion()
         else:
-            self.task_model.set_current_task(task)
-            self.task_view.set_task(self.task_model.get_current_task())
+            self.task_model.set_current_task(reference_task) # current task is what is displayed on the left side, so set current task to reference task in guided mode
+            self.task_view.set_current_task(self.task_model.get_current_task())
             self.task_model.update_statusses_and_set_current_tasks()
             self.task_view.update_task_statuses(self.task_model.get_current_task())
             self.task_view.set_active_accordion()
@@ -224,7 +226,7 @@ class Controller:
         if self.monitored_mode:
             task = self.convertPerformanceToTask.convert_performance_to_task(self.logger.get_performance(), self.task_model.get_title(), self.task_model.get_description())
             self.task_model.set_current_task(task)
-            self.task_view.set_task(self.task_model.get_current_task())
+            self.task_view.set_current_task(self.task_model.get_current_task())
         else:
             self.task_model.perform_action(action, value)
             self.task_model.update_statusses_and_set_current_tasks()
@@ -239,9 +241,9 @@ class Controller:
 
     def finished_task(self):
         current_performance = self.logger.get_performance()
-        current_task = self.task_model.get_current_task()
+        reference_task = self.task_model.get_reference_task()
         current_datetime = datetime.now()
-        competence_vector = self.calculate_competence_vector(current_performance,current_task, current_datetime)
+        competence_vector = self.calculate_competence_vector(current_performance,reference_task, current_datetime)
         if self.monitored_mode and competence_vector != None:
             self.task_view.finished_task(competence_vector)
         elif not self.monitored_mode:

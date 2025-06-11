@@ -8,12 +8,14 @@ import json
 
 class TaskView:
     def __init__(self, controller=None):
-        self.task_data = None
+        self.current_task = None
+        self.reference_task = None
         self.controller = controller
         self.monitored_mode = None
         self.open_ids = set()
         self.hint_counters = {}
 
+        # Hints scripting
         display(HTML("""
         <script>
         function showHint(event) {
@@ -36,6 +38,7 @@ class TaskView:
         }
         </script>
         """))
+        # Accordions styling
         display(HTML("""
         <style>
             .task-box, .subtask-section {
@@ -76,8 +79,8 @@ class TaskView:
     def set_monitored_mode(self, monitored_mode):
         self.monitored_mode = monitored_mode
 
-    def set_task(self, task):
-        self.task_data = task
+    def set_current_task(self, task):
+        self.current_task = task
         html = ""
         self.open_ids = self.capture_open_details()
         self.hint_widgets.clear()
@@ -96,6 +99,9 @@ class TaskView:
         clear_output(wait=True)
         display(self.vbox)
         self.display_hint_widgets()
+    
+    def set_reference_task(self, task):
+        self.reference_task = task
 
     def render_outer_section(self, subtask, uid_prefix):
         status_class = f"status-{subtask.get('status', 'todo')}"
@@ -177,7 +183,7 @@ class TaskView:
         pass
 
     def update_task_statuses(self, updated_task_data):
-        self.set_task(updated_task_data)
+        self.set_current_task(updated_task_data)
 
     def set_active_accordion(self):
         pass
@@ -202,7 +208,7 @@ class TaskView:
 
     def finished_task(self, competence_vector):
         if self.monitored_mode:
-            difficulty_data = dict(self.task_data["difficulty"])
+            difficulty_data = dict(self.reference_task["difficulty"])
             skills = list(difficulty_data.keys())
             scores = [competence_vector.get(skill, 0) for skill in skills]
             difficulties = [difficulty_data[skill] for skill in skills]

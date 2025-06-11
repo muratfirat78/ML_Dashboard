@@ -48,12 +48,9 @@ class LearningManagerModel:
                                     correct += 1
                         else:
                             amount_of_subsubtasks += 1
-                            print(value)
                             if current_performance.action_in_performance(subsubtask["action"],value):
                                 correct += 1
                 score = correct / amount_of_subsubtasks
-                print("correct: " +str(correct))
-                print("total: " + str(amount_of_subsubtasks))
                 return score
         return 0
     
@@ -76,9 +73,15 @@ class LearningManagerModel:
                     percentage_of_reference = (100/reference_accuracy) * current_accuracy
                     result = (min(100, percentage_of_reference)/100)
                     return result   
+                
         if reference_metric[0] == "MSE":
-            #todo
-            return 1
+            current_mse = performance.get_metric("MSE")
+            reference_mse = reference_metric[1]
+            if current_mse != None:
+                score = reference_mse / current_mse
+                score = min(1, score) # If the current MSE is lower (better than reference), the score will be 100% (1)
+                score = max(0, score) # take the max of the score and 0 to prevent score being lower than 0
+                return score
         return 0
     
     def get_competence_vector(self, overlap_score, task_difficulty, date):

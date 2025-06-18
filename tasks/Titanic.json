@@ -1,0 +1,304 @@
+{
+    "title": "Titanic survival chance prediction",
+    "description": "It’s the year 1912. The RMS Titanic has tragically struck an iceberg and begun sinking. As a data scientist in a secret rescue agency, you've been granted access to passenger data from the ship’s manifest. Your mission? Build a model that predicts who had the highest chance of survival.",
+    "mode": "guided",
+    "model_metric": [
+        "accuracy",
+        0.8
+    ],
+    "data_size": 711,
+    "missing_values": 0,
+    "type": "bool",
+    "range": "False-True",
+    "difficulty": [
+        [
+            "Data Cleaning",
+            60
+        ],
+        [
+            "Data Translation",
+            80
+        ],
+        [
+            "Data Transformation",
+            80
+        ],
+        [
+            "Statistics",
+            75
+        ],
+        [
+            "Model Training",
+            50
+        ],
+        [
+            "Predictive Modeling",
+            25
+        ]
+    ],
+    "dataset": "titanic.csv",
+    "subtasks": [
+        {
+            "title": "Data Cleaning",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataCleaning",
+                        "Drop Column"
+                    ],
+                    "value": [
+                        "Cabin",
+                        "PassengerId",
+                        "Pclass",
+                        "Name",
+                        "SibSp",
+                        "Parch",
+                        "Ticket",
+                        "Fare"
+                    ],
+                    "title": "Drop Columns",
+                    "description": "Remove columns that are irrelevant or redundant for the model.",
+                    "hints": [
+                        "Go to the Data Cleaning tab. Select the column(s), choose 'drop column', then click apply.",
+                        "Drop the following column(s): Cabin, PassengerId, Pclass, Name, SibSp, Parch, Ticket, Fare."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataCleaning",
+                        "Replace-Median"
+                    ],
+                    "value": [
+                        "Age"
+                    ],
+                    "title": "Replace Missing Values (Median)",
+                    "description": "Replace missing values in a column using the median.",
+                    "hints": [
+                        "Go to the Data Cleaning tab. Select the column, choose 'replace median', then click apply.",
+                        "Apply replace median to Age."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataCleaning",
+                        "Remove-Missing"
+                    ],
+                    "value": [
+                        "Embarked"
+                    ],
+                    "title": "Remove Rows with Missing Values",
+                    "description": "Remove rows that contain missing values in the column.",
+                    "hints": [
+                        "Go to the Data Cleaning tab. Select the column, choose 'remove missing', then click apply.",
+                        "Remove rows with missing values in Embarked."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": 2
+        },
+        {
+            "title": "Data Translation",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "LabelEncoding"
+                    ],
+                    "value": [
+                        "Embarked",
+                        "Sex"
+                    ],
+                    "title": "Label Encoding",
+                    "description": "Convert categorical columns into numeric codes.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'encoding', choose 'Label Encoding', then click apply.",
+                        "Apply label encoding to Embarked, Sex."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "ConvertToBoolean"
+                    ],
+                    "value": [
+                        "Survived"
+                    ],
+                    "title": "Convert to Boolean",
+                    "description": "Convert 1 and 0 values in the column to boolean (True/False).",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'Convert to Boolean', then click apply.",
+                        "Convert 'Survived' to boolean (True/False)."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": 3
+        },
+        {
+            "title": "Model Training",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "AssignTarget"
+                    ],
+                    "value": [
+                        "Survived"
+                    ],
+                    "title": "Assign Target Variable",
+                    "description": "Assign the column as the target variable for model training.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'Assign Target', then click apply.",
+                        "Assign 'Survived' as the target column."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "Split"
+                    ],
+                    "value": [
+                        "20%"
+                    ],
+                    "title": "Train/Test Split",
+                    "description": "Split dataset into training and testing sets.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, assign the target, set the test ratio, then click split.",
+                        "Use a test ratio of 20% for splitting the dataset."
+                    ],
+                    "applied_values": [],
+                    "order": 2
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "ModelDevelopment",
+                        "ParameterFinetuning"
+                    ],
+                    "value": [
+                        [
+                            "Logistic Regression"
+                        ]
+                    ],
+                    "title": "Parameter Finetuning",
+                    "description": "Optimize model performance by modifying the parameters of the model.",
+                    "hints": [
+                        "Go to the Predictive Modeling tab. Select the model type, adjust parameters if needed, then click train.",
+                        "Train the model using the following parameters: [['Logistic Regression']]."
+                    ],
+                    "applied_values": [],
+                    "order": 3
+                }
+            ],
+            "applied_values": [],
+            "order": 7
+        },
+        {
+            "title": "Predictive Modeling",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "ModelDevelopment",
+                        "ModelPerformance"
+                    ],
+                    "value": [
+                        [
+                            [
+                                "True-Positive",
+                                56
+                            ],
+                            [
+                                "False-Positive",
+                                16
+                            ],
+                            [
+                                "True-Negative",
+                                86
+                            ],
+                            [
+                                "False-Negative",
+                                20
+                            ],
+                            [
+                                "Accuracy",
+                                0.797752808988764
+                            ],
+                            [
+                                "Precision",
+                                0.7777777777777778
+                            ],
+                            [
+                                "Recall",
+                                0.7368421052631579
+                            ],
+                            [
+                                "ROCFPR",
+                                [
+                                    0.0,
+                                    0.1568627450980392,
+                                    1.0
+                                ]
+                            ],
+                            [
+                                "ROCTPR",
+                                [
+                                    0.0,
+                                    0.7368421052631579,
+                                    1.0
+                                ]
+                            ],
+                            [
+                                "data_size",
+                                711
+                            ],
+                            [
+                                "missing_values",
+                                0
+                            ],
+                            [
+                                "type",
+                                "bool"
+                            ],
+                            [
+                                "range",
+                                "False-True"
+                            ]
+                        ]
+                    ],
+                    "title": "Model Training",
+                    "description": "Train a model and evaluate its performance.",
+                    "hints": [],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": null
+        }
+    ]
+}

@@ -325,7 +325,7 @@ class ConvertPerformanceToTask:
         task["missing_values"] = performance.get_metric("missing_values")
         task["type"] = performance.get_metric("type")
         task["range"] = performance.get_metric("range")
-        task["difficulty"] = [('Data Cleaning',60), ('Data Translation',80),("Data Transformation", 0),("Statistics", 0),("Model Training", 0), ("Predictive Modeling", 0)]
+        task["difficulty"] = [('Data Cleaning',0), ('Data Translation',0),("Data Transformation", 0),("Statistics", 0),("Model Training", 0), ("Predictive Modeling", 0)]
         task["dataset"] = dataset
         task["subtasks"] = subtasks
         return task

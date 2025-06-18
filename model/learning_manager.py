@@ -36,6 +36,9 @@ class LearningManagerModel:
     def get_overlap_score(self, reference_task, skill, current_performance):
         for subtask in reference_task["subtasks"]:
             if subtask["title"] == skill:
+                if subtask["title"] == 'Predictive Modeling':
+                    pass
+                
                 amount_of_subsubtasks = 0
                 correct = 0
                 for subsubtask in subtask["subtasks"]:
@@ -46,11 +49,16 @@ class LearningManagerModel:
                                 amount_of_subsubtasks += 1
                                 if current_performance.action_in_performance(subsubtask["action"],parameter):
                                     correct += 1
+                        elif subsubtask["action"][1] == 'ModelPerformance':
+                            pass
                         else:
                             amount_of_subsubtasks += 1
                             if current_performance.action_in_performance(subsubtask["action"],value):
                                 correct += 1
-                score = correct / amount_of_subsubtasks
+                if amount_of_subsubtasks == 0:
+                    score = 0
+                else:
+                    score = correct / amount_of_subsubtasks
                 return score
         return 0
     
@@ -63,7 +71,6 @@ class LearningManagerModel:
 
     def get_predictive_modeling_score(self, reference_task, performance):
         reference_metric = reference_task["model_metric"]
-        
         if reference_metric[0] == "accuracy":
             current_accuracy = performance.get_metric("Accuracy")
             if current_accuracy != None:
@@ -167,8 +174,8 @@ class LearningManagerModel:
                 return competence_vector
 
         except Exception as e:
-            print("error:")
-            print(e)
+            # print("error:")
+            # print(e)
             return None
 
 
@@ -180,3 +187,4 @@ class LearningManagerModel:
             competence_vector = self.calculate_competence_vector(performance, None, None)
             if competence_vector != None:
                 self.controller.add_competence_vector(competence_vector)
+

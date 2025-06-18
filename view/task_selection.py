@@ -7,6 +7,7 @@ class TaskSelectionView:
         self.task_dropdown = None
         self.mode_dropdown = None
         self.select_button = None
+        self.start_developer_mode_button = None
         self.vbox = None
         self.vbox2 = None
         self.tab_set = None
@@ -58,6 +59,12 @@ class TaskSelectionView:
         )
         self.select_button.on_click(self.start_task)
 
+        self.start_developer_mode_button = widgets.Button(
+            description='Developer mode',
+            button_style='warning'
+        )
+        self.start_developer_mode_button.on_click(self.start_developer_mode)
+
         self.guided_mode_items = widgets.VBox([
             self.title_label,
             self.description_label
@@ -65,12 +72,14 @@ class TaskSelectionView:
 
         learning_path_view = self.controller.get_learning_path_view()
 
-        self.vbox = widgets.VBox([
-            self.mode_dropdown, self.recommmended_radio_buttons,self.task_dropdown,self.guided_mode_items, self.select_button
-        ])
+        display_items = [self.mode_dropdown, self.recommmended_radio_buttons,self.task_dropdown,self.guided_mode_items, self.select_button]
+
+        if not self.controller.get_online_version():
+            display_items += [self.start_developer_mode_button]
+
+        self.vbox = widgets.VBox(display_items)
 
         self.vbox2 = widgets.VBox([learning_path_view])
-        # self.vbox.layout.display = 'none'
 
         tabs = [self.vbox, self.vbox2]
         tab_set = widgets.Tab(tabs)
@@ -109,8 +118,6 @@ class TaskSelectionView:
         else:
             filtered_tasks = [task for task in self.tasks_data if task["mode"] == "monitored"]
 
-        filtered_tasks = self.controller.get_filtered_tasks(self.tasks_data, self.guided_mode, self.alltasks)
-
         self.task_map = {
             task["title"]: task for task in filtered_tasks
         }
@@ -127,6 +134,10 @@ class TaskSelectionView:
         selected_task = self.task_map[selected_title]
         self.controller.set_task_model(selected_task, monitored_mode)
         self.controller.read_dataset_view(selected_task["dataset"])
+        self.controller.hide_task_selection_and_show_tabs()
+
+    def start_developer_mode(self, event):
+        self.controller.set_developer_mode()
         self.controller.hide_task_selection_and_show_tabs()
 
     def hide_recommmended_radio_buttons(self):

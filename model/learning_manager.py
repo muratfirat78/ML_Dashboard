@@ -17,12 +17,12 @@ class LearningManagerModel:
         for filename in os.listdir(path):
             with open(os.path.join(path,filename),'r') as file:
                 for line in file:
-                    try:
-                        performance = StudentPerformance(self.controller)
-                        performance.string_to_student_performance(line, filename.replace('.txt', ''))
-                        self.learning_path.append(performance)
-                    except:
-                        print("Error reading performance")
+                    # try:
+                    performance = StudentPerformance(self.controller)
+                    performance.string_to_student_performance(line, filename.replace('.txt', ''))
+                    self.learning_path.append(performance)
+                    # except:
+                    #     print("Error reading performance")
 
 
     def subsubtask_in_current_task(self, action, value, current_task):

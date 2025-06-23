@@ -38,6 +38,7 @@ class StudentPerformance:
         
     def string_to_student_performance(self, input_str, date):
         input_str = re.sub(r'array\((\[.*?\])\)', r'\1', input_str)
+        print("INPUT STR:", input_str)
         data_dict = ast.literal_eval(input_str)
         self.addAction(['General','Date'], datetime.strptime(date, "%d-%m-%Y %H-%M-%S"))
         for category, actions in data_dict.items():

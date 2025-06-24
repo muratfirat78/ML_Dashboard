@@ -134,14 +134,16 @@ class LearningPathView:
             
             #Get reference task
             reference_task = self.controller.get_reference_task(target_column, dataset_name)
-            difficulty_data = dict(reference_task["difficulty"])
-            current_datetime = datetime.now()
+            if reference_task:
+                difficulty_data = dict(reference_task["difficulty"])
+                current_datetime = datetime.now()
 
-            self.label2.value = "Previous result (" + reference_task["title"] + "):"
+                self.label2.value = "Previous result (" + reference_task["title"] + "):"
 
-            competence_vector = self.controller.calculate_competence_vector(last_performance,reference_task, current_datetime)
-            img_html = self.controller.get_result_bar_chart(competence_vector, difficulty_data) 
-            self.previous_performance.value = img_html
-
-        else:
-            self.previous_performance.value = "No data found"
+                competence_vector = self.controller.calculate_competence_vector(last_performance,reference_task, current_datetime)
+                img_html = self.controller.get_result_bar_chart(competence_vector, difficulty_data) 
+                self.previous_performance.value = img_html
+                return
+            
+        # If reference task not found
+        self.previous_performance.value = "No data found"

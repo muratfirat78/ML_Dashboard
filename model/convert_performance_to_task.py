@@ -78,79 +78,25 @@ class ConvertPerformanceToTask:
 
         return title_map.get(action, "Unknown Task")        
 
+    def load_actions(self):
+        filename="./config/actions.txt"
+        actions = {}
+        with open(filename, "r") as file:
+            for line in file:
+                if "=" in line:
+                    key, value = line.strip().split("=", 1)
+                    actions[key.strip()] = value.strip()
+        return actions
+
     def get_description_subsubtask(self, subsubtask):
         action = subsubtask["action"][1]
-        if len(subsubtask["value"]) > 1:
-            columns = "columns"
-            verb = "Edit the ranges of"
-            drop = "Remove columns that are irrelevant or redundant for the model."
-            replace_mean = "Replace missing values in columns using the mean."
-            replace_median = "Replace missing values in columns using the median."
-            remove_missing = "Remove rows that contain missing values in columns."
-            replace_mode = "Replace missing values in columns using the most frequent value (mode)."
-            outlier_desc = "Detect and handle outliers in columns."
-            assign_target = "Assign columns as the target variables for model training."
-            convert_bool = "Convert 1 and 0 values in columns to boolean (True/False)."
-            standardize = "Standardize columns to have zero mean and unit variance."
-            normalize = "Normalize columns to scale values between 0 and 1."
-            label_encode = "Convert categorical columns into numeric codes."
-            onehot_encode = "Convert categorical columns into one-hot encoded vectors."
-        else:
-            columns = "column"
-            verb = "Edit the range of"
-            drop = "Remove a column that is irrelevant or redundant for the model."
-            replace_mean = "Replace missing values in a column using the mean."
-            replace_median = "Replace missing values in a column using the median."
-            remove_missing = "Remove rows that contain missing values in the column."
-            replace_mode = "Replace missing values in a column using the most frequent value (mode)."
-            outlier_desc = "Detect and handle outliers in the column."
-            assign_target = "Assign the column as the target variable for model training."
-            convert_bool = "Convert 1 and 0 values in the column to boolean (True/False)."
-            standardize = "Standardize the column to have zero mean and unit variance."
-            normalize = "Normalize the column to scale values between 0 and 1."
-            label_encode = "Convert the categorical column into numeric codes."
-            onehot_encode = "Convert the categorical column into a one-hot encoded vector."
+        actions = self.load_actions()
+        description = actions.get(action)
 
-        if action == "Edit Range":
-            return verb + f" {columns}."
-        if action == "Drop Column":
-            return drop
-        if action == "Replace-Mean":
-            return replace_mean
-        if action == "Replace-Median":
-            return replace_median
-        if action == "Remove-Missing":
-            return remove_missing
-        if action == "Replace-Mode":
-            return replace_mode
-        if action == "PCA":
-            return "Apply Principal Component Analysis to reduce dimensionality."
-        if action == "outlier":
-            return outlier_desc
-        if action == "AssignTarget":
-            return assign_target
-        if action == "ConvertToBoolean":
-            return convert_bool
-        if action == "Standardize":
-            return standardize
-        if action == "Normalize":
-            return normalize
-        if action == "Unbalancedness Upsample":
-            return "Handle class imbalance by upsampling the minority class."
-        if action == "Unbalancedness DownSample":
-            return "Handle class imbalance by downsampling the majority class."
-        if action == "Split":
-            return "Split dataset into training and testing sets."
-        if action == "LabelEncoding":
-            return label_encode
-        if action == "OneHotEncoding":
-            return onehot_encode
-        if action == "DataSet":
-            return "Load a dataset."
-        if action == "ParameterFinetuning":
-            return "Optimize model performance by modifying the parameters of the model."
-        if action == "ModelPerformance":
-            return "Train a model and evaluate its performance."
+        if description:
+            return description
+        else:
+            return f"No description available for action: {action}"
 
     def order_matters_subtask(self, subtask):
         if subtask["title"] == "Data Selection":

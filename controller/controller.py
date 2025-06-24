@@ -242,6 +242,7 @@ class Controller:
             # self.learning_path_model.set_performance_data()
             self.learning_manager_model.set_competence_vectors()
             self.learning_path_view.set_graph_data(self.get_graph_data())
+            self.learning_path_view.set_last_performance_data()
 
     def update_task_view(self, action, value):
         if self.developer_mode == False:
@@ -319,3 +320,6 @@ class Controller:
     
     def set_developer_mode(self):
         self.developer_mode = True
+    
+    def get_result_bar_chart(self,competence_vector, difficulty_data):
+        return self.main_view.get_result_bar_chart(competence_vector, difficulty_data)

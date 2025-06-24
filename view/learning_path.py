@@ -2,7 +2,7 @@ from ipywidgets import widgets
 import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
-import datetime
+from datetime import datetime
 
 
 class LearningPathView:
@@ -10,6 +10,7 @@ class LearningPathView:
         self.controller = controller
         self.graph_data = [{"date":None}]
         self.label = widgets.Label(value="Log current model:")
+        self.label2 = widgets.Label(value="Previous result:")
         self.list = widgets.SelectMultiple(
             options=[],
             value=[],
@@ -17,13 +18,7 @@ class LearningPathView:
             rows=20,
             layout={'width': '50%'}
         )
-        
-        self.display_dropdown = widgets.Dropdown(
-            options=list(["Current competence", "Learning path", "Current log"]),
-            description='Graph:',
-            disabled=False
-        )
-        self.display_dropdown.observe(self.display_dropdown_change, names='value')
+        self.previous_performance = widgets.HTML()
 
         self.skill_dropdown = widgets.Dropdown(
             options=list(["All"]),
@@ -35,38 +30,13 @@ class LearningPathView:
         self.bar_chart = widgets.Output()
         self.line_chart = widgets.Output()
     
-        self.update_bar_chart()
-        self.update_line_chart({"new": "All"})
-        self.bar_chart.layout.display = 'block'
-        self.skill_dropdown.layout.display = 'none'
-        self.line_chart.layout.display = 'none'
-        self.list.layout.display = 'none' 
-        self.label.layout.display = 'none'  
-        self.hbox =  widgets.VBox([self.display_dropdown,self.skill_dropdown, self.bar_chart, self.line_chart, self.label,self.list])
-
-    def display_dropdown_change(self, value):
-        selection = value["new"]
-
-        if selection == "Learning path":
-            self.line_chart.layout.display = 'block'
-            self.skill_dropdown.layout.display = 'block'
-            self.bar_chart.layout.display = 'none'
-            self.label.layout.display = 'none'  
-            self.list.layout.display = 'none'
-
-        elif selection == "Current competence":
-            self.line_chart.layout.display = 'none'
-            self.skill_dropdown.layout.display = 'none'
-            self.bar_chart.layout.display = 'block'
-            self.label.layout.display = 'none'  
-            self.list.layout.display = 'none'
-
-        elif selection == "Current log":
-            self.line_chart.layout.display = 'none'
-            self.skill_dropdown.layout.display = 'none'
-            self.bar_chart.layout.display = 'none'
-            self.label.layout.display = 'block'  
-            self.list.layout.display = 'block'
+        self.log = widgets.VBox([self.label,self.list])
+        self.log.layout = widgets.Layout(width='50%')
+        self.previous_performance.layout = widgets.Layout(width='50%')
+        self.last_result = widgets.VBox([self.label2,self.previous_performance])
+     
+        self.hbox = widgets.VBox([widgets.HBox([self.bar_chart, self.line_chart])
+                                , widgets.HBox([self.log,self.last_result])])
 
     def get_icon(self, category):
         if category == 'SelectData':
@@ -127,7 +97,7 @@ class LearningPathView:
             max_value = 100
             min_value = 0
             df_melted['Value'] = 5 * (df_melted['Value'] - min_value) / (max_value - min_value)
-            plt.figure(figsize=(12, 6))
+            plt.figure(figsize=(12, 5.6))
             sns.lineplot(data=df_melted, x='date', y='Value', hue='Competence', marker='o', palette='viridis')
             plt.ylim(0, 5)
             plt.yticks([0, 1, 2, 3, 4, 5], ['Beginner', 'Basic Knowledge', 'Intermediate', 'Experienced', 'Expert', 'Master'])
@@ -150,6 +120,28 @@ class LearningPathView:
         self.graph_data = graph_data
         if len(graph_data) > 0:
             graph_data = graph_data[-1].copy()
-            self.skill_dropdown.options = ["All"] + [item[0] for item in list(graph_data.items())[1:]]
             self.update_bar_chart()
-            self.update_line_chart({"new": "All"})
+            self.update_line_chart({"new": "Predictive Modeling"})
+    
+    def set_last_performance_data(self):
+        learning_path = self.controller.get_learning_path()
+        if len(learning_path) > 0:
+            last_performance = learning_path[-1]
+            # Convert to task to get target and dataset name more easily
+            task = self.controller.convert_performance_to_task(last_performance, "", "")
+            target_column = self.controller.get_target_task(task)
+            dataset_name = task["dataset"].replace(".csv", "")
+            
+            #Get reference task
+            reference_task = self.controller.get_reference_task(target_column, dataset_name)
+            difficulty_data = dict(reference_task["difficulty"])
+            current_datetime = datetime.now()
+
+            self.label2.value = "Previous result (" + reference_task["title"] + "):"
+
+            competence_vector = self.controller.calculate_competence_vector(last_performance,reference_task, current_datetime)
+            img_html = self.controller.get_result_bar_chart(competence_vector, difficulty_data) 
+            self.previous_performance.value = img_html
+
+        else:
+            self.previous_performance.value = "No data found"

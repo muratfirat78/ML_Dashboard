@@ -1,8 +1,5 @@
 from IPython.display import HTML, display, clear_output
-import matplotlib.pyplot as plt
 import ipywidgets as widgets
-from io import BytesIO
-import numpy as np
 import uuid
 import json
 
@@ -155,37 +152,7 @@ class TaskView:
     def finished_task(self, competence_vector):
         if self.monitored_mode:
             difficulty_data = dict(self.reference_task["difficulty"])
-            skills = list(difficulty_data.keys())
-            scores = [competence_vector.get(skill, 0) for skill in skills]
-            difficulties = [difficulty_data[skill] for skill in skills]
-            y_pos = np.arange(len(skills))
-
-            fig, ax = plt.subplots(figsize=(3, 2.5))
-            ax.barh(y_pos, scores, color='steelblue', label='Your score')
-            for i, diff in enumerate(difficulties):
-                ax.plot([diff, diff], [i - 0.4, i + 0.4], color='red', linewidth=2)
-
-            ax.set_yticks(y_pos)
-            ax.set_yticklabels(skills, fontsize=8)
-            ax.set_xlim(0, 100)
-            ax.set_xlabel("Score", fontsize=9)
-            ax.set_title("Results", fontsize=10)
-            ax.invert_yaxis()
-
-            handles = [
-                plt.Line2D([], [], color='red', linewidth=2, label='Difficulty (max score)'),
-                plt.Rectangle((0, 0), 1, 1, color='steelblue', label='Your score')
-            ]
-            fig.legend(handles=handles, loc='lower center', bbox_to_anchor=(0.5, -0.15), ncol=2, fontsize=7)
-            plt.tight_layout()
-
-            buf = BytesIO()
-            plt.savefig(buf, format='png', bbox_inches='tight')
-            buf.seek(0)
-            import base64
-            img_b64 = base64.b64encode(buf.getvalue()).decode('utf-8')
-            img_html = f'<img src="data:image/png;base64,{img_b64}" width="300"/>'
-            plt.close(fig)
+            img_html = self.controller.get_result_bar_chart(competence_vector, difficulty_data)
             self.vbox.value += f"""
             <details open class='task-box' style='max-width: 300px;'>
                 <summary><b>🎉 Task completed</b></summary>

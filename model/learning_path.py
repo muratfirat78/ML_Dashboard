@@ -7,7 +7,6 @@ class LearningPathModel:
         self.controller = controller
         self.performance_data = []
         self.competence_vectors = []
-        self.current_competence_vector = None
 
     def get_competence_vectors(self):
         return self.competence_vectors
@@ -37,4 +36,8 @@ class LearningPathModel:
         self.competence_vectors.append(vector)
 
     def get_current_competence_vector(self):
-        return self.current_competence_vector
+        if len(self.competence_vectors) > 0:
+            # Return the most recent competence vector
+            return self.competence_vectors[-1]
+        else:
+            return None

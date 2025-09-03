@@ -11,7 +11,7 @@ class TaskSelectionView:
         self.vbox = None
         self.vbox2 = None
         self.tab_set = None
-        self.alltasks = False
+        self.recommendations_only = False
         self.guided_mode = True
 
         self.tasks_data = controller.get_tasks_data()
@@ -51,7 +51,6 @@ class TaskSelectionView:
         )
         self.recommmended_radio_buttons.observe(self.filter_task_selection, names='value')
 
-        self.recommmended_radio_buttons.layout.display = 'none'
 
         self.select_button = widgets.Button(
             description='Start Task',
@@ -100,23 +99,18 @@ class TaskSelectionView:
     def filter_task_selection(self, change):
         if change != None:
             if change["new"] == "Recommend me tasks":
-                self.alltasks = False
+                self.recommendations_only = True
                 
             if change["new"] == "Show me all tasks":
-                self.alltasks = True
+                self.recommendations_only = False
 
             if change["new"] == "Guidance for a task":
                 self.guided_mode = True
-                self.hide_recommmended_radio_buttons()
 
             if change["new"] == "My performance monitored":
                 self.guided_mode = False
-                self.show_recommmended_radio_buttons()
 
-        if self.guided_mode:
-            filtered_tasks = [task for task in self.tasks_data if task["mode"] == "guided"]
-        else:
-            filtered_tasks = [task for task in self.tasks_data if task["mode"] == "monitored"]
+        filtered_tasks = self.controller.get_filtered_tasks(self.tasks_data,self.recommendations_only, self.guided_mode)
 
         self.task_map = {
             task["title"]: task for task in filtered_tasks
@@ -139,14 +133,6 @@ class TaskSelectionView:
     def start_developer_mode(self, event):
         self.controller.set_developer_mode()
         self.controller.hide_task_selection_and_show_tabs()
-
-    def hide_recommmended_radio_buttons(self):
-        self.recommmended_radio_buttons.layout.display = 'none'
-        
-    def show_recommmended_radio_buttons(self):
-        # Todo: implenment recommendation of exercises
-        # self.recommmended_radio_buttons.layout = widgets.Layout(visibility = 'visible')
-        self.recommmended_radio_buttons.layout.display = 'none'
 
     def get_task_selection_view(self):
         return self.tab_set

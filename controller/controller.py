@@ -287,9 +287,9 @@ class Controller:
     def convert_performance_to_task(self,performance, title, description):
         return self.convertPerformanceToTask.convert_performance_to_task(performance, title, description)
     
-    def get_filtered_tasks(self, tasks, guided_mode, all_tasks):
+    def get_filtered_tasks(self, tasks, recommendations_only, guided_mode):
         current_competence_vector = self.learning_path_model.get_current_competence_vector()
-        return self.task_selection_model.get_filtered_tasks(tasks, guided_mode, all_tasks, current_competence_vector)
+        return self.task_selection_model.get_filtered_tasks(tasks, guided_mode, recommendations_only, current_competence_vector)
     
     def get_target_task(self, task):
         return self.task_model.get_target(task)

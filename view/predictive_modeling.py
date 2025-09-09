@@ -232,7 +232,7 @@ class PredictiveModelingView:
         self.dtdepth.layout.visibility = 'hidden'
         self.dtdepth.layout.display = 'none'
         self.dtcrit = widgets.Dropdown(options=['entropy','gini'],description = 'Criterion')
-        self.dtcrit.layout.width = '175px'
+        self.dtcrit.layout.width = '140px'
         self.dtcrit.layout.display = 'none'
         self.dtminseg = widgets.Dropdown(options=[i for i in range(1,6)],description = 'MinSeg')
         self.dtminseg.layout.width = '125px'
@@ -245,7 +245,7 @@ class PredictiveModelingView:
         self.knnmetric.layout.width = '125px'
         self.knnmetric.layout.display = 'none'
 
-        self.mdplbl = widgets.Label( value="MaxDepth: ")
+        self.mdplbl = widgets.Label( value="MaxDep")
         self.mdplbl.layout.visibility = 'hidden'
         self.mdplbl.layout.display = 'none'
         self.mgplbl = widgets.Label( value="MinSeg: ")
@@ -275,7 +275,7 @@ class PredictiveModelingView:
                                  trmodels,model_sumry
                                 ])
 
-        vbox1 = VBox(children = [HBox(children=[self.main_view.f_box,sel_box]),t4_results],layout= Layout(width='65%'))
+        vbox1 = VBox(children = [HBox(children=[self.main_view.f_box,sel_box]),t4_results])
 
         self.performpage = widgets.Output()
 
@@ -283,5 +283,5 @@ class PredictiveModelingView:
         vbox2 = VBox(children = [self.performpage])
         tab_4 = HBox(children=[vbox1,vbox2])
         
-        tab_4.layout.height = '450px'
+        tab_4.layout.height = '600px'
         return tab_4

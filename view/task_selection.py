@@ -89,7 +89,7 @@ class TaskSelectionView:
 
     def get_description(self, title):
         task = self.task_map.get(title, {})
-        return f"<i>{task['description']}</i>" if task else ""
+        return f"{task['description']}" if task else ""
 
     def update_title_and_description(self, change):
         new_title = change['new']

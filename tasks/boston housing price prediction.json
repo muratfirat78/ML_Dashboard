@@ -1,0 +1,208 @@
+{
+    "title": "Boston House Price Prediction",
+    "description": "The Boston House Price Prediction project focuses on the challenge of figuring out house prices in the Boston area. Buyers, real estate agents, and investors often find it hard to estimate prices because many factors affect the housing market, and understanding their impact can be complicated and time-consuming. Without a reliable prediction model, decisions can be less accurate, leading to poor investments or missed opportunities. The goal is to create a machine learning model that can accurately predict housing prices in Boston.",
+    "mode": "guided",
+    "model_metric": [
+        "MSE",
+        12.7
+    ],
+    "data_size": 388,
+    "missing_values": 0,
+    "type": "float64",
+    "range": "5.0-50.0",
+    "difficulty": [
+        [
+            "Data Cleaning",
+            0
+        ],
+        [
+            "Data Translation",
+            0
+        ],
+        [
+            "Data Transformation",
+            0
+        ],
+        [
+            "Statistics",
+            0
+        ],
+        [
+            "Model Training",
+            0
+        ],
+        [
+            "Predictive Modeling",
+            0
+        ]
+    ],
+    "dataset": "HousingData.csv",
+    "subtasks": [
+        {
+            "title": "Data Cleaning",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataCleaning",
+                        "Replace-Median"
+                    ],
+                    "value": [
+                        "CRIM",
+                        "ZN",
+                        "INDUS",
+                        "AGE",
+                        "LSTAT"
+                    ],
+                    "title": "Replace Missing Values (Median)",
+                    "description": "Replace missing values in columns using the median.",
+                    "hints": [
+                        "Go to the Data Cleaning tab. Select the column, choose 'replace median', then click apply.",
+                        "Apply replace median to CRIM, ZN, INDUS, AGE, LSTAT."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataCleaning",
+                        "Remove-Missing"
+                    ],
+                    "value": [
+                        "CHAS"
+                    ],
+                    "title": "Remove Rows with Missing Values",
+                    "description": "Remove rows that contain missing values in columns.",
+                    "hints": [
+                        "Go to the Data Cleaning tab. Select the column, choose 'remove missing', then click apply.",
+                        "Remove rows with missing values in CHAS."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": 2
+        },
+        {
+            "title": "Model Training",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "AssignTarget"
+                    ],
+                    "value": [
+                        "MEDV"
+                    ],
+                    "title": "Assign Target Variable",
+                    "description": "Assign columns as the target variables for model training.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'Assign Target', then click apply.",
+                        "Assign 'MEDV' as the target column."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "Split"
+                    ],
+                    "value": [
+                        "20%"
+                    ],
+                    "title": "Train/Test Split",
+                    "description": "Split dataset into training and testing sets.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, assign the target, set the test ratio, then click split.",
+                        "Use a test ratio of 20% for splitting the dataset."
+                    ],
+                    "applied_values": [],
+                    "order": 2
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "ModelDevelopment",
+                        "ParameterFinetuning"
+                    ],
+                    "value": [
+                        [
+                            "Random Forest",
+                            105,
+                            "entropy"
+                        ]
+                    ],
+                    "title": "Parameter Finetuning",
+                    "description": "Optimize model performance by modifying the parameters of the model.",
+                    "hints": [
+                        "Go to the Predictive Modeling tab. Select the model type, adjust parameters if needed, then click train.",
+                        "Train the model using the following parameters: [['Random Forest', 105, 'entropy']]."
+                    ],
+                    "applied_values": [],
+                    "order": 3
+                }
+            ],
+            "applied_values": [],
+            "order": 7
+        },
+        {
+            "title": "Predictive Modeling",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "ModelDevelopment",
+                        "ModelPerformance"
+                    ],
+                    "value": [
+                        [
+                            [
+                                "MSE",
+                                12.772283983525364
+                            ],
+                            [
+                                "MAE",
+                                2.547142857142855
+                            ],
+                            [
+                                "RSquared",
+                                0.8773441151262924
+                            ],
+                            [
+                                "data_size",
+                                388
+                            ],
+                            [
+                                "missing_values",
+                                0
+                            ],
+                            [
+                                "type",
+                                "float64"
+                            ],
+                            [
+                                "range",
+                                "5.0-50.0"
+                            ]
+                        ]
+                    ],
+                    "title": "Model Training",
+                    "description": "Train a model and evaluate its performance.",
+                    "hints": [],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": null
+        }
+    ]
+}

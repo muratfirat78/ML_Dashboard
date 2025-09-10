@@ -1,111 +1,83 @@
 {
-    "title": "Titanic survival chance prediction",
-    "description": "Using passenger data from the RMS Titanic, develop a predictive model to estimate the probability of survival for each individual.",
-    "mode": "monitored",
+    "title": "Heart disease prediction",
+    "description": "In this task, we analyze the heart data, which contains patient information such as age, gender, blood pressure, cholesterol, ECG features, and more. The goal is to explore the data and predict if the patient has a heart disease. (hint: use PCA)",
+    "mode": "guided",
     "model_metric": [
         "accuracy",
-        0.8
+        0.82
     ],
-    "data_size": 711,
+    "data_size": 242,
     "missing_values": 0,
     "type": "bool",
     "range": "False-True",
     "difficulty": [
         [
             "Data Cleaning",
-            60
+            0
         ],
         [
             "Data Translation",
-            80
+            0
         ],
         [
             "Data Transformation",
-            80
+            0
         ],
         [
             "Statistics",
-            75
+            0
         ],
         [
             "Model Training",
-            50
+            0
         ],
         [
             "Predictive Modeling",
-            25
+            0
         ]
     ],
-    "dataset": "titanic.csv",
+    "dataset": "heart.csv",
     "subtasks": [
         {
-            "title": "Data Cleaning",
+            "title": "Statistics",
             "status": "todo",
             "subtasks": [
                 {
                     "status": "todo",
                     "action": [
-                        "DataCleaning",
-                        "Drop Column"
+                        "DataProcessing",
+                        "PCA"
                     ],
                     "value": [
-                        "Cabin",
-                        "PassengerId",
-                        "Pclass",
-                        "Name",
-                        "SibSp",
-                        "Parch",
-                        "Ticket",
-                        "Fare"
+                        [
+                            "age",
+                            "trestbps",
+                            "chol",
+                            "thalach"
+                        ],
+                        [
+                            "cp",
+                            "fbs",
+                            "restecg",
+                            "exang",
+                            "oldpeak",
+                            "slope",
+                            "ca",
+                            "thal"
+                        ]
                     ],
-                    "title": "Drop Columns",
-                    "description": "Remove columns that are irrelevant or redundant for the model.",
+                    "title": "Dimensionality Reduction (PCA)",
+                    "description": "Apply Principal Component Analysis to reduce dimensionality.",
                     "hints": [
-                        "Go to the Data Cleaning tab. Select the column(s), choose 'drop column', then click apply.",
-                        "Drop the following column(s): Cabin, PassengerId, Pclass, Name, SibSp, Parch, Ticket, Fare."
-                    ],
-                    "applied_values": [],
-                    "order": 1
-                },
-                {
-                    "status": "todo",
-                    "action": [
-                        "DataCleaning",
-                        "Replace-Median"
-                    ],
-                    "value": [
-                        "Age"
-                    ],
-                    "title": "Replace Missing Values (Median)",
-                    "description": "Replace missing values in a column using the median.",
-                    "hints": [
-                        "Go to the Data Cleaning tab. Select the column, choose 'replace median', then click apply.",
-                        "Apply replace median to Age."
-                    ],
-                    "applied_values": [],
-                    "order": 1
-                },
-                {
-                    "status": "todo",
-                    "action": [
-                        "DataCleaning",
-                        "Remove-Missing"
-                    ],
-                    "value": [
-                        "Embarked"
-                    ],
-                    "title": "Remove Rows with Missing Values",
-                    "description": "Remove rows that contain missing values in the column.",
-                    "hints": [
-                        "Go to the Data Cleaning tab. Select the column, choose 'remove missing', then click apply.",
-                        "Remove rows with missing values in Embarked."
+                        "Go to the Data Processing tab. Choose the column(s), select 'feature extraction', choose 'PCA', then click 'Add PCA' and apply.",
+                        "Apply PCA to the following column(s): [['age', 'trestbps', 'chol', 'thalach'], ['cp', 'fbs', 'restecg', 'exang', 'oldpeak', 'slope', 'ca', 'thal']]."
                     ],
                     "applied_values": [],
                     "order": 1
                 }
             ],
             "applied_values": [],
-            "order": 2
+            "order": 5
         },
         {
             "title": "Data Translation",
@@ -115,17 +87,17 @@
                     "status": "todo",
                     "action": [
                         "DataProcessing",
-                        "LabelEncoding"
+                        "ConvertToBoolean"
                     ],
                     "value": [
-                        "Embarked",
-                        "Sex"
+                        "sex",
+                        "target"
                     ],
-                    "title": "Label Encoding",
-                    "description": "Convert categorical columns into numeric codes.",
+                    "title": "Convert to Boolean",
+                    "description": "Convert 1 and 0 values in columns to boolean (True/False).",
                     "hints": [
-                        "Go to the Data Processing tab. Choose the column, select 'encoding', choose 'Label Encoding', then click apply.",
-                        "Apply label encoding to Embarked, Sex."
+                        "Go to the Data Processing tab. Choose the column, select 'Convert to Boolean', then click apply.",
+                        "Convert 'sex, target' to boolean (True/False)."
                     ],
                     "applied_values": [],
                     "order": 1
@@ -134,16 +106,16 @@
                     "status": "todo",
                     "action": [
                         "DataProcessing",
-                        "ConvertToBoolean"
+                        "OneHotEncoding"
                     ],
                     "value": [
-                        "Survived"
+                        "sex"
                     ],
-                    "title": "Convert to Boolean",
-                    "description": "Convert 1 and 0 values in the column to boolean (True/False).",
+                    "title": "One-Hot Encoding",
+                    "description": "Convert categorical columns into one-hot encoded vectors.",
                     "hints": [
-                        "Go to the Data Processing tab. Choose the column, select 'Convert to Boolean', then click apply.",
-                        "Convert 'Survived' to boolean (True/False)."
+                        "Go to the Data Processing tab. Choose the column, select 'encoding', choose 'One Hot Encoding', then click apply.",
+                        "Apply one-hot encoding to sex."
                     ],
                     "applied_values": [],
                     "order": 1
@@ -163,13 +135,13 @@
                         "AssignTarget"
                     ],
                     "value": [
-                        "Survived"
+                        "target"
                     ],
                     "title": "Assign Target Variable",
-                    "description": "Assign the column as the target variable for model training.",
+                    "description": "Assign columns as the target variables for model training.",
                     "hints": [
                         "Go to the Data Processing tab. Choose the column, select 'Assign Target', then click apply.",
-                        "Assign 'Survived' as the target column."
+                        "Assign 'target' as the target column."
                     ],
                     "applied_values": [],
                     "order": 1
@@ -200,14 +172,16 @@
                     ],
                     "value": [
                         [
-                            "Logistic Regression"
+                            "KNN",
+                            14,
+                            "minkowski"
                         ]
                     ],
                     "title": "Parameter Finetuning",
                     "description": "Optimize model performance by modifying the parameters of the model.",
                     "hints": [
                         "Go to the Predictive Modeling tab. Select the model type, adjust parameters if needed, then click train.",
-                        "Train the model using the following parameters: [['Logistic Regression']]."
+                        "Train the model using the following parameters: [['KNN', 14, 'minkowski']]."
                     ],
                     "applied_values": [],
                     "order": 3
@@ -230,51 +204,35 @@
                         [
                             [
                                 "True-Positive",
-                                56
+                                21
                             ],
                             [
                                 "False-Positive",
-                                16
+                                4
                             ],
                             [
                                 "True-Negative",
-                                86
+                                29
                             ],
                             [
                                 "False-Negative",
-                                20
+                                7
                             ],
                             [
                                 "Accuracy",
-                                0.797752808988764
+                                0.819672131147541
                             ],
                             [
                                 "Precision",
-                                0.7777777777777778
+                                0.84
                             ],
                             [
                                 "Recall",
-                                0.7368421052631579
-                            ],
-                            [
-                                "ROCFPR",
-                                [
-                                    0.0,
-                                    0.1568627450980392,
-                                    1.0
-                                ]
-                            ],
-                            [
-                                "ROCTPR",
-                                [
-                                    0.0,
-                                    0.7368421052631579,
-                                    1.0
-                                ]
+                                0.75
                             ],
                             [
                                 "data_size",
-                                711
+                                242
                             ],
                             [
                                 "missing_values",

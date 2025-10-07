@@ -38,6 +38,7 @@ class LearningPathView:
         self.hbox = widgets.VBox([widgets.HBox([self.bar_chart, self.line_chart])
                                 , widgets.HBox([self.log,self.last_result])])
 
+
     def get_icon(self, category):
         if category == 'SelectData':
             return '(Data selection)'

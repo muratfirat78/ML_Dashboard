@@ -114,6 +114,9 @@ class DataSelectionView:
 
         self.datafolder=widgets.Text(description ='Folder name:',value = 'DataSets')
         self.main_view.datasets = widgets.Dropdown(options=[], description='DataSets:',layout = Layout(width='50%'))
+        if not self.controller.developer_mode:
+             self.datafolder.disabled = True
+             self.main_view.datasets.disabled = True
 
         butlay = Layout(width='75px')
         butlay.display = 'none'

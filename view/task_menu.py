@@ -27,7 +27,7 @@ class TaskMenuView:
         self.subsubtask_textarea = widgets.Textarea("",description='Task:', layout=widgets.Layout(width="100%"))
         self.hint_label = widgets.Label("Hints:", layout=widgets.Layout(height="35px"))
         self.hint_textarea = widgets.Textarea("", description='Hints:',layout=widgets.Layout(width="100%"))
-        self.status_label = widgets.Label("status:todo", layout=widgets.Layout(height="35px"))
+        self.status_label = widgets.HTML("status:todo", layout=widgets.Layout(height="35px"))
         self.button_box = widgets.GridBox(
             children=[self.previous_button, self.hint_button, self.next_button],
             layout=widgets.Layout(
@@ -74,6 +74,7 @@ class TaskMenuView:
         
         if id is not None:
             id -= 1
+
             if id >= len(self.task_list) and self.finishedtask:
                 self.subsubtask_textarea.description = "Results:"
                 if self.mode == "monitored":
@@ -119,7 +120,7 @@ class TaskMenuView:
                 else:
                     color = "black"
 
-                self.status_label.value = "Status: "  + rf"$\quad \color{{{color}}}{{{status}}}$"
+                self.status_label.value = f'<b>Status:</b> <span style="color:{color};">{status}</span>'
                 self.subsubtask_textarea.value = textarea_value
             
                 # Hints

@@ -55,8 +55,6 @@ class MainView:
          self.tab_set.set_title(index, titlename)
 
     def get_result_bar_chart(self,competence_vector, difficulty_data):
-          print("hier6")
-          print(competence_vector)
           skills = list(difficulty_data.keys())
           scores = [competence_vector.get(skill, 0) for skill in skills]
           difficulties = [difficulty_data[skill] for skill in skills]

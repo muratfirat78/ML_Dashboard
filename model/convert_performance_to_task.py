@@ -275,3 +275,4 @@ class ConvertPerformanceToTask:
         task["dataset"] = dataset
         task["subtasks"] = subtasks
         return task
+

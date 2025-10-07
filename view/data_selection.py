@@ -7,12 +7,13 @@ from ipywidgets import *
 
 
 class DataSelectionView:
-    def __init__(self, controller, main_view):
+    def __init__(self, controller, main_view, task_menu):
         self.controller = controller
         self.datafolder = None
         self.main_view = main_view
         self.DFPage = None
         self.InfoPage = None
+        self.task_menu = task_menu
 
     def fileClick(self, event):
         global wslay,wsheets,butlay
@@ -132,6 +133,7 @@ class DataSelectionView:
 
 
         tab_1 = VBox(children=[
+            self.task_menu,
             HBox(children = [self.datafolder,self.main_view.datasets,wsheets,self.readfile],layout=filelay),
             HBox(children = [self.DFPage,self.InfoPage],layout = fthboxlay)],layout=tablayout)
         tab_1.layout.height = '700px'

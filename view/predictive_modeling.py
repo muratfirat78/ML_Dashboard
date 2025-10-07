@@ -9,7 +9,7 @@ import numpy as np
 from array import array
 
 class PredictiveModelingView:
-    def __init__(self, controller, main_view):
+    def __init__(self, controller, main_view,task_menu):
         self.controller = controller
         self.main_view = main_view
         self.dtdepth = None
@@ -25,6 +25,7 @@ class PredictiveModelingView:
         self.svcc = None
         self.svckrnl= None
         self.performpage = None
+        self.task_menu = task_menu
         
     def models_click(self,change):     
         global  trmodels,model_sumry
@@ -281,7 +282,8 @@ class PredictiveModelingView:
 
 
         vbox2 = VBox(children = [self.performpage])
-        tab_4 = HBox(children=[vbox1,vbox2])
+        tab_4 = VBox([self.task_menu,
+                      HBox([vbox1,vbox2])])
         
-        tab_4.layout.height = '600px'
+        tab_4.layout.height = '700px'
         return tab_4

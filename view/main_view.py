@@ -30,7 +30,8 @@ class MainView:
         tab_set.set_title(2, 'Data Processing')
         tab_set.set_title(3, 'Predictive Modeling')
         tab_set.set_title(4, 'Logging')
-        tab_set.layout.display = 'none'
+        tab_set.layout.width='100%'
+        tab_set.layout.display = 'none' 
         self.tab_set = tab_set
 
     def show_tabs(self):
@@ -39,8 +40,13 @@ class MainView:
     def get_tabs(self):
          return self.tab_set
 
-    def get_ui(self, login, tabs, task, task_selection):
-         return widgets.HBox([task,widgets.VBox([login, task_selection, tabs])])
+    def get_ui(self, login, task_selection, tabs):
+        main_vbox = VBox([login, task_selection, tabs],
+                         layout=Layout(flex='1', display='flex', width='100%'))
+
+        ui = HBox([main_vbox],
+                  layout=Layout(width='100%', display='flex'))
+        return ui
     
     def close_tab(self, index):
          self.tabs[index].close()
@@ -49,6 +55,8 @@ class MainView:
          self.tab_set.set_title(index, titlename)
 
     def get_result_bar_chart(self,competence_vector, difficulty_data):
+          print("hier6")
+          print(competence_vector)
           skills = list(difficulty_data.keys())
           scores = [competence_vector.get(skill, 0) for skill in skills]
           difficulties = [difficulty_data[skill] for skill in skills]

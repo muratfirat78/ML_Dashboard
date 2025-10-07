@@ -1,0 +1,14 @@
+Target: species
+
+Columns:
+Id: Unique identifier for each flower sample.
+
+SepalLengthCm: Length of the sepal in centimeters.
+
+SepalWidthCm: Width of the sepal in centimeters.
+
+PetalLengthCm: Length of the petal in centimeters.
+
+PetalWidthCm: Width of the petal in centimeters.
+
+Species: Type of iris flower 

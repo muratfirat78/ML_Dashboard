@@ -1,0 +1,20 @@
+target: mpg
+
+columns:
+mpg: Miles per gallon (fuel efficiency of the car).
+
+cylinders: Number of cylinders in the engine 
+
+displacement: Engine size in cubic inches 
+
+horsepower: Engine power output 
+
+weight: Car weight in pounds
+
+acceleration: Time taken to accelerate from 0 to 60 mph 
+
+model year: Year of manufacture
+
+origin: Region where the car was manufactured (1 = USA, 2 = Europe, 3 = Japan).
+
+car name: The car’s name/model (unique for each instance).

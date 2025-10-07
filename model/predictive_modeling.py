@@ -184,9 +184,9 @@ class PredictiveModelingModel:
                     mymodel.GetPerformanceDict()['Precision'] = precision_score(ytest_df, y_pred)
                     mymodel.GetPerformanceDict()['Recall'] = recall_score(ytest_df, y_pred)
                   
-                    fpr,tpr,thrs = roc_curve(ytest_df, y_pred)
-                    mymodel.GetPerformanceDict()['ROCFPR'] = fpr
-                    mymodel.GetPerformanceDict()['ROCTPR'] = tpr
+                    # fpr,tpr,thrs = roc_curve(ytest_df, y_pred)
+                    # mymodel.GetPerformanceDict()['ROCFPR'] = fpr
+                    # mymodel.GetPerformanceDict()['ROCTPR'] = tpr
                    
                 else:
                     mymodel.GetPerformanceDict()['Accuracy'] = accuracy_score(ytest_df, y_pred)

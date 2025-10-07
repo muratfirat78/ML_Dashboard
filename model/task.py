@@ -58,7 +58,14 @@ class TaskModel:
   def list_in_lists(self, list, lists):
     for list_to_check in lists:
       if sorted(list,key=str) == sorted(list_to_check,key=str):
+        print(sorted(list,key=str))
+        print("==")
+        print(sorted(list_to_check,key=str))
         return True
+
+      print(sorted(list,key=str))
+      print("!=")
+      print(sorted(list_to_check,key=str))
     return False
 
   def get_correct(self, subsubtask):
@@ -94,10 +101,16 @@ class TaskModel:
           #check string
           if isinstance(value,str):
             if value not in subsubtask["value"]:
+              print(value)
+              print("string not in")
+              print(subsubtask["value"])
               incorrect = True
           #check list
           if isinstance(value,list):
              if not self.list_in_lists(value, subsubtask["value"]):
+                print(value)
+                print("list not in ")
+                print(subsubtask["value"])
                 incorrect = True
         return incorrect
 

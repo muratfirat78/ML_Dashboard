@@ -20,6 +20,7 @@ from view.main_view import MainView
 from view.predictive_modeling import PredictiveModelingView
 from view.login import LoginView
 from view.task import TaskView
+from view.task_menu import TaskMenuView
 from view.task_selection import TaskSelectionView
 import json
 import numpy as np
@@ -32,13 +33,15 @@ class Controller:
         self.logger = Logger(self)
         self.login_view = LoginView(self)
         self.login_model = LoginModel(self)
-        self.data_selection_view = DataSelectionView(self, self.main_view)
+        self.task_menu = TaskMenuView(self)
+        task_menu = self.task_menu.get_task_menu()
+        self.data_selection_view = DataSelectionView(self, self.main_view, task_menu)
         self.data_selection_model = DataSelectionModel(self.main_model, self.logger)
-        self.data_cleaning_view = DataCleaningView(self, self.main_view)
+        self.data_cleaning_view = DataCleaningView(self, self.main_view, task_menu)
         self.data_cleaning_model = DataCleaningModel(self.main_model, self.logger)
-        self.data_processing_view = DataProcessingView(self, self.main_view)
+        self.data_processing_view = DataProcessingView(self, self.main_view, task_menu)
         self.data_processing_model = DataProcessingModel(self.main_model, self.logger)
-        self.predictive_modeling_view = PredictiveModelingView(self, self.main_view)
+        self.predictive_modeling_view = PredictiveModelingView(self, self.main_view, task_menu)
         self.predictive_modeling_model = PredictiveModelingModel(self.main_model, self, self.logger)
         self.task_model = TaskModel(self)
         self.task_view = TaskView(self)
@@ -196,6 +199,7 @@ class Controller:
         if self.monitored_mode:
             current_task = self.convertPerformanceToTask.convert_performance_to_task(self.logger.get_performance(), reference_task["title"],reference_task["description"])
             self.task_model.set_current_task(current_task)
+            self.task_menu.set_current_task(current_task,"monitored")
             self.task_model.set_reference_task(reference_task)
             self.task_view.set_current_task(self.task_model.get_current_task())
             self.task_view.set_reference_task(reference_task)
@@ -203,6 +207,7 @@ class Controller:
         else:
             self.task_model.set_current_task(reference_task) # current task is what is displayed on the left side, so set current task to reference task in guided mode
             self.task_view.set_current_task(self.task_model.get_current_task())
+            self.task_menu.set_current_task(self.task_model.get_current_task(), "guided")
             self.task_model.update_statusses_and_set_current_tasks()
             self.task_view.update_task_statuses(self.task_model.get_current_task())
 
@@ -218,7 +223,7 @@ class Controller:
         task_selection_view = self.task_selection_view.get_task_selection_view()
         task_view = self.task_view.get_task_view()
         tabs = self.get_tab_set()
-        return self.main_view.get_ui(login_view, tabs, task_view, task_selection_view)
+        return self.main_view.get_ui(login_view, tabs, task_selection_view)
     
     def update_percentage_done(self, percentage):
         self.login_view.update_percentage_done(percentage)
@@ -250,11 +255,14 @@ class Controller:
                 task = self.convertPerformanceToTask.convert_performance_to_task(self.logger.get_performance(), self.task_model.get_title(), self.task_model.get_description())
                 self.task_model.set_current_task(task)
                 self.task_view.set_current_task(self.task_model.get_current_task())
+                self.task_menu.set_current_task(self.task_model.get_current_task(), 'monitored')
             else:
                 self.task_model.perform_action(action, value)
                 self.task_model.update_statusses_and_set_current_tasks()
                 self.task_view.update_task_statuses(self.task_model.get_current_task())
+                self.task_menu.set_current_task(self.task_model.get_current_task(), 'guided')
                 if self.task_finished == True:
+                    self.task_menu.finished_task(None)
                     self.task_view.finished_task(None)
 
 
@@ -273,7 +281,10 @@ class Controller:
                 competence_vector = self.calculate_competence_vector(current_performance,reference_task, current_datetime)
                 if competence_vector != None:
                     self.task_finished = True
-                    self.task_view.finished_task(competence_vector)
+                    print("hier")
+                    print(competence_vector)
+                    self.task_menu.finished_task(competence_vector)
+                    # self.task_view.finished_task(competence_vector)
             elif not self.monitored_mode:
                 self.task_finished = True
             

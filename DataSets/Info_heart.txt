@@ -1,0 +1,30 @@
+target: target
+
+Columns:
+age: The age of the patient.
+
+sex: Gender of the patient (0: female, 1: male).
+
+cp: Type of chest pain.
+
+trestbps: Resting blood pressure.
+
+chol: Serum cholesterol.
+
+fbs: Fasting blood sugar > 120 mg/dl.
+
+restecg: Resting electrocardiographic results.
+
+thalach: Maximum heart rate achieved.
+
+exang: Exercise induced angina.
+
+oldpeak: ST depression induced by exercise relative to rest
+
+slope: The slope of the peak exercise ST segment.
+
+ca: Number of major vessels colored by fluoroscopy.
+
+thal: Thalassemia status from a heart blood flow test.
+
+target: Presence of heart disease (0: no, 1: yes).

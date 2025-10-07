@@ -1,18 +1,19 @@
 import copy
 import os
+from datetime import datetime
 
 from model.student_performance import StudentPerformance
 
 class LearningManagerModel:
     def __init__(self, controller):
         self.controller = controller
-        self.learning_path = []
+        self.performances = []
 
     def get_learning_path(self):
-        return self.learning_path
+        return self.performances
 
     def set_learning_path(self,userid):
-        self.learning_path = []
+        self.performances = []
         path = os.path.join('drive', str(userid))
         for filename in os.listdir(path):
             with open(os.path.join(path,filename),'r') as file:
@@ -20,7 +21,7 @@ class LearningManagerModel:
                     try:
                         performance = StudentPerformance(self.controller)
                         performance.string_to_student_performance(line, filename.replace('.txt', ''))
-                        self.learning_path.append(performance)
+                        self.performances.append(performance)
                     except:
                         print("Error reading performance")
 
@@ -102,6 +103,18 @@ class LearningManagerModel:
             final_score[skill] = max(overlap,predictive_modeling)
         
         return final_score
+    
+    def get_performance_score(self, overlap_score, task_difficulty, date):
+        final_score = {}
+        final_score['date'] = date
+
+        predictive_modeling_score = overlap_score["Predictive Modeling"]
+        for skill, difficulty in task_difficulty:
+            overlap = overlap_score.get(skill, 0.0) * difficulty
+            predictive_modeling = predictive_modeling_score * difficulty
+            final_score[skill] = max(overlap,predictive_modeling)
+        
+        return final_score
 
     def validate_performance(self, reference_task, current_performance):
         # Check data size
@@ -154,6 +167,35 @@ class LearningManagerModel:
             
         return True
     
+    def calculate_performance_score(self, performance, reference_task):
+        try:
+            current_task = self.controller.convert_performance_to_task(performance, "", "")
+            target_column = self.controller.get_target_task(current_task)
+            dataset_name = current_task["dataset"].replace(".csv", "")
+
+            if reference_task == None:
+                reference_task = self.controller.get_reference_task(target_column, dataset_name)       
+                if not reference_task:
+                    # reference task not found
+                    return None
+            valid_performance = self.validate_performance(reference_task, performance)
+            if valid_performance:
+                overlap_score = self.get_overlap_scores(reference_task, performance) #for example: {data_cleaning: 0.3,...}
+                predictive_modeling_score = overlap_score["Predictive Modeling"]
+
+                for skill,score in overlap_score.items():
+                    overlap_score[skill] = max(score, predictive_modeling_score)
+                
+                return overlap_score
+
+            return None
+
+        
+        except Exception as e:
+            # print("error:")
+            # print(e)
+            return None
+
     def calculate_competence_vector(self, performance, reference_task, date):
         try:
             current_task = self.controller.convert_performance_to_task(performance, "", "")
@@ -178,13 +220,65 @@ class LearningManagerModel:
             # print(e)
             return None
 
+    def get_task_skill_difficulty(self, task_difficulty, skill):
+        for task_skill in task_difficulty:
+            if task_skill[0] == skill:
+                return task_skill[1]
+        
+        return None
+
+
+    def update_competence_vector(self, performance_score, current_competence_vector, task_difficulty, date):
+        updated_competence_vector = {}
+        for skill,score in current_competence_vector.items():
+            if skill == "date":
+                updated_competence_vector["date"] = date
+            else:
+                if score == 0:
+                    updated_competence_vector[skill] = performance_score[skill] * self.get_task_skill_difficulty(task_difficulty, skill)
+                else:
+                    updated_competence_vector[skill] = 0.5 * (score + performance_score[skill] * self.get_task_skill_difficulty(task_difficulty, skill))
+        self.controller.add_competence_vector(updated_competence_vector)
+
+    def get_skills_from_tasks(self):
+        skills = []
+        tasks = self.controller.get_tasks_data()
+
+        for task in tasks:
+            for skill in task["difficulty"]:
+                if skill[0] not in skills:
+                    skills.append(skill[0])
+        return skills
+
 
     def set_competence_vectors(self):
-        learning_path = self.learning_path
-        learning_path.sort(key=lambda x: x.performance['General']['Date'][0])
+        initial_competence_vector = {}
+
+        for skill in self.get_skills_from_tasks():
+            initial_competence_vector[skill] = 0
         
-        for performance in learning_path:
-            competence_vector = self.calculate_competence_vector(performance, None, None)
-            if competence_vector != None:
-                self.controller.add_competence_vector(competence_vector)
+        performances = self.performances
+        performances.sort(key=lambda x: x.performance['General']['Date'][0])
+
+        if len(performances) == 0:
+            date = datetime.now()
+        else:
+            date = performances[0].performance['General']['Date'][0]
+        
+        initial_competence_vector["date"] = date
+        self.controller.add_competence_vector(initial_competence_vector)
+
+        current_competence_vector = initial_competence_vector
+
+        for performance in performances:
+            current_task = self.controller.convert_performance_to_task(performance, "", "")
+            target_column = self.controller.get_target_task(current_task)
+            dataset_name = current_task["dataset"].replace(".csv", "")
+            reference_task = self.controller.get_reference_task(target_column, dataset_name)
+            if reference_task:       
+                task_difficulty = reference_task["difficulty"]
+
+                performance_score = self.calculate_performance_score(performance,reference_task)
+                self.update_competence_vector(performance_score, current_competence_vector, task_difficulty, performance.performance['General']['Date'][0])
+
 

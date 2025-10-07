@@ -34,6 +34,8 @@ class LearningPathModel:
     
     def add_competence_vector(self,vector):
         self.competence_vectors.append(vector)
+        print("add competence vector")
+        print(vector)
 
     def get_current_competence_vector(self):
         if len(self.competence_vectors) > 0:

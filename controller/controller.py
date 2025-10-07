@@ -61,6 +61,9 @@ class Controller:
         else:
             self.drive = GoogleDrive()
 
+    def perform_action(self):
+        None
+
     def get_tab_set(self):
         tab_1 = self.data_selection_view.get_data_selection_tab()
         tab_2 = self.data_cleaning_view.get_data_cleaning_tab()
@@ -278,12 +281,15 @@ class Controller:
             reference_task = self.task_model.get_reference_task()
             current_datetime = datetime.now()
             if self.monitored_mode:
-                competence_vector = self.calculate_competence_vector(current_performance,reference_task, current_datetime)
-                if competence_vector != None:
+                performance_score = self.calculate_performance_score(current_performance,reference_task)
+                if performance_score != None:
+                    current_competence_vector = self.learning_path_model.get_current_competence_vector()
+                    reference_task_difficulty = reference_task['difficulty']
+                    competence_vector = self.update_competence_vector(performance_score, current_competence_vector,reference_task_difficulty, datetime.now())
                     self.task_finished = True
                     print("hier")
-                    print(competence_vector)
-                    self.task_menu.finished_task(competence_vector)
+                    print(performance_score)
+                    self.task_menu.finished_task(performance_score)
                     # self.task_view.finished_task(competence_vector)
             elif not self.monitored_mode:
                 self.task_finished = True
@@ -328,6 +334,12 @@ class Controller:
     
     def calculate_competence_vector(self, performance, reference_task, date):
         return self.learning_manager_model.calculate_competence_vector(performance, reference_task, date)
+
+    def calculate_performance_score(self, performance, reference_task):
+        return self.learning_manager_model.calculate_performance_score(performance, reference_task)
+    
+    def update_competence_vector(self, performance_score, current_competence_vector, task_difficulty,date):
+        return self.learning_manager_model.update_competence_vector( performance_score, current_competence_vector, task_difficulty,date)
     
     def set_developer_mode(self):
         self.developer_mode = True

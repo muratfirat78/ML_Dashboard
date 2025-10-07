@@ -90,7 +90,7 @@ class DataCleaningModel:
                                 ytrain_df[colname].fillna(ytrain_df[colname].median(), inplace=True)
                                           
                             if handling == 'Remove-Missing': 
-                                ytrain_df = ytrain_df.dropna(subset = [colname])
+                                ytrain_df = ytrain_df.dropna(subset = [colname], how='any')
                          
                         else:
                             write_log('Improper action is selected.. ',  result2aexp, 'Data cleaning')

@@ -206,12 +206,7 @@ class PredictiveModelingModel:
             performance = []
             for prf,val in mymodel.GetPerformanceDict().items():
                 performance += [(prf, val)]
-            
-            print(ytrain_df.size)
-            print(ytrain_df.dtype)
-            print(ytrain_df.isnull().sum())
 
-            
             performance += [("data_size", ytrain_df.size)]
             performance += [("missing_values", ytrain_df.isnull().sum())]
             performance += [("type", str(ytrain_df.dtype))]

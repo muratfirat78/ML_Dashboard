@@ -75,8 +75,8 @@ class PredictiveModelingView:
                                 display0.plot()
                                 plt.title('ROC Curve', fontsize=14)
                                 plt.show()
-                        display.display('Confusion Matrix: ')
-                        display.display(mdl.getConfMatrix())
+                        # display.display('Confusion Matrix: ')
+                        # display.display(mdl.getConfMatrix())
                         
                     else:
                         Xtrain_df = self.controller.main_model.get_XTrain()

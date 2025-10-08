@@ -23,7 +23,8 @@ class LearningManagerModel:
                         performance.string_to_student_performance(line, filename.replace('.txt', ''))
                         self.performances.append(performance)
                     except:
-                        print("Error reading performance")
+                        # print("Error reading performance")
+                        None
 
 
     def subsubtask_in_current_task(self, action, value, current_task):

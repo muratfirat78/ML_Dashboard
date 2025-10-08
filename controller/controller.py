@@ -287,8 +287,6 @@ class Controller:
                     reference_task_difficulty = reference_task['difficulty']
                     competence_vector = self.update_competence_vector(performance_score, current_competence_vector,reference_task_difficulty, datetime.now())
                     self.task_finished = True
-                    print("hier")
-                    print(performance_score)
                     self.task_menu.finished_task(performance_score)
                     # self.task_view.finished_task(competence_vector)
             elif not self.monitored_mode:

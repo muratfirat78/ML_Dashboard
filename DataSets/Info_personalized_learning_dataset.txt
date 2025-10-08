@@ -1,0 +1,26 @@
+Education Dataset
+
+Description
+This dataset is designed to support research on adaptive learning systems, personalized education, and predictive student success modeling. It captures rich interaction logs from online education platforms, including student engagement, quiz performance, learning preferences, and dropout likelihood.
+
+Use Cases
+Developing AI-driven adaptive learning models
+Analyzing student engagement and performance patterns
+Predicting dropout likelihood based on learning behavior
+Designing personalized educational content
+Dataset Features
+Student_ID – Unique identifier for each student
+Age – Student's age (15-50 years)
+Gender – Male, Female, Other
+Education_Level – High School, Undergraduate, Postgraduate
+Course_Name – Online course enrolled (e.g., Machine Learning, Python Basics, Data Science)
+Time_Spent_on_Videos (mins) – Total minutes spent watching videos
+Quiz_Attempts – Number of attempts per quiz
+Quiz_Scores (%) – Percentage score in quizzes
+Forum_Participation (posts) – Number of forum discussions participated in
+Assignment_Completion_Rate (%) – Percentage of completed assignments
+Engagement_Level – Low, Medium, High (Based on activity metrics)
+Final_Exam_Score (%) – Percentage score in the final exam
+Learning_Style – Visual, Auditory, Reading/Writing, Kinesthetic
+Feedback_Score (1-5) – Student rating of the course
+Dropout_Likelihood (Yes/No) – Whether the student is likely to drop out

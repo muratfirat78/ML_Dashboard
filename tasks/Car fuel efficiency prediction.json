@@ -1,15 +1,15 @@
 {
-    "title": "Phone Price Prediction",
-    "description": "Predict the price category of the phone",
-    "mode": "monitored",
+    "title": "Car fuel efficiency prediction",
+    "description": "The task is to predict the fuel efficiency (mpg) of a car using features like engine size, horsepower, weight, and model year. The goal is to build a model that can estimate mpg accurately.",
+    "mode": "guided",
     "model_metric": [
         "MSE",
-        0.079
+        4.9
     ],
-    "data_size": 1600,
+    "data_size": 296,
     "missing_values": 0,
-    "type": "int64",
-    "range": "0-3",
+    "type": "float64",
+    "range": "9.0-46.6",
     "difficulty": [
         [
             "Data Cleaning",
@@ -17,27 +17,71 @@
         ],
         [
             "Data Translation",
-            80
+            0
         ],
         [
             "Data Transformation",
-            80
+            0
         ],
         [
             "Statistics",
-            65
+            0
         ],
         [
             "Model Training",
-            80
+            0
         ],
         [
             "Predictive Modeling",
-            70
+            0
         ]
     ],
-    "dataset": "phones.csv",
+    "dataset": "auto-mpg.csv",
     "subtasks": [
+        {
+            "title": "Data Cleaning",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataCleaning",
+                        "Remove-Missing"
+                    ],
+                    "value": [
+                        "horsepower"
+                    ],
+                    "title": "Remove Rows with Missing Values",
+                    "description": "Remove rows that contain missing values in columns.",
+                    "hints": [
+                        "Go to the Data Cleaning tab. Select the column, choose 'remove missing', then click apply.",
+                        "Remove rows with missing values in horsepower."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataCleaning",
+                        "Drop Column"
+                    ],
+                    "value": [
+                        "car name"
+                    ],
+                    "title": "Drop Columns",
+                    "description": "Remove columns that are irrelevant or redundant for the model.",
+                    "hints": [
+                        "Go to the Data Cleaning tab. Select the column(s), choose 'drop column', then click apply.",
+                        "Drop the following column(s): car name."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": 2
+        },
         {
             "title": "Statistics",
             "status": "todo",
@@ -46,44 +90,17 @@
                     "status": "todo",
                     "action": [
                         "DataProcessing",
-                        "PCA"
+                        "outlier"
                     ],
                     "value": [
-                        [
-                            "three_g",
-                            "four_g"
-                        ],
-                        [
-                            "fc",
-                            "pc"
-                        ]
+                        "acceleration",
+                        "horsepower"
                     ],
-                    "title": "Dimensionality Reduction (PCA)",
-                    "description": "Apply Principal Component Analysis to reduce dimensionality.",
+                    "title": "Handle Outliers",
+                    "description": "Detect and handle outliers in columns.",
                     "hints": [
-                        "Go to the Data Processing tab. Choose the column(s), select 'feature extraction', choose 'PCA', then click 'Add PCA' and apply.",
-                        "Apply PCA to the following column(s): [['three_g', 'four_g'], ['fc', 'pc']]."
-                    ],
-                    "applied_values": [],
-                    "order": 1
-                },
-                {
-                    "status": "todo",
-                    "action": [
-                        "DataProcessing",
-                        "Standardize"
-                    ],
-                    "value": [
-                        "battery_power",
-                        "px_height",
-                        "px_width",
-                        "ram"
-                    ],
-                    "title": "Standardize Columns",
-                    "description": "Standardize columns to have zero mean and unit variance.",
-                    "hints": [
-                        "Go to the Data Processing tab. Choose the column, select 'scaling' as process type, then choose 'standardize' as method, and click apply.",
-                        "Standardize the following column(s): battery_power, px_height, px_width, ram."
+                        "Go to the Data Processing tab. Select the column, choose 'outlier', then click apply.",
+                        "Handle outliers in acceleration, horsepower."
                     ],
                     "applied_values": [],
                     "order": 1
@@ -103,13 +120,13 @@
                         "AssignTarget"
                     ],
                     "value": [
-                        "price_range"
+                        "mpg"
                     ],
                     "title": "Assign Target Variable",
                     "description": "Assign columns as the target variables for model training.",
                     "hints": [
                         "Go to the Data Processing tab. Choose the column, select 'Assign Target', then click apply.",
-                        "Assign 'price_range' as the target column."
+                        "Assign 'mpg' as the target column."
                     ],
                     "applied_values": [],
                     "order": 1
@@ -141,7 +158,7 @@
                     "value": [
                         [
                             "Random Forest",
-                            60,
+                            105,
                             "entropy"
                         ]
                     ],
@@ -149,7 +166,7 @@
                     "description": "Optimize model performance by modifying the parameters of the model.",
                     "hints": [
                         "Go to the Predictive Modeling tab. Select the model type, adjust parameters if needed, then click train.",
-                        "Train the model using the following parameters: [['Random Forest', 60, 'entropy']]."
+                        "Train the model using the following parameters: [['Random Forest', 105, 'entropy']]."
                     ],
                     "applied_values": [],
                     "order": 3
@@ -172,19 +189,19 @@
                         [
                             [
                                 "MSE",
-                                0.07959305555555556
+                                4.916024562358273
                             ],
                             [
                                 "MAE",
-                                0.18350000000000002
+                                1.6393523809523818
                             ],
                             [
                                 "RSquared",
-                                0.9356950454764521
+                                0.9000559771801484
                             ],
                             [
                                 "data_size",
-                                1600
+                                296
                             ],
                             [
                                 "missing_values",
@@ -192,11 +209,11 @@
                             ],
                             [
                                 "type",
-                                "int64"
+                                "float64"
                             ],
                             [
                                 "range",
-                                "0-3"
+                                "9.0-46.6"
                             ]
                         ]
                     ],

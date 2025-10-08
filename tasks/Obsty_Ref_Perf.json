@@ -1,6 +1,6 @@
 {
-    "title": "todo",
-    "description": "todo",
+    "title": "Obesity type prediction",
+    "description": "NObeyesdad classifies several obesity types, create a model that predicts the NObeyesdad obesity class",
     "mode": "monitored",
     "model_metric": [
         "accuracy",

@@ -1,4 +1,5 @@
 from log import *
+import numpy as np
 
 class DataCleaningModel:
     def __init__(self, main_model, logger):
@@ -54,8 +55,8 @@ class DataCleaningModel:
                                 Xtest_df[colname].fillna(Xtrain_df[colname].median(), inplace=True)
             
                             if handling == 'Remove-Missing': 
-                                Xtrain_df = Xtrain_df.dropna(subset = [colname])
-                                Xtest_df = Xtest_df.dropna(subset = [colname])
+                                Xtrain_df = Xtrain_df.dropna(subset = [colname], how='any')
+                                Xtest_df = Xtest_df.dropna(subset = [colname], how='any')
                         else:
                             write_log('Improper action is selected.. ',  result2aexp, 'Data cleaning')
                             return
@@ -90,7 +91,10 @@ class DataCleaningModel:
                                 ytrain_df[colname].fillna(ytrain_df[colname].median(), inplace=True)
                                           
                             if handling == 'Remove-Missing': 
+                                # ytrain_df[colname] = ytrain_df[colname].replace(["", " ", "None", "nan", "NaN"], np.nan)
                                 ytrain_df = ytrain_df.dropna(subset = [colname], how='any')
+    
+                                
                          
                         else:
                             write_log('Improper action is selected.. ',  result2aexp, 'Data cleaning')
@@ -102,7 +106,7 @@ class DataCleaningModel:
                           
                             write_log('mode (split) . '+str(ytrain_df[colname].mode()), result2aexp, 'Data cleaning')
                         if handling == 'Remove-Missing': 
-                            ytrain_df = ytrain_df.dropna(subset = [colname])
+                            ytrain_df = ytrain_df.dropna(subset = [colname], how='any')
                        
                          
             
@@ -163,7 +167,7 @@ class DataCleaningModel:
                             curr_df[colname].fillna(curr_df[colname].median(), inplace=True)
         
                         if handling == 'Remove-Missing': 
-                            curr_df = curr_df.dropna(subset = [colname])
+                            curr_df = curr_df.dropna(subset = [colname], how='any')
                     else:
                         write_log('Improper action is selected.. ',  result2aexp, 'Data cleaning')
                         return
@@ -172,7 +176,7 @@ class DataCleaningModel:
                     if handling == 'Replace-Mode': 
                         curr_df[colname].fillna(curr_df[colname].mode()[0], inplace=True)
                     if handling == 'Remove-Missing': 
-                        curr_df = curr_df.dropna(subset = [colname])
+                        curr_df = curr_df.dropna(subset = [colname], how='any')
                     
                         
                         

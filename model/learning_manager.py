@@ -192,8 +192,6 @@ class LearningManagerModel:
 
         
         except Exception as e:
-            # print("error:")
-            # print(e)
             return None
 
     def calculate_competence_vector(self, performance, reference_task, date):
@@ -229,16 +227,19 @@ class LearningManagerModel:
 
 
     def update_competence_vector(self, performance_score, current_competence_vector, task_difficulty, date):
-        updated_competence_vector = {}
-        for skill,score in current_competence_vector.items():
-            if skill == "date":
-                updated_competence_vector["date"] = date
-            else:
-                if score == 0:
-                    updated_competence_vector[skill] = performance_score[skill] * self.get_task_skill_difficulty(task_difficulty, skill)
+        try:
+            updated_competence_vector = {}
+            for skill,score in current_competence_vector.items():
+                if skill == "date":
+                    updated_competence_vector["date"] = date
                 else:
-                    updated_competence_vector[skill] = 0.5 * (score + performance_score[skill] * self.get_task_skill_difficulty(task_difficulty, skill))
-        self.controller.add_competence_vector(updated_competence_vector)
+                    if score == 0:
+                        updated_competence_vector[skill] = performance_score[skill] * self.get_task_skill_difficulty(task_difficulty, skill)
+                    else:
+                        updated_competence_vector[skill] = 0.5 * (score + performance_score[skill] * self.get_task_skill_difficulty(task_difficulty, skill))
+            self.controller.add_competence_vector(updated_competence_vector)
+        except:
+            None #updating competence vector failed
 
     def get_skills_from_tasks(self):
         skills = []
@@ -277,7 +278,6 @@ class LearningManagerModel:
             reference_task = self.controller.get_reference_task(target_column, dataset_name)
             if reference_task:       
                 task_difficulty = reference_task["difficulty"]
-
                 performance_score = self.calculate_performance_score(performance,reference_task)
                 self.update_competence_vector(performance_score, current_competence_vector, task_difficulty, performance.performance['General']['Date'][0])
 

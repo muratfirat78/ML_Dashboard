@@ -669,8 +669,9 @@ class DataProcessingModel:
                 encoder = preprocessing.OneHotEncoder(sparse_output=False)  # Initialize OneHotEncoder
                 one_hot_encoded = encoder.fit_transform(curr_df[categorical_columns])  # Fit and transform the categorical columns          
                 one_hot_df = pd.DataFrame(one_hot_encoded,columns=encoder.get_feature_names_out(categorical_columns)) # Create a DataFrame
+                curr_df = curr_df.reset_index(drop=True)
+                one_hot_df = one_hot_df.reset_index(drop=True)
                 curr_df = pd.concat([curr_df.drop(categorical_columns, axis=1), one_hot_df], axis=1)
-
                 self.logger.add_action(['DataProcessing', 'OneHotEncoding'], colname)
                 write_log('Encoding->'+encodingtype+', col '+colname+', done. ', result2exp, 'Data processing')
                 

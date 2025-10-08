@@ -81,7 +81,7 @@ class TaskMenuView:
                     difficulty_data = dict(self.current_task["difficulty"])
                     competence_vector = self.competence_vector or {}
 
-                    formatted = [f"{skill}: {competence_vector.get(skill,0)}/{diff}" 
+                    formatted = [f"{skill}: {round(competence_vector.get(skill,0)*100)}/100" 
                                 for skill, diff in difficulty_data.items()]
 
                     pad = max(len(formatted[i*2]) for i in range((len(formatted)+1)//2)) + 4
@@ -98,6 +98,7 @@ class TaskMenuView:
                 category = self.task_list[id]["category"]
                 title = self.task_list[id]["title"]
                 description = self.task_list[id]["description"]
+
                 textarea_value = category + ": " + title + "\n" + "Description: " + description
                 if self.mode == "monitored":
                     if self.task_list[id]["value"]:
@@ -194,5 +195,7 @@ class TaskMenuView:
 
     def finished_task(self, competence_vector):
         self.finishedtask = True
-        self.slider.max = len(self.task_list)+1
         self.competence_vector = competence_vector
+        self.slider.max = len(self.task_list)+1
+        self.slider.value = len(self.task_list)+1
+        self.slider_change({"new":len(self.task_list)+1})

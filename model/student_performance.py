@@ -1,5 +1,5 @@
 import ast
-from datetime import datetime
+from datetime import datetime, timedelta
 import re
 
 class StudentPerformance:
@@ -19,20 +19,24 @@ class StudentPerformance:
         #value can be a string or list
         value = (value, self.index)
         category, action_type = action[0], action[1]
-        
-        if category in self.performance:
-            if action_type in self.performance[category]:
-                if isinstance(self.performance[category][action_type], list):
-                    if isinstance(value, list):
-                        self.performance[category][action_type].extend(value) 
+        if action_type in ("ParameterFinetuning", "ModelPerformance"):
+            #max 1 model training, override if it already exists
+            self.timestamp = datetime.now().strftime("%d-%m-%Y %H-%M-%S")
+            self.performance[category][action_type] = value
+        else:    
+            if category in self.performance:
+                if action_type in self.performance[category]:
+                    if isinstance(self.performance[category][action_type], list):
+                        if isinstance(value, list):
+                            self.performance[category][action_type].extend(value) 
+                        else:
+                            self.performance[category][action_type].append(value)
                     else:
-                        self.performance[category][action_type].append(value)
+                        self.performance[category][action_type] = [self.performance[category][action_type], value]
                 else:
-                    self.performance[category][action_type] = [self.performance[category][action_type], value]
+                    self.performance[category][action_type] = value
             else:
-                self.performance[category][action_type] = value
-        else:
-            self.performance[category] = {action_type: value}
+                self.performance[category] = {action_type: value}
         
         self.index += 1
         

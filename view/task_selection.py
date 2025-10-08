@@ -141,6 +141,7 @@ class TaskSelectionView:
         self.tab_set.layout.display = 'none'
     
     def show_task_selection(self):
+        self.filter_task_selection({"new": "Recommend me tasks"})
         self.tab_set.layout = widgets.Layout(visibility = 'visible')
 
     def disable_selection(self):

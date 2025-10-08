@@ -19,6 +19,8 @@ class TaskSelectionModel:
             if task_too_easy == False:
                 tasks_above_skill_level.append(task)
         
+        # For now: do not remove the tasks below skill level, because the recommendations will run out too quickly this way
+        tasks_above_skill_level = tasks
         # Order tasks
         task_differences = []
         # order tasks on difficulty and get the first three
@@ -33,7 +35,13 @@ class TaskSelectionModel:
 
         #order recommended tasks by total difference and get the first 3
         task_differences.sort(key=lambda x: x[0])
-        recommended_tasks = [task for _, task in task_differences[:3]]
+        above_zero = [(diff, task) for diff, task in task_differences if diff >= 0]
+        if len(above_zero) >= 3:
+            #get the first 3 elements
+            recommended_tasks = [task for _, task in above_zero[:3]]
+        else:
+            #Get the last 3 elements
+            recommended_tasks = [task for _, task in task_differences[-3:]]
         return recommended_tasks
 
     def get_filtered_tasks(self, tasks, guided_mode, recommendations_only, current_skill_vector):

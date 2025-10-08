@@ -1,7 +1,7 @@
 {
     "title": "Phone Price Prediction",
     "description": "Predict the price category of the phone",
-    "mode": "monitored",
+    "mode": "guided",
     "model_metric": [
         "MSE",
         0.079

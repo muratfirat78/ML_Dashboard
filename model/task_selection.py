@@ -1,3 +1,6 @@
+import math
+
+
 class TaskSelectionModel:
     def __init__(self, controller):
         self.controller = controller
@@ -29,19 +32,15 @@ class TaskSelectionModel:
             for difficulty in task["difficulty"]:
                 task_skill_difficulty_name = difficulty[0]
                 task_skill_difficulty = difficulty[1]
-                current_skill_level = current_skill_vector.get(task_skill_difficulty_name)
-                total_difference += task_skill_difficulty - current_skill_level
-            task_differences.append((total_difference, task))
+                if task_skill_difficulty_name == "Predictive Modeling" or task_skill_difficulty_name == "Model Training":
+                    current_skill_level = current_skill_vector.get(task_skill_difficulty_name)
+                    total_difference += task_skill_difficulty - current_skill_level
+            if total_difference > 0:
+                task_differences.append((total_difference, task))
 
         #order recommended tasks by total difference and get the first 3
         task_differences.sort(key=lambda x: x[0])
-        above_zero = [(diff, task) for diff, task in task_differences if diff >= 20]
-        if len(above_zero) >= 3:
-            #get the first 3 elements
-            recommended_tasks = [task for _, task in above_zero[:3]]
-        else:
-            #Get the last 3 elements
-            recommended_tasks = [task for _, task in task_differences[-3:]]
+        recommended_tasks = [task for _, task in task_differences[:min(len(task_differences),3)]]
         return recommended_tasks
 
     def get_filtered_tasks(self, tasks, guided_mode, recommendations_only, current_skill_vector):

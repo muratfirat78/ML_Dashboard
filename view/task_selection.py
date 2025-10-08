@@ -25,10 +25,11 @@ class TaskSelectionView:
         )
 
         self.mode_dropdown = widgets.Dropdown(
-            options=list(["Guidance for a task","My performance monitored"]),
-            description='I want...',
+            options=list(["train a machine learning model in a guided way","train a machine learning model myself"]),
+            description='I want to...',
             disabled=False
         )
+        self.mode_dropdown.layout.width = '400px'
 
         self.title_label = widgets.HTML(
             value="<h3>" + self.task_dropdown.value+ "</h3>"
@@ -50,6 +51,8 @@ class TaskSelectionView:
             layout={'width': 'max-content'}
         )
         self.recommmended_radio_buttons.observe(self.filter_task_selection, names='value')
+
+        self.recommmended_radio_buttons.disabled = True
 
 
         self.select_button = widgets.Button(
@@ -104,10 +107,10 @@ class TaskSelectionView:
             if change["new"] == "Show me all tasks":
                 self.recommendations_only = False
 
-            if change["new"] == "Guidance for a task":
+            if change["new"] == "train a machine learning model in a guided way":
                 self.guided_mode = True
 
-            if change["new"] == "My performance monitored":
+            if change["new"] == "train a machine learning model myself":
                 self.guided_mode = False
 
         filtered_tasks = self.controller.get_filtered_tasks(self.tasks_data,self.recommendations_only, self.guided_mode)
@@ -120,9 +123,9 @@ class TaskSelectionView:
             self.task_dropdown.options=list(self.task_map.keys())
 
     def start_task(self, event):
-        if self.mode_dropdown.value == "My performance monitored":
+        if self.mode_dropdown.value == "train a machine learning model myself":
             monitored_mode = True
-        elif self.mode_dropdown.value == "Guidance for a task":
+        elif self.mode_dropdown.value == "train a machine learning model in a guided way":
             monitored_mode = False
         selected_title = self.task_dropdown.value
         selected_task = self.task_map[selected_title]

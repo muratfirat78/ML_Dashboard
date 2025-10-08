@@ -1,0 +1,214 @@
+{
+    "title": "Phone Price Prediction",
+    "description": "Predict the price category of the phone",
+    "mode": "monitored",
+    "model_metric": [
+        "MSE",
+        0.079
+    ],
+    "data_size": 1600,
+    "missing_values": 0,
+    "type": "int64",
+    "range": "0-3",
+    "difficulty": [
+        [
+            "Data Cleaning",
+            0
+        ],
+        [
+            "Data Translation",
+            80
+        ],
+        [
+            "Data Transformation",
+            80
+        ],
+        [
+            "Statistics",
+            65
+        ],
+        [
+            "Model Training",
+            80
+        ],
+        [
+            "Predictive Modeling",
+            70
+        ]
+    ],
+    "dataset": "phones.csv",
+    "subtasks": [
+        {
+            "title": "Statistics",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "PCA"
+                    ],
+                    "value": [
+                        [
+                            "three_g",
+                            "four_g"
+                        ],
+                        [
+                            "fc",
+                            "pc"
+                        ]
+                    ],
+                    "title": "Dimensionality Reduction (PCA)",
+                    "description": "Apply Principal Component Analysis to reduce dimensionality.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column(s), select 'feature extraction', choose 'PCA', then click 'Add PCA' and apply.",
+                        "Apply PCA to the following column(s): [['three_g', 'four_g'], ['fc', 'pc']]."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "Standardize"
+                    ],
+                    "value": [
+                        "battery_power",
+                        "px_height",
+                        "px_width",
+                        "ram"
+                    ],
+                    "title": "Standardize Columns",
+                    "description": "Standardize columns to have zero mean and unit variance.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'scaling' as process type, then choose 'standardize' as method, and click apply.",
+                        "Standardize the following column(s): battery_power, px_height, px_width, ram."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": 5
+        },
+        {
+            "title": "Model Training",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "AssignTarget"
+                    ],
+                    "value": [
+                        "price_range"
+                    ],
+                    "title": "Assign Target Variable",
+                    "description": "Assign columns as the target variables for model training.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'Assign Target', then click apply.",
+                        "Assign 'price_range' as the target column."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "Split"
+                    ],
+                    "value": [
+                        "20%"
+                    ],
+                    "title": "Train/Test Split",
+                    "description": "Split dataset into training and testing sets.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, assign the target, set the test ratio, then click split.",
+                        "Use a test ratio of 20% for splitting the dataset."
+                    ],
+                    "applied_values": [],
+                    "order": 2
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "ModelDevelopment",
+                        "ParameterFinetuning"
+                    ],
+                    "value": [
+                        [
+                            "Random Forest",
+                            60,
+                            "entropy"
+                        ]
+                    ],
+                    "title": "Parameter Finetuning",
+                    "description": "Optimize model performance by modifying the parameters of the model.",
+                    "hints": [
+                        "Go to the Predictive Modeling tab. Select the model type, adjust parameters if needed, then click train.",
+                        "Train the model using the following parameters: [['Random Forest', 60, 'entropy']]."
+                    ],
+                    "applied_values": [],
+                    "order": 3
+                }
+            ],
+            "applied_values": [],
+            "order": 7
+        },
+        {
+            "title": "Predictive Modeling",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "ModelDevelopment",
+                        "ModelPerformance"
+                    ],
+                    "value": [
+                        [
+                            [
+                                "MSE",
+                                0.07959305555555556
+                            ],
+                            [
+                                "MAE",
+                                0.18350000000000002
+                            ],
+                            [
+                                "RSquared",
+                                0.9356950454764521
+                            ],
+                            [
+                                "data_size",
+                                1600
+                            ],
+                            [
+                                "missing_values",
+                                0
+                            ],
+                            [
+                                "type",
+                                "int64"
+                            ],
+                            [
+                                "range",
+                                "0-3"
+                            ]
+                        ]
+                    ],
+                    "title": "Model Training",
+                    "description": "Train a model and evaluate its performance.",
+                    "hints": [],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": null
+        }
+    ]
+}

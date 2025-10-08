@@ -35,7 +35,7 @@ class TaskSelectionModel:
 
         #order recommended tasks by total difference and get the first 3
         task_differences.sort(key=lambda x: x[0])
-        above_zero = [(diff, task) for diff, task in task_differences if diff >= 0]
+        above_zero = [(diff, task) for diff, task in task_differences if diff >= 20]
         if len(above_zero) >= 3:
             #get the first 3 elements
             recommended_tasks = [task for _, task in above_zero[:3]]

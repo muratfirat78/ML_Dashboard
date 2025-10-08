@@ -1,9 +1,11 @@
 import logging
+from datetime import datetime
 from model.student_performance import StudentPerformance
 
 class Logger:
     def __init__(self, controller):
-        self.student_performance = StudentPerformance()
+        self.student_performance = StudentPerformance(controller)
+        # self.student_performance.addAction(['General','Date'], datetime.now())
         self.controller = controller
         # clear log
         with open('output.log', 'w'):
@@ -24,13 +26,18 @@ class Logger:
 
     def add_action(self, action, value):
         self.student_performance.addAction(action, value)
+        self.controller.update_task_view(action, value)
         self.controller.update_log_view()
     
     def get_result(self):
         return self.student_performance.performance
+    
+    def get_performance(self):
+        return self.student_performance
     
     def get_timestamp(self):
         return self.student_performance.get_timestamp()
     
     def get_list_of_actions(self):
         return self.student_performance.get_list_of_actions()
+    

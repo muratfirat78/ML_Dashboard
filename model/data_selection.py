@@ -28,8 +28,6 @@ class DataSelectionModel:
             
             rel_path = foldername
             abs_file_path = os.path.join(Path.cwd(), rel_path)
-
-            #print('Path:',abs_file_path)
             
             for root, dirs, files in os.walk(abs_file_path):
                 for file in files:
@@ -110,3 +108,6 @@ class DataSelectionModel:
     
     def get_datafolder(self):
         return self.datafolder
+    
+    def set_datafolder(self, foldername):
+        self.datafolder = foldername

@@ -9,7 +9,7 @@ import numpy as np
 from array import array
 
 class PredictiveModelingView:
-    def __init__(self, controller, main_view):
+    def __init__(self, controller, main_view,task_menu):
         self.controller = controller
         self.main_view = main_view
         self.dtdepth = None
@@ -25,6 +25,7 @@ class PredictiveModelingView:
         self.svcc = None
         self.svckrnl= None
         self.performpage = None
+        self.task_menu = task_menu
         
     def models_click(self,change):     
         global  trmodels,model_sumry
@@ -67,13 +68,15 @@ class PredictiveModelingView:
                         display.display('__________________________________')                    
             
                         if len(self.controller.main_model.getYtrain().to_frame()[self.controller.main_model.targetcolumn].unique()) == 2:
-                            roc_auc = metrics.auc(mdl.GetPerformanceDict()['ROCFPR'],mdl.GetPerformanceDict()['ROCTPR'])
-                            display0 = metrics.RocCurveDisplay(fpr=mdl.GetPerformanceDict()['ROCFPR'], tpr=mdl.GetPerformanceDict()['ROCTPR'], roc_auc=roc_auc, estimator_name=mdl.getName())
-                            display0.plot()
-                            plt.title('ROC Curve', fontsize=14)
-                            plt.show()
-                        display.display('Confusion Matrix: ')
-                        display.display(mdl.getConfMatrix())
+                            perf = mdl.GetPerformanceDict()
+                            if 'ROCFPR' in perf and 'ROCTPR' in perf:
+                                roc_auc = metrics.auc(perf['ROCFPR'],perf['ROCTPR'])
+                                display0 = metrics.RocCurveDisplay(fpr=perf['ROCFPR'], tpr=perf['ROCTPR'], roc_auc=roc_auc, estimator_name=mdl.getName())
+                                display0.plot()
+                                plt.title('ROC Curve', fontsize=14)
+                                plt.show()
+                        # display.display('Confusion Matrix: ')
+                        # display.display(mdl.getConfMatrix())
                         
                     else:
                         Xtrain_df = self.controller.main_model.get_XTrain()
@@ -232,7 +235,7 @@ class PredictiveModelingView:
         self.dtdepth.layout.visibility = 'hidden'
         self.dtdepth.layout.display = 'none'
         self.dtcrit = widgets.Dropdown(options=['entropy','gini'],description = 'Criterion')
-        self.dtcrit.layout.width = '175px'
+        self.dtcrit.layout.width = '140px'
         self.dtcrit.layout.display = 'none'
         self.dtminseg = widgets.Dropdown(options=[i for i in range(1,6)],description = 'MinSeg')
         self.dtminseg.layout.width = '125px'
@@ -245,7 +248,7 @@ class PredictiveModelingView:
         self.knnmetric.layout.width = '125px'
         self.knnmetric.layout.display = 'none'
 
-        self.mdplbl = widgets.Label( value="MaxDepth: ")
+        self.mdplbl = widgets.Label( value="MaxDep")
         self.mdplbl.layout.visibility = 'hidden'
         self.mdplbl.layout.display = 'none'
         self.mgplbl = widgets.Label( value="MinSeg: ")
@@ -265,9 +268,6 @@ class PredictiveModelingView:
         self.rfnrest.layout.display = 'none'
         self.rfcrit = widgets.Dropdown(options=['entropy','gini'],description = 'criterion')
         self.rfcrit.layout.display = 'none'
-
-
-        
       
         sel_box = VBox(children=[HBox(children=[self.main_view.trg_lbl,self.main_view.prdtsk_lbl]),
                                  HBox(children=[self.dtdepth,self.dtminseg,self.dtcrit]),
@@ -278,13 +278,14 @@ class PredictiveModelingView:
                                  trmodels,model_sumry
                                 ])
 
-        vbox1 = VBox(children = [HBox(children=[self.main_view.f_box,sel_box]),t4_results],layout= Layout(width='65%'))
+        vbox1 = VBox(children = [HBox(children=[self.main_view.f_box,sel_box]),t4_results])
 
         self.performpage = widgets.Output()
 
 
         vbox2 = VBox(children = [self.performpage])
-        tab_4 = HBox(children=[vbox1,vbox2])
+        tab_4 = VBox([self.task_menu,
+                      HBox([vbox1,vbox2])])
         
-        tab_4.layout.height = '450px'
+        tab_4.layout.height = '700px'
         return tab_4

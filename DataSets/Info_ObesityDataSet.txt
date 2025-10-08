@@ -1,0 +1,37 @@
+Target: NObeyesdad
+
+Columns:
+
+Gender: Indicates the individual’s gender (e.g., Male/Female); may influence body composition and obesity risk.
+
+Age: Age of the individual (in years); older age can correlate with changes in metabolism and weight.
+
+Height: Height of the individual (in meters); used with weight to calculate BMI.
+
+Weight: Weight of the individual (in kilograms); helps determine obesity level when combined with height.
+
+family_history_with_overweight: Indicates whether the individual has family members with overweight or obesity (Yes/No); represents genetic predisposition.
+
+FAVC (Frequent consumption of high-calorie food): Indicates whether the person frequently eats high-calorie foods (Yes/No).
+
+FCVC (Frequency of vegetable consumption): Average frequency of vegetable intake; higher values imply healthier eating habits.
+
+NCP (Number of main meals): Typical number of main meals consumed per day; reflects eating pattern.
+
+CAEC (Consumption of food between meals): Indicates how often the individual eats snacks between meals (e.g., No, Sometimes, Frequently, Always).
+
+SMOKE: Indicates whether the individual smokes (Yes/No); smoking habits may influence metabolism and appetite.
+
+CH2O (Daily water intake): Average amount of water consumed per day (in liters); affects metabolism and general health.
+
+SCC (Calories consumption monitoring): Indicates whether the individual actively monitors their calorie intake (Yes/No).
+
+FAF (Physical activity frequency): Frequency of physical activity or exercise per week; higher values indicate a more active lifestyle.
+
+TUE (Time using technology devices): Average daily time spent using technology (in hours); prolonged screen time can relate to sedentary behavior.
+
+CALC (Alcohol consumption frequency): Frequency of alcohol consumption (e.g., No, Sometimes, Frequently, Always).
+
+MTRANS (Mode of transportation): Primary means of daily transportation (e.g., Walking, Bike, Public Transport, Car, Motorbike); reflects activity level.
+
+NObeyesdad: Target variable indicating the individual’s obesity level category (e.g., Underweight, Normal, Overweight, Obesity Types I–III).

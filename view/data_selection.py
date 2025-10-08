@@ -7,12 +7,13 @@ from ipywidgets import *
 
 
 class DataSelectionView:
-    def __init__(self, controller, main_view):
+    def __init__(self, controller, main_view, task_menu):
         self.controller = controller
         self.datafolder = None
         self.main_view = main_view
         self.DFPage = None
         self.InfoPage = None
+        self.task_menu = task_menu
 
     def fileClick(self, event):
         global wslay,wsheets,butlay
@@ -35,9 +36,6 @@ class DataSelectionView:
         info = self.controller.get_curr_info()
         self.main_view.dt_ftslay.height = str(rowheight*len(df.columns))+'px'
         self.main_view.dt_features.layout = self.main_view.dt_ftslay
-
-     
-
 
         self.main_view.ftlaycl.display = 'block'
         self.main_view.ftlaycl.height = str(rowheight*len(df.columns))+'px'
@@ -116,6 +114,9 @@ class DataSelectionView:
 
         self.datafolder=widgets.Text(description ='Folder name:',value = 'DataSets')
         self.main_view.datasets = widgets.Dropdown(options=[], description='DataSets:',layout = Layout(width='50%'))
+        # if not self.controller.developer_mode:
+        #      self.datafolder.disabled = True
+        #      self.main_view.datasets.disabled = True
 
         butlay = Layout(width='75px')
         butlay.display = 'none'
@@ -135,6 +136,7 @@ class DataSelectionView:
 
 
         tab_1 = VBox(children=[
+            self.task_menu,
             HBox(children = [self.datafolder,self.main_view.datasets,wsheets,self.readfile],layout=filelay),
             HBox(children = [self.DFPage,self.InfoPage],layout = fthboxlay)],layout=tablayout)
         tab_1.layout.height = '700px'

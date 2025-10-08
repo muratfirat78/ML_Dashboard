@@ -6,7 +6,7 @@ import seaborn as sns
 from ipywidgets import *
 
 class DataCleaningView:
-    def __init__(self, controller, main_view):
+    def __init__(self, controller, main_view, task_menu):
         self.controller = controller
         self.main_view = main_view
         self.min_lbl = None
@@ -15,6 +15,7 @@ class DataCleaningView:
         self.max_text = None
         self.missacts = None
         self.applybutton = None
+        self.task_menu = task_menu
 
     def featureclclick(self,trgcl_lbl,featurescl,miss_lbl):  
         #settings.curr_df,trgcl_lbl,featurescl,miss_lbl
@@ -271,6 +272,6 @@ class DataCleaningView:
         tab2a_lay = widgets.Layout(witdh='99%')
         tab2_lftbox = VBox(children = [HBox(children=[f2a_box,selcl_box]),result2aexp],layout = tab2a_lay)
 
-        tab_2 = HBox(children=[tab2_lftbox,self.main_view.right_page])
+        tab_2 = VBox([self.task_menu,HBox(children=[tab2_lftbox,self.main_view.right_page])])
         tab_2.layout.height = '700px'
         return tab_2

@@ -7,7 +7,7 @@ import seaborn as sns
 predictiontask = None
 
 class DataProcessingView:
-    def __init__(self, controller, main_view):
+    def __init__(self, controller, main_view, task_menu):
         self.controller = controller
         self.main_view = main_view
         self.coltype = None
@@ -17,6 +17,7 @@ class DataProcessingView:
         self.splt_btn = None
         self.pca_btn = None
         self.pcaselect = None
+        self.task_menu = task_menu
         
 
     def featureprclick(self,features2,FeatPage,processtypes,ProcssPage,scalingacts):  
@@ -319,7 +320,7 @@ class DataProcessingView:
 
         vb2lay =  widgets.Layout()
         vbox2 = VBox(children = [self.main_view.feat_page,self.main_view.process_page],layout = vb2lay)
-        tab_3 = HBox(children=[vbox1,vbox2])
+        tab_3 = VBox([self.task_menu,HBox([vbox1,vbox2])])
         #tab_3.layout.height = '700px'
         return tab_3
 

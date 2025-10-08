@@ -1,0 +1,27 @@
+Target: Survived
+
+Columns:
+
+Cabin: Cabin number assigned to the passenger; may indicate socio-economic status or location on the ship.
+
+Age: Age of the passenger (in years); age could influence survival likelihood, especially for children or elderly passengers.
+
+Embarked: Port where the passenger boarded the ship — typically C (Cherbourg), Q (Queenstown), or S (Southampton).
+
+PassengerId: Unique identifier assigned to each passenger; used for indexing and reference.
+
+Survived: Indicates whether the passenger survived (1 = Survived, 0 = Did not survive); this is the target variable.
+
+Pclass (Passenger class): Socio-economic class of the passenger — 1st, 2nd, or 3rd class
+
+Name: Full name of the passenger, often including title (e.g., Mr., Mrs., Miss); can be used to extract social status or gender.
+
+Sex: Gender of the passenger (Male/Female); a strong predictor of survival in the Titanic dataset.
+
+SibSp (Siblings/Spouses aboard): Number of siblings or spouses the passenger had on board; reflects family group size.
+
+Parch (Parents/Children aboard): Number of parents or children the passenger had on board; indicates family connections.
+
+Ticket: Ticket number associated with the passenger; sometimes used to infer group bookings or fare class.
+
+Fare: Price paid for the ticket (in British pounds); correlates with passenger class and socio-economic status.

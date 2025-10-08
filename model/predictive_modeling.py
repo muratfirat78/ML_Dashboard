@@ -184,9 +184,9 @@ class PredictiveModelingModel:
                     mymodel.GetPerformanceDict()['Precision'] = precision_score(ytest_df, y_pred)
                     mymodel.GetPerformanceDict()['Recall'] = recall_score(ytest_df, y_pred)
                   
-                    fpr,tpr,thrs = roc_curve(ytest_df, y_pred)
-                    mymodel.GetPerformanceDict()['ROCFPR'] = fpr
-                    mymodel.GetPerformanceDict()['ROCTPR'] = tpr
+                    # fpr,tpr,thrs = roc_curve(ytest_df, y_pred)
+                    # mymodel.GetPerformanceDict()['ROCFPR'] = fpr
+                    # mymodel.GetPerformanceDict()['ROCTPR'] = tpr
                    
                 else:
                     mymodel.GetPerformanceDict()['Accuracy'] = accuracy_score(ytest_df, y_pred)
@@ -207,7 +207,13 @@ class PredictiveModelingModel:
             for prf,val in mymodel.GetPerformanceDict().items():
                 performance += [(prf, val)]
 
-            self.logger.add_action(['ModelDevelopment', 'ModelPerformance'], (mytype + str(params).replace('[', '(').replace(']', ')'), performance))
+            performance += [("data_size", ytrain_df.size)]
+            performance += [("missing_values", ytrain_df.isnull().sum())]
+            performance += [("type", str(ytrain_df.dtype))]
+            performance += [("range", str(ytrain_df.min()) + "-" + str(ytrain_df.max()))]
+            
+            self.logger.add_action(['ModelDevelopment', 'ParameterFinetuning'], [mytype] + params)
+            self.logger.add_action(['ModelDevelopment', 'ModelPerformance'], (performance))
             
             trmodels.options = [mdl.getName() for mdl in self.trainedModels]
             write_log('Train Model-> '+mytype+' is trained.',results,'Predictive modeling')
@@ -217,6 +223,7 @@ class PredictiveModelingModel:
             write_log('Train Model-> unsuccessful trial',results,'Predictive modeling')
         
         self.controller.upload_log()
+        self.controller.update_learning_path()
     
     def get_trained_models(self):
         return self.trainedModels

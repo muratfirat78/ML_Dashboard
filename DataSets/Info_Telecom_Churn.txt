@@ -1,0 +1,45 @@
+Target: Churn
+
+Columns:
+
+state: The U.S. state where the customer resides; helps identify regional differences in usage and churn behavior.
+
+account length: Number of days the customer has had an account with the company; reflects customer tenure.
+
+area code: Numerical code representing the customer’s telephone area; may relate to geographic or service region.
+
+phone number: Unique identifier for each customer’s phone line; used for record tracking (not a predictive feature).
+
+international plan: Indicates whether the customer subscribes to an international calling plan (Yes/No).
+
+voice mail plan: Indicates whether the customer has a voice mail service plan (Yes/No).
+
+number vmail messages: Number of voice mail messages received by the customer; shows engagement with voice mail service.
+
+total day minutes: Total number of minutes of phone calls made during daytime hours; measures daytime usage volume.
+
+total day calls: Total number of phone calls made during the day; indicates call frequency in daytime.
+
+total day charge: Total charge billed for daytime calls (in USD); derived from daytime minutes.
+
+total eve minutes: Total number of minutes of phone calls made during evening hours; represents evening usage.
+
+total eve calls: Total number of phone calls made in the evening; indicates evening call activity.
+
+total eve charge: Total charge billed for evening calls (in USD); derived from evening minutes.
+
+total night minutes: Total number of minutes of phone calls made during nighttime hours; reflects late-hour usage.
+
+total night calls: Total number of phone calls made at night; shows night call frequency.
+
+total night charge: Total charge billed for nighttime calls (in USD); derived from night minutes.
+
+total intl minutes: Total number of minutes of international calls made; measures international usage.
+
+total intl calls: Total number of international phone calls made; indicates frequency of international communication.
+
+total intl charge: Total charge billed for international calls (in USD); derived from international minutes.
+
+customer service calls: Number of calls made by the customer to customer service; may signal dissatisfaction or service issues.
+
+churn: Indicates whether the customer has discontinued service (True = customer churned, False = customer retained).

@@ -1,0 +1,318 @@
+{
+    "title": "Student Grade Prediction",
+    "description": "Predict student grade given study details. Note that the prediction power of the dataset is not high!",
+    "mode": "monitored",
+    "model_metric": [
+        "accuracy",
+        0.38
+    ],
+    "data_size": 4000,
+    "missing_values": 0,
+    "type": "object",
+    "range": "A-F",
+    "difficulty": [
+        [
+            "Data Cleaning",
+            70
+        ],
+        [
+            "Data Translation",
+            85
+        ],
+        [
+            "Data Transformation",
+            75
+        ],
+        [
+            "Statistics",
+            50
+        ],
+        [
+            "Model Training",
+            90
+        ],
+        [
+            "Predictive Modeling",
+            95
+        ]
+    ],
+    "dataset": "Student Performance and Behavior Dataset.csv",
+    "subtasks": [
+        {
+            "title": "Data Cleaning",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataCleaning",
+                        "Drop Column"
+                    ],
+                    "value": [
+                        "Student_ID",
+                        "First_Name",
+                        "Last_Name",
+                        "Email",
+                        "Assignments_Avg"
+                    ],
+                    "title": "Drop Columns",
+                    "description": "Remove columns that are irrelevant or redundant for the model.",
+                    "hints": [
+                        "Go to the Data Cleaning tab. Select the column(s), choose 'drop column', then click apply.",
+                        "Drop the following column(s): Student_ID, First_Name, Last_Name, Email, Assignments_Avg."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataCleaning",
+                        "Replace-Mode"
+                    ],
+                    "value": [
+                        "Parent_Education_Level"
+                    ],
+                    "title": "Replace Missing Values (Mode)",
+                    "description": "Replace missing values in columns using the most frequent value (mode).",
+                    "hints": [
+                        "Go to the Data Cleaning tab. Select the column, choose 'replace mode', then click apply.",
+                        "Apply replace mode to Parent_Education_Level."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataCleaning",
+                        "Replace-Median"
+                    ],
+                    "value": [
+                        "Attendance (%)"
+                    ],
+                    "title": "Replace Missing Values (Median)",
+                    "description": "Replace missing values in columns using the median.",
+                    "hints": [
+                        "Go to the Data Cleaning tab. Select the column, choose 'replace median', then click apply.",
+                        "Apply replace median to Attendance (%)."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": 2
+        },
+        {
+            "title": "Model Training",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "AssignTarget"
+                    ],
+                    "value": [
+                        "Grade"
+                    ],
+                    "title": "Assign Target Variable",
+                    "description": "Assign columns as the target variables for model training.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'Assign Target', then click apply.",
+                        "Assign 'Grade' as the target column."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "Split"
+                    ],
+                    "value": [
+                        "20%"
+                    ],
+                    "title": "Train/Test Split",
+                    "description": "Split dataset into training and testing sets.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, assign the target, set the test ratio, then click split.",
+                        "Use a test ratio of 20% for splitting the dataset."
+                    ],
+                    "applied_values": [],
+                    "order": 2
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "ModelDevelopment",
+                        "ParameterFinetuning"
+                    ],
+                    "value": [
+                        [
+                            "Decision Tree",
+                            5,
+                            5,
+                            "entropy"
+                        ]
+                    ],
+                    "title": "Parameter Finetuning",
+                    "description": "Optimize model performance by modifying the parameters of the model.",
+                    "hints": [
+                        "Go to the Predictive Modeling tab. Select the model type, adjust parameters if needed, then click train.",
+                        "Train the model using the following parameters: [['Decision Tree', 5, 5, 'entropy']]."
+                    ],
+                    "applied_values": [],
+                    "order": 3
+                }
+            ],
+            "applied_values": [],
+            "order": 7
+        },
+        {
+            "title": "Data Translation",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "OneHotEncoding"
+                    ],
+                    "value": [
+                        "Parent_Education_Level",
+                        "Gender",
+                        "Department",
+                        "Internet_Access_at_Home",
+                        "Extracurricular_Activities",
+                        "Family_Income_Level"
+                    ],
+                    "title": "One-Hot Encoding",
+                    "description": "Convert categorical columns into one-hot encoded vectors.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'encoding', choose 'One Hot Encoding', then click apply.",
+                        "Apply one-hot encoding to Parent_Education_Level, Gender, Department, Internet_Access_at_Home, Extracurricular_Activities, Family_Income_Level."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": 3
+        },
+        {
+            "title": "Data Transformation",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "Normalize"
+                    ],
+                    "value": [
+                        "Age",
+                        "Midterm_Score",
+                        "Final_Score",
+                        "Quizzes_Avg",
+                        "Projects_Score",
+                        "Total_Score",
+                        "Study_Hours_per_Week"
+                    ],
+                    "title": "Normalize Columns",
+                    "description": "Normalize columns to scale values between 0 and 1.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'scaling' as process type, then choose 'normalize' as method, and click apply.",
+                        "Normalize the following column(s): Age, Midterm_Score, Final_Score, Quizzes_Avg, Projects_Score, Total_Score, Study_Hours_per_Week."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": 4
+        },
+        {
+            "title": "Statistics",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "Standardize"
+                    ],
+                    "value": [
+                        "Participation_Score",
+                        "Stress_Level (1-10)",
+                        "Sleep_Hours_per_Night"
+                    ],
+                    "title": "Standardize Columns",
+                    "description": "Standardize columns to have zero mean and unit variance.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'scaling' as process type, then choose 'standardize' as method, and click apply.",
+                        "Standardize the following column(s): Participation_Score, Stress_Level (1-10), Sleep_Hours_per_Night."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": 5
+        },
+        {
+            "title": "Predictive Modeling",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "ModelDevelopment",
+                        "ModelPerformance"
+                    ],
+                    "value": [
+                        [
+                            [
+                                "Accuracy",
+                                0.376
+                            ],
+                            [
+                                "Precision",
+                                0.37201302450640017
+                            ],
+                            [
+                                "Recall",
+                                0.376
+                            ],
+                            [
+                                "data_size",
+                                4000
+                            ],
+                            [
+                                "missing_values",
+                                0
+                            ],
+                            [
+                                "type",
+                                "object"
+                            ],
+                            [
+                                "range",
+                                "A-F"
+                            ]
+                        ]
+                    ],
+                    "title": "Model Training",
+                    "description": "Train a model and evaluate its performance.",
+                    "hints": [],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": null
+        }
+    ]
+}

@@ -1,0 +1,37 @@
+Target: Species
+
+
+columns:
+studyName: The name of the research study or dataset from which the penguin observations were collected.
+
+Sample Number: A unique identifier for each individual penguin sample in the study.
+
+Species: The species of penguin
+
+Region: The larger geographic region where the penguin was observed
+
+Island: The specific island within the region (e.g., Dream, Torgersen, Biscoe).
+
+Stage: The life stage of the penguin.
+
+Individual ID: A unique identifier assigned to each penguin to track individuals across measurements or studies.
+
+Clutch Completion: The date or status indicating when the penguin’s clutch (group of eggs) was complete.
+
+Date Egg: The date when the egg was laid.
+
+Culmen Length (mm): The length of the penguin’s culmen (upper bill) in millimeters.
+
+Culmen Depth (mm): The depth of the penguin’s culmen in millimeters.
+
+Flipper Length (mm): The length of the penguin’s flipper in millimeters.
+
+Body Mass (g): The mass of the penguin in grams.
+
+Sex: The sex of the penguin (male or female).
+
+Delta 15 N (o/oo): The stable nitrogen isotope ratio, often used to infer trophic level or diet.
+
+Delta 13 C (o/oo): The stable carbon isotope ratio, often used to infer foraging habitat or diet.
+
+Comments: Any additional notes or observations about the individual penguin or measurement.

@@ -1,4 +1,6 @@
 import pandas as pd
+import os
+import json
 
 class MainModel:
     def __init__(self, online_version):
@@ -11,7 +13,10 @@ class MainModel:
         self.ytest_df = pd.DataFrame()
         self.targetcolumn = None
         self.online_version = online_version
-    
+
+        self.tasks_data = None
+        self.read_tasks_data()
+
     def get_online_version(self):
         return self.online_version
 
@@ -44,3 +49,28 @@ class MainModel:
     def set_YTest(self,mydf):
         self.ytest_df = mydf
         return
+    
+    def get_tasks_data(self):
+        return self.tasks_data
+    
+    def get_reference_task(self, target_column, dataset):
+        tasks = self.tasks_data
+        
+        for task in tasks:
+            if task["dataset"].replace('.csv','') == dataset and task["mode"] == "monitored":
+                for subtask in task["subtasks"]:
+                    for subsubtask in subtask["subtasks"]:
+                        if subsubtask["action"][0] == "DataProcessing" and subsubtask["action"][1]== "AssignTarget":
+                            if subsubtask["value"][0] == target_column:
+                                return task
+        return None
+    
+    def read_tasks_data(self):
+        tasks_data = []
+        for filename in os.listdir('./tasks'):
+            filepath = os.path.join('./tasks', filename)
+            if os.path.isfile(filepath):
+                with open(filepath, 'r') as f:
+                    loaded_data = json.load(f)
+                    tasks_data += [loaded_data]
+        self.tasks_data = tasks_data

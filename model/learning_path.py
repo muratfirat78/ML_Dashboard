@@ -1,121 +1,43 @@
 import os
-import ast
 import copy
 from model.student_performance import StudentPerformance
 
 class LearningPathModel:
-    def __init__(self):
-        self.learning_path = []
+    def __init__(self, controller):
+        self.controller = controller
         self.performance_data = []
-        self.dataset_info = []
-        self.stats = []
+        self.competence_vectors = []
 
-    def set_learning_path(self,userid):
-        path = os.path.join('drive', str(userid))
-        for filename in os.listdir(path):
-            with open(os.path.join(path,filename),'r') as file:
-                for line in file:
-                    try:
-                        performance = StudentPerformance()
-                        performance.string_to_student_performance(line, filename.replace('.txt', ''))
-                        self.learning_path.append(performance)
-                    except:
-                        print("Error reading performance")
-
-    def set_performance_data(self):
-        performance_data = self.performance_data
-
-        for performance in self.learning_path:
-            results = performance.get_results()
-
-            if results:
-                dataset = results[0][0][0]
-                target =  results[1][0][0]
-                res = results[2]
-
-                # if dataset not in performance_data:
-                #     performance_data[dataset] = {}
-
-                # if target not in performance_data[dataset]:
-                #     performance_data[dataset][target] = []
-                if isinstance(res, list):
-                    for result in res:
-                        model_info = result[0]
-                        model_name = model_info[0][0].split('(')[0]
-                        metrics = model_info[0][1]
-                        date = results[3]
-                        performance_data += [{
-                            "target": target,
-                            "dataset":dataset,
-                            "date": date,
-                            "model": model_name,
-                            "metrics": dict(metrics)
-                        }]
-                else:
-                        model_info = result[0]
-                        model_name = model_info[0][0].split('(')[0]
-                        metrics = res[0][0][1]
-                        date = results[3]
-                        performance_data += [{
-                            "target": target,
-                            "dataset":dataset,
-                            "date": date,
-                            "model": model_name,
-                            "metrics": dict(metrics)
-                        }]
-
-
-
-    def set_dataset_info(self):
-        path = './DataSets'
-        for filename in os.listdir(path):
-            if filename.startswith('Info'):
-                with open(os.path.join(path,filename),'r') as file:
-                    target = None
-                    difficulty_vector = None
-                    for line in file:
-                        if line.startswith('target:'):
-                            target = line.replace('target: ', '').rstrip()
-
-                        if line.startswith('difficulty:'):
-                            difficulty_vector = ast.literal_eval(line.replace('difficulty: ', ''))
-
-                    if target != None and difficulty_vector != None:
-                        self.dataset_info.append({"dataset": filename.replace('Info_','').replace('.txt',''),"target": target, "difficulty": difficulty_vector})
-
-    def get_dataset_info(self, dataset, target):
-        for info in self.dataset_info:
-            if info['dataset'] == dataset and info['target'] == target:
-                return info
+    def get_competence_vectors(self):
+        return self.competence_vectors
     
-    def set_performance_statistics(self):
-        
-        sorted_performance_data = sorted(self.performance_data, key=lambda x: x['date'][0])
-        # print(self.dataset_info)
-        for performance in sorted_performance_data:
-            dataset_info = self.get_dataset_info(performance['dataset'].replace('.csv',''), performance['target'])
-            if dataset_info:
-                #todo calculate score
-                score = 0.5
+    def get_graph_data(self):
+        graph_data = []
 
-                if len(self.stats) > 1:
-                    stat = copy.copy(self.stats[-1])
-                else:
-                    stat = {}
-                    
-                stat['date'] = performance['date']
-                for difficulty in dataset_info['difficulty']:
-                    increase = score * difficulty[1]
-                    if difficulty[0] in stat:
-                        stat[difficulty[0]] = stat[difficulty[0]] + increase
-                    else:
-                        stat[difficulty[0]] = increase
+        for competence_vector in self.competence_vectors:
+            if not graph_data:
+                graph_data.append(competence_vector)
+                continue
+
+            new_vector = copy.copy(graph_data[-1])
+            new_vector["date"] = competence_vector.get("date", new_vector.get("date"))
+
+            for skill, value in competence_vector.items():
+                if skill == "date":
+                    continue
+                new_vector[skill] = max(value, new_vector.get(skill, value))
+
+            graph_data.append(new_vector)
+
+        return graph_data
                 
-                self.stats += [stat]
+    
+    def add_competence_vector(self,vector):
+        self.competence_vectors.append(vector)
 
-                # self.performance_statistics += [{'date': performance['date'], }]
-
-                print(performance)
-                print(dataset_info)
-                print(self.stats)
-
+    def get_current_competence_vector(self):
+        if len(self.competence_vectors) > 0:
+            # Return the most recent competence vector
+            return self.competence_vectors[-1]
+        else:
+            return None

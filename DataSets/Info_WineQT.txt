@@ -1,0 +1,26 @@
+Target: Quality
+
+Columns:
+Fixed acidity: Amount of non-volatile acids in wine, contributing to taste and stability.
+
+Volatile acidity: Amount of acetic acid; high levels can cause an unpleasant vinegar taste.
+
+Citric acid: Contributes to freshness and flavor balance in wine.
+
+Residual sugar: Amount of sugar remaining after fermentation; affects sweetness.
+
+Chlorides: Salt content in wine; impacts taste.
+
+Free sulfur dioxide: SO₂ present that can prevent microbial growth and oxidation.
+
+Total sulfur dioxide: Total SO₂ (bound + free); affects preservation and stability.
+
+Density: Mass per unit volume; influenced by sugar and alcohol content.
+
+pH: Measures acidity/alkalinity; affects taste and stability.
+
+Sulphates: Contribute to wine’s flavor and act as preservatives.
+
+Alcohol: Alcohol content (%) of the wine; affects body and flavor.
+
+Quality: Sensory score of wine quality, ranging from 0 (poor) to 10 (excellent).

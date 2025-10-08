@@ -1,0 +1,193 @@
+{
+    "title": "Obesity type prediction",
+    "description": "NObeyesdad classifies several obesity types, create a model that predicts the NObeyesdad obesity class",
+    "mode": "monitored",
+    "model_metric": [
+        "accuracy",
+        0.95
+    ],
+    "data_size": 1688,
+    "missing_values": 0,
+    "type": "object",
+    "range": "Insufficient_Weight-Overweight_Level_II",
+    "difficulty": [
+        [
+            "Data Cleaning",
+            25
+        ],
+        [
+            "Data Translation",
+            90
+        ],
+        [
+            "Data Transformation",
+            40
+        ],
+        [
+            "Statistics",
+            20
+        ],
+        [
+            "Model Training",
+            50
+        ],
+        [
+            "Predictive Modeling",
+            50
+        ]
+    ],
+    "dataset": "ObesityDataSet.csv",
+    "subtasks": [
+        {
+            "title": "Data Translation",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "OneHotEncoding"
+                    ],
+                    "value": [
+                        "Gender",
+                        "family_history_with_overweight",
+                        "FAVC",
+                        "CAEC",
+                        "SMOKE",
+                        "SCC",
+                        "CALC",
+                        "MTRANS"
+                    ],
+                    "title": "One-Hot Encoding",
+                    "description": "Convert categorical columns into one-hot encoded vectors.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'encoding', choose 'One Hot Encoding', then click apply.",
+                        "Apply one-hot encoding to Gender, family_history_with_overweight, FAVC, CAEC, SMOKE, SCC, CALC, MTRANS."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": 3
+        },
+        {
+            "title": "Model Training",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "AssignTarget"
+                    ],
+                    "value": [
+                        "NObeyesdad"
+                    ],
+                    "title": "Assign Target Variable",
+                    "description": "Assign columns as the target variables for model training.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'Assign Target', then click apply.",
+                        "Assign 'NObeyesdad' as the target column."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "Split"
+                    ],
+                    "value": [
+                        "20%"
+                    ],
+                    "title": "Train/Test Split",
+                    "description": "Split dataset into training and testing sets.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, assign the target, set the test ratio, then click split.",
+                        "Use a test ratio of 20% for splitting the dataset."
+                    ],
+                    "applied_values": [],
+                    "order": 2
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "ModelDevelopment",
+                        "ParameterFinetuning"
+                    ],
+                    "value": [
+                        [
+                            "Random Forest",
+                            75,
+                            "gini"
+                        ]
+                    ],
+                    "title": "Parameter Finetuning",
+                    "description": "Optimize model performance by modifying the parameters of the model.",
+                    "hints": [
+                        "Go to the Predictive Modeling tab. Select the model type, adjust parameters if needed, then click train.",
+                        "Train the model using the following parameters: [['Random Forest', 75, 'gini']]."
+                    ],
+                    "applied_values": [],
+                    "order": 3
+                }
+            ],
+            "applied_values": [],
+            "order": 7
+        },
+        {
+            "title": "Predictive Modeling",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "ModelDevelopment",
+                        "ModelPerformance"
+                    ],
+                    "value": [
+                        [
+                            [
+                                "Accuracy",
+                                0.9361702127659575
+                            ],
+                            [
+                                "Precision",
+                                0.9476249841028731
+                            ],
+                            [
+                                "Recall",
+                                0.9361702127659575
+                            ],
+                            [
+                                "data_size",
+                                1688
+                            ],
+                            [
+                                "missing_values",
+                                0
+                            ],
+                            [
+                                "type",
+                                "object"
+                            ],
+                            [
+                                "range",
+                                "Insufficient_Weight-Overweight_Level_II"
+                            ]
+                        ]
+                    ],
+                    "title": "Model Training",
+                    "description": "Train a model and evaluate its performance.",
+                    "hints": [],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": null
+        }
+    ]
+}

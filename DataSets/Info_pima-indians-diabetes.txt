@@ -1,0 +1,21 @@
+Target: Label
+
+Columns:
+
+pregnant: Number of times the patient has been pregnant; an indicator of reproductive history, which may relate to diabetes risk.
+
+glucose: Plasma glucose concentration after a 2-hour oral glucose tolerance test (mg/dL); measures blood sugar levels.
+
+bp (blood pressure): Diastolic blood pressure (mm Hg); an important cardiovascular health indicator.
+
+skin: Triceps skinfold thickness (mm); used as a measure of body fat.
+
+insulin: 2-hour serum insulin level (µU/mL); reflects insulin production and glucose regulation.
+
+bmi (Body Mass Index): Weight-to-height ratio (kg/m²); measures body fat and obesity level.
+
+pedigree: Diabetes pedigree function; quantifies the genetic likelihood of diabetes based on family history.
+
+age: Age of the patient (in years); older age is associated with higher diabetes risk.
+
+label: Outcome variable indicating diabetes status (1 = diabetic, 0 = non-diabetic).

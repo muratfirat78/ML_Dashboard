@@ -1,0 +1,45 @@
+Target: Price Range
+
+Columns:
+
+battery_power: Total energy capacity of the mobile battery (in mAh); determines how long the phone can run on a single charge.
+
+blue: Indicates whether the mobile phone supports Bluetooth connectivity (1 = Yes, 0 = No).
+
+clock_speed: The speed at which the phone’s processor executes instructions (in GHz); affects overall performance and responsiveness.
+
+dual_sim: Indicates whether the mobile phone supports two SIM cards (1 = Yes, 0 = No).
+
+fc (front camera): Resolution of the front-facing camera (in megapixels); affects quality of selfies and video calls.
+
+four_g: Indicates whether the phone supports 4G LTE connectivity (1 = Yes, 0 = No).
+
+int_memory (internal memory): Built-in storage capacity of the device (in GB); determines how much data and apps can be stored internally.
+
+m_dep (mobile depth): Thickness of the mobile phone (in cm); influences device design and portability.
+
+mobile_wt (mobile weight): Weight of the mobile phone (in grams); affects handling comfort and portability.
+
+n_cores: Number of processor cores in the CPU; impacts multitasking and performance efficiency.
+
+pc (primary camera): Resolution of the rear (main) camera (in megapixels); determines image quality for standard photography.
+
+px_height: Vertical resolution of the display (in pixels); contributes to screen clarity and detail.
+
+px_width: Horizontal resolution of the display (in pixels); combined with height, determines total screen resolution.
+
+ram: Random Access Memory (in MB); influences speed and ability to handle multiple apps simultaneously.
+
+sc_h (screen height): Height of the mobile screen (in cm); affects display size and user experience.
+
+sc_w (screen width): Width of the mobile screen (in cm); contributes to the overall display dimensions.
+
+talk_time: Maximum time (in hours) that the phone can be used for calls on a full charge; measures battery efficiency.
+
+three_g: Indicates whether the mobile phone supports 3G connectivity (1 = Yes, 0 = No).
+
+touch_screen: Indicates whether the device has a touch-sensitive display (1 = Yes, 0 = No).
+
+wifi: Indicates whether the phone supports Wi-Fi connectivity (1 = Yes, 0 = No).
+
+price_range: Categorical indicator of mobile price level, ranging from 0 (low cost) to 3 (very high cost).

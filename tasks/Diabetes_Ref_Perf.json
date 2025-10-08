@@ -1,6 +1,6 @@
 {
-    "title": "Predict the diabetes foir Indian patients",
-    "description": "Test results are used to predict diabetes of indian pateints. Careful: target is label feature and convert it to bool!",
+    "title": "Predict the diabetes for Indian patients",
+    "description": "Test results are used to predict diabetes of indian patients. Careful: target is label feature and convert it to bool!",
     "mode": "monitored",
     "model_metric": [
         "accuracy",

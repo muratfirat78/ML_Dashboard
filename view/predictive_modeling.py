@@ -68,11 +68,13 @@ class PredictiveModelingView:
                         display.display('__________________________________')                    
             
                         if len(self.controller.main_model.getYtrain().to_frame()[self.controller.main_model.targetcolumn].unique()) == 2:
-                            roc_auc = metrics.auc(mdl.GetPerformanceDict()['ROCFPR'],mdl.GetPerformanceDict()['ROCTPR'])
-                            display0 = metrics.RocCurveDisplay(fpr=mdl.GetPerformanceDict()['ROCFPR'], tpr=mdl.GetPerformanceDict()['ROCTPR'], roc_auc=roc_auc, estimator_name=mdl.getName())
-                            display0.plot()
-                            plt.title('ROC Curve', fontsize=14)
-                            plt.show()
+                            perf = mdl.GetPerformanceDict()
+                            if 'ROCFPR' in perf and 'ROCTPR' in perf:
+                                roc_auc = metrics.auc(perf['ROCFPR'],perf['ROCTPR'])
+                                display0 = metrics.RocCurveDisplay(fpr=perf['ROCFPR'], tpr=perf['ROCTPR'], roc_auc=roc_auc, estimator_name=mdl.getName())
+                                display0.plot()
+                                plt.title('ROC Curve', fontsize=14)
+                                plt.show()
                         display.display('Confusion Matrix: ')
                         display.display(mdl.getConfMatrix())
                         

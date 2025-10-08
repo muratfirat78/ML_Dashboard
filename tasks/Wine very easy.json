@@ -1,6 +1,6 @@
 {
     "title": "Wine Quality Prediction",
-    "description": "<p>This dataset contains chemical properties of red Vinho Verde wines and their impact on quality. The target can be treated as a classification or regression problem. Classes are ordered and imbalanced, with fewer excellent or poor wines compared to average ones.</p><p>The goal: predict wine quality using this data. Despite its small size and imbalance, try to build an accurate classification model, fine-tune hyperparameters, and compare evaluation metrics across algorithms.</p>",
+    "description": "<p>This dataset contains chemical properties of red Vinho Verde wines and their impact on quality. The target can be treated as a classification or regression problem. Classes are ordered and imbalanced, with fewer excellent or poor wines compared to average ones.</p><p>The goal: predict wine quality using this data. Despite its small size and imbalance, try to build an accurate classification model for quality.</p>",
     "mode": "monitored",
     "model_metric": [
         "MSE",

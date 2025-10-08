@@ -32,7 +32,6 @@ class TaskSelectionModel:
                 current_skill_level = current_skill_vector.get(task_skill_difficulty_name)
                 total_difference += task_skill_difficulty - current_skill_level
             task_differences.append((total_difference, task))
-        print(task_differences)
 
         #order recommended tasks by total difference and get the first 3
         task_differences.sort(key=lambda x: x[0])

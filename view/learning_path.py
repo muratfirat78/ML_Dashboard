@@ -3,7 +3,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
 from datetime import datetime
-
+import matplotlib.colors as mcolors
 
 class LearningPathView:
     def __init__(self, controller):
@@ -73,8 +73,12 @@ class LearningPathView:
             else:
                 df['Value'] = 5 
 
+            norm = mcolors.Normalize(vmin=0, vmax=5)
+            cmap = plt.cm.YlGn
+            colors = [cmap(norm(v)) for v in df['Value']]
+
             plt.figure(figsize=(10, 6))
-            sns.barplot(data=df, x='Skill', y='Value', palette='viridis')
+            sns.barplot(data=df, x='Skill', y='Value', palette=colors)
             plt.ylim(0, 5)
             plt.yticks([0, 1, 2, 3, 4, 5], ['Beginner', 'Basic Knowledge', 'Intermediate', 'Experienced', 'Expert', 'Master'])
             plt.title('Current competence')

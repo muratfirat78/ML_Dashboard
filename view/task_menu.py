@@ -24,10 +24,10 @@ class TaskMenuView:
         self.hint_button.on_click(self.hint)
         self.hint_display_list = []
         self.subsubtask_label = widgets.Label("Task:", layout=widgets.Layout(height="35px"))
-        self.subsubtask_textarea = widgets.Textarea("",description='Task:', layout=widgets.Layout(width="100%"))
+        self.subsubtask_textarea = widgets.Textarea("", disabled=True, description='Task:', layout=widgets.Layout(width="100%"),style={'background': "#C7EFFF"})
         self.hint_label = widgets.Label("Hints:", layout=widgets.Layout(height="35px"))
-        self.hint_textarea = widgets.Textarea("", description='Hints:',layout=widgets.Layout(width="100%"))
-        self.status_label = widgets.HTML("status:todo", layout=widgets.Layout(height="35px"))
+        self.hint_textarea = widgets.Textarea("", disabled=True,description='Hints:',layout=widgets.Layout(width="100%"),style={'background': '#C7EFFF'})
+        self.status_label = widgets.HTML("status:todo", layout=widgets.Layout(height="35px", width="100%", text_align="center"))
         self.button_box = widgets.GridBox(
             children=[self.previous_button, self.hint_button, self.next_button],
             layout=widgets.Layout(

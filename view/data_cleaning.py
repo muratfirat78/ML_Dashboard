@@ -104,7 +104,6 @@ class DataCleaningView:
         
         self.controller.make_cleaning(self.main_view.featurescl,result2aexp,self.missacts,self.main_view.dt_features,params) 
 
-        self.missacts.value = "Select"
 
         missings = []
         if not self.controller.main_model.datasplit:
@@ -213,7 +212,7 @@ class DataCleaningView:
 
     def get_data_cleaning_tab(self):
         global trgcl_lbl,miss_lbl, result2aexp
-        RP_lay=Layout(height='250px',width ='70%',align_items='center',overflow="visible")
+        RP_lay=Layout(width ='70%',align_items='center',overflow="visible")
 
         self.main_view.right_page = widgets.Output(layout = RP_lay)
 
@@ -227,7 +226,7 @@ class DataCleaningView:
 
 
         mssactlay = widgets.Layout(display = 'block')
-        self.missacts = widgets.Dropdown(description='Actions',options=['Select','Drop Column','Remove-Missing','Replace-Mean','Replace-Median','Replace-Mode','Edit Range'], disabled=False,layout = mssactlay)
+        self.missacts = widgets.Select(description='Actions',options=['Drop Column','Remove-Missing','Replace-Mean','Replace-Median','Replace-Mode','Edit Range'], disabled=False,layout = mssactlay)
 
         self.missacts.observe(self.makerangedit)
 
@@ -273,5 +272,5 @@ class DataCleaningView:
         tab2_lftbox = VBox(children = [HBox(children=[f2a_box,selcl_box]),result2aexp],layout = tab2a_lay)
 
         tab_2 = VBox([self.task_menu,HBox(children=[tab2_lftbox,self.main_view.right_page])])
-        tab_2.layout.height = '700px'
+        # tab_2.layout.height = '700px'
         return tab_2

@@ -142,7 +142,7 @@ class DataProcessingView:
     def ApplyMethod(self,event):  
         global scalingacts,result2exp,balncacts,fxctingacts
         #'Select Processing','Scaling','Encoding','Feature Extraction','Outlier','Imbalancedness'
-
+        refreshFeatures = True
         with self.main_view.vis_page:
             clear_output()
     
@@ -156,7 +156,8 @@ class DataProcessingView:
             self.controller.make_balanced(self.main_view.dt_features,balncacts,self.main_view.process_page,result2exp)
         if self.main_view.process_types.value == "Feature Extraction":
             if fxctingacts.value == "Correlation":
-                self.controller.showCorrHeatMap(self.main_view.vis_page,fxctingacts,result2exp)
+                self.controller.showCorrHeatMap(self.main_view.feat_page,fxctingacts,result2exp)
+                refreshFeatures = False
             if fxctingacts.value == "PCA":
                 self.controller.ApplyPCA(self.main_view.dt_features,self.pcaselect,result2exp)
                 self.pcaselect.options = []
@@ -168,18 +169,17 @@ class DataProcessingView:
         if self.main_view.process_types.value == "Convert Feature 0/1->Bool":
             self.controller.make_featconvert(self.main_view.dt_features,result2exp)
             
+        if refreshFeatures:
+            opts = []
+            if not self.controller.main_model.datasplit:
+                opts =  [col for col in self.controller.main_model.get_curr_df().columns]
+            else:
+                opts = [col for col in self.controller.main_model.get_XTrain().columns]
+                for col in self.controller.main_model.getYtrain().to_frame().columns:
+                    opts.append(col)
 
-        
-        opts = []
-        if not self.controller.main_model.datasplit:
-            opts =  [col for col in self.controller.main_model.get_curr_df().columns]
-        else:
-            opts = [col for col in self.controller.main_model.get_XTrain().columns]
-            for col in self.controller.main_model.getYtrain().to_frame().columns:
-                opts.append(col)
-          
-        self.main_view.dt_features.options = [x for x in opts]
-        self.main_view.featurescl.options  = [x for x in opts] 
+            self.main_view.dt_features.options = [x for x in opts]
+            self.main_view.featurescl.options  = [x for x in opts] 
 
         
         return
@@ -231,9 +231,9 @@ class DataProcessingView:
        
         outrmvbtn.layout = outrmvlay
 
-        self.main_view.process_types = widgets.Dropdown( options=['Select Processing','Scaling','Encoding','Feature Extraction','Outlier','Imbalancedness','Convert Feature 0/1->Bool'], description='', disabled=False)
+        self.main_view.process_types = widgets.Select( description='Process types',options=['Scaling','Encoding','Feature Extraction','Outlier','Imbalancedness','Convert Feature 0/1->Bool'],disabled=False)
         self.main_view.process_types.observe(self.selectProcessType,'value')
-        self.main_view.process_types.layout.width = '200px'
+        self.main_view.process_types.layout.width = '300px'
 
 
 
@@ -280,7 +280,7 @@ class DataProcessingView:
 
         
         self.selcl = widgets.Label(value ='Column: -',disabled = True)
-        self.ApplyButton = widgets.Button(description="Apply")
+        self.ApplyButton = widgets.Button(description="Apply",layout=widgets.Layout(width='60px'))
         self.ApplyButton.on_click(self.ApplyMethod)
 
         self.main_view.vis_page = widgets.Output()
@@ -298,7 +298,7 @@ class DataProcessingView:
         sel_box = VBox(children=[self.selcl,
                                  HBox(children=[self.main_view.trg_lbl,self.trg_btn,self.main_view.prdtsk_lbl]),
                                  HBox(children=[self.testratiolbl,self.splt_txt,self.splt_btn]),
-                                 HBox(children=[widgets.Label(value ='Process Types'),self.main_view.process_types,self.ApplyButton]),
+                                 HBox(children=[self.main_view.process_types,self.ApplyButton]),
                                  HBox(children=[scalelbl,scalingacts]),
                                  HBox(children=[imbllbl,balncacts]),HBox(children=[encdlbl,encodingacts]),
                                  HBox(children=[fxctlbl,fxctingacts]),

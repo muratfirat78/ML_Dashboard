@@ -278,7 +278,7 @@ class PredictiveModelingView:
                                  trmodels,model_sumry
                                 ])
 
-        vbox1 = VBox(children = [HBox(children=[self.main_view.f_box,sel_box]),t4_results])
+        vbox1 = VBox(children = [HBox(children=[sel_box]),t4_results])
 
         self.performpage = widgets.Output()
 

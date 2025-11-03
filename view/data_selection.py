@@ -30,6 +30,7 @@ class DataSelectionView:
     def read_dataset(self,b):  
         global InfoPage,wsheets
         rowheight = 20
+        featurelist_width = '100%'
         self.controller.read_data_set(self.controller.get_datafolder(),self.main_view.datasets.value,wsheets.value)
 
         df = self.controller.get_curr_df()
@@ -39,6 +40,7 @@ class DataSelectionView:
 
         self.main_view.ftlaycl.display = 'block'
         self.main_view.ftlaycl.height = str(rowheight*len(df.columns))+'px'
+        self.main_view.ftlaycl.width = featurelist_width
         self.main_view.featurescl.layout = self.main_view.ftlaycl
 
 

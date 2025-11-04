@@ -7,9 +7,9 @@ class TaskMenuView:
         self.slider = widgets.IntSlider(layout=widgets.Layout(width="90%"), min=1,max=1)
         self.slider.observe(self.slider_change)
         self.slider_box = widgets.HBox([self.slider], layout=widgets.Layout(justify_content="center", width="100%"))
-        self.previous_button = widgets.Button(description='<< Previous', button_style="primary")
+        self.previous_button = widgets.Button(description='<-- Previous', button_style="primary")
         self.previous_button.on_click(self.previous_button_click)
-        self.next_button = widgets.Button(description="Next >>", button_style="primary")
+        self.next_button = widgets.Button(description="Next -->", button_style="primary")
         self.next_button.on_click(self.next_button_click)
         self.task_box = widgets.HBox([])
         self.mode = ""

@@ -1,6 +1,6 @@
 {
-    "title": "todo",
-    "description": "todo",
+    "title": "Crop Recommendation",
+    "description": "Recommend crop type with agricultural analysis",
     "mode": "monitored",
     "model_metric": [
         "accuracy",

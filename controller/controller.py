@@ -112,8 +112,8 @@ class Controller:
     def make_balanced(self,features2,balncacts,ProcssPage,result2exp):
         self.data_processing_model.make_balanced(features2,balncacts,ProcssPage,result2exp)
 
-    def make_encoding(self,features2,encodingacts,result2exp):
-        self.data_processing_model.make_encoding(features2,encodingacts,result2exp)
+    def make_encoding(self,features2,encodingacts,ordinalenconding,result2exp):
+        self.data_processing_model.make_encoding(features2,encodingacts,ordinalenconding,result2exp)
 
     def make_featconvert(self,dt_features,result2exp):
         self.data_processing_model.make_featconvert(dt_features,result2exp)

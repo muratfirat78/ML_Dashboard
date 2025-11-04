@@ -575,7 +575,7 @@ class DataProcessingModel:
         
         return
     ############################################################################################################    
-    def make_encoding(self,features2,encodingacts,result2exp):
+    def make_encoding(self,features2,encodingacts,ordselect,result2exp):
 
         colname = features2.value
 
@@ -674,7 +674,19 @@ class DataProcessingModel:
                 curr_df = pd.concat([curr_df.drop(categorical_columns, axis=1), one_hot_df], axis=1)
                 self.logger.add_action(['DataProcessing', 'OneHotEncoding'], colname)
                 write_log('Encoding->'+encodingtype+', col '+colname+', done. ', result2exp, 'Data processing')
+
+            if encodingacts.value == 'Ordinal Encoding':
+                classorder =[x for x in ordselect.options]
+
+                mapping = dict()
+
+                for i in range(len(classorder)):
+                    mapping[classorder[i]] = len(classorder)-i
+ 
+                curr_df[colname] = curr_df[colname].replace(mapping)
                 
+                
+            
             self.main_model.set_curr_df(curr_df)
    
         

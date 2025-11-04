@@ -1,0 +1,229 @@
+{
+    "title": "Manufacturing detect prediction",
+    "description": "Predict defect using given production values",
+    "mode": "monitored",
+    "model_metric": [
+        "accuracy",
+        0.96
+    ],
+    "data_size": 2430,
+    "missing_values": 0,
+    "type": "bool",
+    "range": "False-True",
+    "difficulty": [
+        [
+            "Data Cleaning",
+            10
+        ],
+        [
+            "Data Translation",
+            10
+        ],
+        [
+            "Data Transformation",
+            75
+        ],
+        [
+            "Statistics",
+            20
+        ],
+        [
+            "Model Training",
+            70
+        ],
+        [
+            "Predictive Modeling",
+            60
+        ]
+    ],
+    "dataset": "manufacturing_defect_dataset.csv",
+    "subtasks": [
+        {
+            "title": "Data Translation",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "ConvertToBoolean"
+                    ],
+                    "value": [
+                        "DefectStatus"
+                    ],
+                    "title": "Convert to Boolean",
+                    "description": "Convert 1 and 0 values in columns to boolean (True/False).",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'Convert to Boolean', then click apply.",
+                        "Convert 'DefectStatus' to boolean (True/False)."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": 3
+        },
+        {
+            "title": "Model Training",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "AssignTarget"
+                    ],
+                    "value": [
+                        "DefectStatus"
+                    ],
+                    "title": "Assign Target Variable",
+                    "description": "Assign columns as the target variables for model training.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'Assign Target', then click apply.",
+                        "Assign 'DefectStatus' as the target column."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "Split"
+                    ],
+                    "value": [
+                        "25%"
+                    ],
+                    "title": "Train/Test Split",
+                    "description": "Split dataset into training and testing sets.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, assign the target, set the test ratio, then click split.",
+                        "Use a test ratio of 25% for splitting the dataset."
+                    ],
+                    "applied_values": [],
+                    "order": 2
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "ModelDevelopment",
+                        "ParameterFinetuning"
+                    ],
+                    "value": [
+                        [
+                            "Linear Model"
+                        ]
+                    ],
+                    "title": "Parameter Finetuning",
+                    "description": "Optimize model performance by modifying the parameters of the model.",
+                    "hints": [
+                        "Go to the Predictive Modeling tab. Select the model type, adjust parameters if needed, then click train.",
+                        "Train the model using the following parameters: [['Linear Model']]."
+                    ],
+                    "applied_values": [],
+                    "order": 3
+                }
+            ],
+            "applied_values": [],
+            "order": 7
+        },
+        {
+            "title": "Statistics",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "Standardize"
+                    ],
+                    "value": [
+                        "ProductionVolume",
+                        "ProductionCost",
+                        "EnergyConsumption",
+                        "AdditiveMaterialCost"
+                    ],
+                    "title": "Standardize Columns",
+                    "description": "Standardize columns to have zero mean and unit variance.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'scaling' as process type, then choose 'standardize' as method, and click apply.",
+                        "Standardize the following column(s): ProductionVolume, ProductionCost, EnergyConsumption, AdditiveMaterialCost."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": 5
+        },
+        {
+            "title": "Predictive Modeling",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "ModelDevelopment",
+                        "ModelPerformance"
+                    ],
+                    "value": [
+                        [
+                            [
+                                "True-Positive",
+                                276
+                            ],
+                            [
+                                "False-Positive",
+                                10
+                            ],
+                            [
+                                "True-Negative",
+                                113
+                            ],
+                            [
+                                "False-Negative",
+                                411
+                            ],
+                            [
+                                "Accuracy",
+                                0.4802469135802469
+                            ],
+                            [
+                                "Precision",
+                                0.965034965034965
+                            ],
+                            [
+                                "Recall",
+                                0.4017467248908297
+                            ],
+                            [
+                                "data_size",
+                                2430
+                            ],
+                            [
+                                "missing_values",
+                                0
+                            ],
+                            [
+                                "type",
+                                "bool"
+                            ],
+                            [
+                                "range",
+                                "False-True"
+                            ]
+                        ]
+                    ],
+                    "title": "Model Training",
+                    "description": "Train a model and evaluate its performance.",
+                    "hints": [],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": null
+        }
+    ]
+}

@@ -1,23 +1,23 @@
 {
-    "title": "todo",
-    "description": "todo",
+    "title": "Rice Classification",
+    "description": "Classify Rice with given properties",
     "mode": "monitored",
     "model_metric": [
         "accuracy",
-        0.0
+        0.98
     ],
-    "data_size": 1760,
+    "data_size": 14548,
     "missing_values": 0,
-    "type": "object",
-    "range": "apple-watermelon",
+    "type": "bool",
+    "range": "False-True",
     "difficulty": [
         [
             "Data Cleaning",
-            0
+            10
         ],
         [
             "Data Translation",
-            0
+            10
         ],
         [
             "Data Transformation",
@@ -25,19 +25,71 @@
         ],
         [
             "Statistics",
-            0
+            50
         ],
         [
             "Model Training",
-            0
+            50
         ],
         [
             "Predictive Modeling",
-            0
+            55
         ]
     ],
-    "dataset": "Crop_recommendation.csv",
+    "dataset": "riceClassification.csv",
     "subtasks": [
+        {
+            "title": "Data Cleaning",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataCleaning",
+                        "Drop Column"
+                    ],
+                    "value": [
+                        "id"
+                    ],
+                    "title": "Drop Columns",
+                    "description": "Remove columns that are irrelevant or redundant for the model.",
+                    "hints": [
+                        "Go to the Data Cleaning tab. Select the column(s), choose 'drop column', then click apply.",
+                        "Drop the following column(s): id."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": 2
+        },
+        {
+            "title": "Data Translation",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "ConvertToBoolean"
+                    ],
+                    "value": [
+                        "Class"
+                    ],
+                    "title": "Convert to Boolean",
+                    "description": "Convert 1 and 0 values in columns to boolean (True/False).",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'Convert to Boolean', then click apply.",
+                        "Convert 'Class' to boolean (True/False)."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": 3
+        },
         {
             "title": "Model Training",
             "status": "todo",
@@ -49,13 +101,13 @@
                         "AssignTarget"
                     ],
                     "value": [
-                        "label"
+                        "Class"
                     ],
                     "title": "Assign Target Variable",
                     "description": "Assign columns as the target variables for model training.",
                     "hints": [
                         "Go to the Data Processing tab. Choose the column, select 'Assign Target', then click apply.",
-                        "Assign 'label' as the target column."
+                        "Assign 'Class' as the target column."
                     ],
                     "applied_values": [],
                     "order": 1
@@ -86,16 +138,14 @@
                     ],
                     "value": [
                         [
-                            "Random Forest",
-                            75,
-                            "gini"
+                            "Logistic Regression"
                         ]
                     ],
                     "title": "Parameter Finetuning",
                     "description": "Optimize model performance by modifying the parameters of the model.",
                     "hints": [
                         "Go to the Predictive Modeling tab. Select the model type, adjust parameters if needed, then click train.",
-                        "Train the model using the following parameters: [['Random Forest', 75, 'gini']]."
+                        "Train the model using the following parameters: [['Logistic Regression']]."
                     ],
                     "applied_values": [],
                     "order": 3
@@ -116,15 +166,35 @@
                     ],
                     "value": [
                         [
-                            "P",
-                            "K"
+                            "Area",
+                            "ConvexArea"
+                        ],
+                        [
+                            "MajorAxisLength",
+                            "Perimeter"
+                        ],
+                        [
+                            "Princ_Comp_0",
+                            "EquivDiameter"
+                        ],
+                        [
+                            "Eccentricity",
+                            "AspectRation"
+                        ],
+                        [
+                            "Princ_Comp_3",
+                            "Roundness"
+                        ],
+                        [
+                            "MinorAxisLength",
+                            "Princ_Comp_2"
                         ]
                     ],
                     "title": "Dimensionality Reduction (PCA)",
                     "description": "Apply Principal Component Analysis to reduce dimensionality.",
                     "hints": [
                         "Go to the Data Processing tab. Choose the column(s), select 'feature extraction', choose 'PCA', then click 'Add PCA' and apply.",
-                        "Apply PCA to the following column(s): [['P', 'K']]."
+                        "Apply PCA to the following column(s): [['Area', 'ConvexArea'], ['MajorAxisLength', 'Perimeter'], ['Princ_Comp_0', 'EquivDiameter'], ['Eccentricity', 'AspectRation'], ['Princ_Comp_3', 'Roundness'], ['MinorAxisLength', 'Princ_Comp_2']]."
                     ],
                     "applied_values": [],
                     "order": 1
@@ -146,20 +216,36 @@
                     "value": [
                         [
                             [
+                                "True-Positive",
+                                1964
+                            ],
+                            [
+                                "False-Positive",
+                                25
+                            ],
+                            [
+                                "True-Negative",
+                                1634
+                            ],
+                            [
+                                "False-Negative",
+                                14
+                            ],
+                            [
                                 "Accuracy",
-                                0.9840909090909091
+                                0.9892768765466043
                             ],
                             [
                                 "Precision",
-                                0.9855097972203236
+                                0.987430869783811
                             ],
                             [
                                 "Recall",
-                                0.9840909090909091
+                                0.9929221435793731
                             ],
                             [
                                 "data_size",
-                                1760
+                                14548
                             ],
                             [
                                 "missing_values",
@@ -167,11 +253,11 @@
                             ],
                             [
                                 "type",
-                                "object"
+                                "bool"
                             ],
                             [
                                 "range",
-                                "apple-watermelon"
+                                "False-True"
                             ]
                         ]
                     ],

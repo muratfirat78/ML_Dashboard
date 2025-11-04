@@ -1,0 +1,208 @@
+{
+    "title": "House Pricing",
+    "description": "Predict house price with given house features",
+    "mode": "monitored",
+    "model_metric": [
+        "MSE",
+        1500000000000
+    ],
+    "data_size": 436,
+    "missing_values": 0,
+    "type": "int64",
+    "range": "1750000-12250000",
+    "difficulty": [
+        [
+            "Data Cleaning",
+            0
+        ],
+        [
+            "Data Translation",
+            10
+        ],
+        [
+            "Data Transformation",
+            10
+        ],
+        [
+            "Statistics",
+            0
+        ],
+        [
+            "Model Training",
+            50
+        ],
+        [
+            "Predictive Modeling",
+            75
+        ]
+    ],
+    "dataset": "Housing.csv",
+    "subtasks": [
+        {
+            "title": "Data Translation",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "OneHotEncoding"
+                    ],
+                    "value": [
+                        "mainroad",
+                        "guestroom",
+                        "basement",
+                        "airconditioning",
+                        "prefarea"
+                    ],
+                    "title": "One-Hot Encoding",
+                    "description": "Convert categorical columns into one-hot encoded vectors.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'encoding', choose 'One Hot Encoding', then click apply.",
+                        "Apply one-hot encoding to mainroad, guestroom, basement, airconditioning, prefarea."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "LabelEncoding"
+                    ],
+                    "value": [
+                        "hotwaterheating"
+                    ],
+                    "title": "Label Encoding",
+                    "description": "Convert categorical columns into numeric codes.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'encoding', choose 'Label Encoding', then click apply.",
+                        "Apply label encoding to hotwaterheating."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": 3
+        },
+        {
+            "title": "Model Training",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "AssignTarget"
+                    ],
+                    "value": [
+                        "price"
+                    ],
+                    "title": "Assign Target Variable",
+                    "description": "Assign columns as the target variables for model training.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'Assign Target', then click apply.",
+                        "Assign 'price' as the target column."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "Split"
+                    ],
+                    "value": [
+                        "20%"
+                    ],
+                    "title": "Train/Test Split",
+                    "description": "Split dataset into training and testing sets.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, assign the target, set the test ratio, then click split.",
+                        "Use a test ratio of 20% for splitting the dataset."
+                    ],
+                    "applied_values": [],
+                    "order": 2
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "ModelDevelopment",
+                        "ParameterFinetuning"
+                    ],
+                    "value": [
+                        [
+                            "SVM",
+                            0.7000000000000001,
+                            "rbf"
+                        ]
+                    ],
+                    "title": "Parameter Finetuning",
+                    "description": "Optimize model performance by modifying the parameters of the model.",
+                    "hints": [
+                        "Go to the Predictive Modeling tab. Select the model type, adjust parameters if needed, then click train.",
+                        "Train the model using the following parameters: [['SVM', 0.7000000000000001, 'rbf']]."
+                    ],
+                    "applied_values": [],
+                    "order": 3
+                }
+            ],
+            "applied_values": [],
+            "order": 7
+        },
+        {
+            "title": "Predictive Modeling",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "ModelDevelopment",
+                        "ModelPerformance"
+                    ],
+                    "value": [
+                        [
+                            [
+                                "MSE",
+                                4148364976397.695
+                            ],
+                            [
+                                "MAE",
+                                1388618.1400830334
+                            ],
+                            [
+                                "RSquared",
+                                -0.04113071567601834
+                            ],
+                            [
+                                "data_size",
+                                436
+                            ],
+                            [
+                                "missing_values",
+                                0
+                            ],
+                            [
+                                "type",
+                                "int64"
+                            ],
+                            [
+                                "range",
+                                "1750000-12250000"
+                            ]
+                        ]
+                    ],
+                    "title": "Model Training",
+                    "description": "Train a model and evaluate its performance.",
+                    "hints": [],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": null
+        }
+    ]
+}

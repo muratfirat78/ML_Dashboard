@@ -1,0 +1,189 @@
+{
+    "title": "todo",
+    "description": "todo",
+    "mode": "monitored",
+    "model_metric": [
+        "accuracy",
+        0.0
+    ],
+    "data_size": 1760,
+    "missing_values": 0,
+    "type": "object",
+    "range": "apple-watermelon",
+    "difficulty": [
+        [
+            "Data Cleaning",
+            0
+        ],
+        [
+            "Data Translation",
+            0
+        ],
+        [
+            "Data Transformation",
+            0
+        ],
+        [
+            "Statistics",
+            0
+        ],
+        [
+            "Model Training",
+            0
+        ],
+        [
+            "Predictive Modeling",
+            0
+        ]
+    ],
+    "dataset": "Crop_recommendation.csv",
+    "subtasks": [
+        {
+            "title": "Model Training",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "AssignTarget"
+                    ],
+                    "value": [
+                        "label"
+                    ],
+                    "title": "Assign Target Variable",
+                    "description": "Assign columns as the target variables for model training.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'Assign Target', then click apply.",
+                        "Assign 'label' as the target column."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "Split"
+                    ],
+                    "value": [
+                        "20%"
+                    ],
+                    "title": "Train/Test Split",
+                    "description": "Split dataset into training and testing sets.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, assign the target, set the test ratio, then click split.",
+                        "Use a test ratio of 20% for splitting the dataset."
+                    ],
+                    "applied_values": [],
+                    "order": 2
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "ModelDevelopment",
+                        "ParameterFinetuning"
+                    ],
+                    "value": [
+                        [
+                            "Random Forest",
+                            75,
+                            "gini"
+                        ]
+                    ],
+                    "title": "Parameter Finetuning",
+                    "description": "Optimize model performance by modifying the parameters of the model.",
+                    "hints": [
+                        "Go to the Predictive Modeling tab. Select the model type, adjust parameters if needed, then click train.",
+                        "Train the model using the following parameters: [['Random Forest', 75, 'gini']]."
+                    ],
+                    "applied_values": [],
+                    "order": 3
+                }
+            ],
+            "applied_values": [],
+            "order": 7
+        },
+        {
+            "title": "Statistics",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "PCA"
+                    ],
+                    "value": [
+                        [
+                            "P",
+                            "K"
+                        ]
+                    ],
+                    "title": "Dimensionality Reduction (PCA)",
+                    "description": "Apply Principal Component Analysis to reduce dimensionality.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column(s), select 'feature extraction', choose 'PCA', then click 'Add PCA' and apply.",
+                        "Apply PCA to the following column(s): [['P', 'K']]."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": 5
+        },
+        {
+            "title": "Predictive Modeling",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "ModelDevelopment",
+                        "ModelPerformance"
+                    ],
+                    "value": [
+                        [
+                            [
+                                "Accuracy",
+                                0.9840909090909091
+                            ],
+                            [
+                                "Precision",
+                                0.9855097972203236
+                            ],
+                            [
+                                "Recall",
+                                0.9840909090909091
+                            ],
+                            [
+                                "data_size",
+                                1760
+                            ],
+                            [
+                                "missing_values",
+                                0
+                            ],
+                            [
+                                "type",
+                                "object"
+                            ],
+                            [
+                                "range",
+                                "apple-watermelon"
+                            ]
+                        ]
+                    ],
+                    "title": "Model Training",
+                    "description": "Train a model and evaluate its performance.",
+                    "hints": [],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": null
+        }
+    ]
+}

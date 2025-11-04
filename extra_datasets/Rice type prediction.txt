@@ -1,0 +1,24 @@
+About Dataset
+Context
+This is a set of data created for rice classification. I recommend using this dataset for educational purposes, for practice and to acquire the necessary knowledge. It is modified dataset from this resource: link Jasmine - 1, Gonen - 0.
+
+Content
+What's inside is more than just rows and columns. You can see rice details listed as column names.
+
+Description
+All attributes are numeric variables and they are listed bellow:
+
+id
+Area
+MajorAxisLength
+MinorAxisLength
+Eccentricity
+ConvexArea
+EquivDiameter
+Extent
+Perimeter
+Roundness
+AspectRation
+Class
+Inspiration
+Idea was to create dataset that is good for binary classification and that gives adequate results.

@@ -61,37 +61,6 @@ class Controller:
         else:
             self.drive = GoogleDrive()
 
-    def get_keys_from_task_output(self):
-        try:
-            with open('./task_output.json', 'r') as f:
-                data = json.load(f)
-                
-                
-                dataset_name = data.get('dataset', None)
-                mse_value = None
-                accuracy_value = None
-
-                dataset_name = data.get('dataset', None)
-                for subtask in data.get('subtasks', []):
-                    if subtask.get('title') == 'Predictive Modeling':
-                        for inner in subtask.get('subtasks', []):
-                            if inner.get('action') == ['ModelDevelopment', 'ModelPerformance']:
-                                metrics = inner.get('value', [])
-                                if metrics and isinstance(metrics[0], list):
-                                    for metric_pair in metrics[0]:
-                                        key, val = metric_pair
-                                        if key == 'MSE':
-                                            mse_value = val
-                                        elif key == 'Accuracy':
-                                            accuracy_value = val
-            return {
-                "dataset": dataset_name,
-                "MSE": mse_value,
-                "accuracy": accuracy_value
-            }
-        except:
-            return None
-
     def perform_action(self):
         None
 
@@ -122,45 +91,14 @@ class Controller:
             return obj.tolist()
         else:
             return obj
-    
-    def write_developer_mode(self):
-        data = self.convertPerformanceToTask.convert_performance_to_task(self.logger.get_performance(), 'todo', 'todo')
-        converted_data = self.convert_numpy(data)
-        previous_output = self.get_keys_from_task_output()
-        write = False
-        performance = self.logger.get_performance()
-        performance_dict = performance.performance
-        dataset = performance_dict['SelectData']['DataSet'][0]
-        model_performance = dict(performance_dict['ModelDevelopment']['ModelPerformance'][0])
-        mse = model_performance.get('MSE')
-        accuracy = model_performance.get('Accuracy')
-
-        if previous_output:
-            if dataset == previous_output.get("dataset"):
-                previous_mse = previous_output.get("MSE")
-                previous_accuracy = previous_output.get("accuracy")
-
-                
-                if previous_mse is not None:
-                    if mse < previous_mse:
-                        write = True
-                if previous_accuracy is not None:
-                    if accuracy > previous_accuracy:
-                        write = True
-            else:
-                write = True
-        else:
-            write = True
-
-        if write:
-            with open('task_output.json', 'w') as f:
-                json.dump(converted_data, f, indent=4)
 
     def train_Model(self,tasktype,mytype,results,trmodels,params):
         self.predictive_modeling_model.train_Model(tasktype,mytype,results,trmodels,params)
         if self.developer_mode:
-            self.write_developer_mode()
-
+            data = self.convertPerformanceToTask.convert_performance_to_task(self.logger.get_performance(), 'todo', 'todo')
+            converted_data = self.convert_numpy(data)
+            with open('task_output.json', 'w') as f:
+                 json.dump(converted_data, f, indent=4)
         if self.monitored_mode:
             # Only try to finish the task in monitored mode, in guided mode the task finished when all tasks are complete
             self.finished_task()
@@ -278,6 +216,7 @@ class Controller:
 
     def hide_task_selection_and_show_tabs(self):
         self.task_selection_view.hide_task_selection()
+        self.data_selection_view.settaskmenu(self.monitored_mode)
         self.main_view.show_tabs()
     
     def register(self):

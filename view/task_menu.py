@@ -4,9 +4,11 @@ from IPython.display import display, HTML
 class TaskMenuView:
     
     def __init__(self, controller):
-        self.slider = widgets.IntSlider(layout=widgets.Layout(width="90%"), min=1,max=1)
+        self.slider = widgets.IntSlider(layout=widgets.Layout(width="99%"), min=1,max=1)
+        
+        self.slider.style.handle_color = 'lightblue'
         self.slider.observe(self.slider_change)
-        self.slider_box = widgets.HBox([self.slider], layout=widgets.Layout(justify_content="center", width="100%"))
+        #self.slider_box = widgets.HBox([self.slider], layout=widgets.Layout(justify_content="center"))
         self.previous_button = widgets.Button(description='<< Previous', button_style="primary")
         self.previous_button.on_click(self.previous_button_click)
         self.next_button = widgets.Button(description="Next >>", button_style="primary")
@@ -23,11 +25,9 @@ class TaskMenuView:
         self.finishedtask = False
         self.hint_button.on_click(self.hint)
         self.hint_display_list = []
-        self.subsubtask_label = widgets.Label("Task:", layout=widgets.Layout(height="35px"))
-        self.subsubtask_textarea = widgets.Textarea("", disabled=True, description='Task:', layout=widgets.Layout(width="100%"),style={'background': "#C7EFFF"})
-        self.hint_label = widgets.Label("Hints:", layout=widgets.Layout(height="35px"))
-        self.hint_textarea = widgets.Textarea("", disabled=True,description='Hints:',layout=widgets.Layout(width="100%"),style={'background': '#C7EFFF'})
-        self.status_label = widgets.HTML("status:todo", layout=widgets.Layout(height="35px", width="100%", text_align="center"))
+        
+        
+        self.status_label = widgets.HTML("status:todo", layout=widgets.Layout(height="35px", width="25%", text_align="center"))
         self.button_box = widgets.GridBox(
             children=[self.previous_button, self.hint_button, self.next_button],
             layout=widgets.Layout(
@@ -37,19 +37,32 @@ class TaskMenuView:
                 height="50px"
             )
         )
-        self.subsubtask_box = widgets.HBox([self.subsubtask_textarea], layout=widgets.Layout(height="65px"))
-        self.hints_box = widgets.HBox([self.hint_textarea], layout=widgets.Layout(width="99%"))
-        self.separator = widgets.Box(
-            layout=widgets.Layout(border='solid 1px lightgray', width='100%', height='1px', margin='5px 0px')
+       
+        self.statusbox = widgets.GridBox(
+            children=[widgets.HTML(""),self.status_label, widgets.HTML("")],
+            layout=widgets.Layout(
+                grid_template_columns="33% 33% 33%",   
+                justify_items="center",                
+                width="100%",
+                height="50px",style={'background': "#C7EFFF"}
+            )
         )
+
+        self.subsubtask_textarea = widgets.Textarea("", disabled=True, description='', layout=widgets.Layout(width="99%"),style={'background': "#C7EFFF"})
+        self.hint_textarea = widgets.Textarea("", disabled=True,description='',style={'background': '#C7EFFF'})
+
+        
+        
+        self.subsubtask_box = widgets.VBox([self.subsubtask_textarea,self.hint_textarea], layout=widgets.Layout(width="99%",height="110px"))
+        #self.hints_box = widgets.HBox([self.hint_textarea], layout=widgets.Layout(width="99%"))
+        #self.separator = widgets.Box(layout=widgets.Layout(border='solid 1px lightgray', width='95%', height='1px', margin='5px 0px'))
         self.task_list = []
         self.ui = widgets.VBox([
-            self.slider_box,
+            self.slider, 
             self.button_box,
             self.subsubtask_box,
-            self.hints_box,
-            self.status_label,
-            self.separator
+            self.statusbox,
+            widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"}))
         ], layout=widgets.Layout(height="280px"))
         self.controller = controller
 
@@ -94,7 +107,9 @@ class TaskMenuView:
                     self.subsubtask_textarea.value = "Task completed 🎉"
 
             else:
-                self.subsubtask_textarea.description = "Task:"
+          
+                self.hint_textarea.layout.width = self.subsubtask_textarea.layout.width 
+                
                 category = self.task_list[id]["category"]
                 title = self.task_list[id]["title"]
                 description = self.task_list[id]["description"]

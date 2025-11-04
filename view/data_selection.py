@@ -4,6 +4,10 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from ipywidgets import *
+from IPython.display import  HTML
+
+display.display(HTML("<style>.red_label { color:red }</style>"))
+display.display(HTML("<style>.blue_label { color:blue }</style>"))
 
 
 class DataSelectionView:
@@ -12,9 +16,17 @@ class DataSelectionView:
         self.datafolder = None
         self.main_view = main_view
         self.DFPage = None
+        self.HeadPage = None
         self.InfoPage = None
         self.task_menu = task_menu
+        self.infotext = None
+        self.infolbl = widgets.Label(value="Dataset Information",layout = widgets.Layout(width='50%'))
+        self.infolbl.add_class("red_label")
+        self.statlbl = widgets.Label(value="Statistical Summary")
+        self.statlbl.add_class("red_label")
 
+
+    
     def fileClick(self, event):
         global wslay,wsheets,butlay
 
@@ -86,10 +98,15 @@ class DataSelectionView:
         with self.DFPage:
             clear_output()
             #####################################
-            display.display(df.info()) 
+            display.display(df.info())            
+            #####################################
+        with self.HeadPage:
+            clear_output()
+            #####################################
             display.display(df.describe()) 
             display.display(df) 
             #####################################
+
 
        
         nrlines = 0
@@ -106,6 +123,18 @@ class DataSelectionView:
 
     def on_submit_func(self, event):
         self.controller.on_submitfunc(self.datafolder.value,self.main_view.datasets)
+        return
+
+    def settaskmenu(self,monitormode):
+  
+        if not monitormode:
+            self.task_menu.layout.display = 'block'
+            self.task_menu.layout.visibility  = 'visible'
+    
+        else:
+            self.task_menu.layout.visibility  = 'hidden'
+            self.task_menu.layout.display = 'none'
+        
         return
 
     def get_data_selection_tab(self):
@@ -130,17 +159,24 @@ class DataSelectionView:
 
 
         filelay =  widgets.Layout(height = '60px',width='99%')
-        tablayout = widgets.Layout(height='500px')
-        fthboxlay = widgets.Layout(height='500px')
+      
 
-        self.DFPage = widgets.Output(layout=Layout(width='50%',height='250px',align_items='center',overflow="visible"))
-        self.InfoPage = widgets.Textarea(layout=Layout(width='500px',height='250px',align_items='center',overflow="visible", visibility="hidden"))
+        self.DFPage = widgets.Output(layout=Layout(width='50%',height='150px',align_items='center',overflow="visible"))
+        self.HeadPage = widgets.Output(layout=Layout(width='99%',height='200px',align_items='center',overflow="visible"))
+        self.InfoPage = widgets.Textarea(layout=Layout(width='500px',height='150px',align_items='center',overflow="visible", visibility="hidden"))
 
+        self.infotext = widgets.Label(value="Dataset Context")
+        self.infotext .add_class("red_label")
 
         tab_1 = VBox(children=[
             self.task_menu,
-            HBox(children = [self.datafolder,self.main_view.datasets,wsheets,self.readfile],layout=filelay),
-            HBox(children = [self.DFPage,self.InfoPage],layout = fthboxlay)],layout=tablayout)
-        tab_1.layout.height = '700px'
+            HBox(children = [self.datafolder,self.main_view.datasets,wsheets,self.readfile]),
+            HBox(children = [self.infolbl,self.infotext]),
+            widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"})),
+            HBox(children = [self.DFPage,VBox(children=[widgets.Label(value="  "),self.InfoPage])]),
+            widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"})),
+            self.statlbl,
+            HBox(children = [self.HeadPage]) ])
+        tab_1.layout.height = '720px'
         return tab_1
         

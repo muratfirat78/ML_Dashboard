@@ -18,7 +18,9 @@ class DataProcessingView:
         self.pca_btn = None
         self.pcaselect = None
         self.task_menu = task_menu
-        
+        self.ordinalenconding = None
+        self.ord_btn = None
+        self.ord_btn2 = None
 
     def featureprclick(self,features2,FeatPage,processtypes,ProcssPage,scalingacts):  
         colname = features2.value
@@ -149,7 +151,7 @@ class DataProcessingView:
         if self.main_view.process_types.value == "Scaling":
             self.controller.make_scaling(self.main_view.dt_features,self.main_view.process_page,scalingacts,result2exp)
         if self.main_view.process_types.value == "Encoding":
-            self.controller.make_encoding(self.main_view.dt_features,encodingacts,result2exp)
+            self.controller.make_encoding(self.main_view.dt_features,encodingacts,self.ordinalenconding,result2exp)
         if self.main_view.process_types.value == "Outlier":
             self.controller.remove_outliers(self.main_view.dt_features,result2exp)
         if self.main_view.process_types.value == "Imbalancedness":
@@ -269,7 +271,8 @@ class DataProcessingView:
         encdlbl = widgets.Label(value ='Methods',layout = encdblly)
 
         ecndlay = widgets.Layout(width="25%",display = 'none')
-        encodingacts = widgets.Dropdown( options=['Select','Label Encoding','One Hot Encoding'], description='', disabled=False,layout = ecndlay)
+        encodingacts = widgets.Dropdown( options=['Select','Label Encoding','One Hot Encoding','Ordinal Encoding'], description='', disabled=False,layout = ecndlay)
+        encodingacts.observe(self.OrdinalView)
      
         fxctblly = widgets.Layout(width="25%",visibility = 'hidden')
         fxctlbl = widgets.Label(value ='Methods',layout = fxctblly)
@@ -294,6 +297,25 @@ class DataProcessingView:
         self.pcaselect.layout.visibility = 'hidden'
         self.pcaselect.layout.display = 'none'
 
+        self.ordinalenconding = widgets.Select(options=[],description = '')
+        self.ordinalenconding.layout.visibility = 'hidden'
+        self.ordinalenconding.layout.display = 'none'
+
+
+        self.ord_btn = widgets.Button(description="Select ->",layout=widgets.Layout(width='80px'))
+        self.ord_btn.layout.visibility = 'hidden'
+        self.ord_btn.layout.display = 'none'
+        self.ord_btn.on_click(self.SelectOrdFeature)
+        
+        self.ord_btn2 = widgets.Button(description=" Move up ",layout=widgets.Layout(width='80px'))
+        self.ord_btn2.layout.visibility = 'hidden'
+        self.ord_btn2.layout.display = 'none'
+        #self.ord_btn.on_click(self.AddftPCA)
+        self.ord_btn2.on_click(self.OrdinalMoveup)
+
+
+    
+
         sboxxlay = widgets.Layout()
         sel_box = VBox(children=[self.selcl,
                                  HBox(children=[self.main_view.trg_lbl,self.trg_btn,self.main_view.prdtsk_lbl]),
@@ -303,6 +325,7 @@ class DataProcessingView:
                                  HBox(children=[imbllbl,balncacts]),HBox(children=[encdlbl,encodingacts]),
                                  HBox(children=[fxctlbl,fxctingacts]),
                                  HBox(children=[self.pca_btn,self.pcaselect]),
+                                 HBox(children=[VBox(children=[self.ord_btn,self.ord_btn2]),self.ordinalenconding]),
                                  self.main_view.vis_page
                                 ],layout = sboxxlay)
 
@@ -345,6 +368,33 @@ class DataProcessingView:
             self.pcaselect.layout.display = 'none'
   
         return
+        
+    def OrdinalView(self,event):
+         
+        global encodingacts
+
+        
+
+        if encodingacts.value == 'Ordinal Encoding':
+            with self.main_view.vis_page:
+                clear_output()
+            self.ordinalenconding.options = []
+            self.ord_btn.layout.display = 'block'
+            self.ord_btn.layout.visibility = 'visible'
+            self.ord_btn2.layout.display = 'block'
+            self.ord_btn2.layout.visibility = 'visible'
+            self.ordinalenconding.layout.display = 'block'
+            self.ordinalenconding.layout.visibility = 'visible'
+        else: 
+            self.ordinalenconding.options = []
+            self.ord_btn.layout.visibility = 'hidden'
+            self.ord_btn.layout.display = 'none'
+            self.ord_btn2.layout.visibility = 'hidden'
+            self.ord_btn2.layout.display = 'none'
+            self.ordinalenconding.layout.visibility = 'hidden'
+            self.ordinalenconding.layout.display = 'none'
+  
+        return
     def AddftPCA(self,event):
 
         ftname = self.main_view.dt_features.value
@@ -356,6 +406,33 @@ class DataProcessingView:
             
 
         return
+
+    def SelectOrdFeature(self,event):
+
+        ftname = self.main_view.dt_features.value
+
+        data_df = self.controller.get_curr_df()
+
+        # add checking if this is a categorical feature type
+        self.ordinalenconding.options= [val for val in data_df[ftname].unique()]
+
+        return
+
+    def OrdinalMoveup(self,event):
+
+        classname = self.ordinalenconding.value
+        allclasses = [cls for cls in self.ordinalenconding.options]
+
+        classind = allclasses.index(classname)
+
+        if classind > 0: 
+            allclasses.remove(classname)
+            allclasses.insert(classind-1,classname)
+            self.ordinalenconding.options= [val for val in allclasses]
+     
+
+        return
+
 
     def selectProcess_Type(self,vis_list):
         processtypes = vis_list[0]

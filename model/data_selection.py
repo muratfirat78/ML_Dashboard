@@ -3,6 +3,7 @@ import pandas as pd
 from IPython.display import clear_output
 from IPython import display
 from pathlib import Path
+from datetime import timedelta
 import os
 
 colabpath = '/content/ML_Dashboard/DataSets'
@@ -56,6 +57,24 @@ class DataSelectionModel:
 
         if abs_file_path.find('.csv') > -1:
             self.main_model.curr_df = pd.read_csv(abs_file_path, sep=sheetname) 
+
+            for col in self.main_model.curr_df.columns:
+                if str(col).find("Date") > -1:
+                    try: 
+                        self.main_model.curr_df[col] = pd.to_datetime(self.main_model.curr_df[col], format='%Y-%m-%d')
+
+                        self.main_model.curr_df['year']=[x.year for x  in self.main_model.curr_df[col]]
+    
+                        minyear = min(self.main_model.curr_df['year'])
+                        self.main_model.curr_df['month']=[x.month for x  in self.main_model.curr_df[col]]
+                        self.main_model.curr_df['week']=[x.isocalendar()[1]+52*((x+timedelta(days= 7-x.weekday())).year-minyear) for x in self.main_model.curr_df[col]]
+                       
+                        self.main_model.curr_df['dayofweek']=[x.weekday() for x  in self.main_model.curr_df[col]]
+                        self.main_model.curr_df.sort_values(by=[col], inplace=True)
+                    except:
+                        pass
+      
+            
         if (abs_file_path.find('.xlsx') > -1) or (filename.find('.xls') > -1):
             xls = pd.ExcelFile(abs_file_path)
             self.main_model.curr_df = pd.read_excel(xls,sheetname)

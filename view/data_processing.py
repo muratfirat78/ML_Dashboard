@@ -290,7 +290,7 @@ class DataProcessingView:
         fxctingacts.observe(self.PCAView)
 
         
-        self.selcl = widgets.HTML("", layout=widgets.Layout(height="30px", width="55%", text_align="center"))
+        self.selcl = widgets.HTML("", layout=widgets.Layout(height="20px", width="55%", text_align="center"))
         
         self.ApplyButton = widgets.Button(description="Apply",layout=widgets.Layout(width='60px'))
         self.ApplyButton.on_click(self.ApplyMethod)

@@ -14,7 +14,7 @@ class MainView:
             self.f_box = None
             self.trg_lbl = None
             self.dt_ftslay = None
-            self.ftlaycl = None
+           # self.ftlaycl = None
             self.prdtsk_lbl = None
             self.datasets = None
             self.tab_set = None

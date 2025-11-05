@@ -17,6 +17,9 @@ class DataCleaningView:
         self.applybutton = None
         self.task_menu = task_menu
         self.feattitle = None
+        self.acttitle = None
+        self.prgtitle = None
+        
 
     def featureclclick(self,trgcl_lbl,featurescl,miss_lbl):  
         #settings.curr_df,trgcl_lbl,featurescl,miss_lbl
@@ -169,6 +172,7 @@ class DataCleaningView:
                     missing_df = pd.concat([missing_df, new_df], axis=0, ignore_index=True)
                    
 
+          
                 
             #display.display(missing_df.head(20))  
             g = sns.barplot(x='feature', y='missing values', data=missing_df)
@@ -214,35 +218,31 @@ class DataCleaningView:
 
     def get_data_cleaning_tab(self):
         global trgcl_lbl,miss_lbl, result2aexp
-        RP_lay=Layout(width ='70%',align_items='center',overflow="visible")
+        RP_lay=Layout(align_items='center',overflow="visible")
 
         self.main_view.right_page = widgets.Output(layout = RP_lay)
 
         self.main_view.ftlaycl =  widgets.Layout(display = 'none')
         
-        self.main_view.featurescl = widgets.Select(options=[],description = '',layout = self.main_view.ftlaycl)
+        self.main_view.featurescl = widgets.Select(options=[],description = '',layout = widgets.Layout(display = 'none'))
         self.main_view.featurescl.observe(self.featurecl_click, 'value')
 
-        misslycl =  widgets.Layout(display = 'none')
-        misscl = widgets.Select(options=[],description = '',layout = misslycl)
-
+    
 
         mssactlay = widgets.Layout(display = 'block')
-        self.missacts = widgets.Select(description='Actions',options=['Drop Column','Remove-Missing','Replace-Mean','Replace-Median','Replace-Mode'], disabled=False,layout = mssactlay)
+        self.missacts = widgets.Select(description='',options=['Drop Column','Remove-Missing','Replace-Mean','Replace-Median','Replace-Mode'], disabled=False,layout = mssactlay)
 
         self.missacts.observe(self.makerangedit)
 
-        msshndlay = Layout(width='125px')
-        self.applybutton = widgets.Button(description="Apply",layout = msshndlay)
+        self.applybutton = widgets.Button(description="Apply")
         self.applybutton.on_click(self.makecleaning)
 
 
-        trgcl_lbl =  widgets.HTML("", layout=widgets.Layout(height="30px", width="55%", text_align="center"))
+        trgcl_lbl =  widgets.HTML("", layout=widgets.Layout(text_align="center"))
         color = "gray"
-        mytext =""
+        mytext ="           "
         trgcl_lbl.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
         
-        widgets.Label(value ='',disabled = True)
      
         miss_lbl =widgets.Label(value ='Missing values: -',disabled = True)
 
@@ -259,32 +259,45 @@ class DataCleaningView:
 
         
 
-        fbox2alay = widgets.Layout(width = '30%')
-
-        self.feattitle = widgets.HTML("Features", layout=widgets.Layout(height="30px", width="55%", text_align="center"))
+     
+        self.feattitle = widgets.HTML("Features")
         color = "gray"
         mytext ="Features"
         
         self.feattitle.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
+
+  
+        f2a_box = VBox(children=[self.feattitle,self.main_view.featurescl])
+
         
-        f2a_box = VBox(children=[self.feattitle,HBox(children=[self.main_view.featurescl,misscl])],layout = fbox2alay)
+        self.acttitle = widgets.HTML("Actions")
+        color = "gray"
+        mytext ="Actions"
+        self.acttitle.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
 
+        self.prgtitle = widgets.HTML("Actions")
+        color = "gray"
+        mytext ="Progress"
+        self.prgtitle.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
+      
 
+        selcl_box = VBox(children=[trgcl_lbl,miss_lbl,self.acttitle,self.missacts,self.applybutton])
+     
+        result2aexp = widgets.Textarea(value='', placeholder='',description='',disabled=True)
+        result2aexp.layout.height = '150px'
+        result2aexp.layout.width = '350px'
 
+        f2a_box.layout.width = '23%'
+        selcl_box.layout.width = '77%'
+        
+        myvbox = VBox(children = [HBox(children=[f2a_box,selcl_box],layout = widgets.Layout(height = '60%')),self.prgtitle,result2aexp])
+        myvbox.layout.width = '40%'
+        self.main_view.right_page.layout.width = '60%'
 
-        sboxcllay = widgets.Layout()
-        selcl_box = VBox(children=[trgcl_lbl,miss_lbl,
-                                  
-                                   HBox(children=[self.missacts,self.applybutton],layout = Layout(align_items='flex-start'))],layout = sboxcllay)
+        
+        tab_2 = VBox(children = [ self.task_menu,
+                                  HBox(children=[myvbox,self.main_view.right_page])
+                                ])
 
-
-        res2alay = widgets.Layout(height='150px')
-        result2aexp = widgets.Textarea(value='', placeholder='',description='',disabled=True,layout = res2alay)
-
-
-        tab2a_lay = widgets.Layout(witdh='99%')
-        tab2_lftbox = VBox(children = [HBox(children=[f2a_box,selcl_box]),result2aexp],layout = tab2a_lay)
-
-        tab_2 = VBox([self.task_menu,HBox(children=[tab2_lftbox,self.main_view.right_page])])
-        # tab_2.layout.height = '700px'
+        
         return tab_2

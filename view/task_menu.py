@@ -27,7 +27,7 @@ class TaskMenuView:
         self.hint_display_list = []
         
         
-        self.status_label = widgets.HTML("status:todo", layout=widgets.Layout(height="35px", width="25%", text_align="center"))
+        self.status_label = widgets.HTML(" Status: todo", layout=widgets.Layout(height="35px", width="25%", text_align="center"),style={'background': "#C7EFFF"})
         self.button_box = widgets.GridBox(
             children=[self.previous_button, self.hint_button, self.next_button],
             layout=widgets.Layout(
@@ -44,12 +44,12 @@ class TaskMenuView:
                 grid_template_columns="33% 33% 33%",   
                 justify_items="center",                
                 width="100%",
-                height="50px",style={'background': "#C7EFFF"}
+                height="50px"
             )
         )
 
-        self.subsubtask_textarea = widgets.Textarea("", disabled=True, description='', layout=widgets.Layout(width="99%"),style={'background': "#C7EFFF"})
-        self.hint_textarea = widgets.Textarea("", disabled=True,description='',style={'background': '#C7EFFF'})
+        self.subsubtask_textarea = widgets.Textarea(description="Tasks", disabled=True, layout=widgets.Layout(width="99%"),style={'background': "#C7EFFF"})
+        self.hint_textarea = widgets.Textarea(disabled=True,description="Hints",style={'background': '#C7EFFF'})
 
         
         
@@ -137,7 +137,7 @@ class TaskMenuView:
                 else:
                     color = "black"
 
-                self.status_label.value = f'<b>Status:</b> <span style="color:{color};">{status}</span>'
+                self.status_label.value = f'<b> Status: </b> <span style="color:{color};">{status}</span>'
                 self.subsubtask_textarea.value = textarea_value
             
                 # Hints
@@ -146,6 +146,25 @@ class TaskMenuView:
                     if x < len(self.task_list[id]["hints"]):
                         hints += self.task_list[id]["hints"][x] + "\n" 
                 self.hint_textarea.value = hints
+
+    def setmonitoring(self,monitormode):
+  
+        if monitormode:
+            self.subsubtask_textarea.layout.visibility  = 'hidden'
+            self.subsubtask_textarea.layout.display = 'none'
+            self.button_box.layout.visibility  = 'hidden'
+            self.button_box.layout.display = 'none'
+            self.statusbox.layout.visibility  = 'hidden'
+            self.statusbox.layout.display = 'none'
+            self.slider.layout.visibility  = 'hidden'
+            self.slider.layout.display = 'none'
+            self.hint_textarea.layout.display = 'block'
+            self.hint_textarea.layout.width = "99%"
+            self.hint_textarea.layout.visibility  = 'visible'
+
+       
+        return
+
     
     def hint(self, button):
         #increase the hint display by 1

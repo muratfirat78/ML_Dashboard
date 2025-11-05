@@ -216,7 +216,7 @@ class Controller:
 
     def hide_task_selection_and_show_tabs(self):
         self.task_selection_view.hide_task_selection()
-        self.data_selection_view.settaskmenu(self.monitored_mode)
+        self.task_menu.setmonitoring(self.monitored_mode)
         self.main_view.show_tabs()
     
     def register(self):

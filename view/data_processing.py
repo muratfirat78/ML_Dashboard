@@ -1,8 +1,10 @@
-from IPython.display import clear_output
+from IPython.display import clear_output,HTML
 from IPython import display
 from ipywidgets import *
 import matplotlib.pyplot as plt
 import seaborn as sns
+
+
 
 predictiontask = None
 
@@ -21,6 +23,7 @@ class DataProcessingView:
         self.ordinalenconding = None
         self.ord_btn = None
         self.ord_btn2 = None
+        self.feattitle = None
 
     def featureprclick(self,features2,FeatPage,processtypes,ProcssPage,scalingacts):  
         colname = features2.value
@@ -43,7 +46,12 @@ class DataProcessingView:
         if not colname in display_df.columns:
             return
 
-        self.selcl.value = "Column: ["+str(colname)+"] | Type -> "+str(display_df[colname].dtype)+""
+
+
+        color = "gray"
+        mytext =str(colname)
+        mytext2 = " -> "+str(display_df[colname].dtype)
+        self.selcl.value = f'<span style="color:{color};"><b>{mytext}</b>{mytext2}</span>'
       
         
         with FeatPage:
@@ -282,7 +290,8 @@ class DataProcessingView:
         fxctingacts.observe(self.PCAView)
 
         
-        self.selcl = widgets.Label(value ='Column: -',disabled = True)
+        self.selcl = widgets.HTML("", layout=widgets.Layout(height="30px", width="55%", text_align="center"))
+        
         self.ApplyButton = widgets.Button(description="Apply",layout=widgets.Layout(width='60px'))
         self.ApplyButton.on_click(self.ApplyMethod)
 
@@ -331,8 +340,14 @@ class DataProcessingView:
 
 
         fbox2alay = widgets.Layout(width = '30%')
-        self.main_view.f_box = VBox(children=[widgets.Label(value ='Features'),HBox(children=[self.main_view.dt_features])],layout = fbox2alay)
-
+        self.feattitle = widgets.HTML("Features", layout=widgets.Layout(height="30px", width="55%", text_align="center"))
+        color = "gray"
+        mytext ="Features"
+        
+        self.feattitle.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
+        
+        self.main_view.f_box = VBox(children=[self.feattitle,HBox(children=[self.main_view.dt_features])],layout = fbox2alay)
+       
 
         res2lay = widgets.Layout(height='150px',width='99%')
         result2exp = widgets.Textarea(value='', placeholder='',description='',disabled=True,layout = res2lay)

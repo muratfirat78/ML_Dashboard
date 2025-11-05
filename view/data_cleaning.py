@@ -16,6 +16,7 @@ class DataCleaningView:
         self.missacts = None
         self.applybutton = None
         self.task_menu = task_menu
+        self.feattitle = None
 
     def featureclclick(self,trgcl_lbl,featurescl,miss_lbl):  
         #settings.curr_df,trgcl_lbl,featurescl,miss_lbl
@@ -65,10 +66,11 @@ class DataCleaningView:
         
         
  
-        
-
-        trgcl_lbl.value = " Column: "+colname
-        trgcl_lbl.value = "Column: ["+str(colname)+"] | Type -> "+str(display_df[colname].dtype)
+     
+        color = "gray"
+        mytext =str(colname)
+        mytext2 = " -> "+str(display_df[colname].dtype)
+        trgcl_lbl.value = f'<span style="color:{color};"><b>{mytext}</b>{mytext2}</span>'
         
         miss_lbl.value =" Missing values: " + str(missng_vals)+" ( Total: "+str(totalmisses)+")"
 
@@ -226,7 +228,7 @@ class DataCleaningView:
 
 
         mssactlay = widgets.Layout(display = 'block')
-        self.missacts = widgets.Select(description='Actions',options=['Drop Column','Remove-Missing','Replace-Mean','Replace-Median','Replace-Mode','Edit Range'], disabled=False,layout = mssactlay)
+        self.missacts = widgets.Select(description='Actions',options=['Drop Column','Remove-Missing','Replace-Mean','Replace-Median','Replace-Mode'], disabled=False,layout = mssactlay)
 
         self.missacts.observe(self.makerangedit)
 
@@ -235,12 +237,17 @@ class DataCleaningView:
         self.applybutton.on_click(self.makecleaning)
 
 
-        trgcl_lbl = widgets.Label(value ='Column: -',disabled = True)
+        trgcl_lbl =  widgets.HTML("", layout=widgets.Layout(height="30px", width="55%", text_align="center"))
+        color = "gray"
+        mytext =""
+        trgcl_lbl.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
+        
+        widgets.Label(value ='',disabled = True)
      
         miss_lbl =widgets.Label(value ='Missing values: -',disabled = True)
 
 
-        self.min_lbl =widgets.Label(value ='Min: -',disabled = True)
+        self.min_lbl =widgets.Label(value ='Range: -',disabled = True)
         self.max_lbl =widgets.Label(value ='Max: -',disabled = True)
 
         self.min_text =widgets.Text(value ='',disabled = False)
@@ -253,14 +260,21 @@ class DataCleaningView:
         
 
         fbox2alay = widgets.Layout(width = '30%')
-        f2a_box = VBox(children=[widgets.Label(value ='Features'),HBox(children=[self.main_view.featurescl,misscl])],layout = fbox2alay)
+
+        self.feattitle = widgets.HTML("Features", layout=widgets.Layout(height="30px", width="55%", text_align="center"))
+        color = "gray"
+        mytext ="Features"
+        
+        self.feattitle.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
+        
+        f2a_box = VBox(children=[self.feattitle,HBox(children=[self.main_view.featurescl,misscl])],layout = fbox2alay)
 
 
 
 
         sboxcllay = widgets.Layout()
         selcl_box = VBox(children=[trgcl_lbl,miss_lbl,
-                                   HBox(children=[self.min_lbl,self.min_text,self.max_lbl,self.max_text]),
+                                  
                                    HBox(children=[self.missacts,self.applybutton],layout = Layout(align_items='flex-start'))],layout = sboxcllay)
 
 

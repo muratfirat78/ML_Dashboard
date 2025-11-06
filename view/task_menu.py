@@ -18,7 +18,7 @@ class TaskMenuView:
         self.competence_vector = None
         
         self.hint_button = widgets.Button(
-            description="Hint",
+            description="Instructions",
             icon="lightbulb",
             button_style="warning"
         )

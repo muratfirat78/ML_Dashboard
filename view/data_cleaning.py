@@ -290,7 +290,7 @@ class DataCleaningView:
         f2a_box.layout.width = '23%'
         selcl_box.layout.width = '77%'
         
-        myvbox = VBox(children = [HBox(children=[f2a_box,selcl_box],layout = widgets.Layout(height = '60%')),self.prgtitle,result2aexp])
+        myvbox = VBox(children = [HBox(children=[f2a_box,widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='1px', height='90%', margin='5px 0px',style={'background': "#C7EFFF"})),selcl_box],layout = widgets.Layout(height = '60%')),self.prgtitle,result2aexp])
         myvbox.layout.width = '40%'
         self.main_view.right_page.layout.width = '60%'
 

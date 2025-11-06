@@ -27,7 +27,7 @@ class TaskMenuView:
         self.hint_display_list = []
         
         
-        self.status_label = widgets.HTML(" Status: todo", layout=widgets.Layout(height="35px", width="25%", text_align="center"),style={'background': "#C7EFFF"})
+        self.status_label = widgets.HTML(" Status: todo", layout=widgets.Layout(height="35px", width="25%", text_align="center"))
         self.button_box = widgets.GridBox(
             children=[self.previous_button, self.hint_button, self.next_button],
             layout=widgets.Layout(

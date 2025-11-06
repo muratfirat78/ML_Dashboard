@@ -39,8 +39,14 @@ class MLModel:
                 self.PythonObject.fit(xtrain,ytrain) 
         if self.Type == 'Linear Model':
             if self.myTask == 'Classification': 
-                self.PythonObject = linear_model.SGDClassifier()       
-                self.PythonObject.fit(xtrain,ytrain) 
+                if params[0] == 'SklearnLR':
+                    self.PythonObject = linear_model.SGDClassifier()       
+                    self.PythonObject.fit(xtrain,ytrain) 
+                
+                if params[0] == 'OLS':
+                    self.PythonObject = sm.OLS(y_train,X_train)
+                    self.PythonObject.fit()
+             
             if self.myTask == 'Regression': 
                 self.PythonObject = linear_model.LinearRegression()
                 reg = self.PythonObject.fit(xtrain,ytrain) 

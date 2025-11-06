@@ -14,7 +14,7 @@ class PredictiveModelingView:
         self.main_view = main_view
         self.dtdepth = None
         self.dtcrit = None
-        self.t4_models = None
+     
         self.dtminseg = None
         self.mdplbl = None
         self.mgplbl = None
@@ -26,6 +26,8 @@ class PredictiveModelingView:
         self.svckrnl= None
         self.performpage = None
         self.task_menu = task_menu
+        self.modelmenu = None
+        self.mdltitle = None
         
     def models_click(self,change):     
         global  trmodels,model_sumry
@@ -122,7 +124,9 @@ class PredictiveModelingView:
                 
         return
         
-    def ModelChange(self,event):
+    
+
+    def ShowModel(self,event):
 
         self.dtdepth.layout.visibility = 'hidden'
         self.dtdepth.layout.display = 'none'
@@ -146,11 +150,12 @@ class PredictiveModelingView:
         self.svcc.layout.display = 'none'
         self.svckrnl.layout.visibility = 'hidden'
         self.svckrnl.layout.display = 'none'
-
+        self.lmlib.layout.visibility = 'hidden'
+        self.lmlib.layout.display = 'none'
 
         
     
-        if self.t4_models.value == "Decision Tree":
+        if self.modelmenu.value == "Decision Tree":
             self.dtdepth.layout.display = 'block'
             self.dtdepth.layout.visibility = 'visible'
             self.dtcrit.layout.display = 'block'
@@ -161,25 +166,29 @@ class PredictiveModelingView:
             self.mdplbl.layout.visibility = 'visible'
             self.mgplbl.layout.display = 'block'
             self.mgplbl.layout.visibility = 'visible'
-        if self.t4_models.value == "KNN":
+        if self.modelmenu.value == "KNN":
             self.knnkval.layout.display = 'block'
             self.knnkval.layout.visibility = 'visible'
             self.knnmetric.layout.display = 'block'
             self.knnmetric.layout.visibility = 'visible'
-        if self.t4_models.value == "Random Forest":
+        if self.modelmenu.value == "Random Forest":
             self.rfnrest.layout.display = 'block'
             self.rfnrest.layout.visibility = 'visible'
             if self.main_view.prdtsk_lbl.value[self.main_view.prdtsk_lbl.value.find(":")+2:] == 'Classification': 
                 self.rfcrit.layout.display = 'block'
                 self.rfcrit.layout.visibility = 'visible'
-        if self.t4_models.value == "SVM":
+        if self.modelmenu.value == "SVM":
             self.svcc.layout.display = 'block'
             self.svcc.layout.visibility = 'visible'
             self.svckrnl.layout.display = 'block'
             self.svckrnl.layout.visibility = 'visible'
+        if self.modelmenu.value == "Linear Model":
+            self.lmlib.layout.display = 'block'
+            self.lmlib.layout.visibility = 'visible'
             
                 
         return
+
 
     def TrainModel(self,event): 
         global t4_results,trmodels
@@ -187,18 +196,20 @@ class PredictiveModelingView:
         t4_results.value += 'Train Model...'+'\n'
         params= []
 
-        if self.t4_models.value == "Decision Tree":
+        if self.modelmenu.value == "Decision Tree":
             params= [self.dtdepth.value,self.dtminseg.value,self.dtcrit.value]
-        if self.t4_models.value == "KNN":
+        if self.modelmenu.value == "KNN":
             params= [self.knnkval.value,self.knnmetric.value]
-        if self.t4_models.value == "Random Forest":
+        if self.modelmenu.value == "Random Forest":
             params= [self.rfnrest.value,self.rfcrit.value]
-        if self.t4_models.value == "SVM":
+        if self.modelmenu.value == "SVM":
             params= [self.svcc.value,self.svckrnl.value]
+        if self.modelmenu.value == "Linear Model":
+            params= [self.lmlib.value]
 
 
     
-        self.controller.train_Model(self.main_view.prdtsk_lbl.value,self.t4_models.value,t4_results,trmodels,params)
+        self.controller.train_Model(self.main_view.prdtsk_lbl.value,self.modelmenu.value,t4_results,trmodels,params)
         return
 
     def get_predictive_modeling_tab(self):
@@ -215,9 +226,12 @@ class PredictiveModelingView:
         t4_results.layout.height = '100px'
 
         
-        self.t4_models = widgets.Dropdown(options=['Select','Decision Tree','KNN','Random Forest','SVM','Logistic Regression','Linear Model'],description = '')
-        #self.t4_models.layout.width = '200px'
-        self.t4_models.observe(self.ModelChange)
+     
+        self.mdltitle = widgets.HTML("")
+        color = "gray"
+        mytext ="ML Models"
+        
+        self.mdltitle.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
        
 
 
@@ -226,8 +240,11 @@ class PredictiveModelingView:
      
         model_sumry = widgets.Textarea(options=[],description = '',disabled = True)
         model_sumry.layout.height = '150px'
-       
 
+        self.modelmenu = widgets.Select(options=['Decision Tree','KNN','Random Forest','SVM','Logistic Regression','Linear Model'])
+        self.modelmenu.layout.height = '175px'
+        self.modelmenu.layout.width = '120px'
+        self.modelmenu.observe(self.ShowModel)
      
         mdsmrylbl = widgets.Label( value="Model summary: ")
         self.dtdepth = widgets.Dropdown(options=[i for i in range(1,16)],description = 'MaxDepth')
@@ -255,8 +272,8 @@ class PredictiveModelingView:
         self.mgplbl.layout.display = 'none'
 
         self.lmlib = widgets.Dropdown(options=['SklearnLR','OLS',],description = 'Library')
-        self.knnmetric.layout.width = '125px'
-        self.knnmetric.layout.display = 'none'
+        self.lmlib.layout.width = '125px'
+        self.lmlib.layout.display = 'none'
 
 
         self.svcc =widgets.Dropdown(options=[0.1*i for i in range(10,1,-1)],description = 'C')
@@ -272,20 +289,22 @@ class PredictiveModelingView:
         sel_box = VBox(children=[HBox(children=[self.main_view.trg_lbl,self.main_view.prdtsk_lbl]),
                                  HBox(children=[self.dtdepth,self.dtminseg,self.dtcrit]),
                                  HBox(children=[self.knnkval,self.knnmetric]),
+                                 HBox(children=[self.lmlib]),
                                  HBox(children=[self.rfnrest,self.rfcrit]),
                                  HBox(children=[self.svcc,self.svckrnl]),
-                                 HBox(children=[self.t4_models,trnml_btn]),
+                                 HBox(children=[trnml_btn]),
                                  trmodels,model_sumry
                                 ])
 
         vbox1 = VBox(children = [HBox(children=[sel_box]),t4_results])
 
         self.performpage = widgets.Output()
+        separator = widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='1px', height='90%', margin='5px 0px',style={'background': "#C7EFFF"}))
 
 
         vbox2 = VBox(children = [self.performpage])
         tab_4 = VBox([self.task_menu,
-                      HBox([vbox1,vbox2])])
+                      HBox([VBox(children=[self.mdltitle,self.modelmenu]), separator,vbox1,vbox2])])
         
         tab_4.layout.height = '700px'
         return tab_4

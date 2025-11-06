@@ -20,10 +20,9 @@ class DataSelectionView:
         self.InfoPage = None
         self.task_menu = task_menu
         self.infotext = None
-        self.infolbl = widgets.Label(value="Dataset Information",layout = widgets.Layout(width='50%'))
-        self.infolbl.add_class("red_label")
-        self.statlbl = widgets.Label(value="Statistical Summary")
-        self.statlbl.add_class("red_label")
+        self.infolbl = None 
+        self.spacelbl = None
+        self.statlbl = None
 
 
     
@@ -158,6 +157,18 @@ class DataSelectionView:
         self.readfile.on_click(self.read_dataset)
 
 
+
+       
+       
+
+        self.infolbl = widgets.HTML("")
+        color = "gray"
+        mytext ="Dataset Information"
+        
+        self.infolbl.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
+       
+
+
         filelay =  widgets.Layout(height = '60px',width='99%')
       
 
@@ -165,15 +176,30 @@ class DataSelectionView:
         self.HeadPage = widgets.Output(layout=Layout(width='99%',height='200px',align_items='center',overflow="visible"))
         self.InfoPage = widgets.Textarea(layout=Layout(width='500px',height='150px',align_items='center',overflow="visible", visibility="hidden"))
 
-        self.infotext = widgets.Label(value="Dataset Context")
-        self.infotext .add_class("red_label")
+
+        self.infotext = widgets.HTML("")
+        color = "gray"
+        mytext ="Dataset Context"
+
+        self.infolbl.layout.width = '50%'
+        self.infotext.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
+
+
+        self.statlbl =  widgets.HTML("")
+        color = "gray"
+        mytext ="Statistical Summary"
+
+    
+        self.statlbl.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
+
+        separator = widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='1px', height='90%', margin='5px 0px',style={'background': "#C7EFFF"}))
 
         tab_1 = VBox(children=[
             self.task_menu,
             HBox(children = [self.datafolder,self.main_view.datasets,wsheets,self.readfile]),
-            HBox(children = [self.infolbl,self.infotext]),
+            HBox(children = [self.infolbl,separator,self.infotext]),
             widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"})),
-            HBox(children = [self.DFPage,VBox(children=[widgets.Label(value="  "),self.InfoPage])]),
+            HBox(children = [self.DFPage,separator,VBox(children=[widgets.Label(value="  "),self.InfoPage])]),
             widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"})),
             self.statlbl,
             HBox(children = [self.HeadPage]) ])

@@ -110,11 +110,10 @@ class DataProcessingView:
     def makesplit(self,event):  
         global result2exp
         
-        self.testratiolbl.value = 'Test Ratio(%): '+str(self.splt_txt.value)
+        
         self.controller.make_split(self.splt_txt,self.splt_btn,result2exp)
         
-        self.testratiolbl.layout.display = 'block'
-        self.testratiolbl.layout.visibility = 'visible'
+       
 
         opts = []
         if not self.controller.main_model.datasplit:

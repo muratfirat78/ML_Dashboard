@@ -28,6 +28,7 @@ class PredictiveModelingView:
         self.task_menu = task_menu
         self.modelmenu = None
         self.mdltitle = None
+        self.paramtitle = None
         
     def models_click(self,change):     
         global  trmodels,model_sumry
@@ -241,7 +242,7 @@ class PredictiveModelingView:
         model_sumry = widgets.Textarea(options=[],description = '',disabled = True)
         model_sumry.layout.height = '150px'
 
-        self.modelmenu = widgets.Select(options=['Decision Tree','KNN','Random Forest','SVM','Logistic Regression','Linear Model'])
+        self.modelmenu = widgets.Select(options=['Decision Tree','KNN','Random Forest','SVM','Logistic Regression','Linear Model','Gaussian NB'])
         self.modelmenu.layout.height = '175px'
         self.modelmenu.layout.width = '120px'
         self.modelmenu.observe(self.ShowModel)
@@ -285,8 +286,16 @@ class PredictiveModelingView:
         self.rfnrest.layout.display = 'none'
         self.rfcrit = widgets.Dropdown(options=['entropy','gini'],description = 'criterion')
         self.rfcrit.layout.display = 'none'
+
+
+        self.paramtitle = widgets.HTML("")
+        color = "gray"
+        mytext ="Model Parameters"
+        self.paramtitle.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
       
-        sel_box = VBox(children=[HBox(children=[self.main_view.trg_lbl,self.main_view.prdtsk_lbl]),
+        sel_box = VBox(children=[self.paramtitle,
+                                 widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"})),
+            HBox(children=[self.main_view.trg_lbl,self.main_view.prdtsk_lbl]),
                                  HBox(children=[self.dtdepth,self.dtminseg,self.dtcrit]),
                                  HBox(children=[self.knnkval,self.knnmetric]),
                                  HBox(children=[self.lmlib]),
@@ -296,15 +305,28 @@ class PredictiveModelingView:
                                  trmodels,model_sumry
                                 ])
 
-        vbox1 = VBox(children = [HBox(children=[sel_box]),t4_results])
+        #vbox1 = VBox(children = [HBox(children=[sel_box]),t4_results])
+
+        fbox2alay = widgets.Layout(width = '35%')
+
+        self.f_box = VBox(children=[self.mdltitle,
+                                    HBox(children=[self.modelmenu])],layout = fbox2alay)
+
+        vb1lay =  widgets.Layout(width='55%')
+        prboxlay = widgets.Layout(width= '99%')
+
+        vbox1 = VBox(children = [HBox(children=[self.f_box,sel_box],layout = prboxlay),t4_results],layout = vb1lay)
+
 
         self.performpage = widgets.Output()
         separator = widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='1px', height='90%', margin='5px 0px',style={'background': "#C7EFFF"}))
 
 
         vbox2 = VBox(children = [self.performpage])
-        tab_4 = VBox([self.task_menu,
-                      HBox([VBox(children=[self.mdltitle,self.modelmenu]), separator,vbox1,vbox2])])
+
+        tab_4 = VBox([self.task_menu,HBox([vbox1,vbox2])])
+        
+        #tab_4 = VBox([self.task_menu, HBox([VBox(children=[self.mdltitle,self.modelmenu]), separator,vbox1,vbox2])])
         
         tab_4.layout.height = '700px'
         return tab_4

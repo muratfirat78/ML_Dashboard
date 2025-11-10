@@ -2,25 +2,37 @@ from log import *
 from sklearn import tree,neighbors,linear_model,ensemble,svm
 from sklearn.metrics import accuracy_score,mean_squared_error,confusion_matrix,roc_curve,precision_score,recall_score,mean_absolute_error,r2_score
 import statsmodels.api as sm
+from sklearn.naive_bayes import GaussianNB 
 
 class MLModel:
     def __init__(self,target,tasktype,mytype,report,myname,params,xtrain,ytrain):
   
         self.modelsetting = dict()
         self.performance = dict()
-        self.roc = dict()
+        self.roc = None
         self.Type = mytype
         self.myTask = tasktype[tasktype.find(":")+2:]
         self.PythonObject = None
         self.PreprocessingSteps = [] 
         self.Name = myname
         self.ConfMatrix = None
-        self.modelinfo = dict()
-        self.ROCFPR = None
-        self.ROCTPR = None
-        self.Predictions = None
+
+        write_log(self.Type+"__"+self.myTask, report, 'Predictive modeling')
+
+        write_log(str(params), report, 'Predictive modeling')
+
         
-        
+
+        if self.Type == 'Gaussian NB':
+            if self.myTask == 'Classification': 
+               
+                self.PythonObject = GaussianNB() 
+                self.PythonObject.fit(xtrain,ytrain) 
+            if self.myTask == 'Regression': 
+
+                self.PythonObject = GaussianNB() 
+                self.PythonObject.fit(xtrain,ytrain) 
+
         if self.Type == 'Decision Tree':
             if self.myTask == 'Classification': 
                 write_log('DT: Classification', report, 'Predictive modeling')
@@ -39,27 +51,18 @@ class MLModel:
                 self.PythonObject.fit(xtrain,ytrain) 
         if self.Type == 'Linear Model':
             if self.myTask == 'Classification': 
-                if params[0] == 'SklearnLR':
-                    self.PythonObject = linear_model.SGDClassifier()       
-                    self.PythonObject.fit(xtrain,ytrain) 
-                
-                if params[0] == 'OLS':
-                    self.PythonObject = sm.OLS(y_train,X_train)
-                    self.PythonObject.fit()
-             
+                self.PythonObject = linear_model.SGDClassifier()       
+                self.PythonObject.fit(xtrain,ytrain) 
             if self.myTask == 'Regression': 
                 self.PythonObject = linear_model.LinearRegression()
-                reg = self.PythonObject.fit(xtrain,ytrain) 
-               
-
+                self.PythonObject.fit(xtrain,ytrain) 
         if self.Type == 'Random Forest':
             if self.myTask == 'Classification': 
-                self.PythonObject = ensemble.RandomForestClassifier(n_estimators=int(params[0]))      
+                self.PythonObject = ensemble.RandomForestClassifier(n_estimators=int(params[0]),criterion=params[1])      
                 self.PythonObject.fit(xtrain,ytrain) 
             if self.myTask == 'Regression': 
-                self.PythonObject = ensemble.RandomForestRegressor(n_estimators=int(params[0]), random_state=0,)   # try before standardization..
+                self.PythonObject = ensemble.RandomForestRegressor(n_estimators=int(params[0]),criterion=params[1], random_state=0,)   # try before standardization..
                 self.PythonObject.fit(xtrain,ytrain) 
-                
         if self.Type == 'SVM':
             if self.myTask == 'Classification': 
                 self.PythonObject = svm.SVC(C=float(params[0]),kernel=params[1], gamma='auto',probability = True)
@@ -71,23 +74,9 @@ class MLModel:
             self.PythonObject = linear_model.LogisticRegression(random_state=16)   # Initialize the model object 
             self.PythonObject.fit(xtrain,ytrain) 
             
-       
+        write_log('Model.. Type '+str(type(self.PythonObject)), report, 'Predictive modeling')
         return
 
-    def getPredictions(self):
-        return self.Predictions
-
-    def setPredictions(self,iytm):
-        self.Predictions = iytm   
-        return
-
-    def getROCTPR(self):
-        return self.ROCTPR
-
-    def setROCTPR(self,iytm):
-        self.ROCTPR = iytm   
-        return
-     
     def setConfMatrix(self,myitm):
         self.ConfMatrix = myitm
         return
@@ -123,9 +112,6 @@ class MLModel:
 
     def getType(self):
         return self.Type
-
-    def getModelInfo(self):
-        return self.modelinfo
     
 
     def GetPerformanceDict(self):
@@ -143,12 +129,13 @@ class PredictiveModelingModel:
         
         #data = [self.main_model.Xtrain_df,self.main_model.ytrain_df,self.main_model.Xtest_df,self.main_model.ytest_df]
         write_log('Train Model-> '+ mytype,results,'Predictive modeling')
-        
 
         Xtest_df = self.main_model.get_XTest()
         Xtrain_df = self.main_model.get_XTrain()
         ytrain_df = self.main_model.getYtrain()
         ytest_df = self.main_model.get_YTest()
+
+        write_log('Train Model-> Xtrain'+str(len(Xtrain_df)),results,'Predictive modeling')
 
         models = [1 for mdl in self.trainedModels if mdl.getName().find(mytype) > -1]
 
@@ -156,80 +143,56 @@ class PredictiveModelingModel:
 
         success = False
         try: 
-            if tasktype[tasktype.find(":")+2:] == 'Regression':
-                if mytype == 'Logistic Regression':
-                   if (ytrain_df.to_frame()[self.main_model.targetcolumn].max() > 1) or (ytrain_df.to_frame()[self.main_model.targetcolumn].min() < 0):
-                       write_log('Train Model-> No proper feature range for logit',results,'Predictive modeling')
-                       return
-                    
-            if tasktype[tasktype.find(":")+2:] == 'Classification':
-                if mytype == 'Logistic Regression':
-                    if (len(ytrain_df.to_frame()[self.main_model.targetcolumn].unique()) > 2):
-                        write_log('Train Model-> No binary class case for logit',results,'Predictive modeling')
-                        return
-                       
             mymodel = MLModel(self.main_model.targetcolumn,tasktype,mytype,results,mytype+"_"+str(len(models)),params,Xtrain_df,ytrain_df)
 
+            write_log('*Train Model-> model'+str(type(mymodel)),results,'Predictive modeling')
 
+            write_log('++Train Model-> '+str(len(Xtrain_df)),results,'Predictive modeling')
+            
+            #mymodel.getSkLearnModel().fit(Xtrain_df,ytrain_df) 
+            write_log('Train Model-> trained..',results,'Predictive modeling')
+            
             y_pred = mymodel.GetPredictions(Xtest_df)
-           
-            mymodel.setPredictions(y_pred)
 
+            #mymodel.setROC(roc_curve(ytest_df, y_pred))
+            
     
-            write_log('>>Train Model-> predcts'+str(len(y_pred))+"??"+str(len(ytest_df))+", "+tasktype,results,'Predictive modeling')
+            write_log('>>Train Model-> predcts'+str(len(y_pred))+", "+tasktype,results,'Predictive modeling')
     
             if tasktype[tasktype.find(":")+2:] == 'Classification': 
-                mymodel.setConfMatrix(confusion_matrix(ytest_df,y_pred))      
+                mymodel.setConfMatrix(confusion_matrix(ytest_df,y_pred))
                 
-                if len(ytrain_df.to_frame()[self.main_model.targetcolumn].unique()) == 2:
-                    mymodel.GetPerformanceDict()['True-Positive'] = mymodel.getConfMatrix()[1][1]
-                    mymodel.GetPerformanceDict()['False-Positive'] = mymodel.getConfMatrix()[0][1]
-                    mymodel.GetPerformanceDict()['True-Negative'] = mymodel.getConfMatrix()[0][0]
-                    mymodel.GetPerformanceDict()['False-Negative'] = mymodel.getConfMatrix()[1][0]
-                    mymodel.GetPerformanceDict()['Accuracy'] = accuracy_score(ytest_df, y_pred)
-                    mymodel.GetPerformanceDict()['Precision'] = precision_score(ytest_df, y_pred)
-                    mymodel.GetPerformanceDict()['Recall'] = recall_score(ytest_df, y_pred)
-                  
-                    # fpr,tpr,thrs = roc_curve(ytest_df, y_pred)
-                    # mymodel.GetPerformanceDict()['ROCFPR'] = fpr
-                    # mymodel.GetPerformanceDict()['ROCTPR'] = tpr
-                   
-                else:
-                    mymodel.GetPerformanceDict()['Accuracy'] = accuracy_score(ytest_df, y_pred)
-                    mymodel.GetPerformanceDict()['Precision'] = precision_score(ytest_df, y_pred,average ='weighted')
-                    mymodel.GetPerformanceDict()['Recall'] = recall_score(ytest_df, y_pred,average ='weighted')
-   
+                mymodel.GetPerformanceDict()['True-Positive'] = mymodel.getConfMatrix()[1][1]
+                mymodel.GetPerformanceDict()['False-Positive'] = mymodel.getConfMatrix()[0][1]
+                mymodel.GetPerformanceDict()['True-Negative'] = mymodel.getConfMatrix()[0][0]
+                mymodel.GetPerformanceDict()['False-Negative'] = mymodel.getConfMatrix()[1][0]
+                mymodel.GetPerformanceDict()['Accuracy'] = accuracy_score(ytest_df, y_pred)
+                mymodel.GetPerformanceDict()['Precision'] = precision_score(ytest_df, y_pred)
+                mymodel.GetPerformanceDict()['Recall'] = recall_score(ytest_df, y_pred)
+                 
                 
             
             if tasktype[tasktype.find(":")+2:] == 'Regression': 
                 mymodel.GetPerformanceDict()['MSE'] = mean_squared_error(ytest_df, y_pred)
                 mymodel.GetPerformanceDict()['MAE'] = mean_absolute_error(ytest_df, y_pred)
                 mymodel.GetPerformanceDict()['RSquared'] = r2_score(ytest_df, y_pred)
-              
-
+    
             self.trainedModels.append(mymodel)
-
-            performance = []
+    
+            write_log('**Train Model-> '+ mytype, results, 'Predictive modeling')
+            self.logger.add_action(['ModelDevelopment', 'SelectModel'], mytype)
+            
             for prf,val in mymodel.GetPerformanceDict().items():
-                performance += [(prf, val)]
-
-            performance += [("data_size", ytrain_df.size)]
-            performance += [("missing_values", ytrain_df.isnull().sum())]
-            performance += [("type", str(ytrain_df.dtype))]
-            performance += [("range", str(ytrain_df.min()) + "-" + str(ytrain_df.max()))]
-            
-            self.logger.add_action(['ModelDevelopment', 'ParameterFinetuning'], [mytype] + params)
-            self.logger.add_action(['ModelDevelopment', 'ModelPerformance'], (performance))
-            
+                write_log('Model Performance-> '+prf+': '+str(val), results, 'Predictive modeling')
+                self.logger.add_action(['ModelDevelopment', 'ModelPerformance'], (prf, val))
+    
             trmodels.options = [mdl.getName() for mdl in self.trainedModels]
-            write_log('Train Model-> '+mytype+' is trained.',results,'Predictive modeling')
             
         except Exception as e: 
             write_log('Train Model-> exception raised \"'+str(e)+'\"',results,'Predictive modeling')
             write_log('Train Model-> unsuccessful trial',results,'Predictive modeling')
         
         self.controller.upload_log()
-        self.controller.update_learning_path()
     
     def get_trained_models(self):
         return self.trainedModels

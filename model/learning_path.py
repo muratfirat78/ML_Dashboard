@@ -25,7 +25,7 @@ class LearningPathModel:
             for skill, value in competence_vector.items():
                 if skill == "date":
                     continue
-                new_vector[skill] = max(value, new_vector.get(skill, value))
+                new_vector[skill] = value
 
             graph_data.append(new_vector)
 

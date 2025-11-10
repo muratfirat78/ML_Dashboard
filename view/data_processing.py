@@ -285,7 +285,7 @@ class DataProcessingView:
 
         self.main_view.process_types = widgets.Select(description = '',options=['Scaling','Encoding','Assign Target','Data Split','Feature Extraction','Outlier','Imbalancedness','Convert Feature 0/1->Bool'],disabled=False)
         self.main_view.process_types.observe(self.selectProcessType,'value')
-        self.main_view.process_types.layout.width = '300px'
+        self.main_view.process_types.layout.width = '250px'
 
 
 

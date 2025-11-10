@@ -230,14 +230,15 @@ class DataCleaningView:
 
       
 
-    
 
-        mssactlay = widgets.Layout(display = 'block')
-        self.missacts = widgets.Select(description='',options=['Drop Column','Remove-Missing','Replace-Mean','Replace-Median','Replace-Mode'], disabled=False,layout = mssactlay)
+        self.missacts = widgets.Select(description='',options=['Drop Column','Remove-Missing','Replace-Mean','Replace-Median','Replace-Mode'], disabled=False)
+        self.missacts.layout.width = '170px'
+     
 
         self.missacts.observe(self.makerangedit)
 
         self.applybutton = widgets.Button(description="Apply")
+        self.applybutton.layout.width = '60px'
         self.applybutton.on_click(self.makecleaning)
 
 
@@ -250,17 +251,7 @@ class DataCleaningView:
         miss_lbl =widgets.Label(value ='Missing values: -',disabled = True)
 
 
-        self.min_lbl =widgets.Label(value ='Range: -',disabled = True)
-        self.max_lbl =widgets.Label(value ='Max: -',disabled = True)
-
-        self.min_text =widgets.Text(value ='',disabled = False)
-        self.min_text.layout.width = '1px'
-        self.min_text.layout.visibility = 'hidden'
-        self.max_text =widgets.Text(value ='',disabled = False)
-        self.max_text.layout.width = '1px'
-        self.max_text.layout.visibility = 'hidden'
-
-        
+       
 
      
         self.feattitle = widgets.HTML("Features", layout=widgets.Layout(height="30px", width="55%", text_align="center"))
@@ -278,23 +269,30 @@ class DataCleaningView:
       
 
         selcl_box = VBox(children=[trgcl_lbl,
-                                   widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='90%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"})),
-                                   miss_lbl,self.acttitle,self.missacts,self.applybutton])
+                                   widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"})),
+                                   miss_lbl,self.acttitle,
+                                   
+                                   HBox(children=[self.missacts,self.applybutton])
+                                   
+                                   ])
      
         result2aexp = widgets.Textarea(value='', placeholder='',description='',disabled=True)
         result2aexp.layout.height = '150px'
         result2aexp.layout.width = '99%'
 
 
-       
+        fbox2alay = widgets.Layout(width = '35%')
 
-        self.f_box = VBox(children=[self.feattitle,HBox(children=[self.main_view.featurescl])])
+        self.f_box = VBox(children=[self.feattitle,HBox(children=[self.main_view.featurescl])],layout = fbox2alay)
         
         #myvbox = VBox(children = [HBox(children=[f2a_box,selcl_box],layout = widgets.Layout(height = '60%')),self.prgtitle,result2aexp])
         #myvbox.layout.width = '40%'
         self.main_view.right_page.layout.width = '95%'
+        
+        vb1lay =  widgets.Layout(width='55%')
+        prboxlay = widgets.Layout(width= '99%')
 
-        vbox1 = VBox(children = [HBox(children=[self.f_box,selcl_box]),result2aexp],layout = widgets.Layout(width = '60%'))
+        vbox1 = VBox(children = [HBox(children=[self.f_box,selcl_box],layout = prboxlay),result2aexp],layout = vb1lay)
 
 
         vbox2 = VBox(children = [self.main_view.right_page])

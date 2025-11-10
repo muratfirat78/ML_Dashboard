@@ -36,6 +36,7 @@ class MLModel:
         if self.Type == 'Decision Tree':
             if self.myTask == 'Classification': 
                 write_log('DT: Classification', report, 'Predictive modeling')
+
                 self.PythonObject = tree.DecisionTreeClassifier(criterion=params[2],max_depth=int(params[0]))
                 self.PythonObject.fit(xtrain,ytrain) 
             if self.myTask == 'Regression': 
@@ -162,13 +163,13 @@ class PredictiveModelingModel:
             if tasktype[tasktype.find(":")+2:] == 'Classification': 
                 mymodel.setConfMatrix(confusion_matrix(ytest_df,y_pred))
                 
-                mymodel.GetPerformanceDict()['True-Positive'] = mymodel.getConfMatrix()[1][1]
-                mymodel.GetPerformanceDict()['False-Positive'] = mymodel.getConfMatrix()[0][1]
-                mymodel.GetPerformanceDict()['True-Negative'] = mymodel.getConfMatrix()[0][0]
-                mymodel.GetPerformanceDict()['False-Negative'] = mymodel.getConfMatrix()[1][0]
+                #mymodel.GetPerformanceDict()['True-Positive'] = mymodel.getConfMatrix()[1][1]
+                #mymodel.GetPerformanceDict()['False-Positive'] = mymodel.getConfMatrix()[0][1]
+                #mymodel.GetPerformanceDict()['True-Negative'] = mymodel.getConfMatrix()[0][0]
+                #mymodel.GetPerformanceDict()['False-Negative'] = mymodel.getConfMatrix()[1][0]
                 mymodel.GetPerformanceDict()['Accuracy'] = accuracy_score(ytest_df, y_pred)
-                mymodel.GetPerformanceDict()['Precision'] = precision_score(ytest_df, y_pred)
-                mymodel.GetPerformanceDict()['Recall'] = recall_score(ytest_df, y_pred)
+                mymodel.GetPerformanceDict()['Precision'] = precision_score(ytest_df, y_pred,average='micro')
+                mymodel.GetPerformanceDict()['Recall'] = recall_score(ytest_df, y_pred,average='micro')
                  
                 
             

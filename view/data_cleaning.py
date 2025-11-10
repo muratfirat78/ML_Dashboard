@@ -19,6 +19,7 @@ class DataCleaningView:
         self.feattitle = None
         self.acttitle = None
         self.prgtitle = None
+        self.f_box  = None
         
 
     def featureclclick(self,trgcl_lbl,featurescl,miss_lbl):  
@@ -227,6 +228,8 @@ class DataCleaningView:
         self.main_view.featurescl = widgets.Select(options=[],description = '',layout = widgets.Layout(display = 'none'))
         self.main_view.featurescl.observe(self.featurecl_click, 'value')
 
+      
+
     
 
         mssactlay = widgets.Layout(display = 'block')
@@ -260,44 +263,45 @@ class DataCleaningView:
         
 
      
-        self.feattitle = widgets.HTML("Features")
+        self.feattitle = widgets.HTML("Features", layout=widgets.Layout(height="30px", width="55%", text_align="center"))
         color = "gray"
         mytext ="Features"
         
         self.feattitle.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
-
-  
-        f2a_box = VBox(children=[self.feattitle,self.main_view.featurescl])
-
+      
         
-        self.acttitle = widgets.HTML("Actions")
+        self.acttitle = widgets.HTML("")
         color = "gray"
         mytext ="Actions"
         self.acttitle.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
 
-        self.prgtitle = widgets.HTML("Actions")
-        color = "gray"
-        mytext ="Progress"
-        self.prgtitle.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
       
 
-        selcl_box = VBox(children=[trgcl_lbl,miss_lbl,self.acttitle,self.missacts,self.applybutton])
+        selcl_box = VBox(children=[trgcl_lbl,
+                                   widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='90%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"})),
+                                   miss_lbl,self.acttitle,self.missacts,self.applybutton])
      
         result2aexp = widgets.Textarea(value='', placeholder='',description='',disabled=True)
         result2aexp.layout.height = '150px'
-        result2aexp.layout.width = '350px'
+        result2aexp.layout.width = '99%'
 
-        f2a_box.layout.width = '23%'
-        selcl_box.layout.width = '77%'
-        
-        myvbox = VBox(children = [HBox(children=[f2a_box,widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='1px', height='90%', margin='5px 0px',style={'background': "#C7EFFF"})),selcl_box],layout = widgets.Layout(height = '60%')),self.prgtitle,result2aexp])
-        myvbox.layout.width = '40%'
-        self.main_view.right_page.layout.width = '60%'
 
+       
+
+        self.f_box = VBox(children=[self.feattitle,HBox(children=[self.main_view.featurescl])])
         
-        tab_2 = VBox(children = [ self.task_menu,
-                                  HBox(children=[myvbox,self.main_view.right_page])
-                                ])
+        #myvbox = VBox(children = [HBox(children=[f2a_box,selcl_box],layout = widgets.Layout(height = '60%')),self.prgtitle,result2aexp])
+        #myvbox.layout.width = '40%'
+        self.main_view.right_page.layout.width = '95%'
+
+        vbox1 = VBox(children = [HBox(children=[self.f_box,selcl_box]),result2aexp],layout = widgets.Layout(width = '60%'))
+
+
+        vbox2 = VBox(children = [self.main_view.right_page])
+        
+        tab_2 = VBox([self.task_menu,HBox([vbox1,vbox2])])
+        
+        #tab_2 = VBox(children = [ self.task_menu,HBox(children=[myvbox,self.main_view.right_page])])
 
         
         return tab_2

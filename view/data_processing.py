@@ -24,6 +24,7 @@ class DataProcessingView:
         self.ord_btn = None
         self.ord_btn2 = None
         self.feattitle = None
+        self.proctitle = None
 
     def featureprclick(self,features2,FeatPage,processtypes,ProcssPage,scalingacts):  
         colname = features2.value
@@ -140,10 +141,42 @@ class DataProcessingView:
         global sclblly,scalelbl,prctlay,scalingacts,imblncdlay,balncacts,imbllbllly,imbllbl,encdlbl,encodingacts 
         global outrmvlay,outrmvbtn,encdblly,ecndlay,fxctlbl,fxctingacts,fxctblly,fxctlay
 
-        self.selectProcess_Type([self.main_view.process_types,sclblly,scalelbl,prctlay
-                                 ,scalingacts,imblncdlay,balncacts,imbllbllly,imbllbl,outrmvlay,
-                                 outrmvbtn,encdlbl,encodingacts,encdblly,
-                                 ecndlay,fxctlbl,fxctingacts,fxctblly,fxctlay])
+        if  self.main_view.process_types.value == "Assign Target":
+            
+            self.main_view.trg_lbl.layout.display = 'block'
+            self.main_view.trg_lbl.layout.visibility = 'visible'
+            self.trg_btn.layout.display = 'block'
+            self.trg_btn.layout.visibility = 'visible'
+            self.main_view.prdtsk_lbl.layout.display = 'block'
+            self.main_view.prdtsk_lbl.layout.visibility = 'visible'
+            self.splt_txt.layout.visibility = 'hidden'
+            self.splt_txt.layout.display = 'none'
+            self.splt_btn.layout.visibility = 'hidden'
+            self.splt_btn.layout.display = 'none'
+ 
+        else: 
+            self.main_view.trg_lbl.layout.visibility = 'hidden'
+            self.main_view.trg_lbl.layout.display = 'none'
+            self.trg_btn.layout.visibility = 'hidden'
+            self.trg_btn.layout.display = 'none'
+            self.main_view.prdtsk_lbl.layout.visibility = 'hidden'
+            self.main_view.prdtsk_lbl.layout.display = 'none'
+
+            if self.main_view.process_types.value == "Data Split":
+                self.splt_txt.layout.display = 'block'
+                self.splt_txt.layout.visibility = 'visible'
+                self.splt_btn.layout.display = 'block'
+                self.splt_btn.layout.visibility = 'visible'
+     
+            else:
+                self.splt_txt.layout.visibility = 'hidden'
+                self.splt_txt.layout.display = 'none'
+                self.splt_btn.layout.visibility = 'hidden'
+                self.splt_btn.layout.display = 'none'
+                self.selectProcess_Type([self.main_view.process_types,sclblly,scalelbl,prctlay
+                                     ,scalingacts,imblncdlay,balncacts,imbllbllly,imbllbl,outrmvlay,
+                                     outrmvbtn,encdlbl,encodingacts,encdblly,
+                                     ecndlay,fxctlbl,fxctingacts,fxctblly,fxctlay])
         
         return
 
@@ -153,6 +186,10 @@ class DataProcessingView:
         global scalingacts,result2exp,balncacts,fxctingacts
         #'Select Processing','Scaling','Encoding','Feature Extraction','Outlier','Imbalancedness'
         refreshFeatures = True
+
+
+
+        
         with self.main_view.vis_page:
             clear_output()
     
@@ -241,7 +278,12 @@ class DataProcessingView:
        
         outrmvbtn.layout = outrmvlay
 
-        self.main_view.process_types = widgets.Select( description='Process types',options=['Scaling','Encoding','Feature Extraction','Outlier','Imbalancedness','Convert Feature 0/1->Bool'],disabled=False)
+        self.proctitle = widgets.HTML("")
+        color = "gray"
+        mytext ="Process types"
+        self.proctitle.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
+
+        self.main_view.process_types = widgets.Select(description = '',options=['Scaling','Encoding','Assign Target','Data Split','Feature Extraction','Outlier','Imbalancedness','Convert Feature 0/1->Bool'],disabled=False)
         self.main_view.process_types.observe(self.selectProcessType,'value')
         self.main_view.process_types.layout.width = '300px'
 
@@ -251,15 +293,14 @@ class DataProcessingView:
         self.main_view.dt_features = widgets.Select(options=[],description = '',layout = self.main_view.dt_ftslay)
         self.main_view.dt_features.observe(self.featurepr_click, 'value')
        
-        self.testratiolbl  =widgets.Label(value = 'Test Ratio(%):',disabled = True)
-        self.testratiolbl.layout.visibility = 'hidden'
-        self.testratiolbl.layout.display = 'none'
+     
         self.splt_txt =widgets.Dropdown(description ='Test Ratio(%): ',options=[20,25,30,35])
         self.splt_txt.layout.width = '160px'
         self.splt_btn = widgets.Button(description="Split",disabled = True)
         self.splt_btn.layout.width = '100px'
         self.splt_btn.on_click(self.makesplit)
 
+        
         self.main_view.trg_lbl = widgets.Label(value ='Target: -',disabled = True)
         
         #self.main_view.trg_lbl.layout.display = 'none'
@@ -322,14 +363,29 @@ class DataProcessingView:
         #self.ord_btn.on_click(self.AddftPCA)
         self.ord_btn2.on_click(self.OrdinalMoveup)
 
+        self.splt_txt.layout.visibility = 'hidden'
+        self.splt_txt.layout.display = 'none'
+        self.splt_btn.layout.visibility = 'hidden'
+        self.splt_btn.layout.display = 'none'
+
+        self.main_view.trg_lbl.layout.visibility = 'hidden'
+        self.main_view.trg_lbl.layout.display = 'none'
+        self.trg_btn.layout.visibility = 'hidden'
+        self.trg_btn.layout.display = 'none'
+        self.main_view.prdtsk_lbl.layout.visibility = 'hidden'
+        self.main_view.prdtsk_lbl.layout.display = 'none'
+
 
     
 
         sboxxlay = widgets.Layout()
         sel_box = VBox(children=[self.selcl,
-                                 HBox(children=[self.main_view.trg_lbl,self.trg_btn,self.main_view.prdtsk_lbl]),
-                                 HBox(children=[self.testratiolbl,self.splt_txt,self.splt_btn]),
+                                  widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"})),
+                                 self.proctitle,
+                                 
                                  HBox(children=[self.main_view.process_types,self.ApplyButton]),
+                                 HBox(children=[self.main_view.trg_lbl,self.trg_btn,self.main_view.prdtsk_lbl]),
+                                 HBox(children=[self.splt_txt,self.splt_btn]),
                                  HBox(children=[scalelbl,scalingacts]),
                                  HBox(children=[imbllbl,balncacts]),HBox(children=[encdlbl,encodingacts]),
                                  HBox(children=[fxctlbl,fxctingacts]),
@@ -339,7 +395,7 @@ class DataProcessingView:
                                 ],layout = sboxxlay)
 
 
-        fbox2alay = widgets.Layout(width = '30%')
+        fbox2alay = widgets.Layout(width = '35%')
         self.feattitle = widgets.HTML("Features", layout=widgets.Layout(height="30px", width="55%", text_align="center"))
         color = "gray"
         mytext ="Features"

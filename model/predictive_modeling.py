@@ -179,13 +179,30 @@ class PredictiveModelingModel:
                 mymodel.GetPerformanceDict()['RSquared'] = r2_score(ytest_df, y_pred)
     
             self.trainedModels.append(mymodel)
-    
-            write_log('**Train Model-> '+ mytype, results, 'Predictive modeling')
-            self.logger.add_action(['ModelDevelopment', 'SelectModel'], mytype)
-            
+
+            performance = []
             for prf,val in mymodel.GetPerformanceDict().items():
-                write_log('Model Performance-> '+prf+': '+str(val), results, 'Predictive modeling')
-                self.logger.add_action(['ModelDevelopment', 'ModelPerformance'], (prf, val))
+                performance += [(prf, val)]
+
+            performance += [("data_size", ytrain_df.size)]
+            performance += [("missing_values", ytrain_df.isnull().sum())]
+            performance += [("type", str(ytrain_df.dtype))]
+            performance += [("range", str(ytrain_df.min()) + "-" + str(ytrain_df.max()))]
+            
+            self.logger.add_action(['ModelDevelopment', 'ParameterFinetuning'], [mytype] + params)
+            self.logger.add_action(['ModelDevelopment', 'ModelPerformance'], (performance))
+
+
+
+    
+            # write_log('**Train Model-> '+ mytype, results, 'Predictive modeling')
+            
+
+            # self.logger.add_action(['ModelDevelopment', 'SelectModel'], mytype)
+            
+            # for prf,val in mymodel.GetPerformanceDict().items():
+            #     write_log('Model Performance-> '+prf+': '+str(val), results, 'Predictive modeling')
+            #     self.logger.add_action(['ModelDevelopment', 'ModelPerformance'], (prf, val))
     
             trmodels.options = [mdl.getName() for mdl in self.trainedModels]
             

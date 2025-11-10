@@ -77,17 +77,6 @@ class DataCleaningView:
         trgcl_lbl.value = f'<span style="color:{color};"><b>{mytext}</b>{mytext2}</span>'
         
         miss_lbl.value =" Missing values: " + str(missng_vals)+" ( Total: "+str(totalmisses)+")"
-
-
-        
-        if (display_df[colname].dtype == 'int64') or (display_df[colname].dtype == 'float64') or (display_df[colname].dtype == 'int32'):
-            self.min_lbl.value = "Min: "+str(display_df[colname].min())
-            self.max_lbl.value = "Max: "+str(display_df[colname].max())
-        else:
-            self.min_lbl.value = "Min: -"
-            self.max_lbl.value = "Max: -"
-     
-
         
         return
 

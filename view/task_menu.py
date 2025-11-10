@@ -114,10 +114,10 @@ class TaskMenuView:
                 title = self.task_list[id]["title"]
                 description = self.task_list[id]["description"]
 
-                textarea_value = category + ": " + title + "\n" + "Description: " + description
-                if self.mode == "monitored":
-                    if self.task_list[id]["value"]:
-                        textarea_value += "\nApplied values:" + str(self.task_list[id]["value"])
+                
+                if self.mode != "monitored": 
+                    textarea_value = category + ": " + title + "\n" + "Description: " + description
+
 
 
                 status = self.task_list[id]["status"]
@@ -137,15 +137,16 @@ class TaskMenuView:
                 else:
                     color = "black"
 
-                self.status_label.value = f'<b> Status: </b> <span style="color:{color};">{status}</span>'
-                self.subsubtask_textarea.value = textarea_value
+                if self.mode != "monitored": 
+                    self.status_label.value = f'<b> Status: </b> <span style="color:{color};">{status}</span>'
+                    self.subsubtask_textarea.value = textarea_value
             
-                # Hints
-                hints = ""
-                for x in range(self.hint_display_list[id]):
-                    if x < len(self.task_list[id]["hints"]):
-                        hints += self.task_list[id]["hints"][x] + "\n" 
-                self.hint_textarea.value = hints
+                    # Hints
+                    hints = ""
+                    for x in range(self.hint_display_list[id]):
+                        if x < len(self.task_list[id]["hints"]):
+                            hints += self.task_list[id]["hints"][x] + "\n" 
+                    self.hint_textarea.value = hints
 
     def setmonitoring(self,monitormode):
   
@@ -212,17 +213,23 @@ class TaskMenuView:
         self.slider_change({"new":slider_value})
 
         if mode == "monitored":
-            self.hint_button.layout.display = 'none'
-            self.hint_textarea.layout.display = 'none'
+            self.subsubtask_textarea.layout.visibility  = 'hidden'
+            self.subsubtask_textarea.layout.display = 'none'
+            self.button_box.layout.visibility  = 'hidden'
+            self.button_box.layout.display = 'none'
+            self.statusbox.layout.visibility  = 'hidden'
+            self.statusbox.layout.display = 'none'
+            self.slider.layout.visibility  = 'hidden'
+            self.slider.layout.display = 'none'
+            self.hint_textarea.layout.display = 'block'
+            self.hint_textarea.layout.width = "99%"
+            self.hint_textarea.layout.visibility  = 'visible'
             self.status_label.layout.display = 'none'
             self.ui.layout=widgets.Layout(height="150px")
-            self.button_box.layout=widgets.Layout(
-                grid_template_columns="50% 50%",   
-                justify_items="center",                
-                width="100%",
-                height="50px"
-            )
-            self.subsubtask_textarea.layout=widgets.Layout(width="100%",height="55px")
+            self.button_box.layout.display = 'none'
+            self.subsubtask_textarea.layout.display = 'none'
+            #self.button_box.layout=widgets.Layout(grid_template_columns="50% 50%",   justify_items="center",                width="100%",height="50px")
+            #self.subsubtask_textarea.layout=widgets.Layout(width="100%",height="55px")
         
         self.mode = mode
 

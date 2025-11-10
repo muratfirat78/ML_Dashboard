@@ -188,34 +188,7 @@ class DataCleaningView:
       
         return
 
-    def makerangedit(self,event):
-
-        if  self.missacts.value == "Edit Range":
-            self.min_text.layout.width = '50px'
-            self.min_text.layout.visibility = 'visible'
-            self.min_lbl.layout.visibility = 'hidden'
-
-            self.min_text.value = self.min_lbl.value[self.min_lbl.value.find(":")+1:]
-           
-            self.max_text.layout.width = '50px'
-            self.max_text.layout.visibility = 'visible'
-            self.max_lbl.layout.visibility = 'hidden'
-
-            self.max_text.value = self.max_lbl.value[self.max_lbl.value.find(":")+1:]
-           
-            
-        else:
-            self.min_lbl.layout.visibility = 'visible'
-            
-            self.min_text.layout.width = '1px'
-            self.min_text.layout.visibility = 'hidden'
-
-            self.max_lbl.layout.visibility = 'visible'
-           
-            self.max_text.layout.width = '1px'
-            self.max_text.layout.visibility = 'hidden'
-
-        return
+   
 
     def get_data_cleaning_tab(self):
         global trgcl_lbl,miss_lbl, result2aexp
@@ -235,7 +208,7 @@ class DataCleaningView:
         self.missacts.layout.width = '170px'
      
 
-        self.missacts.observe(self.makerangedit)
+      
 
         self.applybutton = widgets.Button(description="Apply")
         self.applybutton.layout.width = '60px'

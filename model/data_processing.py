@@ -23,11 +23,11 @@ class DataProcessingModel:
         self.main_model = main_model
         self.logger = logger
 
-    def showCorrHeatMap(self,ProcssPage,fxctingacts,result2exp):
+    def showCorrHeatMap(self,ProcssPage,processtype,result2exp):
 
-        write_log('Correlation: '+fxctingacts.value,result2exp, 'Correlation')
+        write_log('Correlation: '+processtype,result2exp, 'Correlation')
 
-        if fxctingacts.value == "Correlation":
+        if processtype == "Correlation":
             current_df = self.main_model.get_curr_df()
 
             if self.main_model.datasplit:
@@ -166,7 +166,7 @@ class DataProcessingModel:
 
         return
      
-    def remove_outliers(self,dt_features,result2exp): 
+    def remove_outliers(self,dt_features,methodtype,result2exp): 
 
         colname = dt_features.value
         write_log('Outlier removal: '+colname,result2exp, 'Outlier removal')
@@ -174,72 +174,136 @@ class DataProcessingModel:
       
         
         if self.main_model.datasplit:
+            
             write_log('Outlier removal: (split)-> '+': '+colname, result2exp, 'Data processing')
-
             Xtest_df = self.main_model.get_XTest()
             Xtrain_df = self.main_model.get_XTrain()
             ytrain_df = self.main_model.getYtrain()
             ytest_df = self.main_model.get_YTest().to_frame()
-            
-            if colname in Xtrain_df.columns:                                                                     
 
-                quantiles = Xtrain_df[colname].quantile([0.25,0.5,0.75])
-                IQR = quantiles[0.75] - quantiles[0.25]
-                boxplot_outlierLB =  quantiles[0.25]-1.5*IQR
-                boxplot_outlierUB =  quantiles[0.75]+1.5*IQR
-
-                prev_size = len(Xtrain_df)
-                outliers = Xtrain_df[(Xtrain_df[colname]>boxplot_outlierUB) | (Xtrain_df[colname]<boxplot_outlierLB)]
-                Xtrain_df = Xtrain_df.drop(outliers.index)
-
-               
-                ytrain_df = ytrain_df.drop(outliers.index)
-
-                self.main_model.set_XTest(Xtest_df)
-                self.main_model.set_XTrain(Xtrain_df)
-                self.main_model.set_YTrain(ytrain_df)
-                self.main_model.set_YTest(ytest_df.squeeze())
-
-            else:
-                ytrain_df = ytrain_df.to_frame()
-                
-                if colname in ytrain_df.columns:   
-                    write_log('Outlier removal-target: (split): '+colname, result2exp, 'Data processing')
-      
-                    quantiles = ytrain_df[colname].quantile([0.25,0.5,0.75])
+            if methodtype == "IQR":
+   
+                if colname in Xtrain_df.columns:                                                                     
+    
+                    quantiles = Xtrain_df[colname].quantile([0.25,0.5,0.75])
                     IQR = quantiles[0.75] - quantiles[0.25]
                     boxplot_outlierLB =  quantiles[0.25]-1.5*IQR
                     boxplot_outlierUB =  quantiles[0.75]+1.5*IQR
-                    prev_size = len(ytrain_df)
-                    outliers = ytrain_df[(ytrain_df[colname]>boxplot_outlierUB) | (ytrain_df[colname]<boxplot_outlierLB)]
-                    
-                    ytrain_df = ytrain_df.drop(outliers.index)
+    
+                    prev_size = len(Xtrain_df)
+                    outliers = Xtrain_df[(Xtrain_df[colname]>boxplot_outlierUB) | (Xtrain_df[colname]<boxplot_outlierLB)]
                     Xtrain_df = Xtrain_df.drop(outliers.index)
     
-                  
+                   
+                    ytrain_df = ytrain_df.drop(outliers.index)
+    
                     self.main_model.set_XTest(Xtest_df)
                     self.main_model.set_XTrain(Xtrain_df)
-                    self.main_model.set_YTrain(ytrain_df.squeeze())
+                    self.main_model.set_YTrain(ytrain_df)
                     self.main_model.set_YTest(ytest_df.squeeze())
+    
+                else:
+                    ytrain_df = ytrain_df.to_frame()
                     
+                    if colname in ytrain_df.columns:   
+                        write_log('Outlier removal-target: (split): '+colname, result2exp, 'Data processing')
           
+                        quantiles = ytrain_df[colname].quantile([0.25,0.5,0.75])
+                        IQR = quantiles[0.75] - quantiles[0.25]
+                        boxplot_outlierLB =  quantiles[0.25]-1.5*IQR
+                        boxplot_outlierUB =  quantiles[0.75]+1.5*IQR
+                        prev_size = len(ytrain_df)
+                        outliers = ytrain_df[(ytrain_df[colname]>boxplot_outlierUB) | (ytrain_df[colname]<boxplot_outlierLB)]
+                        
+                        ytrain_df = ytrain_df.drop(outliers.index)
+                        Xtrain_df = Xtrain_df.drop(outliers.index)
+        
+                      
+                        self.main_model.set_XTest(Xtest_df)
+                        self.main_model.set_XTrain(Xtrain_df)
+                        self.main_model.set_YTrain(ytrain_df.squeeze())
+                        self.main_model.set_YTest(ytest_df.squeeze())
+                        
+            if methodtype == "Z-scores":
+
+                negthreshold = -3
+                posthreshold = 3
+                prev_size = len(Xtrain_df)
+                if colname in Xtrain_df.columns:     
+
+                    outlierLB =  negthreshold*Xtrain_df[colname].std()+Xtrain_df[colname].mean()
+                    outlierUB =  posthreshold*Xtrain_df[colname].std()+Xtrain_df[colname].mean()
+
+                    outliers = Xtrain_df[(Xtrain_df[colname]>outlierUB) | (Xtrain_df[colname]<outlierLB)]   
+                    Xtrain_df = Xtrain_df.drop(outliers.index)
+                    ytrain_df = ytrain_df.drop(outliers.index)
+    
+                    self.main_model.set_XTest(Xtest_df)
+                    self.main_model.set_XTrain(Xtrain_df)
+                    self.main_model.set_YTrain(ytrain_df)
+                    self.main_model.set_YTest(ytest_df.squeeze())
+
+                else:
+                    ytrain_df = ytrain_df.to_frame()
+                    
+                    if colname in ytrain_df.columns:   
+                        write_log('Outlier removal-target: (split): '+colname, result2exp, 'Data processing')
+          
+                        outlierLB =  negthreshold*ytrain_df[colname].std()+ytrain_df[colname].mean()
+                        outlierUB =  posthreshold*ytrain_df[colname].std()+ytrain_df[colname].mean()
+
+                        outliers = ytrain_df[(ytrain_df[colname]>outlierUB) | (ytrain_df[colname]<outlierLB)]
+                        
+                        Xtrain_df = Xtrain_df.drop(outliers.index)
+                        ytrain_df = ytrain_df.drop(outliers.index)
+    
+                        self.main_model.set_XTest(Xtest_df)
+                        self.main_model.set_XTrain(Xtrain_df)
+                        self.main_model.set_YTrain(ytrain_df.squeeze())
+                        self.main_model.set_YTest(ytest_df.squeeze())
+
+                write_log('Outlier removal: (split)-> '+str(prev_size)+'->'+str(len(Xtrain_df))+': '+colname, result2exp, 'Data processing')
+
+       
         else:
             
             write_log('Outlier removal: (no split)-> '+': '+colname, result2exp, 'Data processing')
             curr_df = self.main_model.get_curr_df()
-            quantiles = curr_df[colname].quantile([0.25,0.5,0.75])
-            IQR = quantiles[0.75] - quantiles[0.25]
-            boxplot_outlierLB =  quantiles[0.25]-1.5*IQR
-            boxplot_outlierUB =  quantiles[0.75]+1.5*IQR
 
+            if methodtype == "IQR":
+                
+                quantiles = curr_df[colname].quantile([0.25,0.5,0.75])
+                IQR = quantiles[0.75] - quantiles[0.25]
+                boxplot_outlierLB =  quantiles[0.25]-1.5*IQR
+                boxplot_outlierUB =  quantiles[0.75]+1.5*IQR
+    
+    
+                prev_size = len(curr_df)
+                
+                outliers = curr_df[(curr_df[colname]>boxplot_outlierUB) | (curr_df[colname]<boxplot_outlierLB)]
+                curr_df = curr_df.drop(outliers.index)
+    
+                write_log('Outlier removal: (no split)-> '+str(prev_size)+'->'+str(len(curr_df))+': '+colname, result2exp, 'Data processing')
+                self.main_model.set_curr_df(curr_df)
 
-            prev_size = len(curr_df)
             
-            outliers = curr_df[(curr_df[colname]>boxplot_outlierUB) | (curr_df[colname]<boxplot_outlierLB)]
-            curr_df = curr_df.drop(outliers.index)
 
-            write_log('Outlier removal: (no split)-> '+str(prev_size)+'->'+str(len(curr_df))+': '+colname, result2exp, 'Data processing')
-            self.main_model.set_curr_df(curr_df)
+            if methodtype == "Z-scores":
+
+                negthreshold = -3
+                posthreshold = 3
+
+                prev_size = len(curr_df)
+                
+                outlierLB =  negthreshold*curr_df[colname].std()+curr_df[colname].mean()
+                outlierUB =  posthreshold*curr_df[colname].std()+curr_df[colname].mean()
+
+                outliers = curr_df[(curr_df[colname]>outlierUB) | (curr_df[colname]<outlierLB)]
+                curr_df = curr_df.drop(outliers.index)
+    
+                write_log('Outlier removal: (no split)-> '+str(prev_size)+'->'+str(len(curr_df))+': '+colname, result2exp, 'Data processing')
+                self.main_model.set_curr_df(curr_df)
+                
             
 
             
@@ -251,12 +315,13 @@ class DataProcessingModel:
         return
     ##################################################################################
 
-    def assign_target(self,trg_lbl,dt_features,prdtsk_lbl,result2exp,trg_btn,predictiontask):
+    def assign_target(self,trg_lbl,dt_features,prdtsk_lbl,result2exp,predictiontask):
 
         self.main_model.targetcolumn = dt_features.value
 
         trg_lbl.value = "Target: ["+self.main_model.targetcolumn+"]"
-        trg_btn.disabled = True
+
+        result2exp.value+="In assign target..."+"\n"
 
         curr_df = self.main_model.get_curr_df()
         target_column = self.main_model.targetcolumn
@@ -269,7 +334,7 @@ class DataProcessingModel:
         prdtsk_lbl.value = "| Prediction Task: "+predictiontask 
         write_log('Target assigned: '+target_column, result2exp, 'Data processing')
         self.logger.add_action(['DataProcessing', 'AssignTarget'], target_column)
-        
+        result2exp.value+="assign target done..."+"\n"
 
         return 
     ############################################################################################################    
@@ -326,11 +391,10 @@ class DataProcessingModel:
       
         return
 
-    def make_scaling(self,dt_features,FeatPage,scalingacts,result2exp):
+    def make_scaling(self,dt_features,FeatPage,scalingtype,result2exp):
                     
-        write_log('Scaling-> '+scalingacts.value, result2exp, 'Data processing')
+        write_log('Scaling-> '+scalingtype, result2exp, 'Data processing')
        
-        scalingtype = scalingacts.value
         colname = dt_features.value
       
         if colname is None:
@@ -477,12 +541,11 @@ class DataProcessingModel:
     
         return
     #################################################################################################################
-    def make_balanced(self,features2,balncacts,ProcssPage,result2exp):  
+    def make_balanced(self,features2,balancetype,ProcssPage,result2exp):  
 
 
-        write_log('Balancing-> '+balncacts.value, result2exp, 'Data processing')
+        write_log('Balancing-> '+balancetype, result2exp, 'Data processing')
        
-        balancetype = balncacts.value
         colname = features2.value
 
         if not self.main_model.datasplit:
@@ -533,7 +596,7 @@ class DataProcessingModel:
     #####################################################################################################################
 
 
-    def make_split(self,splt_txt,splt_btn,result2exp):
+    def make_split(self,splt_txt,result2exp):
         curr_df = self.main_model.curr_df
         targetcolumn = self.main_model.targetcolumn
         if targetcolumn is None:
@@ -556,9 +619,7 @@ class DataProcessingModel:
         self.main_model.set_YTest(ytest)
         splt_txt.layout.visibility = 'hidden'
         splt_txt.layout.display = 'none'
-        splt_btn.layout.visibility = 'hidden'
-        splt_btn.disabled = True
-        splt_btn.layout.display = 'none'
+    
 
 
         write_log('Split, XTrain size: '+str(len(self.main_model.get_XTrain())), result2exp, 'Data processing')
@@ -569,13 +630,11 @@ class DataProcessingModel:
         self.logger.add_action(['DataProcessing', 'Split'], str(ratio_percnt) + '%')
         self.main_model.datasplit = True
 
-
-    
-       
+ 
         
         return
     ############################################################################################################    
-    def make_encoding(self,features2,encodingacts,ordselect,result2exp):
+    def make_encoding(self,features2,encodingtype,ordselect,result2exp):
 
         colname = features2.value
 
@@ -584,9 +643,7 @@ class DataProcessingModel:
         if (colname is None) or (colname == ''):
             return
 
-        encodingtype = encodingacts.value
-
-       
+   
         # Encode column  
         if self.main_model.datasplit:
 
@@ -664,7 +721,7 @@ class DataProcessingModel:
                 
                 write_log('Encoding->'+encodingtype+', col '+colname+', done. ', result2exp, 'Data processing')
                 
-            if encodingacts.value == "One Hot Encoding":
+            if encodingtype == "One Hot Encoding":
                 categorical_columns = [colname]
                 encoder = preprocessing.OneHotEncoder(sparse_output=False)  # Initialize OneHotEncoder
                 one_hot_encoded = encoder.fit_transform(curr_df[categorical_columns])  # Fit and transform the categorical columns          
@@ -675,7 +732,7 @@ class DataProcessingModel:
                 self.logger.add_action(['DataProcessing', 'OneHotEncoding'], colname)
                 write_log('Encoding->'+encodingtype+', col '+colname+', done. ', result2exp, 'Data processing')
 
-            if encodingacts.value == 'Ordinal Encoding':
+            if encodingtype == 'Ordinal Encoding':
                 classorder =[x for x in ordselect.options]
 
                 mapping = dict()

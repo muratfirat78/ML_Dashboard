@@ -106,34 +106,34 @@ class Controller:
     def make_cleaning(self,featurescl,result2aexp,missacts,dt_features,params):
          self.data_cleaning_model.make_cleaning(featurescl,result2aexp,missacts,dt_features,params)
 
-    def assign_target(self,trg_lbl,dt_features,prdtsk_lbl,result2exp,trg_btn,predictiontask):
-        self.data_processing_model.assign_target(trg_lbl,dt_features,prdtsk_lbl,result2exp,trg_btn,predictiontask)  
+    def assign_target(self,trg_lbl,dt_features,prdtsk_lbl,result2exp,predictiontask):
+        self.data_processing_model.assign_target(trg_lbl,dt_features,prdtsk_lbl,result2exp,predictiontask)  
 
-    def make_balanced(self,features2,balncacts,ProcssPage,result2exp):
-        self.data_processing_model.make_balanced(features2,balncacts,ProcssPage,result2exp)
+    def make_balanced(self,features2,balncetype,ProcssPage,result2exp):
+        self.data_processing_model.make_balanced(features2,balncetype,ProcssPage,result2exp)
 
-    def make_encoding(self,features2,encodingacts,ordinalenconding,result2exp):
-        self.data_processing_model.make_encoding(features2,encodingacts,ordinalenconding,result2exp)
+    def make_encoding(self,features2,encodingtype,ordinalenconding,result2exp):
+        self.data_processing_model.make_encoding(features2,encodingtype,ordinalenconding,result2exp)
 
     def make_featconvert(self,dt_features,result2exp):
         self.data_processing_model.make_featconvert(dt_features,result2exp)
 
-    def make_scaling(self,dt_features,FeatPage,scalingacts,result2exp):
-        self.data_processing_model.make_scaling(dt_features,FeatPage,scalingacts,result2exp)
+    def make_scaling(self,dt_features,FeatPage,scalingtype,result2exp):
+        self.data_processing_model.make_scaling(dt_features,FeatPage,scalingtype,result2exp)
 
-    def showCorrHeatMap(self,ProcssPage,fxctingacts,result2exp):
-        self.data_processing_model.showCorrHeatMap(ProcssPage,fxctingacts,result2exp)
+    def showCorrHeatMap(self,ProcssPage,processtype,result2exp):
+        self.data_processing_model.showCorrHeatMap(ProcssPage,processtype,result2exp)
 
     def ApplyPCA(self,features2,pca_features,result2exp):
         self.data_processing_model.ApplyPCA(features2,pca_features,result2exp)
         
-    def make_split(self,splt_txt,splt_btn,result2exp):
+    def make_split(self,splt_txt,result2exp):
         # self.main_view.close_tab(0)
         # self.main_view.close_tab(1)
-        self.data_processing_model.make_split(splt_txt,splt_btn,result2exp)
+        self.data_processing_model.make_split(splt_txt,result2exp)
 
-    def remove_outliers(self,dt_features,result2exp):
-        self.data_processing_model.remove_outliers(dt_features,result2exp)
+    def remove_outliers(self,dt_features,methodtype,result2exp):
+        self.data_processing_model.remove_outliers(dt_features,methodtype,result2exp)
         self.refresh_data_processing()
 
     def savedata(self,dataFolder, datasetname):

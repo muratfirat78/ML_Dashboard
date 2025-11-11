@@ -289,7 +289,8 @@ class Controller:
                     competence_vector = self.update_competence_vector(performance_score, current_competence_vector,reference_task_difficulty, datetime.now())
                     self.task_finished = True
                     self.task_menu.finished_task(performance_score)
-                    # self.task_view.finished_task(competence_vector)
+                    self.learning_path_view.set_graph_data(self.get_graph_data())
+                    self.learning_path_view.set_last_performance_data()
             elif not self.monitored_mode:
                 self.task_finished = True
             

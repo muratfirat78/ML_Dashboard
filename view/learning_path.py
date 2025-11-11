@@ -124,7 +124,6 @@ class LearningPathView:
     def set_graph_data(self, graph_data):
         self.graph_data = graph_data
         if len(graph_data) > 0:
-            graph_data = graph_data[-1].copy()
             self.update_bar_chart()
             self.update_line_chart({"new": "Predictive Modeling"})
     

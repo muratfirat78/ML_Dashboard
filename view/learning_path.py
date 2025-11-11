@@ -94,6 +94,7 @@ class LearningPathView:
         with self.line_chart:
             df = pd.DataFrame(self.graph_data)
             df['date'] = df['date'].apply(lambda d: d[0] if isinstance(d, tuple) else d)
+            df['date'] = pd.to_datetime(df['date'], format='%d-%m-%Y')
 
             if value and value != "All":
                 df = df[['date', value]]
@@ -113,7 +114,7 @@ class LearningPathView:
                 plt.title('Competence level of ' + value + ' over time')
 
             plt.gca().xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%d-%m-%Y'))
-            plt.xticks(rotation=45)
+            plt.xticks(df_melted['date'], df_melted['date'].dt.strftime('%d-%m-%Y'), rotation=45)
             plt.tight_layout()
             plt.show()
 

@@ -111,15 +111,12 @@ class Controller:
 
     def make_balanced(self,features2,balncacts,ProcssPage,result2exp):
         self.data_processing_model.make_balanced(features2,balncacts,ProcssPage,result2exp)
-        self.refresh_data_processing()
 
     def make_encoding(self,features2,encodingacts,ordinalenconding,result2exp):
         self.data_processing_model.make_encoding(features2,encodingacts,ordinalenconding,result2exp)
-        self.refresh_data_processing()
 
     def make_featconvert(self,dt_features,result2exp):
         self.data_processing_model.make_featconvert(dt_features,result2exp)
-        self.refresh_data_processing()
 
     def make_scaling(self,dt_features,FeatPage,scalingacts,result2exp):
         self.data_processing_model.make_scaling(dt_features,FeatPage,scalingacts,result2exp)

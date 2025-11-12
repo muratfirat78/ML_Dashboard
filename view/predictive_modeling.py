@@ -29,6 +29,13 @@ class PredictiveModelingView:
         self.modelmenu = None
         self.mdltitle = None
         self.paramtitle = None
+        self.parammenu = None
+        self.paramvalues = None
+        self.selectedmodel = None
+        self.selectedparam = None
+        self.selectedparamval = None
+        
+        self.progress = None
         
     def models_click(self,change):     
         global  trmodels,model_sumry
@@ -124,6 +131,62 @@ class PredictiveModelingView:
                         
                 
         return
+
+    def ShowOptions(self,event):
+
+        self.progress.value+="********** ShowOptions***********"+"\n"
+        
+        self.progress.value+="Parameter menu value: "+str(self.parammenu.value)+"\n"
+        
+
+        self.selectedparam = self.parammenu.value
+
+        self.progress.value+="Set Parameter: "+str(self.selectedparam)+"\n"
+        
+        
+
+        if self.selectedparam == '' or self.selectedparam == None:
+            return
+
+
+        if self.selectedparam in self.mlmodels[self.selectedmodel]:
+            self.paramoptions.options = [x for x in self.mlmodels[self.selectedmodel][self.selectedparam]] 
+            self.paramoptions.value = "Select"
+        else:
+            self.paramoptions.options = []
+
+     
+
+        return
+
+    def ChangeParam(self,event):
+
+        self.progress.value+="**********ChangeParam***********"+"\n"
+        self.progress.value+="in change paramter..."+"\n"
+
+
+        self.progress.value+="Model "+str(self.selectedmodel)+"\n"
+
+        self.progress.value+="Parameter: "+str(self.selectedparam)+"\n"
+    
+
+        if self.selectedparam == '' or self.selectedparam == None:
+            return
+            
+        self.selectedparamval = self.paramoptions.value
+
+        
+        self.progress.value+="Parameter value: "+ str(self.selectedparamval)+"\n"
+
+        if self.selectedparamval == "Select"  or self.selectedparamval ==  None:
+            return
+
+        self.mlmodelparams[self.selectedmodel][self.selectedparam] = self.selectedparamval
+        
+        self.paramvalues.options = [self.mlmodelparams[self.selectedmodel][x] for x in self.mlmodels[self.selectedmodel].keys()] 
+      
+
+        return
         
     
 
@@ -154,6 +217,17 @@ class PredictiveModelingView:
         self.lmlib.layout.visibility = 'hidden'
         self.lmlib.layout.display = 'none'
 
+        self.progress.value+="**********ShowModel***********"+"\n"
+  
+        self.selectedmodel = self.modelmenu.value
+
+        self.progress.value+=" Set Model "+str(self.selectedmodel)+"\n"
+   
+        #self.selectedparam = None
+        #self.selectedparamval = None
+
+        self.paramvalues.options = [self.mlmodelparams[self.selectedmodel][x] for x in self.mlmodels[self.selectedmodel].keys()] 
+        self.parammenu.options = [x for x in self.mlmodels[self.selectedmodel].keys()] 
         
     
         if self.modelmenu.value == "Decision Tree":
@@ -192,9 +266,9 @@ class PredictiveModelingView:
 
 
     def TrainModel(self,event): 
-        global t4_results,trmodels
+        global trmodels
 
-        t4_results.value += 'Train Model...'+'\n'
+        self.progress.value += 'Train Model...'+'\n'
         params= []
 
         if self.modelmenu.value == "Decision Tree":
@@ -210,24 +284,44 @@ class PredictiveModelingView:
 
 
     
-        self.controller.train_Model(self.main_view.prdtsk_lbl.value,self.modelmenu.value,t4_results,trmodels,params)
+        self.controller.train_Model(self.main_view.prdtsk_lbl.value,self.modelmenu.value,self.progress,trmodels,params)
         return
 
     def get_predictive_modeling_tab(self):
         
-        global t4_results,trmodels, model_sumry
+        global trmodels, model_sumry
  
         trnml_btn = widgets.Button(description="Train")
         #trnml_btn.layout.width = '150px'
         trnml_btn.on_click(self.TrainModel)
 
         t4_rslay = widgets.Layout(height='150x', width="99%")
-        t4_results = widgets.Textarea(value='', placeholder='',description='',disabled=True,layout = t4_rslay)
+        
+        self.progress = widgets.Textarea(value='', placeholder='',description='',disabled=True,layout = t4_rslay)
+        self.progress.layout.height = '100px'
 
-        t4_results.layout.height = '100px'
+        self.mlmodels = dict()
+        self.mlmodelparams = dict()
+   
+
+        self.mlmodels['Decision Tree'] = dict()
+        self.mlmodels['KNN'] = dict()
+        self.mlmodels['Random Forest'] = dict()
+        self.mlmodels['SVM'] = dict()
+        self.mlmodels['Logistic Regression'] = dict()
+        self.mlmodels['Linear Model'] = dict()
+        self.mlmodels['Gaussian NB'] = dict()
+
+        self.mlmodelparams['Decision Tree'] = dict()
+        self.mlmodelparams['KNN'] = dict()
+        self.mlmodelparams['Random Forest'] = dict()
+        self.mlmodelparams['SVM'] = dict()
+        self.mlmodelparams['Logistic Regression'] = dict()
+        self.mlmodelparams['Linear Model'] = dict()
+        self.mlmodelparams['Gaussian NB'] = dict()
 
         
-     
+
         self.mdltitle = widgets.HTML("")
         color = "gray"
         mytext ="ML Models"
@@ -242,12 +336,87 @@ class PredictiveModelingView:
         model_sumry = widgets.Textarea(options=[],description = '',disabled = True)
         model_sumry.layout.height = '150px'
 
-        self.modelmenu = widgets.Select(options=['Decision Tree','KNN','Random Forest','SVM','Logistic Regression','Linear Model','Gaussian NB'])
+     
+        self.mlmodels['Decision Tree']['max_depth'] = [x for x in range(1,16)]
+        self.mlmodels['Decision Tree']['criterion'] = ['entropy','gini']
+        self.mlmodels['Decision Tree']['min_samples_split'] = [x for x in range(1,5)]
+
+        self.mlmodelparams['Decision Tree']['max_depth'] = 5
+        self.mlmodelparams['Decision Tree']['criterion'] = 'gini'
+        self.mlmodelparams['Decision Tree']['min_samples_split'] = 3
+
+
+        
+
+        self.mlmodels['KNN']['n_neighbors'] = [x for x in range(1,16)]
+        self.mlmodels['KNN']['weights'] = ['uniform','distance']
+        self.mlmodels['KNN']['metric'] = ['minkowski','euclidean']
+
+        self.mlmodelparams['KNN']['n_neighbors'] = 8
+        self.mlmodelparams['KNN']['weights'] = 'uniform'
+        self.mlmodelparams['KNN']['metric'] = 'euclidean'
+
+        self.mlmodels['Random Forest']['estimators'] = [i for i in range(15,150,15)]
+        self.mlmodels['Random Forest']['criterion'] = ['entropy','gini']
+        self.mlmodels['Random Forest']['max_depth'] = [x for x in range(1,7)]
+
+        self.mlmodelparams['Random Forest']['estimators'] = 90
+        self.mlmodelparams['Random Forest']['criterion'] = 'entropy'
+        self.mlmodelparams['Random Forest']['max_depth'] = 4
+
+        self.mlmodels['SVM']['kernel'] = ['linear','poly','rbf','sigmoid']
+        self.mlmodels['SVM']['C'] = [0.1*i for i in range(10,1,-1)]
+        self.mlmodels['SVM']['degree'] = ['minkowski','euclidean']
+
+        self.mlmodelparams['SVM']['kernel'] = 'linear'
+        self.mlmodelparams['SVM']['C'] = 1.0
+        self.mlmodelparams['SVM']['degree'] = 'minkowski'
+
+
+        
+        self.mlmodels['Logistic Regression']['C'] = [0.1*i for i in range(10,1,-1)]
+        self.mlmodels['Logistic Regression']['penalty'] = ['l1', 'l2', 'elasticnet']
+
+
+        self.mlmodelparams['Logistic Regression']['C'] = 1.0
+        self.mlmodelparams['Logistic Regression']['penalty'] = 'l1'
+
+
+        self.mlmodels['Linear Model']['validation_fraction'] = [0.1*i for i in range(10,1,-1)]
+        self.mlmodels['Linear Model']['penalty'] = ['l1', 'l2', 'elasticnet']
+
+        self.mlmodelparams['Linear Model']['validation_fraction'] = 0.1
+        self.mlmodelparams['Linear Model']['penalty'] = 'l2'
+
+        
+
+
+        self.modelmenu = widgets.Select(options=[x for x in self.mlmodels.keys()])
         self.modelmenu.layout.height = '175px'
         self.modelmenu.layout.width = '120px'
         self.modelmenu.observe(self.ShowModel)
+
+        
+        
      
         mdsmrylbl = widgets.Label( value="Model summary: ")
+
+        self.parammenu = widgets.Select(options=[])
+        self.parammenu.layout.height = '80px'
+        self.parammenu.layout.width = '120px'
+        self.parammenu.observe(self.ShowOptions)
+
+        self.paramvalues = widgets.Select(options=[],disabled = True)
+        self.paramvalues.layout.height = '80px'
+        self.paramvalues.layout.width = '120px'
+       
+
+        self.paramoptions = widgets.Dropdown(options=[],description = '')
+        self.paramoptions.layout.width = '100px'
+        self.paramoptions.observe(self.ChangeParam)
+
+
+        
         self.dtdepth = widgets.Dropdown(options=[i for i in range(1,16)],description = 'MaxDepth')
         self.dtdepth.layout.width = '125px'
         self.dtdepth.layout.visibility = 'hidden'
@@ -296,16 +465,10 @@ class PredictiveModelingView:
         sel_box = VBox(children=[self.paramtitle,
                                  widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"})),
             HBox(children=[self.main_view.trg_lbl,self.main_view.prdtsk_lbl]),
-                                 HBox(children=[self.dtdepth,self.dtminseg,self.dtcrit]),
-                                 HBox(children=[self.knnkval,self.knnmetric]),
-                                 HBox(children=[self.lmlib]),
-                                 HBox(children=[self.rfnrest,self.rfcrit]),
-                                 HBox(children=[self.svcc,self.svckrnl]),
+                                 HBox(children=[self.parammenu,self.paramoptions,self.paramvalues]),
                                  HBox(children=[trnml_btn]),
                                  trmodels,model_sumry
                                 ])
-
-        #vbox1 = VBox(children = [HBox(children=[sel_box]),t4_results])
 
         fbox2alay = widgets.Layout(width = '35%')
 
@@ -315,7 +478,7 @@ class PredictiveModelingView:
         vb1lay =  widgets.Layout(width='55%')
         prboxlay = widgets.Layout(width= '99%')
 
-        vbox1 = VBox(children = [HBox(children=[self.f_box,sel_box],layout = prboxlay),t4_results],layout = vb1lay)
+        vbox1 = VBox(children = [HBox(children=[self.f_box,sel_box],layout = prboxlay),self.progress],layout = vb1lay)
 
 
         self.performpage = widgets.Output()

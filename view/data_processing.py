@@ -269,7 +269,7 @@ class DataProcessingView:
 
         self.main_view.process_types = widgets.Select(description = '',options= processmethods ,disabled=False)
         self.main_view.process_types.observe(self.selectProcessType,'value')
-        self.main_view.process_types.layout.width = '250px'
+        self.main_view.process_types.layout.width = '200px'
         self.main_view.process_types.layout.height = '150px'
 
     
@@ -342,13 +342,13 @@ class DataProcessingView:
         self.proctitle.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
 
     
-        self.methodslbl = widgets.Label(value ='Methods',layout = widgets.Layout(width="25%",visibility = 'hidden'))
+        self.methodslbl = widgets.Label(value ='Methods',layout = widgets.Layout(width="99%",visibility = 'hidden'))
 
-        self.methodsmenu = widgets.Dropdown( options=[], description='', disabled=False,layout = widgets.Layout(width="25%",display = 'none'))
+        self.methodsmenu = widgets.Dropdown( options=[], description='', disabled=False,layout = widgets.Layout(width="99%",display = 'none'))
         
         self.methodsmenu.observe(self.MethodView)
         
-        self.selcl = widgets.HTML("", layout=widgets.Layout(height="20px", width="90%", text_align="center"))
+        self.selcl = widgets.HTML("", layout=widgets.Layout(height="20px", width="99%", text_align="center"))
         
     
         self.nooutliers = widgets.Label(value ='Outliers: ',layout = widgets.Layout(width="25%",visibility = 'hidden'))

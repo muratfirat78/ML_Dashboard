@@ -194,13 +194,13 @@ class DataCleaningView:
 
 
         self.missacts = widgets.Select(description='',options=['Drop Column','Remove-Missing','Replace-Mean','Replace-Median','Replace-Mode'], disabled=False)
-        self.missacts.layout.width = '170px'
+        self.missacts.layout.width = '200px'
      
 
       
 
         self.applybutton = widgets.Button(description="Apply")
-        self.applybutton.layout.width = '60px'
+        self.applybutton.layout.width = self.missacts.layout.width
         self.applybutton.on_click(self.makecleaning)
 
 
@@ -233,8 +233,8 @@ class DataCleaningView:
         selcl_box = VBox(children=[trgcl_lbl,
                                    widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"})),
                                    miss_lbl,self.acttitle,
-                                   
-                                   HBox(children=[self.missacts,self.applybutton])
+                                   self.missacts,
+                                   self.applybutton
                                    
                                    ])
      

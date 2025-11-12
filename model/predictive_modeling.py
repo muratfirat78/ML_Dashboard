@@ -60,17 +60,17 @@ class MLModel:
                 self.PythonObject.fit(xtrain,ytrain) 
         if self.Type == 'Random Forest':
             if self.myTask == 'Classification': 
-                self.PythonObject = ensemble.RandomForestClassifier(n_estimators=int(params[0]),criterion=params[1])      
+                self.PythonObject = ensemble.RandomForestClassifier(n_estimators=int(params['estimators']),criterion=params['criterion'])      
                 self.PythonObject.fit(xtrain,ytrain) 
             if self.myTask == 'Regression': 
-                self.PythonObject = ensemble.RandomForestRegressor(n_estimators=int(params[0]), random_state=0)   # try before standardization..
+                self.PythonObject = ensemble.RandomForestRegressor(n_estimators=int(params['estimators']), random_state=0)   # try before standardization..
                 self.PythonObject.fit(xtrain,ytrain) 
         if self.Type == 'SVM':
             if self.myTask == 'Classification': 
-                self.PythonObject = svm.SVC(C=float(params[0]),kernel=params[1], gamma='auto',probability = True)
+                self.PythonObject = svm.SVC(C=float(params['C']),kernel=params['kernel'], gamma='auto',probability = True)
                 self.PythonObject.fit(xtrain,ytrain) 
             if self.myTask == 'Regression': 
-                self.PythonObject = svm.SVR(C=float(params[0]),kernel=params[1])
+                self.PythonObject = svm.SVR(C=float(params['C']),kernel=params['kernel'])
                 self.PythonObject.fit(xtrain,ytrain) 
         if self.Type == 'Logistic Regression':
             self.PythonObject = linear_model.LogisticRegression(random_state=16)   # Initialize the model object 
@@ -160,9 +160,9 @@ class PredictiveModelingModel:
 
             #mymodel.setROC(roc_curve(ytest_df, y_pred))
             
-    
+
             write_log('>>Train Model-> predcts'+str(len(y_pred))+", "+tasktype,results,'Predictive modeling')
-    
+
             if tasktype == 'Classification': 
                 mymodel.setConfMatrix(confusion_matrix(ytest_df,y_pred))
                 
@@ -173,14 +173,14 @@ class PredictiveModelingModel:
                 mymodel.GetPerformanceDict()['Accuracy'] = accuracy_score(ytest_df, y_pred)
                 mymodel.GetPerformanceDict()['Precision'] = precision_score(ytest_df, y_pred,average='micro')
                 mymodel.GetPerformanceDict()['Recall'] = recall_score(ytest_df, y_pred,average='micro')
-                 
+                    
                 
             
             if tasktype == 'Regression': 
                 mymodel.GetPerformanceDict()['MSE'] = mean_squared_error(ytest_df, y_pred)
                 mymodel.GetPerformanceDict()['MAE'] = mean_absolute_error(ytest_df, y_pred)
                 mymodel.GetPerformanceDict()['RSquared'] = r2_score(ytest_df, y_pred)
-    
+
             self.trainedModels.append(mymodel)
 
             performance = []
@@ -191,13 +191,12 @@ class PredictiveModelingModel:
             performance += [("missing_values", ytrain_df.isnull().sum())]
             performance += [("type", str(ytrain_df.dtype))]
             performance += [("range", str(ytrain_df.min()) + "-" + str(ytrain_df.max()))]
-            
-            self.logger.add_action(['ModelDevelopment', 'ParameterFinetuning'], [mytype] + params)
+            self.logger.add_action(['ModelDevelopment', 'ParameterFinetuning'], [mytype] + list(params.values()))
             self.logger.add_action(['ModelDevelopment', 'ModelPerformance'], (performance))
 
 
 
-    
+
             # write_log('**Train Model-> '+ mytype, results, 'Predictive modeling')
             
 
@@ -206,7 +205,7 @@ class PredictiveModelingModel:
             # for prf,val in mymodel.GetPerformanceDict().items():
             #     write_log('Model Performance-> '+prf+': '+str(val), results, 'Predictive modeling')
             #     self.logger.add_action(['ModelDevelopment', 'ModelPerformance'], (prf, val))
-    
+
             trmodels.options = [mdl.getName() for mdl in self.trainedModels]
             
         except Exception as e: 

@@ -151,7 +151,7 @@ class PredictiveModelingView:
 
         if self.selectedparam in self.mlmodels[self.selectedmodel]:
             self.paramoptions.options = [x for x in self.mlmodels[self.selectedmodel][self.selectedparam]] 
-            self.paramoptions.value = "Select"
+            self.paramoptions.value = self.mlmodels[self.selectedmodel][self.selectedparam][0]
         else:
             self.paramoptions.options = []
 

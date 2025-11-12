@@ -12,9 +12,7 @@ class PredictiveModelingView:
     def __init__(self, controller, main_view,task_menu):
         self.controller = controller
         self.main_view = main_view
-        self.dtdepth = None
         self.dtcrit = None
-     
         self.dtminseg = None
         self.mdplbl = None
         self.mgplbl = None
@@ -34,6 +32,8 @@ class PredictiveModelingView:
         self.selectedmodel = None
         self.selectedparam = None
         self.selectedparamval = None
+
+        self.paramchangective = False
         
         self.progress = None
         
@@ -132,9 +132,15 @@ class PredictiveModelingView:
                 
         return
 
-    def ShowOptions(self,event):
+    def ShowParamOpts(self,event):
 
+
+        self.paramchangective = True
         self.progress.value+="********** ShowOptions***********"+"\n"
+
+        self.progress.value+="Model "+str(self.selectedmodel)+"\n"
+
+        self.progress.value+="Parameter: "+str(self.selectedparam)+"\n"
         
         self.progress.value+="Parameter menu value: "+str(self.parammenu.value)+"\n"
         
@@ -146,24 +152,32 @@ class PredictiveModelingView:
         
 
         if self.selectedparam == '' or self.selectedparam == None:
+            self.paramchangective = False
             return
 
 
         if self.selectedparam in self.mlmodels[self.selectedmodel]:
+            self.progress.value+="parameter options..: "+str(self.selectedparam)+"\n"
+
             self.paramoptions.options = [x for x in self.mlmodels[self.selectedmodel][self.selectedparam]] 
-            self.paramoptions.value = self.mlmodels[self.selectedmodel][self.selectedparam][0]
+            self.paramoptions.value = self.mlmodelparams[self.selectedmodel][self.selectedparam]
+
+            self.progress.value+="set done options: "+str(self.selectedparam)+"\n"
+            
         else:
             self.paramoptions.options = []
 
      
-
+        self.paramchangective = False
         return
 
-    def ChangeParam(self,event):
+    def ChangeParamVal(self,event):
 
         self.progress.value+="**********ChangeParam***********"+"\n"
         self.progress.value+="in change paramter..."+"\n"
 
+        if self.paramchangective:
+            return
 
         self.progress.value+="Model "+str(self.selectedmodel)+"\n"
 
@@ -172,19 +186,20 @@ class PredictiveModelingView:
 
         if self.selectedparam == '' or self.selectedparam == None:
             return
-            
-        self.selectedparamval = self.paramoptions.value
 
-        
+       
         self.progress.value+="Parameter value: "+ str(self.selectedparamval)+"\n"
 
-        if self.selectedparamval == "Select"  or self.selectedparamval ==  None:
+        if self.paramoptions.value == ''  or self.paramoptions.value==  None:
             return
 
+        self.selectedparamval = self.paramoptions.value
+     
         self.mlmodelparams[self.selectedmodel][self.selectedparam] = self.selectedparamval
         
         self.paramvalues.options = [self.mlmodelparams[self.selectedmodel][x] for x in self.mlmodels[self.selectedmodel].keys()] 
-      
+        
+       
 
         return
         
@@ -192,8 +207,7 @@ class PredictiveModelingView:
 
     def ShowModel(self,event):
 
-        self.dtdepth.layout.visibility = 'hidden'
-        self.dtdepth.layout.display = 'none'
+      
         self.dtcrit.layout.visibility = 'hidden'
         self.dtcrit.layout.display = 'none'
         self.dtminseg.layout.visibility = 'hidden'
@@ -223,16 +237,14 @@ class PredictiveModelingView:
 
         self.progress.value+=" Set Model "+str(self.selectedmodel)+"\n"
    
-        #self.selectedparam = None
-        #self.selectedparamval = None
+
 
         self.paramvalues.options = [self.mlmodelparams[self.selectedmodel][x] for x in self.mlmodels[self.selectedmodel].keys()] 
         self.parammenu.options = [x for x in self.mlmodels[self.selectedmodel].keys()] 
         
     
         if self.modelmenu.value == "Decision Tree":
-            self.dtdepth.layout.display = 'block'
-            self.dtdepth.layout.visibility = 'visible'
+          
             self.dtcrit.layout.display = 'block'
             self.dtcrit.layout.visibility = 'visible'
             self.dtminseg.layout.display = 'block'
@@ -268,23 +280,21 @@ class PredictiveModelingView:
     def TrainModel(self,event): 
         global trmodels
 
-        self.progress.value += 'Train Model...'+'\n'
-        params= []
 
-        if self.modelmenu.value == "Decision Tree":
-            params= [self.dtdepth.value,self.dtminseg.value,self.dtcrit.value]
-        if self.modelmenu.value == "KNN":
-            params= [self.knnkval.value,self.knnmetric.value]
-        if self.modelmenu.value == "Random Forest":
-            params= [self.rfnrest.value,self.rfcrit.value]
-        if self.modelmenu.value == "SVM":
-            params= [self.svcc.value,self.svckrnl.value]
-        if self.modelmenu.value == "Linear Model":
-            params= [self.lmlib.value]
+        self.progress.value += 'Train Model...'+str(self.selectedmodel)+'\n'
 
+        
+        params= dict()
 
-    
-        self.controller.train_Model(self.main_view.prdtsk_lbl.value,self.modelmenu.value,self.progress,trmodels,params)
+        for param,val in self.mlmodelparams[self.selectedmodel].items():
+            params[param] = val
+
+        self.progress.value += 'Params...'+str(params)+'\n'
+
+        
+        self.controller.train_Model(self.selectedmodel,self.progress,trmodels,params)
+ 
+
         return
 
     def get_predictive_modeling_tab(self):
@@ -374,7 +384,7 @@ class PredictiveModelingView:
 
 
         
-        self.mlmodels['Logistic Regression']['C'] = [0.1*i for i in range(10,1,-1)]
+        self.mlmodels['Logistic Regression']['C'] = [round(0.1*i,2) for i in range(10,1,-1)]
         self.mlmodels['Logistic Regression']['penalty'] = ['l1', 'l2', 'elasticnet']
 
 
@@ -382,7 +392,7 @@ class PredictiveModelingView:
         self.mlmodelparams['Logistic Regression']['penalty'] = 'l1'
 
 
-        self.mlmodels['Linear Model']['validation_fraction'] = [0.1*i for i in range(10,1,-1)]
+        self.mlmodels['Linear Model']['validation_fraction'] = [round(0.1*i,2) for i in range(10,0,-1)]
         self.mlmodels['Linear Model']['penalty'] = ['l1', 'l2', 'elasticnet']
 
         self.mlmodelparams['Linear Model']['validation_fraction'] = 0.1
@@ -404,7 +414,7 @@ class PredictiveModelingView:
         self.parammenu = widgets.Select(options=[])
         self.parammenu.layout.height = '80px'
         self.parammenu.layout.width = '120px'
-        self.parammenu.observe(self.ShowOptions)
+        self.parammenu.observe(self.ShowParamOpts)
 
         self.paramvalues = widgets.Select(options=[],disabled = True)
         self.paramvalues.layout.height = '80px'
@@ -413,7 +423,7 @@ class PredictiveModelingView:
 
         self.paramoptions = widgets.Dropdown(options=[],description = '')
         self.paramoptions.layout.width = '100px'
-        self.paramoptions.observe(self.ChangeParam)
+        self.paramoptions.observe(self.ChangeParamVal)
 
 
         

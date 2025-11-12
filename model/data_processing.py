@@ -315,7 +315,9 @@ class DataProcessingModel:
         return
     ##################################################################################
 
-    def assign_target(self,trg_lbl,dt_features,prdtsk_lbl,result2exp,predictiontask):
+    def assign_target(self,trg_lbl,dt_features,prdtsk_lbl,result2exp):
+
+        predictiontask = ''
 
         self.main_model.targetcolumn = dt_features.value
 
@@ -331,12 +333,13 @@ class DataProcessingModel:
         else:
             predictiontask = "Classification" 
 
+  
         prdtsk_lbl.value = "| Prediction Task: "+predictiontask 
         write_log('Target assigned: '+target_column, result2exp, 'Data processing')
         self.logger.add_action(['DataProcessing', 'AssignTarget'], target_column)
         result2exp.value+="assign target done..."+"\n"
 
-        return 
+        return predictiontask
     ############################################################################################################    
     def make_featconvert(self,dt_features,result2exp):
         colname = dt_features.value

@@ -197,7 +197,9 @@ class DataProcessingView:
         if self.main_view.process_types.value == "Assign Target":
             self.progress.value+="> Target ... "+"\n"  
             if self.controller.main_model.targetcolumn == None:
-                self.controller.assign_target(self.main_view.trg_lbl,self.main_view.dt_features,self.main_view.prdtsk_lbl,self.progress,predictiontask)
+                self.controller.assign_target(self.main_view.trg_lbl,self.main_view.dt_features,self.main_view.prdtsk_lbl,self.progress)
+                predictiontask = self.controller.predictiontask
+              
             else:
                 self.progress.value+="> Target is already assigned... "+"\n"   
                 

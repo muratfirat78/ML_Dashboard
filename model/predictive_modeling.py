@@ -11,7 +11,7 @@ class MLModel:
         self.performance = dict()
         self.roc = None
         self.Type = mytype
-        self.myTask = tasktype[tasktype.find(":")+2:]
+        self.myTask = tasktype
         self.PythonObject = None
         self.PreprocessingSteps = [] 
         self.Name = myname
@@ -37,7 +37,8 @@ class MLModel:
             if self.myTask == 'Classification': 
                 write_log('DT: Classification', report, 'Predictive modeling')
 
-                self.PythonObject = tree.DecisionTreeClassifier(criterion=params[2],max_depth=int(params[0]))
+    
+                self.PythonObject = tree.DecisionTreeClassifier(criterion=params['criterion'],max_depth=int(params['max_depth']))
                 self.PythonObject.fit(xtrain,ytrain) 
             if self.myTask == 'Regression': 
                 write_log('DT: Regression', report, 'Predictive modeling')
@@ -45,10 +46,10 @@ class MLModel:
                 self.PythonObject.fit(xtrain,ytrain) 
         if self.Type == 'KNN':
             if self.myTask == 'Classification': 
-                self.PythonObject = neighbors.KNeighborsClassifier(n_neighbors=int(params[0]))
+                self.PythonObject = neighbors.KNeighborsClassifier(n_neighbors=int(params['n_neighbors']))
                 self.PythonObject.fit(xtrain,ytrain) 
             if self.myTask == 'Regression': 
-                self.PythonObject = neighbors.KNeighborsRegressor(n_neighbors=int(params[0]))
+                self.PythonObject = neighbors.KNeighborsRegressor(n_neighbors=int(params['n_neighbors']))
                 self.PythonObject.fit(xtrain,ytrain) 
         if self.Type == 'Linear Model':
             if self.myTask == 'Classification': 
@@ -127,6 +128,8 @@ class PredictiveModelingModel:
         self.logger = logger
 
     def train_Model(self,tasktype,mytype,results,trmodels,params):
+
+        #self.controller.predictiontask
         
         #data = [self.main_model.Xtrain_df,self.main_model.ytrain_df,self.main_model.Xtest_df,self.main_model.ytest_df]
         write_log('Train Model-> '+ mytype,results,'Predictive modeling')
@@ -140,7 +143,7 @@ class PredictiveModelingModel:
 
         models = [1 for mdl in self.trainedModels if mdl.getName().find(mytype) > -1]
 
-        write_log('Train Model-> task'+str(tasktype[tasktype.find(":")+2:]),results,'Predictive modeling')
+        write_log('Train Model-> task'+str(tasktype),results,'Predictive modeling')
 
         success = False
         try: 
@@ -160,7 +163,7 @@ class PredictiveModelingModel:
     
             write_log('>>Train Model-> predcts'+str(len(y_pred))+", "+tasktype,results,'Predictive modeling')
     
-            if tasktype[tasktype.find(":")+2:] == 'Classification': 
+            if tasktype == 'Classification': 
                 mymodel.setConfMatrix(confusion_matrix(ytest_df,y_pred))
                 
                 #mymodel.GetPerformanceDict()['True-Positive'] = mymodel.getConfMatrix()[1][1]
@@ -173,7 +176,7 @@ class PredictiveModelingModel:
                  
                 
             
-            if tasktype[tasktype.find(":")+2:] == 'Regression': 
+            if tasktype == 'Regression': 
                 mymodel.GetPerformanceDict()['MSE'] = mean_squared_error(ytest_df, y_pred)
                 mymodel.GetPerformanceDict()['MAE'] = mean_absolute_error(ytest_df, y_pred)
                 mymodel.GetPerformanceDict()['RSquared'] = r2_score(ytest_df, y_pred)

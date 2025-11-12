@@ -54,6 +54,7 @@ class Controller:
         self.convertPerformanceToTask = ConvertPerformanceToTask()
         self.task_finished = False
         self.developer_mode = False
+        self.predictiontask = None
         # performance = {'General': {}, 'SelectData': {'DataSet': ('titanic.csv', 0)}, 'DataCleaning': {'Drop Column': [(['Fare'], 1), (['Ticket'], 2), (['Parch'], 3), (['SibSp'], 4), (['Name'], 5), (['Pclass'], 6), (['PassengerId'], 7), (['Cabin'], 9)], 'Remove-Missing': (['Embarked'], 8), 'Replace-Median': (['Age'], 10)}, 'DataProcessing': {'LabelEncoding': [(['Embarked'], 11), (['Sex'], 12)], 'ConvertToBoolean': ('Survived', 13), 'AssignTarget': ('Survived', 14), 'Split': ('20%', 15)}, 'ModelDevelopment': {'ModelPerformance': (('Logistic Regression()', [('True-Positive', 56), ('False-Positive', 16), ('True-Negative', 86), ('False-Negative', 20), ('Accuracy', 0.797752808988764), ('Precision', 0.7777777777777778), ('Recall', 0.7368421052631579), ('ROCFPR', ([0.        , 0.15686275, 1.        ])), ('ROCTPR',([0.        , 0.73684211, 1.        ]))]), 16)}}
         # self.convertPerformanceToTask.convert_performance_to_task(performance)
         if drive != None:
@@ -92,8 +93,8 @@ class Controller:
         else:
             return obj
 
-    def train_Model(self,tasktype,mytype,results,trmodels,params):
-        self.predictive_modeling_model.train_Model(tasktype,mytype,results,trmodels,params)
+    def train_Model(self,mytype,results,trmodels,params):
+        self.predictive_modeling_model.train_Model(self.predictiontask,mytype,results,trmodels,params)
         if self.developer_mode:
             data = self.convertPerformanceToTask.convert_performance_to_task(self.logger.get_performance(), 'todo', 'todo')
             converted_data = self.convert_numpy(data)
@@ -107,7 +108,7 @@ class Controller:
          self.data_cleaning_model.make_cleaning(featurescl,result2aexp,missacts,dt_features,params)
 
     def assign_target(self,trg_lbl,dt_features,prdtsk_lbl,result2exp,predictiontask):
-        self.data_processing_model.assign_target(trg_lbl,dt_features,prdtsk_lbl,result2exp,predictiontask)  
+        self.predictiontask = self.data_processing_model.assign_target(trg_lbl,dt_features,prdtsk_lbl,result2exp)  
 
     def make_balanced(self,features2,balncetype,ProcssPage,result2exp):
         self.data_processing_model.make_balanced(features2,balncetype,ProcssPage,result2exp)

@@ -49,7 +49,7 @@ class PredictiveModelingView:
         self.performlbl = None
         
         self.progress = None
-        self.selectedmodel = None
+        self.selectedMLmodel = None
         
     def models_click(self,change):     
    
@@ -57,7 +57,7 @@ class PredictiveModelingView:
         for mdl in self.controller.get_trained_models():
             if self.trmodels.value == mdl.getName():
 
-                self.selectedmodel  = mdl
+                self.selectedMLmodel  = mdl
                 self.progress.value += 'model found...'+str(mdl.getName())+'\n'
 
                 self.progress.value += 'labels...'+str(len(self.paramlbls))+'\n'
@@ -295,14 +295,14 @@ class PredictiveModelingView:
     
             pred_df = pd.DataFrame(columns = ['y_true','y_pred','tag'])
         
-            preds = self.selectedmodel.GetPredictions(Xtest_df)
+            preds = self.selectedMLmodel.GetPredictions(Xtest_df)
             pred_df['y_true'] = [x for x in ytest_df]
             pred_df['y_pred'] = [x for x in preds]
             pred_df['tag'] = ['test' for i in preds]
         
             trpred_df = pd.DataFrame(columns = ['y_true','y_pred','tag'])
         
-            ytr_pred = self.selectedmodel.GetPredictions(Xtrain_df)
+            ytr_pred = self.selectedMLmodel.GetPredictions(Xtrain_df)
             ytr_pred = ytr_pred.tolist()
             ytrain_df = ytrain_df.to_list()
         

@@ -91,6 +91,8 @@ class PredictiveModelingView:
                     clear_output()
                     
                     if mdl.getTask() == "Classification":
+
+                        self.plt_btn.visible = 'hidden'
                       
                         classes = [cls for cls in self.controller.main_model.getYtrain().to_frame()[self.controller.main_model.targetcolumn].unique()]
 

@@ -27,6 +27,7 @@ class DataProcessingView:
         self.proctitle = None
         self.nooutliers = None
         self.progress = None
+        self.f_box = None
 
         
         self.methodslbl = None
@@ -179,13 +180,16 @@ class DataProcessingView:
         global predictiontask
         refreshFeatures = True
 
+        self.ApplyButton.disabled = True
 
         with self.main_view.vis_page:
             clear_output()
         
         processtype = self.methodsmenu.value
 
-         
+        for model in self.controller.get_trained_models():
+            model.settraindatachanged()
+        
 
         if self.main_view.process_types.value == "Data Split":
             if not self.controller.main_model.datasplit: 
@@ -241,6 +245,7 @@ class DataProcessingView:
             self.featureprclick(self.main_view.dt_features,self.main_view.feat_page,self.main_view.process_types,self.main_view.process_page)
 
 
+        self.ApplyButton.disabled = False
         
         return
 
@@ -248,10 +253,10 @@ class DataProcessingView:
 
     def get_data_processing_tab(self):
      
-        fpgelay = Layout(width="100%")
-        self.main_view.feat_page = widgets.Output(layout = fpgelay)
-        fpgelay = Layout(width="100%")
-        self.main_view.process_page = widgets.Output(layout=fpgelay)
+
+        self.main_view.feat_page = widgets.Output()
+     
+        self.main_view.process_page = widgets.Output()
 
     
         self.processmethods = dict()
@@ -270,7 +275,7 @@ class DataProcessingView:
         processmethods.insert(4,'Data Split')
 
         self.main_view.process_types = widgets.Select(description = '',options= processmethods ,disabled=False)
-        self.main_view.process_types.observe(self.selectProcessType,'value')
+        self.main_view.process_types.observe(self.selectProcessType)
         self.main_view.process_types.layout.width = '200px'
         self.main_view.process_types.layout.height = '150px'
 
@@ -288,14 +293,11 @@ class DataProcessingView:
      
         self.main_view.trg_lbl = widgets.Label(value ='Target: -',disabled = True)
         self.main_view.prdtsk_lbl =widgets.Label(value = ' | Prediction Task: - ',disabled = True)
-        trglay = Layout(width='150px')
-        
-      
+       
 
         self.processvisuals['Assign Target'] = [self.main_view.trg_lbl,self.main_view.prdtsk_lbl]
 
         self.splt_txt =widgets.Dropdown(description ='Test Ratio(%): ',options=[20,25,30,35])
-        self.splt_txt.layout.width = '160px'
        
         self.processvisuals['Data Split'] = [self.splt_txt]
 
@@ -305,7 +307,7 @@ class DataProcessingView:
         self.pca_btn = widgets.Button(description=">> Add PCA >> ")
         self.pca_btn.layout.visibility = 'hidden'
         self.pca_btn.layout.display = 'none'
-        self.pca_btn.layout.width = '120px'
+        self.pca_btn.layout.width = '100px'
         self.pca_btn.on_click(self.AddftPCA)
 
         self.pcaselect = widgets.Select(options=[],description = '')
@@ -344,9 +346,9 @@ class DataProcessingView:
         self.proctitle.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
 
     
-        self.methodslbl = widgets.Label(value ='Methods',layout = widgets.Layout(width="99%",visibility = 'hidden'))
+        self.methodslbl = widgets.Label(value ='Methods')
 
-        self.methodsmenu = widgets.Dropdown( options=[], description='', disabled=False,layout = widgets.Layout(width="99%",display = 'none'))
+        self.methodsmenu = widgets.Dropdown( options=[], description='', disabled=False)
         
         self.methodsmenu.observe(self.MethodView)
         
@@ -380,40 +382,39 @@ class DataProcessingView:
 
       
 
-        sboxxlay = widgets.Layout()
+       
         sel_box = VBox(children=[self.selcl,
                                   widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"})),
                                  self.proctitle, 
-                                 HBox(children=[self.main_view.process_types]),
+                                 self.main_view.process_types,
                                  self.ApplyButton,
                                  HBox(children=[self.main_view.trg_lbl,self.main_view.prdtsk_lbl]),
-                                 HBox(children=[self.splt_txt]),
+                                 self.splt_txt,
                                  HBox(children=[self.methodslbl,self.methodsmenu]),    
                                  HBox(children=[self.pca_btn,self.pcaselect]),
-                                 HBox(children=[VBox(children=[self.ord_btn,self.ord_btn2]),self.ordinalenconding]),
-                                 self.main_view.vis_page
-                                ],layout = sboxxlay)
+                                 HBox(children=[VBox(children=[self.ord_btn,self.ord_btn2]),self.ordinalenconding])
+                                ])
 
 
-        fbox2alay = widgets.Layout(width = '35%')
-        self.feattitle = widgets.HTML("Features", layout=widgets.Layout(height="30px", width="55%", text_align="center"))
+     
+        self.feattitle = widgets.HTML("Features", layout=widgets.Layout(height="30px", text_align="center"))
         color = "gray"
         mytext ="Features"
         
         self.feattitle.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
         
-        self.main_view.f_box = VBox(children=[self.feattitle,HBox(children=[self.main_view.dt_features])],layout = fbox2alay)
+        self.f_box = VBox(children=[self.feattitle,HBox(children=[self.main_view.dt_features])])
        
 
         res2lay = widgets.Layout(height='150px',width='99%')
+        
         self.progress = widgets.Textarea(value='', placeholder='',description='',disabled=True,layout = res2lay)
 
-        vb1lay =  widgets.Layout()
-        prboxlay = widgets.Layout()
-        vbox1 = VBox(children = [HBox(children=[self.main_view.f_box,sel_box],layout = prboxlay),self.progress],layout = vb1lay)
 
-        vb2lay =  widgets.Layout()
-        vbox2 = VBox(children = [self.main_view.feat_page,self.main_view.process_page],layout = vb2lay)
+        vbox1 = VBox(children = [HBox(children=[self.f_box,sel_box]),self.progress])
+        vbox2 = VBox(children = [self.main_view.feat_page,self.main_view.process_page])
+
+        
         tab_3 = VBox([self.task_menu,HBox([vbox1,vbox2])])
         return tab_3
 

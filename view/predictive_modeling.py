@@ -32,25 +32,60 @@ class PredictiveModelingView:
         self.selectedmodel = None
         self.selectedparam = None
         self.selectedparamval = None
+        self.paramvals = None
+        self.paramedit = None
+        self.modelslbl = None
+        self.trmodels = None
+        self.perlbl = None
+        self.tasklbl = None
+        self.trnml_btn = None
 
         self.paramchangective = False
+
+        self.prm1lbl = None
+        self.prm2lbl = None
+        self.prm3lbl = None
+        self.paramlbls = None
+        self.performlbl = None
         
         self.progress = None
+        self.selectedmodel = None
         
     def models_click(self,change):     
-        global  trmodels,model_sumry
-
-        model_sumry.value = ''
+   
 
         for mdl in self.controller.get_trained_models():
-            if trmodels.value == mdl.getName():
-                if len(mdl.GetPerformanceDict()) > 0:
-                    model_sumry.value += 'Performance scores: '+'\n'
+            if self.trmodels.value == mdl.getName():
 
-                for prf,val in mdl.GetPerformanceDict().items():
-                    if (prf == 'ROCFPR') or (prf == 'ROCTPR'):
-                        continue
-                    model_sumry.value += '  > '+prf+': '+str(val)+'\n'
+                self.selectedmodel  = mdl
+                self.progress.value += 'model found...'+str(mdl.getName())+'\n'
+
+                self.progress.value += 'labels...'+str(len(self.paramlbls))+'\n'
+
+                for mylbl in self.paramlbls:
+                    self.progress.value += 'lbl type...'+str(type(mylbl))+'\n'
+                    mylbl.value = ''
+
+                self.progress.value += 'start...'+str(mdl.getName())+'\n'
+
+
+                self.progress.value += 'params...'+str(len(mdl.getModelParams()))+'\n'
+                
+                prind = 0
+                for param,val in mdl.getModelParams().items():
+                    self.progress.value += str(param)+": "+str(val)+'\n'
+                    self.paramlbls[prind].value = str(param)+": "+str(val)
+                    prind+=1
+
+                if 'Accuracy' in mdl.GetPerformanceDict():
+                    self.performlbl.value = " Accuracy: "+str(mdl.GetPerformanceDict()['Accuracy'])
+
+                if 'MSE' in mdl.GetPerformanceDict():
+                    self.performlbl.value = " MSE: "+str(mdl.GetPerformanceDict()['MSE'])
+
+                self.progress.value += 'labels set...'+'\n'
+                    
+
 
                 with self.performpage:          
                     clear_output()
@@ -89,41 +124,14 @@ class PredictiveModelingView:
                         # display.display(mdl.getConfMatrix())
                         
                     else:
-                        Xtrain_df = self.controller.main_model.get_XTrain()
-                        ytrain_df = self.controller.main_model.getYtrain()
-                        ytest_df = self.controller.main_model.get_YTest()
                         
-                        
-                        
-                        pred_df = pd.DataFrame(columns = ['y_true','y_pred','tag'])
-
-                        ytest_df = ytest_df.to_list()
-                        preds = mdl.getPredictions().tolist()
-                        pred_df['y_true'] = ytest_df
-                        pred_df['y_pred'] = preds
-                        pred_df['tag'] = ['test' for i in preds]
-
-                        trpred_df = pd.DataFrame(columns = ['y_true','y_pred','tag'])
-
-                        ytr_pred = mdl.GetPredictions(Xtrain_df)
-                        ytr_pred = ytr_pred.tolist()
-                        ytrain_df = ytrain_df.to_list()
-
-                        
-                        trpred_df['y_true'] = ytrain_df
-                        trpred_df['y_pred'] = ytr_pred
-                        trpred_df['tag'] = ['train' for i in ytr_pred]
-
-                        pred_df = pd.concat([pred_df, trpred_df], ignore_index=True)
-
-                        
-                        #for valind in range(len(ytrain_df)):
-                            #newrow = pd.DataFrame({'y_true':ytrain_df[valind], 'y_pred':mdl.getPredictions()[valind],'tag':'train'})
-
-                        g = sns.lmplot(x='y_true', y ='y_pred', data=pred_df, hue='tag')
-                        g.fig.suptitle('True Vs Pred', y= 1.02)
-                        g.set_axis_labels('y_true', 'y_pred');
-                        plt.show()  
+                        if not mdl.istraindatachanged():
+                            
+                            self.plt_btn.visible = 'visible'
+                            self.plt_btn.disabled = False
+        
+                        else: 
+                            self.plt_btn.visible = 'hidden'
 
                         
               
@@ -276,10 +284,54 @@ class PredictiveModelingView:
                 
         return
 
+    def PlotGraph(self,event):
+
+        with self.performpage:          
+            clear_output()
+            Xtrain_df = self.controller.main_model.get_XTrain()
+            ytrain_df = self.controller.main_model.getYtrain()
+            ytest_df = self.controller.main_model.get_YTest()
+            Xtest_df = self.controller.main_model.get_XTest()
+    
+            pred_df = pd.DataFrame(columns = ['y_true','y_pred','tag'])
+        
+            preds = self.selectedmodel.GetPredictions(Xtest_df)
+            pred_df['y_true'] = [x for x in ytest_df]
+            pred_df['y_pred'] = [x for x in preds]
+            pred_df['tag'] = ['test' for i in preds]
+        
+            trpred_df = pd.DataFrame(columns = ['y_true','y_pred','tag'])
+        
+            ytr_pred = self.selectedmodel.GetPredictions(Xtrain_df)
+            ytr_pred = ytr_pred.tolist()
+            ytrain_df = ytrain_df.to_list()
+        
+                                
+            trpred_df['y_true'] = ytrain_df
+            trpred_df['y_pred'] = ytr_pred
+            trpred_df['tag'] = ['train' for i in ytr_pred]
+        
+            pred_df = pd.concat([pred_df, trpred_df], ignore_index=True)
+        
+        
+            g = sns.lmplot(x='y_true', y ='y_pred', data=pred_df, hue='tag')
+            g.fig.suptitle('True Vs Pred', y= 1.02)
+            g.set_axis_labels('y_true', 'y_pred');
+            plt.show()  
+
+        
+        
+        
+        self.plt_btn.disabled = True
+
+
+        return 
+
 
     def TrainModel(self,event): 
-        global trmodels
 
+
+        self.trnml_btn.disabled = True
 
         self.progress.value += 'Train Model...'+str(self.selectedmodel)+'\n'
 
@@ -292,18 +344,25 @@ class PredictiveModelingView:
         self.progress.value += 'Params...'+str(params)+'\n'
 
         
-        self.controller.train_Model(self.selectedmodel,self.progress,trmodels,params)
+        self.controller.train_Model(self.selectedmodel,self.progress,self.trmodels ,params)
  
 
+        self.trnml_btn.disabled = False
         return
 
     def get_predictive_modeling_tab(self):
         
-        global trmodels, model_sumry
+   
  
-        trnml_btn = widgets.Button(description="Train")
-        #trnml_btn.layout.width = '150px'
-        trnml_btn.on_click(self.TrainModel)
+        self.trnml_btn= widgets.Button(description="Train")
+        self.trnml_btn.layout.width = '98px'
+        self.trnml_btn.on_click(self.TrainModel)
+
+        self.plt_btn= widgets.Button(description="Plot true vs predicted values")
+        self.plt_btn.layout.width = '200px'
+        self.plt_btn.on_click(self.PlotGraph)
+
+        self.plt_btn.visible = 'hidden'
 
         t4_rslay = widgets.Layout(height='150x', width="99%")
         
@@ -340,11 +399,12 @@ class PredictiveModelingView:
        
 
 
-        trmodels = widgets.Select(options=[],description = '')
-        trmodels.observe(self.models_click, 'value')
+        self.trmodels = widgets.Select(options=[],description = '')
+        self.trmodels.layout.width = '220px'
+        self.trmodels.layout.height = '140px'
+        self.trmodels.observe(self.models_click, 'value')
      
-        model_sumry = widgets.Textarea(options=[],description = '',disabled = True)
-        model_sumry.layout.height = '150px'
+
 
      
         self.mlmodels['Decision Tree']['max_depth'] = [x for x in range(1,16)]
@@ -406,7 +466,7 @@ class PredictiveModelingView:
         self.modelmenu.layout.width = '120px'
         self.modelmenu.observe(self.ShowModel)
 
-        
+        self.tasklbl = widgets.Label(value ='Perdiction task: -')
         
      
         mdsmrylbl = widgets.Label( value="Model summary: ")
@@ -425,6 +485,16 @@ class PredictiveModelingView:
         self.paramoptions.layout.width = '100px'
         self.paramoptions.observe(self.ChangeParamVal)
 
+
+        self.prm1lbl = widgets.Label( value="")
+        self.prm1lbl.layout.width = '120px'
+        self.prm2lbl = widgets.Label( value="")
+        self.prm2lbl.layout.width = '120px'
+        self.prm3lbl = widgets.Label( value="")
+        self.prm3lbl.layout.width = '120px'
+        self.performlbl = widgets.Label( value="")
+
+        self.paramlbls = [self.prm1lbl,self.prm2lbl,self.prm3lbl]
 
         
         self.dtdepth = widgets.Dropdown(options=[i for i in range(1,16)],description = 'MaxDepth')
@@ -469,15 +539,45 @@ class PredictiveModelingView:
 
         self.paramtitle = widgets.HTML("")
         color = "gray"
-        mytext ="Model Parameters"
+        mytext ="Parameters"
         self.paramtitle.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
+        self.paramtitle.layout.width = '120px'
+
+        self.paramedit = widgets.HTML("")
+        color = "gray"
+        mytext ="Modify"
+        self.paramedit.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
+        self.paramedit.layout.width = '100px'
+
+        self.paramvals = widgets.HTML("")
+        color = "gray"
+        mytext ="Values"
+        self.paramvals.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
+        self.paramvals.layout.width = '120px'
+
+        self.modelslbl = widgets.HTML("")
+        color = "gray"
+        mytext ="Trained Models"
+        self.modelslbl.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
+        self.modelslbl.layout.width = '120px'
+
+
+        self.perlbl = widgets.HTML("")
+        color = "gray"
+        mytext ="Performance"
+        self.perlbl.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
+        self.perlbl.layout.width = '120px'
+
+        horzbar = widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"}))
       
-        sel_box = VBox(children=[self.paramtitle,
-                                 widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"})),
-            HBox(children=[self.main_view.trg_lbl,self.main_view.prdtsk_lbl]),
-                                 HBox(children=[self.parammenu,self.paramoptions,self.paramvalues]),
-                                 HBox(children=[trnml_btn]),
-                                 trmodels,model_sumry
+        sel_box = VBox(children=[ self.tasklbl,
+            HBox(children=[self.paramtitle,self.paramedit,self.paramvals]),
+                               horzbar,
+                                 HBox(children=[self.parammenu,VBox(children=[self.paramoptions, self.trnml_btn]),self.paramvalues]),
+                                 self.modelslbl,horzbar,
+                                 HBox(children=[
+                                     VBox(children = [self.trmodels,self.plt_btn]),
+                                     VBox(children = [self.prm1lbl,self.prm2lbl,self.prm3lbl,self.perlbl,horzbar,self.performlbl])])
                                 ])
 
         fbox2alay = widgets.Layout(width = '35%')

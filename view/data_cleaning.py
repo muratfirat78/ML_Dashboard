@@ -241,27 +241,15 @@ class DataCleaningView:
         result2aexp = widgets.Textarea(value='', placeholder='',description='',disabled=True)
         result2aexp.layout.height = '150px'
         result2aexp.layout.width = '99%'
-
-
-        fbox2alay = widgets.Layout(width = '35%')
-
-        self.f_box = VBox(children=[self.feattitle,HBox(children=[self.main_view.featurescl])],layout = fbox2alay)
         
-        #myvbox = VBox(children = [HBox(children=[f2a_box,selcl_box],layout = widgets.Layout(height = '60%')),self.prgtitle,result2aexp])
-        #myvbox.layout.width = '40%'
-        self.main_view.right_page.layout.width = '95%'
+        self.f_box = VBox(children=[self.feattitle,HBox(children=[self.main_view.featurescl])])
+
+        vbox1 = VBox(children = [HBox(children=[self.f_box,selcl_box]),result2aexp])
         
-        vb1lay =  widgets.Layout(width='55%')
-        prboxlay = widgets.Layout(width= '99%')
-
-        vbox1 = VBox(children = [HBox(children=[self.f_box,selcl_box],layout = prboxlay),result2aexp],layout = vb1lay)
-
-
         vbox2 = VBox(children = [self.main_view.right_page])
         
         tab_2 = VBox([self.task_menu,HBox([vbox1,vbox2])])
-        
-        #tab_2 = VBox(children = [ self.task_menu,HBox(children=[myvbox,self.main_view.right_page])])
+
 
         
         return tab_2

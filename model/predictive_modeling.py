@@ -7,7 +7,7 @@ from sklearn.naive_bayes import GaussianNB
 class MLModel:
     def __init__(self,target,tasktype,mytype,report,myname,params,xtrain,ytrain):
   
-        self.modelsetting = dict()
+        self.modelparams = dict()
         self.performance = dict()
         self.roc = None
         self.Type = mytype
@@ -16,6 +16,11 @@ class MLModel:
         self.PreprocessingSteps = [] 
         self.Name = myname
         self.ConfMatrix = None
+        self.traindatachanged = False
+
+        for param,val in params.items():
+            self.modelparams[param]= val
+            
 
         write_log(self.Type+"__"+self.myTask, report, 'Predictive modeling')
 
@@ -78,6 +83,17 @@ class MLModel:
             
         write_log('Model.. Type '+str(type(self.PythonObject)), report, 'Predictive modeling')
         return
+
+    def getModelParams(self):
+        return self.modelparams
+
+    def settraindatachanged(self):
+        self.traindatachanged = True
+        return
+
+    def istraindatachanged(self):
+        return self.traindatachanged 
+       
 
     def setConfMatrix(self,myitm):
         self.ConfMatrix = myitm
@@ -170,14 +186,14 @@ class PredictiveModelingModel:
                 #mymodel.GetPerformanceDict()['False-Positive'] = mymodel.getConfMatrix()[0][1]
                 #mymodel.GetPerformanceDict()['True-Negative'] = mymodel.getConfMatrix()[0][0]
                 #mymodel.GetPerformanceDict()['False-Negative'] = mymodel.getConfMatrix()[1][0]
-                mymodel.GetPerformanceDict()['Accuracy'] = accuracy_score(ytest_df, y_pred)
+                mymodel.GetPerformanceDict()['Accuracy'] = round(accuracy_score(ytest_df, y_pred),2)
                 mymodel.GetPerformanceDict()['Precision'] = precision_score(ytest_df, y_pred,average='micro')
                 mymodel.GetPerformanceDict()['Recall'] = recall_score(ytest_df, y_pred,average='micro')
                     
                 
             
             if tasktype == 'Regression': 
-                mymodel.GetPerformanceDict()['MSE'] = mean_squared_error(ytest_df, y_pred)
+                mymodel.GetPerformanceDict()['MSE'] = round(mean_squared_error(ytest_df, y_pred),2)
                 mymodel.GetPerformanceDict()['MAE'] = mean_absolute_error(ytest_df, y_pred)
                 mymodel.GetPerformanceDict()['RSquared'] = r2_score(ytest_df, y_pred)
 

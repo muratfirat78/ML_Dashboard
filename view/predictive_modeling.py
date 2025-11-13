@@ -52,7 +52,8 @@ class PredictiveModelingView:
         self.selectedMLmodel = None
         
     def models_click(self,change):     
-   
+
+        self.plt_btn.layout.visibility = 'hidden'
 
         for mdl in self.controller.get_trained_models():
             if self.trmodels.value == mdl.getName():
@@ -92,7 +93,7 @@ class PredictiveModelingView:
                     
                     if mdl.getTask() == "Classification":
 
-                        self.plt_btn.visible = 'hidden'
+                        self.plt_btn.layout.visibility = 'hidden'
                       
                         classes = [cls for cls in self.controller.main_model.getYtrain().to_frame()[self.controller.main_model.targetcolumn].unique()]
 
@@ -129,11 +130,11 @@ class PredictiveModelingView:
                         
                         if not mdl.istraindatachanged():
                             
-                            self.plt_btn.visible = 'visible'
+                            self.plt_btn.layout.visibility = 'visible'
                             self.plt_btn.disabled = False
         
                         else: 
-                            self.plt_btn.visible = 'hidden'
+                            self.plt_btn.layout.visibility = 'hidden'
 
                         
               
@@ -248,6 +249,9 @@ class PredictiveModelingView:
         self.progress.value+=" Set Model "+str(self.selectedmodel)+"\n"
    
 
+     
+        self.plt_btn.layout.visibility = 'hidden'
+       
 
         self.paramvalues.options = [self.mlmodelparams[self.selectedmodel][x] for x in self.mlmodels[self.selectedmodel].keys()] 
         self.parammenu.options = [x for x in self.mlmodels[self.selectedmodel].keys()] 
@@ -364,7 +368,8 @@ class PredictiveModelingView:
         self.plt_btn.layout.width = '200px'
         self.plt_btn.on_click(self.PlotGraph)
 
-        self.plt_btn.visible = 'hidden'
+        self.plt_btn.layout.visibility = 'hidden'
+        self.plt_btn.layout.display = 'none'
 
         t4_rslay = widgets.Layout(height='150x', width="99%")
         

@@ -230,14 +230,20 @@ class LearningManagerModel:
     def update_competence_vector(self, performance_score, current_competence_vector, task_difficulty, date):
         try:
             updated_competence_vector = {}
-            for skill,score in current_competence_vector.items():
+            for skill,skill_level in current_competence_vector.items():
                 if skill == "date":
                     updated_competence_vector["date"] = date
                 else:
-                    if score == 0:
+                    if skill_level == 0:
                         updated_competence_vector[skill] = performance_score[skill] * self.get_task_skill_difficulty(task_difficulty, skill)
                     else:
-                        updated_competence_vector[skill] = 0.5 * (score + performance_score[skill] * self.get_task_skill_difficulty(task_difficulty, skill))
+                        new_level = performance_score[skill] * self.get_task_skill_difficulty(task_difficulty, skill)
+                        if skill_level < new_level:
+                            updated_competence_vector[skill] = 0.5 * (skill_level + new_level)
+                        else:
+                            #weighted average
+                            updated_competence_vector[skill] =  (len(self.performances)*skill_level + new_level) / (len(self.performances)+1)
+                            
             self.controller.add_competence_vector(updated_competence_vector)
         except:
             None #updating competence vector failed

@@ -8,6 +8,7 @@ class LearningManagerModel:
     def __init__(self, controller):
         self.controller = controller
         self.performances = []
+        self.current_competence_vector = None
 
     def get_learning_path(self):
         return self.performances
@@ -243,7 +244,7 @@ class LearningManagerModel:
                         else:
                             #weighted average
                             updated_competence_vector[skill] =  (len(self.performances)*skill_level + new_level) / (len(self.performances)+1)
-                            
+            self.current_competence_vector = updated_competence_vector                
             self.controller.add_competence_vector(updated_competence_vector)
         except:
             None #updating competence vector failed
@@ -287,5 +288,6 @@ class LearningManagerModel:
                 task_difficulty = reference_task["difficulty"]
                 performance_score = self.calculate_performance_score(performance,reference_task)
                 self.update_competence_vector(performance_score, current_competence_vector, task_difficulty, performance.performance['General']['Date'][0])
+                current_competence_vector = self.current_competence_vector
 
 

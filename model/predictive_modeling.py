@@ -225,6 +225,12 @@ class PredictiveModelingModel:
             trmodels.options = [mdl.getName() for mdl in self.trainedModels]
             
         except Exception as e: 
+            if "can only concatenate str" in str(e):
+                self.controller.show_hint("Error: Can only concatenate str, probably a target needs to be selected.")
+            if "at least one array or dtype" in str(e):
+                self.controller.show_hint("Error: at least one array or dtype is required, probably the data needs to be split.")
+            if "could not convert" in str(e) and "to float" in str(e):
+                self.controller.show_hint("Error: could not convert ... to float, probably there are non numerical values in the dataset")
             write_log('Train Model-> exception raised \"'+str(e)+'\"',results,'Predictive modeling')
             write_log('Train Model-> unsuccessful trial',results,'Predictive modeling')
         

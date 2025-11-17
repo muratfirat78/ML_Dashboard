@@ -174,6 +174,9 @@ class TaskMenuView:
         #refresh display
         self.slider_change({"new":self.slider.value})
 
+    def show_hint_text(self, text):
+        self.hint_textarea.value = text
+
 
 
     def get_task_menu(self):

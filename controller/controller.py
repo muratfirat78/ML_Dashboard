@@ -1,6 +1,7 @@
 from datetime import datetime
 from model.convert_performance_to_task import ConvertPerformanceToTask
 from model.learning_manager import LearningManagerModel
+from model.step_explaination import StepExplainationModel
 from model.task import TaskModel
 from model.data_cleaning import DataCleaningModel
 from model.data_processing import DataProcessingModel
@@ -50,6 +51,7 @@ class Controller:
         self.learning_manager_model = LearningManagerModel(self)
         self.task_selection_model = TaskSelectionModel(self)
         self.task_selection_view = TaskSelectionView(self)
+        self.step_explaination_model = StepExplainationModel()
         self.learning_path = None
         self.convertPerformanceToTask = ConvertPerformanceToTask()
         self.task_finished = False
@@ -348,3 +350,13 @@ class Controller:
     
     def get_result_bar_chart(self,competence_vector, difficulty_data):
         return self.main_view.get_result_bar_chart(competence_vector, difficulty_data)
+    
+    def show_hint(self,hint_text):
+        if self.monitored_mode:
+            self.task_menu.show_hint_text(hint_text)
+
+    def show_step_explaination(self,step):
+        explaination_text = self.step_explaination_model.get_explaination(step)
+        self.show_hint(explaination_text)
+
+

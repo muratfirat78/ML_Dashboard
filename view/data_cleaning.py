@@ -178,6 +178,11 @@ class DataCleaningView:
         return
 
    
+    def missacts_changed(self,change):
+        if change['name'] == 'value':         
+            step = change['new']              
+            self.controller.show_step_explaination(step)
+
 
     def get_data_cleaning_tab(self):
         global trgcl_lbl,miss_lbl, result2aexp
@@ -194,6 +199,7 @@ class DataCleaningView:
 
 
         self.missacts = widgets.Select(description='',options=['Drop Column','Remove-Missing','Replace-Mean','Replace-Median','Replace-Mode'], disabled=False)
+        self.missacts.observe(self.missacts_changed, 'value')
         self.missacts.layout.width = '200px'
      
 

@@ -123,7 +123,6 @@ class DataProcessingView:
         return
 
     def selectProcessType(self,event):   
-
         self.methodslbl.layout.visibility = 'hidden'
         self.methodslbl.layout.display = 'none'
 
@@ -151,7 +150,7 @@ class DataProcessingView:
             
 
         selectedprocess = self.main_view.process_types.value
-
+        self.controller.show_step_explaination(selectedprocess)
         self.progress.value+="Select process type.."+selectedprocess+"\n"
 
 

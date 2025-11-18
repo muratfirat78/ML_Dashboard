@@ -132,6 +132,7 @@ class TaskMenuView:
                     status = "in progress"
                 elif status == "done":
                     color = "green"
+                    status = "done (press Next >>)"
                 elif status == "incorrect":
                     color = "red"
                 else:

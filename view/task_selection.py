@@ -12,21 +12,21 @@ class TaskSelectionView:
         self.vbox2 = None
         self.tab_set = None
         self.recommendations_only = False
-        self.guided_mode = True
+        self.guided_mode = False
 
         self.tasks_data = controller.get_tasks_data()
         
         self.filter_task_selection(None)
-
-        self.task_dropdown = widgets.Dropdown(
+        
+        self.task_dropdown = widgets.Select(
             options=list(self.task_map.keys()),
             description='Let me work on...',
             disabled=False
         )
-
-        self.mode_dropdown = widgets.Dropdown(
-            options=list(["train a machine learning model in a guided way","train a machine learning model myself"]),
-            description='I want to...',
+        self.mode_label = widgets.Label('I want to train a machine learning model...')
+        self.mode_dropdown = widgets.RadioButtons(
+            options=list(["myself","in a guided way"]),
+            # description='I want to train a machine learning model...',
             disabled=False
         )
         self.mode_dropdown.layout.width = '400px'
@@ -53,6 +53,8 @@ class TaskSelectionView:
         self.recommmended_radio_buttons.observe(self.filter_task_selection, names='value')
 
         self.recommmended_radio_buttons.disabled = True
+        self.recommmended_radio_buttons.layout.visibility = 'hidden'
+        self.recommmended_radio_buttons.layout.display = 'none'
 
 
         self.select_button = widgets.Button(
@@ -74,7 +76,7 @@ class TaskSelectionView:
 
         learning_path_view = self.controller.get_learning_path_view()
 
-        display_items = [self.mode_dropdown, self.recommmended_radio_buttons,self.task_dropdown,self.guided_mode_items, self.select_button]
+        display_items = [widgets.HBox([self.mode_label,self.mode_dropdown]),self.guided_mode_items, self.recommmended_radio_buttons,self.task_dropdown, self.select_button]
 
         if not self.controller.get_online_version():
             display_items += [self.start_developer_mode_button]
@@ -107,10 +109,10 @@ class TaskSelectionView:
             if change["new"] == "Show me all tasks":
                 self.recommendations_only = False
 
-            if change["new"] == "train a machine learning model in a guided way":
+            if change["new"] == "in a guided way":
                 self.guided_mode = True
 
-            if change["new"] == "train a machine learning model myself":
+            if change["new"] == "myself":
                 self.guided_mode = False
 
         filtered_tasks = self.controller.get_filtered_tasks(self.tasks_data,self.recommendations_only, self.guided_mode)
@@ -123,9 +125,9 @@ class TaskSelectionView:
             self.task_dropdown.options=list(self.task_map.keys())
 
     def start_task(self, event):
-        if self.mode_dropdown.value == "train a machine learning model myself":
+        if self.mode_dropdown.value == "myself":
             monitored_mode = True
-        elif self.mode_dropdown.value == "train a machine learning model in a guided way":
+        elif self.mode_dropdown.value == "in a guided way":
             monitored_mode = False
         selected_title = self.task_dropdown.value
         selected_task = self.task_map[selected_title]

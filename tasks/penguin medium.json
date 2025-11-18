@@ -168,14 +168,15 @@
                         [
                             "Random Forest",
                             105,
-                            "entropy"
+                            "entropy",
+                            4
                         ]
                     ],
                     "title": "Parameter Finetuning",
                     "description": "Optimize model performance by modifying the parameters of the model.",
                     "hints": [
                         "Go to the Predictive Modeling tab. Select the model type, adjust parameters if needed, then click train.",
-                        "Train the model using the following parameters: [['Random Forest', 105, 'entropy']]."
+                        "Train the model using the following parameters: [['Random Forest', 105, 'entropy', 4]]."
                     ],
                     "applied_values": [],
                     "order": 3

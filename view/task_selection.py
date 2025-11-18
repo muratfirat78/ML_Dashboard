@@ -17,13 +17,14 @@ class TaskSelectionView:
         self.tasks_data = controller.get_tasks_data()
         
         self.filter_task_selection(None)
-        
+        self.tasks_label = widgets.Label('Let me work on...')
         self.task_dropdown = widgets.Select(
             options=list(self.task_map.keys()),
-            description='Let me work on...',
+            # description='Let me work on...',
             disabled=False
         )
         self.mode_label = widgets.Label('I want to train a machine learning model...')
+
         self.mode_dropdown = widgets.RadioButtons(
             options=list(["myself","in a guided way"]),
             # description='I want to train a machine learning model...',
@@ -76,7 +77,7 @@ class TaskSelectionView:
 
         learning_path_view = self.controller.get_learning_path_view()
 
-        display_items = [widgets.HBox([self.mode_label,self.mode_dropdown]),self.guided_mode_items, self.recommmended_radio_buttons,self.task_dropdown, self.select_button]
+        display_items = [widgets.HBox([self.mode_label,self.mode_dropdown]),self.guided_mode_items, self.recommmended_radio_buttons,widgets.HBox([self.tasks_label,self.task_dropdown]), self.select_button]
 
         if not self.controller.get_online_version():
             display_items += [self.start_developer_mode_button]

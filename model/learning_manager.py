@@ -124,9 +124,9 @@ class LearningManagerModel:
         min_data_size_threshold = reference_task["data_size"] * 0.9
         max_data_size_threshold = reference_task["data_size"] * 1.1
 
-        # Data size smaller than the minimum or larger than the maximum data size
-        if data_size < min_data_size_threshold or data_size > max_data_size_threshold:
-            return False
+        # # Data size smaller than the minimum or larger than the maximum data size
+        # if data_size < min_data_size_threshold or data_size > max_data_size_threshold:
+        #     return False
         
         # Missing values
         missing_values= current_performance.get_metric("missing_values")
@@ -138,34 +138,34 @@ class LearningManagerModel:
         if d_type != reference_task["type"]:
             return False
 
-        # Range
-        range = current_performance.get_metric("range")
+        # # Range
+        # range = current_performance.get_metric("range")
         
-        try:
-            # check number range
-            min_max = range.split("-")
-            min_val = int(min_max[0])
-            max_val = int(min_max[1])
+        # try:
+        #     # check number range
+        #     min_max = range.split("-")
+        #     min_val = int(min_max[0])
+        #     max_val = int(min_max[1])
 
-            ref_range = reference_task["range"]
-            min_max_ref = ref_range.split("-")
-            ref_min = int(min_max_ref[0])
-            ref_max = int(min_max_ref[1])
+        #     ref_range = reference_task["range"]
+        #     min_max_ref = ref_range.split("-")
+        #     ref_min = int(min_max_ref[0])
+        #     ref_max = int(min_max_ref[1])
 
-            deviation_margin = 10
+        #     deviation_margin = 10
 
-            min_threshold = ref_min * (1 - (deviation_margin/100))
-            max_threshold = ref_max * (1 + (deviation_margin/100))
+        #     min_threshold = ref_min * (1 - (deviation_margin/100))
+        #     max_threshold = ref_max * (1 + (deviation_margin/100))
 
-            if min_val < min_threshold or min_val > max_threshold:
-                return False
+        #     if min_val < min_threshold or min_val > max_threshold:
+        #         return False
             
-            if max_val < min_threshold or max_val > max_threshold:
-                return False
-        except:
-            # If parsing fails, fall back to simple string comparison
-            if range != reference_task["range"]:
-                return False
+        #     if max_val < min_threshold or max_val > max_threshold:
+        #         return False
+        # except:
+        #     # If parsing fails, fall back to simple string comparison
+        #     if range != reference_task["range"]:
+        #         return False
             
         return True
     
@@ -287,7 +287,8 @@ class LearningManagerModel:
             if reference_task:       
                 task_difficulty = reference_task["difficulty"]
                 performance_score = self.calculate_performance_score(performance,reference_task)
-                self.update_competence_vector(performance_score, current_competence_vector, task_difficulty, performance.performance['General']['Date'][0])
-                current_competence_vector = self.current_competence_vector
+                if performance_score:
+                    self.update_competence_vector(performance_score, current_competence_vector, task_difficulty, performance.performance['General']['Date'][0])
+                    current_competence_vector = self.current_competence_vector
 
 

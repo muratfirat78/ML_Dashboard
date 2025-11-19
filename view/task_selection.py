@@ -11,7 +11,7 @@ class TaskSelectionView:
         self.vbox = None
         self.vbox2 = None
         self.tab_set = None
-        self.recommendations_only = False
+        self.recommendations_only = True
         self.guided_mode = False
 
         self.tasks_data = controller.get_tasks_data()

@@ -17,6 +17,7 @@ import seaborn as sns
 from sklearn.preprocessing import StandardScaler
 from imblearn.over_sampling import RandomOverSampler
 from imblearn.under_sampling import RandomUnderSampler
+from sklearn.impute import KNNImputer
 
 class DataProcessingModel:
     def __init__(self, main_model, logger):
@@ -181,7 +182,27 @@ class DataProcessingModel:
             ytrain_df = self.main_model.getYtrain()
             ytest_df = self.main_model.get_YTest().to_frame()
 
-            if methodtype == "IQR":
+
+            if methodtype == "Impute (KNN)":
+                if colname in Xtrain_df.columns:                          
+                    imputer = KNNImputer(n_neighbors=8)
+                    Xtrain_df[colname] = imputer.fit_transform(Xtrain_df[[colname]])
+                    Xtest_df[colname] = imputer.transform(Xtest_df[[colname]])
+
+                    self.main_model.set_XTest(Xtest_df)
+                    self.main_model.set_XTrain(Xtrain_df)
+                  
+                else:
+                    ytrain_df = ytrain_df.to_frame()
+                    if colname in ytrain_df.columns:   
+                        write_log('Outlier removal-target: (split): '+colname, result2exp, 'Data processing')
+
+                    imputer = KNNImputer(n_neighbors=8)
+                    ytrain_df[colname] = imputer.fit_transform(ytrain_df[[colname]])          
+                    self.main_model.set_YTrain(ytrain_df)
+           
+
+            if methodtype == "Remove (IQR)":
    
                 if colname in Xtrain_df.columns:                                                                     
     
@@ -224,7 +245,7 @@ class DataProcessingModel:
                         self.main_model.set_YTrain(ytrain_df.squeeze())
                         self.main_model.set_YTest(ytest_df.squeeze())
                         
-            if methodtype == "Z-scores":
+            if methodtype == "Remove (Z-scores)":
 
                 negthreshold = -3
                 posthreshold = 3
@@ -270,7 +291,16 @@ class DataProcessingModel:
             write_log('Outlier removal: (no split)-> '+': '+colname, result2exp, 'Data processing')
             curr_df = self.main_model.get_curr_df()
 
-            if methodtype == "IQR":
+            if methodtype == "Impute (KNN)":
+                       
+                imputer = KNNImputer(n_neighbors=8)
+                curr_df[colname] = imputer.fit_transform(curr_df[colname])
+                self.main_model.set_curr_df(curr_df)
+                   
+                  
+               
+
+            if methodtype == "Remove (IQR)":
                 
                 quantiles = curr_df[colname].quantile([0.25,0.5,0.75])
                 IQR = quantiles[0.75] - quantiles[0.25]
@@ -288,7 +318,7 @@ class DataProcessingModel:
 
             
 
-            if methodtype == "Z-scores":
+            if methodtype == "Remove (Z-scores)":
 
                 negthreshold = -3
                 posthreshold = 3

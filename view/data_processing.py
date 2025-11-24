@@ -262,7 +262,7 @@ class DataProcessingView:
         self.processmethods['Scaling'] = ['Standardize','Normalize']
         self.processmethods['Encoding'] = ['Label Encoding','One Hot Encoding','Ordinal Encoding']
         self.processmethods['Feature Extraction'] = ['PCA','Correlation']
-        self.processmethods['Outlier'] = ['IQR','Z-scores']
+        self.processmethods['Outlier'] = ['Remove (IQR)','Remove (Z-scores)','Impute (KNN)']
         self.processmethods['Imbalancedness'] = ['Upsample','DownSample']
 
         self.processvisuals = dict()

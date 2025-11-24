@@ -9,6 +9,7 @@ class LearningManagerModel:
         self.controller = controller
         self.performances = []
         self.current_competence_vector = None
+        self.dataset_performances = {}
 
     def get_learning_path(self):
         return self.performances
@@ -227,27 +228,31 @@ class LearningManagerModel:
         
         return None
 
+    def update_competence_vector(self, performance_score, current_competence_vector, task_difficulty, date, dataset):
+            try:
+                dataset_pred_score = self.dataset_performances.get(dataset,0)
+                if performance_score.get("Predictive Modeling",0) > dataset_pred_score:
+                    self.dataset_performances[dataset] = performance_score.get("Predictive Modeling")
+                    # predictive modeling score is better than the previous time this dataset was completed, update competence vector
 
-    def update_competence_vector(self, performance_score, current_competence_vector, task_difficulty, date):
-        try:
-            updated_competence_vector = {}
-            for skill,skill_level in current_competence_vector.items():
-                if skill == "date":
-                    updated_competence_vector["date"] = date
-                else:
-                    if skill_level == 0:
-                        updated_competence_vector[skill] = performance_score[skill] * self.get_task_skill_difficulty(task_difficulty, skill)
-                    else:
-                        new_level = performance_score[skill] * self.get_task_skill_difficulty(task_difficulty, skill)
-                        if skill_level < new_level:
-                            updated_competence_vector[skill] = 0.5 * (skill_level + new_level)
+                    updated_competence_vector = {}
+                    for skill,skill_level in current_competence_vector.items():
+                        if skill == "date":
+                            updated_competence_vector["date"] = date
                         else:
-                            #weighted average
-                            updated_competence_vector[skill] =  (len(self.performances)*skill_level + new_level) / (len(self.performances)+1)
-            self.current_competence_vector = updated_competence_vector                
-            self.controller.add_competence_vector(updated_competence_vector)
-        except:
-            None #updating competence vector failed
+                            if skill_level == 0:
+                                updated_competence_vector[skill] = performance_score[skill] * self.get_task_skill_difficulty(task_difficulty, skill)
+                            else:
+                                new_level = performance_score[skill] * self.get_task_skill_difficulty(task_difficulty, skill)
+                                if skill_level < new_level:
+                                    updated_competence_vector[skill] = 0.5 * (skill_level + new_level)
+                                else:
+                                    #weighted average
+                                    updated_competence_vector[skill] =  (max(5,len(self.performances))*skill_level + new_level) / (max(5,len(self.performances))+1)
+                    self.current_competence_vector = updated_competence_vector                
+                    self.controller.add_competence_vector(updated_competence_vector)
+            except:
+                None #updating competence vector failed
 
     def get_skills_from_tasks(self):
         skills = []
@@ -288,7 +293,7 @@ class LearningManagerModel:
                 task_difficulty = reference_task["difficulty"]
                 performance_score = self.calculate_performance_score(performance,reference_task)
                 if performance_score:
-                    self.update_competence_vector(performance_score, current_competence_vector, task_difficulty, performance.performance['General']['Date'][0])
+                    self.update_competence_vector(performance_score, current_competence_vector, task_difficulty, performance.performance['General']['Date'][0], dataset_name)
                     current_competence_vector = self.current_competence_vector
 
 

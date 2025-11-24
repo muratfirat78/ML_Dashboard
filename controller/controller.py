@@ -290,7 +290,8 @@ class Controller:
                 if performance_score != None:
                     current_competence_vector = self.learning_path_model.get_current_competence_vector()
                     reference_task_difficulty = reference_task['difficulty']
-                    competence_vector = self.update_competence_vector(performance_score, current_competence_vector,reference_task_difficulty, datetime.now())
+                    dataset = reference_task['dataset']
+                    competence_vector = self.update_competence_vector(performance_score, current_competence_vector,reference_task_difficulty, datetime.now(), dataset)
                     self.task_finished = True
                     self.task_menu.finished_task(performance_score)
                     self.learning_path_view.set_graph_data(self.get_graph_data())
@@ -342,8 +343,8 @@ class Controller:
     def calculate_performance_score(self, performance, reference_task):
         return self.learning_manager_model.calculate_performance_score(performance, reference_task)
     
-    def update_competence_vector(self, performance_score, current_competence_vector, task_difficulty,date):
-        return self.learning_manager_model.update_competence_vector( performance_score, current_competence_vector, task_difficulty,date)
+    def update_competence_vector(self, performance_score, current_competence_vector, task_difficulty,date,dataset):
+        return self.learning_manager_model.update_competence_vector( performance_score, current_competence_vector, task_difficulty,date,dataset)
     
     def set_developer_mode(self):
         self.developer_mode = True
@@ -359,4 +360,6 @@ class Controller:
         explaination_text = self.step_explaination_model.get_explaination(step)
         self.show_hint(explaination_text)
 
+    def get_dataset_performances(self):
+        return self.learning_manager_model.dataset_performances
 

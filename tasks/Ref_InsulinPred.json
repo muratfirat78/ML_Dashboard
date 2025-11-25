@@ -1,0 +1,323 @@
+{
+    "title": "Insulin dosage prediction",
+    "description": "Predict insulin tendency for deciding dosage",
+    "mode": "monitored",
+    "model_metric": [
+        "accuracy",
+        0.98
+    ],
+    "data_size": 7992,
+    "missing_values": 0,
+    "type": "object",
+    "range": "down-up",
+    "difficulty": [
+        [
+            "Data Cleaning",
+            90
+        ],
+        [
+            "Data Translation",
+            80
+        ],
+        [
+            "Data Transformation",
+            80
+        ],
+        [
+            "Statistics",
+            70
+        ],
+        [
+            "Model Training",
+            90
+        ],
+        [
+            "Predictive Modeling",
+            95
+        ]
+    ],
+    "dataset": "insulin_dosage_prediction_edt.csv",
+    "subtasks": [
+        {
+            "title": "Data Cleaning",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataCleaning",
+                        "Drop Column"
+                    ],
+                    "value": [
+                        "patient_id",
+                        "Unnamed: 0"
+                    ],
+                    "title": "Drop Columns",
+                    "description": "Remove columns that are irrelevant or redundant for the model.",
+                    "hints": [
+                        "Go to the Data Cleaning tab. Select the column(s), choose 'drop column', then click apply.",
+                        "Drop the following column(s): patient_id, Unnamed: 0."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataCleaning",
+                        "Replace-Mean"
+                    ],
+                    "value": [
+                        "weight"
+                    ],
+                    "title": "Replace Missing Values (Mean)",
+                    "description": "Replace missing values in columns using the mean.",
+                    "hints": [
+                        "Go to the Data Cleaning tab. Select the column, choose 'replace mean', then click apply.",
+                        "Apply replace mean to weight."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": 2
+        },
+        {
+            "title": "Data Translation",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "OneHotEncoding"
+                    ],
+                    "value": [
+                        "gender",
+                        "previous_medications",
+                        "family_history"
+                    ],
+                    "title": "One-Hot Encoding",
+                    "description": "Convert categorical columns into one-hot encoded vectors.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'encoding', choose 'One Hot Encoding', then click apply.",
+                        "Apply one-hot encoding to gender, previous_medications, family_history."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "LabelEncoding"
+                    ],
+                    "value": [
+                        "family_history_no",
+                        "family_history_yes"
+                    ],
+                    "title": "Label Encoding",
+                    "description": "Convert categorical columns into numeric codes.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'encoding', choose 'Label Encoding', then click apply.",
+                        "Apply label encoding to family_history_no, family_history_yes."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": 3
+        },
+        {
+            "title": "Model Training",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "AssignTarget"
+                    ],
+                    "value": [
+                        "Insulin"
+                    ],
+                    "title": "Assign Target Variable",
+                    "description": "Assign columns as the target variables for model training.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'Assign Target', then click apply.",
+                        "Assign 'Insulin' as the target column."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "Split"
+                    ],
+                    "value": [
+                        "20%"
+                    ],
+                    "title": "Train/Test Split",
+                    "description": "Split dataset into training and testing sets.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, assign the target, set the test ratio, then click split.",
+                        "Use a test ratio of 20% for splitting the dataset."
+                    ],
+                    "applied_values": [],
+                    "order": 2
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "ModelDevelopment",
+                        "ParameterFinetuning"
+                    ],
+                    "value": [
+                        [
+                            "KNN",
+                            8,
+                            "uniform",
+                            "euclidean"
+                        ]
+                    ],
+                    "title": "Parameter Finetuning",
+                    "description": "Optimize model performance by modifying the parameters of the model.",
+                    "hints": [
+                        "Go to the Predictive Modeling tab. Select the model type, adjust parameters if needed, then click train.",
+                        "Train the model using the following parameters: [['KNN', 8, 'uniform', 'euclidean']]."
+                    ],
+                    "applied_values": [],
+                    "order": 3
+                }
+            ],
+            "applied_values": [],
+            "order": 7
+        },
+        {
+            "title": "Statistics",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "PCA"
+                    ],
+                    "value": [
+                        [
+                            "HbA1c",
+                            "Rnd_score"
+                        ]
+                    ],
+                    "title": "Dimensionality Reduction (PCA)",
+                    "description": "Apply Principal Component Analysis to reduce dimensionality.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column(s), select 'feature extraction', choose 'PCA', then click 'Add PCA' and apply.",
+                        "Apply PCA to the following column(s): [['HbA1c', 'Rnd_score']]."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "outlier"
+                    ],
+                    "value": [
+                        "BMI",
+                        "BMI",
+                        "BMI"
+                    ],
+                    "title": "Handle Outliers",
+                    "description": "Detect and handle outliers in columns.",
+                    "hints": [
+                        "Go to the Data Processing tab. Select the column, choose 'outlier', then click apply.",
+                        "Handle outliers in BMI, BMI, BMI."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "Standardize"
+                    ],
+                    "value": [
+                        "sleep_hours",
+                        "weight",
+                        "age",
+                        "glucose_level"
+                    ],
+                    "title": "Standardize Columns",
+                    "description": "Standardize columns to have zero mean and unit variance.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'scaling' as process type, then choose 'standardize' as method, and click apply.",
+                        "Standardize the following column(s): sleep_hours, weight, age, glucose_level."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": 5
+        },
+        {
+            "title": "Predictive Modeling",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "ModelDevelopment",
+                        "ModelPerformance"
+                    ],
+                    "value": [
+                        [
+                            [
+                                "Accuracy",
+                                0.67
+                            ],
+                            [
+                                "Precision",
+                                0.6655
+                            ],
+                            [
+                                "Recall",
+                                0.6655
+                            ],
+                            [
+                                "data_size",
+                                7992
+                            ],
+                            [
+                                "missing_values",
+                                0
+                            ],
+                            [
+                                "type",
+                                "object"
+                            ],
+                            [
+                                "range",
+                                "down-up"
+                            ]
+                        ]
+                    ],
+                    "title": "Model Training",
+                    "description": "Train a model and evaluate its performance.",
+                    "hints": [],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": null
+        }
+    ]
+}

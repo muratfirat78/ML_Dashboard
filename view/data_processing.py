@@ -28,6 +28,7 @@ class DataProcessingView:
         self.nooutliers = None
         self.progress = None
         self.f_box = None
+        self.colsordered = False
 
         
         self.methodslbl = None
@@ -63,7 +64,8 @@ class DataProcessingView:
         mytext =str(colname)
         mytext2 = " -> "+str(display_df[colname].dtype)
         self.selcl.value = f'<span style="color:{color};"><b>{mytext}</b>{mytext2}</span>'
-      
+
+    
         
         with FeatPage:
             clear_output()
@@ -245,6 +247,7 @@ class DataProcessingView:
 
 
         self.ApplyButton.disabled = False
+        self.controller.data_processing_model.ReorderColumns()
         
         return
 

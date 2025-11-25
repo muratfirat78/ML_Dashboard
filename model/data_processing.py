@@ -791,3 +791,25 @@ class DataProcessingModel:
 
         
         version = 0
+
+    def ReorderColumns(self):
+
+        objects = []
+        if self.main_model.datasplit:
+            for col in self.controller.main_model.get_XTrain().columns:
+                objects.append((int(self.controller.main_model.get_XTrain()[col].dtype == 'object'),col))
+                
+            for col in self.controller.main_model.getYtrain().to_frame().columns: 
+                objects.append((int(self.controller.main_model.getYtrain().to_frame()[col].dtype == 'object'),col))
+
+        else:
+            curr_df = self.main_model.get_curr_df()
+            for col in curr_df.columns:
+                objects.append((int(curr_df[col].dtype == 'object'),col))
+            
+                
+        new_list = sorted(objects, key=lambda x: x[0], reverse=True)
+        self.main_view.dt_features.options = [col for (objtype,col) in new_list]
+        
+            
+        return

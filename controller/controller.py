@@ -112,6 +112,7 @@ class Controller:
     def assign_target(self,trg_lbl,dt_features,prdtsk_lbl,result2exp,predictiontask):
         self.predictiontask = self.data_processing_model.assign_target(trg_lbl,dt_features,prdtsk_lbl,result2exp) 
         self.predictive_modeling_view.tasklbl.value ='Prediction task: '+str(self.predictiontask)
+        
 
     def make_balanced(self,features2,balncetype,ProcssPage,result2exp):
         self.data_processing_model.make_balanced(features2,balncetype,ProcssPage,result2exp)

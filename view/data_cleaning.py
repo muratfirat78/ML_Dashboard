@@ -171,6 +171,8 @@ class DataCleaningView:
             plt.show()
                     
 
+           
+        #self.controller.data_processing_model.ReorderColumns()
         self.main_view.dt_features.options = [col for (miss,col) in new_list]
         self.main_view.featurescl.options = [col for (miss,col) in new_list]
 

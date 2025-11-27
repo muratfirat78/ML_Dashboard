@@ -247,7 +247,7 @@ class DataProcessingView:
 
 
         self.ApplyButton.disabled = False
-        self.controller.data_processing_model.ReorderColumns()
+        #self.controller.data_processing_model.ReorderColumns()
         
         return
 

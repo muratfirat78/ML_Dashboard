@@ -1,0 +1,317 @@
+{
+    "title": "Predict the cancellation of a booking",
+    "description": "Hotel reservations dataset of booking information.",
+    "mode": "monitored",
+    "model_metric": [
+        "accuracy",
+        0.90
+    ],
+    "data_size": 28979,
+    "missing_values": 0,
+    "type": "object",
+    "range": "Canceled-Not_Canceled",
+    "difficulty": [
+        [
+            "Data Cleaning",
+            70
+        ],
+        [
+            "Data Translation",
+            70
+        ],
+        [
+            "Data Transformation",
+            80
+        ],
+        [
+            "Statistics",
+            80
+        ],
+        [
+            "Model Training",
+            80
+        ],
+        [
+            "Predictive Modeling",
+            85
+        ]
+    ],
+    "dataset": "Hotel Reservations_dtst.csv",
+    "subtasks": [
+        {
+            "title": "Data Cleaning",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataCleaning",
+                        "Drop Column"
+                    ],
+                    "value": [
+                        "Unnamed: 0",
+                        "Booking_ID"
+                    ],
+                    "title": "Drop Columns",
+                    "description": "Remove columns that are irrelevant or redundant for the model.",
+                    "hints": [
+                        "Go to the Data Cleaning tab. Select the column(s), choose 'drop column', then click apply.",
+                        "Drop the following column(s): Unnamed: 0, Booking_ID."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataCleaning",
+                        "Replace-Mode"
+                    ],
+                    "value": [
+                        "type_of_meal_plan"
+                    ],
+                    "title": "Replace Missing Values (Mode)",
+                    "description": "Replace missing values in columns using the most frequent value (mode).",
+                    "hints": [
+                        "Go to the Data Cleaning tab. Select the column, choose 'replace mode', then click apply.",
+                        "Apply replace mode to type_of_meal_plan."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataCleaning",
+                        "Replace-Median"
+                    ],
+                    "value": [
+                        "no_of_previous_cancellations"
+                    ],
+                    "title": "Replace Missing Values (Median)",
+                    "description": "Replace missing values in columns using the median.",
+                    "hints": [
+                        "Go to the Data Cleaning tab. Select the column, choose 'replace median', then click apply.",
+                        "Apply replace median to no_of_previous_cancellations."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": 2
+        },
+        {
+            "title": "Data Translation",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "LabelEncoding"
+                    ],
+                    "value": [
+                        "type_of_meal_plan",
+                        "room_type_reserved"
+                    ],
+                    "title": "Label Encoding",
+                    "description": "Convert categorical columns into numeric codes.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'encoding', choose 'Label Encoding', then click apply.",
+                        "Apply label encoding to type_of_meal_plan, room_type_reserved."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "OneHotEncoding"
+                    ],
+                    "value": [
+                        "market_segment_type"
+                    ],
+                    "title": "One-Hot Encoding",
+                    "description": "Convert categorical columns into one-hot encoded vectors.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'encoding', choose 'One Hot Encoding', then click apply.",
+                        "Apply one-hot encoding to market_segment_type."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": 3
+        },
+        {
+            "title": "Model Training",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "AssignTarget"
+                    ],
+                    "value": [
+                        "booking_status"
+                    ],
+                    "title": "Assign Target Variable",
+                    "description": "Assign columns as the target variables for model training.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'Assign Target', then click apply.",
+                        "Assign 'booking_status' as the target column."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "Split"
+                    ],
+                    "value": [
+                        "20%"
+                    ],
+                    "title": "Train/Test Split",
+                    "description": "Split dataset into training and testing sets.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, assign the target, set the test ratio, then click split.",
+                        "Use a test ratio of 20% for splitting the dataset."
+                    ],
+                    "applied_values": [],
+                    "order": 2
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "ModelDevelopment",
+                        "ParameterFinetuning"
+                    ],
+                    "value": [
+                        [
+                            "KNN",
+                            8,
+                            "uniform",
+                            "euclidean"
+                        ]
+                    ],
+                    "title": "Parameter Finetuning",
+                    "description": "Optimize model performance by modifying the parameters of the model.",
+                    "hints": [
+                        "Go to the Predictive Modeling tab. Select the model type, adjust parameters if needed, then click train.",
+                        "Train the model using the following parameters: [['KNN', 8, 'uniform', 'euclidean']]."
+                    ],
+                    "applied_values": [],
+                    "order": 3
+                }
+            ],
+            "applied_values": [],
+            "order": 7
+        },
+        {
+            "title": "Statistics",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "PCA"
+                    ],
+                    "value": [
+                        [
+                            "family_size",
+                            "no_of_adults"
+                        ]
+                    ],
+                    "title": "Dimensionality Reduction (PCA)",
+                    "description": "Apply Principal Component Analysis to reduce dimensionality.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column(s), select 'feature extraction', choose 'PCA', then click 'Add PCA' and apply.",
+                        "Apply PCA to the following column(s): [['family_size', 'no_of_adults']]."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "outlier"
+                    ],
+                    "value": [
+                        "required_car_parking_space",
+                        "required_car_parking_space"
+                    ],
+                    "title": "Handle Outliers",
+                    "description": "Detect and handle outliers in columns.",
+                    "hints": [
+                        "Go to the Data Processing tab. Select the column, choose 'outlier', then click apply.",
+                        "Handle outliers in required_car_parking_space, required_car_parking_space."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": 5
+        },
+        {
+            "title": "Predictive Modeling",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "ModelDevelopment",
+                        "ModelPerformance"
+                    ],
+                    "value": [
+                        [
+                            [
+                                "Accuracy",
+                                0.8
+                            ],
+                            [
+                                "Precision",
+                                0.8016540317022743
+                            ],
+                            [
+                                "Recall",
+                                0.8016540317022743
+                            ],
+                            [
+                                "data_size",
+                                28979
+                            ],
+                            [
+                                "missing_values",
+                                0
+                            ],
+                            [
+                                "type",
+                                "object"
+                            ],
+                            [
+                                "range",
+                                "Canceled-Not_Canceled"
+                            ]
+                        ]
+                    ],
+                    "title": "Model Training",
+                    "description": "Train a model and evaluate its performance.",
+                    "hints": [],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": null
+        }
+    ]
+}

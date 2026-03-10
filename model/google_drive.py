@@ -40,26 +40,26 @@ class GoogleDrive:
         while done is False:
             status, done = downloader.next_chunk()
 
-        def get_performances(self,userid):
-            folderid = self.get_folder(userid)
-            query = f"'{folderid}' in parents and trashed=false"
-            results = self.drive_service.files().list(q=query, fields="files(id, name)").execute()
-            files = results.get('files', [])
+    def get_performances(self,userid):
+        folderid = self.get_folder(userid)
+        query = f"'{folderid}' in parents and trashed=false"
+        results = self.drive_service.files().list(q=query, fields="files(id, name)").execute()
+        files = results.get('files', [])
+        
+        if not os.path.exists('/content/ML_Dashboard/drive/' + str(userid)):
+            os.makedirs('/content/ML_Dashboard/drive/' + str(userid))
             
-            if not os.path.exists('/content/ML_Dashboard/drive/' + str(userid)):
-                os.makedirs('/content/ML_Dashboard/drive/' + str(userid))
-                
-            for file in files:
-                if not os.path.exists('./drive/' + userid + '/' + file['name']):
-                    self.download(file['id'], file['name'], userid)
+        for file in files:
+            if not os.path.exists('./drive/' + userid + '/' + file['name']):
+                self.download(file['id'], file['name'], userid)
 
-        def login_correct(self,userid):
-            query = f"name='{userid}' and '{self.folderid}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false"
-            results = self.drive_service.files().list(q=query, fields="files(id)").execute()
-            if len(results['files']) > 0:
-                return True
-            else:
-                return False
+    def login_correct(self,userid):
+        query = f"name='{userid}' and '{self.folderid}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false"
+        results = self.drive_service.files().list(q=query, fields="files(id)").execute()
+        if len(results['files']) > 0:
+            return True
+        else:
+            return False
 
     def register(self):
         if self.userid !=None:

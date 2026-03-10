@@ -24,8 +24,6 @@ class DataSelectionView:
         self.spacelbl = None
         self.statlbl = None
 
-
-    
     def fileClick(self, event):
         global wslay,wsheets,butlay
 
@@ -35,7 +33,6 @@ class DataSelectionView:
         wsheets.layout = wslay
             
         butlay.display = 'block'
-
         return
 
     def read_dataset(self,b):  
@@ -54,7 +51,6 @@ class DataSelectionView:
         self.main_view.ftlaycl.width = featurelist_width
         self.main_view.featurescl.layout = self.main_view.ftlaycl
 
-
         missings = []
         for col in self.controller.get_curr_df().columns:
             missings.append((self.controller.get_curr_df()[col].isnull().sum(),col))
@@ -65,7 +61,6 @@ class DataSelectionView:
         self.main_view.featurescl.options = [col for (miss,col) in new_list]
 
         df = df[[col for (miss,col) in new_list]]
-        
 
         self.main_view.right_page.layout.display = 'block'
         self.main_view.right_page.layout.visibility = 'visible'
@@ -83,9 +78,7 @@ class DataSelectionView:
             g = sns.barplot(x='feature', y='missing values', data=missing_df)
             g.set_xticklabels(g.get_xticklabels(),rotation= 45)
             plt.title('Total Missing Values: '+str(totalmisses))
-            plt.show()
-
-                
+            plt.show()                
         
         self.main_view.process_types.value = self.main_view.process_types.options[0]
 
@@ -96,22 +89,13 @@ class DataSelectionView:
         
         with self.DFPage:
             clear_output()
-            #####################################
             display.display(df.info())            
-            #####################################
         with self.HeadPage:
             clear_output()
-            #####################################
             display.display(df.describe()) 
             display.display(df) 
-            #####################################
-
-
-       
         nrlines = 0
-
         self.InfoPage.value = ''
-        
 
         infotxt = str(info)
         self.InfoPage.value=infotxt
@@ -125,15 +109,12 @@ class DataSelectionView:
         return
 
     def settaskmenu(self,monitormode):
-  
         if not monitormode:
             self.task_menu.layout.display = 'block'
             self.task_menu.layout.visibility  = 'visible'
-    
         else:
             self.task_menu.layout.visibility  = 'hidden'
             self.task_menu.layout.display = 'none'
-        
         return
 
     def get_data_selection_tab(self):
@@ -144,9 +125,6 @@ class DataSelectionView:
 
         self.datafolder=widgets.Text(description ='Folder name:',value = 'DataSets')
         self.main_view.datasets = widgets.Dropdown(options=[], description='DataSets:',layout = Layout(width='50%'))
-        # if not self.controller.developer_mode:
-        #      self.datafolder.disabled = True
-        #      self.main_view.datasets.disabled = True
 
         butlay = Layout(width='75px')
         butlay.display = 'none'
@@ -156,26 +134,17 @@ class DataSelectionView:
         self.main_view.datasets.observe(self.fileClick,'value')
         self.readfile.on_click(self.read_dataset)
 
-
-
-       
-       
-
         self.infolbl = widgets.HTML("")
         color = "gray"
         mytext ="Dataset Information"
         
         self.infolbl.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
        
-
-
         filelay =  widgets.Layout(height = '60px',width='99%')
-      
 
         self.DFPage = widgets.Output(layout=Layout(width='50%',height='150px',align_items='center',overflow="visible"))
         self.HeadPage = widgets.Output(layout=Layout(width='99%',height='200px',align_items='center',overflow="visible"))
         self.InfoPage = widgets.Textarea(layout=Layout(width='500px',height='150px',align_items='center',overflow="visible", visibility="hidden"))
-
 
         self.infotext = widgets.HTML("")
         color = "gray"
@@ -184,11 +153,9 @@ class DataSelectionView:
         self.infolbl.layout.width = '50%'
         self.infotext.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
 
-
         self.statlbl =  widgets.HTML("")
         color = "gray"
         mytext ="Statistical Summary"
-
     
         self.statlbl.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
 

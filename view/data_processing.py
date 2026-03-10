@@ -29,7 +29,6 @@ class DataProcessingView:
         self.progress = None
         self.f_box = None
         self.colsordered = False
-
         
         self.methodslbl = None
         self.processmethods = dict()
@@ -39,11 +38,8 @@ class DataProcessingView:
 
     def featureprclick(self,features2,FeatPage,processtypes,ProcssPage):  
         colname = features2.value
-
         display_df = self.controller.get_curr_df()
 
-
-        
         if self.controller.main_model.datasplit:
             if colname in self.controller.get_XTrain().columns: 
                 display_df = self.controller.get_XTrain()
@@ -54,24 +50,17 @@ class DataProcessingView:
                 else: 
                     return
 
-
         if not colname in display_df.columns:
             return
-
-
 
         color = "gray"
         mytext =str(colname)
         mytext2 = " -> "+str(display_df[colname].dtype)
         self.selcl.value = f'<span style="color:{color};"><b>{mytext}</b>{mytext2}</span>'
 
-    
-        
         with FeatPage:
             clear_output()
-
             if (display_df[colname].dtype == 'float64') or (display_df[colname].dtype == 'int64') or (display_df[colname].dtype == 'int32'):
-
                 fig, (axbox, axhist) = plt.subplots(1,2)
 
                 sns.boxplot(x=colname,data=display_df, ax=axbox)
@@ -86,11 +75,9 @@ class DataProcessingView:
                     title+=' (train)'
                 axhist.set_title(title) 
                 plt.legend(['Mean '+str(round(display_df[colname].mean(),2)),'Stdev '+str(round(display_df[colname].std(),2))], bbox_to_anchor=(0.6, 0.6))
-
                 plt.show()
         
-            if (display_df[colname].dtype == 'object') or (display_df[colname].dtype== 'string') or (display_df[colname].dtype== 'bool')  :
-                
+            if (display_df[colname].dtype == 'object') or (display_df[colname].dtype== 'string') or (display_df[colname].dtype== 'bool'):
                 nrclasses = len(display_df[colname].unique())
                 if nrclasses < 250:
                     g = sns.countplot(display_df, x=colname)
@@ -99,29 +86,18 @@ class DataProcessingView:
                 else:
                     display.display('Number of classes: ',nrclasses)
 
-        
         with ProcssPage:
             clear_output()            
-        
-
         return
     
     def savecurrdata(self,event):
         self.controller.savedata(self.controller.get_datafolder(), self.main_view.datasets.value)
 
     def makebalanced(self,event):  
-      
-        
-        
         return
-
-
-   
+    
     def featurepr_click(self,event):  
-        
         self.featureprclick(self.main_view.dt_features,self.main_view.feat_page,self.main_view.process_types,self.main_view.process_page)
-
-        
         return
 
     def selectProcessType(self,event):   
@@ -133,8 +109,6 @@ class DataProcessingView:
 
         self.ApplyButton.layout.display = 'block'
         self.ApplyButton.layout.visibility = 'visible'
-
-       
 
         self.progress.value+="In select process type.."+"\n"
 
@@ -148,16 +122,13 @@ class DataProcessingView:
                 for methodname,methoditems in myitem.items():
                     for methoditem in methoditems:
                         methoditem.layout.visibility = 'hidden'
-                        methoditem.layout.display = 'none'  
-            
+                        methoditem.layout.display = 'none'   
 
         selectedprocess = self.main_view.process_types.value
         self.controller.show_step_explaination(selectedprocess)
         self.progress.value+="Select process type.."+selectedprocess+"\n"
 
-
         if selectedprocess in self.processmethods:
-            
             self.methodsmenu.options = [x for x in self.processmethods[selectedprocess]]
             self.methodsmenu.value = self.methodsmenu.options[0]
 
@@ -171,16 +142,13 @@ class DataProcessingView:
                 for visitem in self.processvisuals[selectedprocess]:
                     visitem.layout.display = 'block'
                     visitem.layout.visibility = 'visible'
-          
         return
 
 
 
     def ApplyMethod(self,event):  
-
         global predictiontask
         refreshFeatures = True
-
         self.ApplyButton.disabled = True
 
         with self.main_view.vis_page:
@@ -190,7 +158,6 @@ class DataProcessingView:
 
         for model in self.controller.get_trained_models():
             model.settraindatachanged()
-        
 
         if self.main_view.process_types.value == "Data Split":
             if not self.controller.main_model.datasplit: 
@@ -208,7 +175,6 @@ class DataProcessingView:
             else:
                 self.progress.value+="> Target is already assigned... "+"\n"   
                 
-           
         if self.main_view.process_types.value == "Scaling":
             self.controller.make_scaling(self.main_view.dt_features,self.main_view.process_page,processtype,self.progress)
         if self.main_view.process_types.value == "Encoding":
@@ -244,21 +210,14 @@ class DataProcessingView:
             self.main_view.dt_features.options = [x for x in opts]
             self.main_view.featurescl.options  = [x for x in opts] 
             self.featureprclick(self.main_view.dt_features,self.main_view.feat_page,self.main_view.process_types,self.main_view.process_page)
-
-
         self.ApplyButton.disabled = False
-
         return
 
    
 
     def get_data_processing_tab(self):
-     
-
         self.main_view.feat_page = widgets.Output()
-     
         self.main_view.process_page = widgets.Output()
-
     
         self.processmethods = dict()
         self.processmethods['Scaling'] = ['Standardize','Normalize']
@@ -269,7 +228,6 @@ class DataProcessingView:
 
         self.processvisuals = dict()
        
-
         processmethods = [ x for x in self.processmethods.keys()]
         processmethods.insert(2,'Convert Feature 0/1->Bool')
         processmethods.insert(3,'Assign Target')
@@ -280,28 +238,19 @@ class DataProcessingView:
         self.main_view.process_types.layout.width = '200px'
         self.main_view.process_types.layout.height = '150px'
 
-    
-        
-
-       
-
-        
         self.ApplyButton = widgets.Button(description="Apply",layout=widgets.Layout(width='60px'))
         self.ApplyButton.on_click(self.ApplyMethod)
 
         self.ApplyButton.layout.width =  self.main_view.process_types.layout.width 
 
-     
         self.main_view.trg_lbl = widgets.Label(value ='Target: -',disabled = True)
         self.main_view.prdtsk_lbl =widgets.Label(value = ' | Prediction Task: - ',disabled = True)
-       
-
+    
         self.processvisuals['Assign Target'] = [self.main_view.trg_lbl,self.main_view.prdtsk_lbl]
 
         self.splt_txt =widgets.Dropdown(description ='Test Ratio(%): ',options=[20,25,30,35])
        
         self.processvisuals['Data Split'] = [self.splt_txt]
-
 
         self.main_view.vis_page = widgets.Output()
 
@@ -336,7 +285,6 @@ class DataProcessingView:
         self.processvisuals['Encoding'] = dict()
         self.processvisuals['Encoding']['Ordinal Encoding'] =[self.ordinalenconding,self.ord_btn,self.ord_btn2]
 
-
         self.main_view.dt_ftslay =  widgets.Layout( width="99%",display = 'block')
         self.main_view.dt_features = widgets.Select(options=[],description = '',layout = self.main_view.dt_ftslay)
         self.main_view.dt_features.observe(self.featurepr_click, 'value')
@@ -346,7 +294,6 @@ class DataProcessingView:
         mytext ="Process types"
         self.proctitle.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
 
-    
         self.methodslbl = widgets.Label(value ='Methods')
 
         self.methodsmenu = widgets.Dropdown( options=[], description='', disabled=False)
@@ -355,18 +302,12 @@ class DataProcessingView:
         
         self.selcl = widgets.HTML("", layout=widgets.Layout(height="20px", width="99%", text_align="center"))
         
-    
         self.nooutliers = widgets.Label(value ='Outliers: ',layout = widgets.Layout(width="25%",visibility = 'hidden'))
         self.thrshlds = widgets.Label(value ='Thresholds: ',layout = widgets.Layout(width="25%",visibility = 'hidden'))
-
-       
-
-       
 
         self.splt_txt.layout.visibility = 'hidden'
         self.splt_txt.layout.display = 'none'
     
-
         self.main_view.trg_lbl.layout.visibility = 'hidden'
         self.main_view.trg_lbl.layout.display = 'none'
         
@@ -379,10 +320,6 @@ class DataProcessingView:
        
         self.methodslbl.layout.visibility = 'hidden'
         self.methodslbl.layout.display = 'none'
-
-
-      
-
        
         sel_box = VBox(children=[self.selcl,
                                   widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"})),
@@ -396,8 +333,6 @@ class DataProcessingView:
                                  HBox(children=[VBox(children=[self.ord_btn,self.ord_btn2]),self.ordinalenconding])
                                 ])
 
-
-     
         self.feattitle = widgets.HTML("Features", layout=widgets.Layout(height="30px", text_align="center"))
         color = "gray"
         mytext ="Features"
@@ -405,22 +340,18 @@ class DataProcessingView:
         self.feattitle.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
         
         self.f_box = VBox(children=[self.feattitle,HBox(children=[self.main_view.dt_features])])
-       
 
         res2lay = widgets.Layout(height='150px',width='99%')
         
         self.progress = widgets.Textarea(value='', placeholder='',description='',disabled=True,layout = res2lay)
 
-
         vbox1 = VBox(children = [HBox(children=[self.f_box,sel_box]),self.progress])
         vbox2 = VBox(children = [self.main_view.feat_page,self.main_view.process_page])
-
         
         tab_3 = VBox([self.task_menu,HBox([vbox1,vbox2])])
         return tab_3
 
     def MethodView(self,event):
-
         selectedprocess = self.main_view.process_types.value
         selectedmethod = self.methodsmenu.value
 
@@ -432,13 +363,11 @@ class DataProcessingView:
                     for methoditem in methoditems:
                         methoditem.layout.visibility = 'hidden'
                         methoditem.layout.display = 'none'  
-
        
         if selectedprocess in self.processvisuals:
             self.progress.value+="> in visuals... "+"\n" 
             if isinstance(self.processvisuals[selectedprocess], dict):
                 self.progress.value+="> dict... "+selectedprocess+"\n" 
-
                 self.progress.value+=str(self.processvisuals[selectedprocess].keys())+"\n" 
                 if selectedmethod in self.processvisuals[selectedprocess]:
                     self.progress.value+="> in second list... "+"\n" 
@@ -446,36 +375,26 @@ class DataProcessingView:
                         self.progress.value+="> item "+str(type(methoditem))+"\n" 
                         methoditem.layout.display = 'block'  
                         methoditem.layout.visibility = 'visible'
-    
-    
         return
 
-        
     def AddftPCA(self,event):
-
         ftname = self.main_view.dt_features.value
 
         if not ftname in self.pcaselect.options:
             newosp = [op for op in self.pcaselect.options]
             newosp.append(ftname)
             self.pcaselect.options = newosp
-            
-
         return
 
     def SelectOrdFeature(self,event):
-
         ftname = self.main_view.dt_features.value
-
         data_df = self.controller.get_curr_df()
 
         # add checking if this is a categorical feature type
         self.ordinalenconding.options= [val for val in data_df[ftname].unique()]
-
         return
 
     def OrdinalMoveup(self,event):
-
         classname = self.ordinalenconding.value
         allclasses = [cls for cls in self.ordinalenconding.options]
 
@@ -485,8 +404,6 @@ class DataProcessingView:
             allclasses.remove(classname)
             allclasses.insert(classind-1,classname)
             self.ordinalenconding.options= [val for val in allclasses]
-     
-
         return
 
 

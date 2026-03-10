@@ -225,8 +225,6 @@ class LearningManagerModel:
                 return competence_vector
 
         except Exception as e:
-            # print("error:")
-            # print(e)
             return None
 
     def get_task_skill_difficulty(self, task_difficulty, skill):
@@ -360,90 +358,21 @@ class LearningManagerModel:
             next_competence_vector["competence_vector"].pop("date", None)
             amount_of_skills = len(previous_competence_vector["competence_vector"])
             next_task = self.controller.get_reference_task_using_dataset(next_competence_vector["dataset"])
-            print("previous competence_vector:")
-            print(previous_competence_vector["competence_vector"])
-            print("next competence_vector:")
-            print(next_competence_vector["competence_vector"])
-            print("task difficulty:")
-            print(next_task["difficulty"])
-            print("----")
+
             #calculate max_jump
             max_jump = 0
             for skill,task_skill_difficulty in next_task["difficulty"]:
                 if skill == "Predictive Modeling":
-                    print("max jump = "+ str(task_skill_difficulty) + "- " + str(previous_competence_vector["competence_vector"][skill]) )
                     max_jump += task_skill_difficulty - previous_competence_vector["competence_vector"][skill] 
-            print(str(max_jump))
-            print("max_jump: " + str(max_jump))
 
-            #calculate std_jump
             std_jump = 0
             for skill, skill_level in next_competence_vector["competence_vector"].items():
                 if skill == "Predictive Modeling":
                     std_jump += skill_level - previous_competence_vector["competence_vector"][skill]
-        
-            print("std_jump: " + str(std_jump))
 
             learning_rate = max(0,std_jump)/max_jump
-            print("learning rate " + str(learning_rate))
-            print("----")
-
             self.learning_rate = learning_rate
             previous_competence_vector = next_competence_vector
-        #    else:
-        #        previous_competence_vector = next_competence_vector
-        #        continue
-
-
-        
-    #    competence_vectors = self.controller.get_competence_vectors()
-    #    print(competence_vectors)
-    #    second_to_last_competence_vector = competence_vectors[:-2]
-    #    last_competence_vector = competence_vectors[:-1]
-
-       
-
-
-
-    #    print(self.competence_sequence)
-
-
-
-    #    performances = [
-    #         entry["performance"] 
-    #         for entry in sorted(
-    #             self.competence_sequence.values(), 
-    #             key=lambda x: x["date"]
-    #         )
-    #     ]
-       
-    #    for index, performance in enumerate(performances):
-    #        current_task = self.controller.convert_performance_to_task(performance, "", "")
-    #        target_column = self.controller.get_target_task(current_task)
-    #        dataset_name = current_task["dataset"].replace(".csv", "")
-    #        score = self.competence_sequence[dataset_name]["score"]
-    #        reference_task = self.controller.get_reference_task(target_column, dataset_name)
-    #        if reference_task:
-    #            dataset_pd = self.read_file(reference_task["dataset"])
-
-    #            if reference_task["model_metric"][0] == "MSE":
-    #                train_col, test_col = train_test_split(
-    #                     dataset_pd[target_column],
-    #                     test_size=0.2,
-    #                     random_state=42  # for reproducibility
-    #                 )
-    #                minimum_score = test_col.var()
-    #            if reference_task["model_metric"][0] == "accuracy":
-    #                number_of_classes = dataset_pd[target_column].nunique()
-    #                minimum_score =  1/number_of_classes
-
-            #    print(competence_vectors[-1]["Predictive Modeling"])
-            #    print("-----------")
-            #    print("max score: 1")
-            #    print("min score: " + str(minimum_score))
-            #    print("score: " + str(score))
-            #    print("learning rate: " + str((score - minimum_score)/(1-minimum_score)*100))
-            #    print("-----------")
         
     def get_learning_rate(self):
         return self.learning_rate

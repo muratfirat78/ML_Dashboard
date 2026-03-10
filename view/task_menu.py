@@ -8,7 +8,6 @@ class TaskMenuView:
         
         self.slider.style.handle_color = 'lightblue'
         self.slider.observe(self.slider_change)
-        #self.slider_box = widgets.HBox([self.slider], layout=widgets.Layout(justify_content="center"))
         self.previous_button = widgets.Button(description='<< Previous', button_style="primary")
         self.previous_button.on_click(self.previous_button_click)
         self.next_button = widgets.Button(description="Next >>", button_style="primary")
@@ -50,12 +49,7 @@ class TaskMenuView:
 
         self.subsubtask_textarea = widgets.Textarea(description="Tasks", disabled=True, layout=widgets.Layout(width="99%"),style={'background': "#C7EFFF"})
         self.hint_textarea = widgets.Textarea(disabled=True,description="Hints",style={'background': '#C7EFFF'})
-
-        
-        
         self.subsubtask_box = widgets.VBox([self.subsubtask_textarea,self.hint_textarea], layout=widgets.Layout(width="99%",height="110px"))
-        #self.hints_box = widgets.HBox([self.hint_textarea], layout=widgets.Layout(width="99%"))
-        #self.separator = widgets.Box(layout=widgets.Layout(border='solid 1px lightgray', width='95%', height='1px', margin='5px 0px'))
         self.task_list = []
         self.ui = widgets.VBox([
             self.slider, 
@@ -79,7 +73,6 @@ class TaskMenuView:
             return
         
         change_new = change["new"]
-        #sometimes change is a dict and sometimes a int?
         if isinstance(change_new, dict):
             id = change_new.get("value", None)
         else:
@@ -93,7 +86,6 @@ class TaskMenuView:
                 if self.mode == "monitored":
                     difficulty_data = dict(self.current_task["difficulty"])
                     competence_vector = self.competence_vector or {}
-
                     formatted = [f"{skill}: {round(competence_vector.get(skill,0)*100)}/100" 
                                 for skill, diff in difficulty_data.items()]
 
@@ -107,22 +99,15 @@ class TaskMenuView:
                     self.subsubtask_textarea.value = "Task completed 🎉"
 
             else:
-          
                 self.hint_textarea.layout.width = self.subsubtask_textarea.layout.width 
-                
                 category = self.task_list[id]["category"]
                 title = self.task_list[id]["title"]
                 description = self.task_list[id]["description"]
 
-                
                 if self.mode != "monitored": 
                     textarea_value = category + ": " + title + "\n" + "Description: " + description
 
-
-
                 status = self.task_list[id]["status"]
-
-                    
                 if status == "todo":
                     color = "black"
                 elif status == "ready":
@@ -150,7 +135,6 @@ class TaskMenuView:
                     self.hint_textarea.value = hints
 
     def setmonitoring(self,monitormode):
-  
         if monitormode:
             self.subsubtask_textarea.layout.visibility  = 'hidden'
             self.subsubtask_textarea.layout.display = 'none'
@@ -163,8 +147,6 @@ class TaskMenuView:
             self.hint_textarea.layout.display = 'block'
             self.hint_textarea.layout.width = "99%"
             self.hint_textarea.layout.visibility  = 'visible'
-
-       
         return
 
     
@@ -177,8 +159,6 @@ class TaskMenuView:
 
     def show_hint_text(self, text):
         self.hint_textarea.value = text
-
-
 
     def get_task_menu(self):
         return self.ui
@@ -232,9 +212,6 @@ class TaskMenuView:
             self.ui.layout=widgets.Layout(height="150px")
             self.button_box.layout.display = 'none'
             self.subsubtask_textarea.layout.display = 'none'
-            #self.button_box.layout=widgets.Layout(grid_template_columns="50% 50%",   justify_items="center",                width="100%",height="50px")
-            #self.subsubtask_textarea.layout=widgets.Layout(width="100%",height="55px")
-        
         self.mode = mode
 
 

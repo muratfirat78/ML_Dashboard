@@ -23,19 +23,15 @@ class DataCleaningView:
         
 
     def featureclclick(self,trgcl_lbl,featurescl,miss_lbl):  
-        #settings.curr_df,trgcl_lbl,featurescl,miss_lbl
         colname = featurescl.value
-
         missng_vals = 0
         totalmisses  = 0
-
         display_df = self.controller.get_curr_df()
 
         for col in display_df.columns:
             curr_miss = display_df[col].isnull().sum()  
             totalmisses+=curr_miss
         missng_vals = display_df[colname].isnull().sum()
-
 
         if self.controller.main_model.datasplit:
             totalmisses  = 0
@@ -54,7 +50,6 @@ class DataCleaningView:
             for col in self.controller.main_model.get_YTest().to_frame().columns:
                 totalmisses+= self.controller.main_model.get_YTest().to_frame()[col].isnull().sum()  
 
-            
             if colname in self.controller.get_XTrain().columns: 
                 display_df = self.controller.main_model.get_XTrain()
                 missng_vals = display_df[colname].isnull().sum()
@@ -67,39 +62,25 @@ class DataCleaningView:
                     missng_vals+= self.controller.main_model.get_YTest().to_frame()[colname].isnull().sum()  
                 else: 
                     return
-        
-        
- 
-     
+
         color = "gray"
         mytext =str(colname)
         mytext2 = " -> "+str(display_df[colname].dtype)
         trgcl_lbl.value = f'<span style="color:{color};"><b>{mytext}</b>{mytext2}</span>'
-        
         miss_lbl.value =" Missing values: " + str(missng_vals)+" ( Total: "+str(totalmisses)+")"
-        
         return
 
     def featurecl_click(self,event):  
         global trgcl_lbl,miss_lbl
-        
         self.featureclclick(trgcl_lbl,self.main_view.featurescl,miss_lbl)
-
         return
 
     def makecleaning(self,event):
-        
         global result2aexp
-
         params = []
         if  self.missacts.value == "Edit Range":
             params = [self.min_text,self.max_text]
-
-        
-        
         self.controller.make_cleaning(self.main_view.featurescl,result2aexp,self.missacts,self.main_view.dt_features,params) 
-
-
         missings = []
         if not self.controller.main_model.datasplit:
             for col in self.controller.get_curr_df().columns:
@@ -108,9 +89,7 @@ class DataCleaningView:
             curr_df = self.controller.get_curr_df()
             new_list = sorted(missings, key=lambda x: x[0], reverse=True)
             curr_df = curr_df[[col for (miss,col) in new_list]]
-
             self.controller.set_curr_df(curr_df)
-            
         else:
             for col in self.controller.main_model.get_XTrain().columns:
                 missings.append((self.controller.main_model.get_XTrain()[col].isnull().sum()+self.controller.main_model.get_XTest()[col].isnull().sum(),col))
@@ -124,15 +103,13 @@ class DataCleaningView:
             for col in self.controller.main_model.getYtrain().to_frame().columns: 
                 missings.append((self.controller.main_model.getYtrain().to_frame()[col].isnull().sum(),col))
                 
-            new_list = sorted(missings, key=lambda x: x[0], reverse=True)
-            
+            new_list = sorted(missings, key=lambda x: x[0], reverse=True)   
             self.controller.main_model.set_XTest(Xtest)
             self.controller.main_model.set_XTrain(Xtrain)
         
 
         with self.main_view.right_page:
             clear_output()
-            
             missing_df = pd.DataFrame(columns=['feature','missing values'])
             totalmisses  = 0
             if not self.controller.main_model.datasplit:
@@ -142,9 +119,7 @@ class DataCleaningView:
                     new_df = pd.DataFrame([row])
                     missing_df = pd.concat([missing_df, new_df], axis=0, ignore_index=True)
                     totalmisses+=curr_miss
-
             else:
-               
                 for col in self.controller.main_model.get_XTrain().columns:
                     curr_miss = self.controller.main_model.get_XTrain()[col].isnull().sum()
                     curr_miss +=  self.controller.main_model.get_XTest()[col].isnull().sum()
@@ -160,19 +135,12 @@ class DataCleaningView:
                     row = {'feature': self.controller.main_model.targetcolumn , 'missing values':trg_miss}
                     new_df = pd.DataFrame([row])
                     missing_df = pd.concat([missing_df, new_df], axis=0, ignore_index=True)
-                   
-
-          
-                
-            #display.display(missing_df.head(20))  
+                    
             g = sns.barplot(x='feature', y='missing values', data=missing_df)
             g.set_xticklabels(g.get_xticklabels(),rotation= 45)
             plt.title('Total Missing Values: '+str(totalmisses))
             plt.show()
-                    
 
-           
-        #self.controller.data_processing_model.ReorderColumns()
         self.main_view.dt_features.options = [col for (miss,col) in new_list]
         self.main_view.featurescl.options = [col for (miss,col) in new_list]
 
@@ -189,54 +157,37 @@ class DataCleaningView:
     def get_data_cleaning_tab(self):
         global trgcl_lbl,miss_lbl, result2aexp
         RP_lay=Layout(align_items='center',overflow="visible")
-
         self.main_view.right_page = widgets.Output(layout = RP_lay)
-
         self.main_view.ftlaycl =  widgets.Layout(display = 'none')
         
         self.main_view.featurescl = widgets.Select(options=[],description = '',layout = widgets.Layout(display = 'none'))
         self.main_view.featurescl.observe(self.featurecl_click, 'value')
 
-      
-
-
         self.missacts = widgets.Select(description='',options=['Drop Column','Remove-Missing','Replace-Mean','Replace-Median','Replace-Mode'], disabled=False)
         self.missacts.observe(self.missacts_changed, 'value')
         self.missacts.layout.width = '200px'
-     
-
-      
-
+  
         self.applybutton = widgets.Button(description="Apply")
         self.applybutton.layout.width = self.missacts.layout.width
         self.applybutton.on_click(self.makecleaning)
-
 
         trgcl_lbl =  widgets.HTML("", layout=widgets.Layout(text_align="center"))
         color = "gray"
         mytext ="           "
         trgcl_lbl.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
-        
      
         miss_lbl =widgets.Label(value ='Missing values: -',disabled = True)
 
-
-       
-
-     
         self.feattitle = widgets.HTML("Features", layout=widgets.Layout(height="30px", width="55%", text_align="center"))
         color = "gray"
         mytext ="Features"
         
         self.feattitle.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
-      
         
         self.acttitle = widgets.HTML("")
         color = "gray"
         mytext ="Actions"
         self.acttitle.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
-
-      
 
         selcl_box = VBox(children=[trgcl_lbl,
                                    widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"})),
@@ -252,12 +203,8 @@ class DataCleaningView:
         
         self.f_box = VBox(children=[self.feattitle,HBox(children=[self.main_view.featurescl])])
 
-        vbox1 = VBox(children = [HBox(children=[self.f_box,selcl_box]),result2aexp])
-        
-        vbox2 = VBox(children = [self.main_view.right_page])
-        
+        vbox1 = VBox(children = [HBox(children=[self.f_box,selcl_box]),result2aexp]) 
+        vbox2 = VBox(children = [self.main_view.right_page])   
         tab_2 = VBox([self.task_menu,HBox([vbox1,vbox2])])
 
-
-        
         return tab_2

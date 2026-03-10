@@ -133,8 +133,6 @@ class Controller:
         self.data_processing_model.ApplyPCA(features2,pca_features,result2exp)
         
     def make_split(self,splt_txt,result2exp):
-        # self.main_view.close_tab(0)
-        # self.main_view.close_tab(1)
         self.data_processing_model.make_split(splt_txt,result2exp)
 
     def remove_outliers(self,dt_features,methodtype,result2exp):
@@ -253,7 +251,6 @@ class Controller:
         if self.developer_mode == False:
             userid = self.login_model.get_userid()
             self.learning_manager_model.set_learning_path(userid)
-            # self.learning_path_model.set_performance_data()
             self.learning_manager_model.set_competence_sequence()
             self.learning_manager_model.set_competence_vectors()
             self.learning_manager_model.set_learning_rate()

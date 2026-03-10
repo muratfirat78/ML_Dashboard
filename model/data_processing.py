@@ -333,15 +333,6 @@ class DataProcessingModel:
     
                 write_log('Outlier removal: (no split)-> '+str(prev_size)+'->'+str(len(curr_df))+': '+colname, result2exp, 'Data processing')
                 self.main_model.set_curr_df(curr_df)
-                
-            
-
-            
-        #self.main_model.curr_df[self.main_model.curr_df["outlier"] == False]
-        #self.main_model.curr_df.drop(["outlier"], axis=1)
-        #logging.info('Data preprocessing, outlier detection and removal')
-        #self.logger.add_action(['DataProcessing', 'outlier'], 'All columns')
-        
         return
     ##################################################################################
 
@@ -370,7 +361,7 @@ class DataProcessingModel:
         result2exp.value+="assign target done..."+"\n"
 
         return predictiontask
-    ############################################################################################################    
+    
     def make_featconvert(self,dt_features,result2exp):
         colname = dt_features.value
         self.logger.add_action(['DataProcessing', 'ConvertToBoolean'], colname)
@@ -573,14 +564,10 @@ class DataProcessingModel:
         
     
         return
-    #################################################################################################################
+    
     def make_balanced(self,features2,balancetype,ProcssPage,result2exp):  
-
-
-        write_log('Balancing-> '+balancetype, result2exp, 'Data processing')
-       
+        write_log('Balancing-> '+balancetype, result2exp, 'Data processing')     
         colname = features2.value
-
         if not self.main_model.datasplit:
             write_log('Balancing-> No split, improper balancing ', result2exp, 'Data processing')
             return
@@ -588,7 +575,6 @@ class DataProcessingModel:
         if colname != self.main_model.targetcolumn:
             write_log('Balancing-> Non-target feature is attempted for balancing', result2exp, 'Data processing')
             return
-      
       
         if colname is None:
             return
@@ -598,7 +584,6 @@ class DataProcessingModel:
         prev_size = len(ytrain_df)
         write_log('Balancing (split)-> '+colname, result2exp, 'Data processing')
     
-      
         if len(ytrain_df.to_frame()[colname].unique()) == 2: # binary detection      
 
             if balancetype == 'Upsample':
@@ -626,9 +611,6 @@ class DataProcessingModel:
         self.logger.add_action(['DataProcessing', 'Unbalancedness ' + balancetype ], colname)
         return
 
-    #####################################################################################################################
-
-
     def make_split(self,splt_txt,result2exp):
         curr_df = self.main_model.curr_df
         targetcolumn = self.main_model.targetcolumn
@@ -652,8 +634,6 @@ class DataProcessingModel:
         self.main_model.set_YTest(ytest)
         splt_txt.layout.visibility = 'hidden'
         splt_txt.layout.display = 'none'
-    
-
 
         write_log('Split, XTrain size: '+str(len(self.main_model.get_XTrain())), result2exp, 'Data processing')
         write_log('Split, XTest size: '+str(len(self.main_model.get_XTest())), result2exp, 'Data processing')
@@ -666,17 +646,12 @@ class DataProcessingModel:
  
         
         return
-    ############################################################################################################    
+    
     def make_encoding(self,features2,encodingtype,ordselect,result2exp):
-
         colname = features2.value
-
-       
-
         if (colname is None) or (colname == ''):
             return
-
-   
+        
         # Encode column  
         if self.main_model.datasplit:
 
@@ -688,12 +663,9 @@ class DataProcessingModel:
             if encodingtype == "Label Encoding":
                 
                 if colname in Xtrain_df.columns:
-
-                    
                     if Xtrain_df[colname].dtype in ['float64','int64','int32']:
                         write_log('Encoding (split)-> Attempt to encode a numerical feature '+str(colname), result2exp, 'Data processing')
                         return
-                    
 
                     label_encoder = preprocessing.LabelEncoder() 
 
@@ -740,9 +712,7 @@ class DataProcessingModel:
             if curr_df[colname].dtype in ['float64','int64','int32']:
                 write_log('Encoding-> Attempt to encode a numerical feature '+str(colname), result2exp, 'Data processing')
                 return
-              
-          
-            
+
             if encodingtype == "Label Encoding":
                 label_encoder = preprocessing.LabelEncoder() 
     
@@ -774,12 +744,7 @@ class DataProcessingModel:
                     mapping[classorder[i]] = len(classorder)-i
  
                 curr_df[colname] = curr_df[colname].replace(mapping)
-                
-                
-            
             self.main_model.set_curr_df(curr_df)
-   
-        
         return
 
     def savedata(self, dataFolder, datasetname):
@@ -788,12 +753,9 @@ class DataProcessingModel:
         filename = dataFolder + '/' + datasetname + '_' + current_datetime
         shutil.copy('output.log', filename + '.txt')
         self.main_model.curr_df.to_csv(filename + '.csv')
-
-        
         version = 0
 
     def ReorderColumns(self):
-
         objects = []
         if self.main_model.datasplit:
             for col in self.controller.main_model.get_XTrain().columns:
@@ -801,15 +763,11 @@ class DataProcessingModel:
                 
             for col in self.controller.main_model.getYtrain().to_frame().columns: 
                 objects.append((int(self.controller.main_model.getYtrain().to_frame()[col].dtype == 'object'),col))
-
         else:
             curr_df = self.main_model.get_curr_df()
             for col in curr_df.columns:
                 objects.append((int(curr_df[col].dtype == 'object'),col))
             
-                
         new_list = sorted(objects, key=lambda x: x[0], reverse=True)
-        self.main_view.dt_features.options = [col for (objtype,col) in new_list]
-        
-            
+        self.main_view.dt_features.options = [col for (objtype,col) in new_list]      
         return

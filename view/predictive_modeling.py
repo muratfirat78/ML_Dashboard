@@ -52,12 +52,10 @@ class PredictiveModelingView:
         self.selectedMLmodel = None
         
     def models_click(self,change):     
-
         self.plt_btn.layout.visibility = 'hidden'
 
         for mdl in self.controller.get_trained_models():
             if self.trmodels.value == mdl.getName():
-
                 self.selectedMLmodel  = mdl
                 self.progress.value += 'model found...'+str(mdl.getName())+'\n'
 
@@ -68,8 +66,6 @@ class PredictiveModelingView:
                     mylbl.value = ''
 
                 self.progress.value += 'start...'+str(mdl.getName())+'\n'
-
-
                 self.progress.value += 'params...'+str(len(mdl.getModelParams()))+'\n'
                 
                 prind = 0
@@ -85,16 +81,11 @@ class PredictiveModelingView:
                     self.performlbl.value = " MSE: "+str(mdl.GetPerformanceDict()['MSE'])
 
                 self.progress.value += 'labels set...'+'\n'
-                    
-
 
                 with self.performpage:          
                     clear_output()
-                    
                     if mdl.getTask() == "Classification":
-
                         self.plt_btn.layout.visibility = 'hidden'
-                      
                         classes = [cls for cls in self.controller.main_model.getYtrain().to_frame()[self.controller.main_model.targetcolumn].unique()]
 
                         # Normalized confusion matrix
@@ -106,8 +97,6 @@ class PredictiveModelingView:
                         # Seaborn Heatmap
                         sns.heatmap(cm, cmap = cmap, center = 0, annot = mdl.getConfMatrix(), fmt = 'd',
                                     xticklabels = classes, yticklabels = classes, annot_kws = {'size': 12})
-                        
-                        
                         plt.xlabel('Predicted Class', fontsize=12)
                         plt.ylabel('Actual Class', fontsize=12)
                         plt.title('Confusion Matrix', fontsize=14)
@@ -123,49 +112,26 @@ class PredictiveModelingView:
                                 display0.plot()
                                 plt.title('ROC Curve', fontsize=14)
                                 plt.show()
-                        # display.display('Confusion Matrix: ')
-                        # display.display(mdl.getConfMatrix())
-                        
                     else:
-                        
                         if not mdl.istraindatachanged():
-                            
                             self.plt_btn.layout.visibility = 'visible'
                             self.plt_btn.disabled = False
-        
                         else: 
                             self.plt_btn.layout.visibility = 'hidden'
-
-                        
-              
-                        
-                        
-                
         return
 
     def ShowParamOpts(self,event):
-
-
         self.paramchangective = True
         self.progress.value+="********** ShowOptions***********"+"\n"
-
         self.progress.value+="Model "+str(self.selectedmodel)+"\n"
-
         self.progress.value+="Parameter: "+str(self.selectedparam)+"\n"
-        
         self.progress.value+="Parameter menu value: "+str(self.parammenu.value)+"\n"
-        
-
         self.selectedparam = self.parammenu.value
-
         self.progress.value+="Set Parameter: "+str(self.selectedparam)+"\n"
-        
-        
 
         if self.selectedparam == '' or self.selectedparam == None:
             self.paramchangective = False
             return
-
 
         if self.selectedparam in self.mlmodels[self.selectedmodel]:
             self.progress.value+="parameter options..: "+str(self.selectedparam)+"\n"
@@ -174,16 +140,13 @@ class PredictiveModelingView:
             self.paramoptions.value = self.mlmodelparams[self.selectedmodel][self.selectedparam]
 
             self.progress.value+="set done options: "+str(self.selectedparam)+"\n"
-            
         else:
             self.paramoptions.options = []
 
-     
         self.paramchangective = False
         return
 
     def ChangeParamVal(self,event):
-
         self.progress.value+="**********ChangeParam***********"+"\n"
         self.progress.value+="in change paramter..."+"\n"
 
@@ -191,13 +154,10 @@ class PredictiveModelingView:
             return
 
         self.progress.value+="Model "+str(self.selectedmodel)+"\n"
-
         self.progress.value+="Parameter: "+str(self.selectedparam)+"\n"
-    
 
         if self.selectedparam == '' or self.selectedparam == None:
             return
-
        
         self.progress.value+="Parameter value: "+ str(self.selectedparamval)+"\n"
 
@@ -205,20 +165,13 @@ class PredictiveModelingView:
             return
 
         self.selectedparamval = self.paramoptions.value
-     
         self.mlmodelparams[self.selectedmodel][self.selectedparam] = self.selectedparamval
-        
         self.paramvalues.options = [self.mlmodelparams[self.selectedmodel][x] for x in self.mlmodels[self.selectedmodel].keys()] 
-        
-       
-
         return
         
     
 
     def ShowModel(self,event):
-
-      
         self.dtcrit.layout.visibility = 'hidden'
         self.dtcrit.layout.display = 'none'
         self.dtminseg.layout.visibility = 'hidden'
@@ -248,17 +201,12 @@ class PredictiveModelingView:
 
         self.progress.value+=" Set Model "+str(self.selectedmodel)+"\n"
    
-
-     
         self.plt_btn.layout.visibility = 'hidden'
-       
 
         self.paramvalues.options = [self.mlmodelparams[self.selectedmodel][x] for x in self.mlmodels[self.selectedmodel].keys()] 
         self.parammenu.options = [x for x in self.mlmodels[self.selectedmodel].keys()] 
-        
     
         if self.modelmenu.value == "Decision Tree":
-          
             self.dtcrit.layout.display = 'block'
             self.dtcrit.layout.visibility = 'visible'
             self.dtminseg.layout.display = 'block'
@@ -285,20 +233,17 @@ class PredictiveModelingView:
             self.svckrnl.layout.visibility = 'visible'
         if self.modelmenu.value == "Linear Model":
             self.lmlib.layout.display = 'block'
-            self.lmlib.layout.visibility = 'visible'
-            
-                
+            self.lmlib.layout.visibility = 'visible'   
         return
 
     def PlotGraph(self,event):
-
         with self.performpage:          
             clear_output()
             Xtrain_df = self.controller.main_model.get_XTrain()
             ytrain_df = self.controller.main_model.getYtrain()
             ytest_df = self.controller.main_model.get_YTest()
             Xtest_df = self.controller.main_model.get_XTest()
-    
+
             pred_df = pd.DataFrame(columns = ['y_true','y_pred','tag'])
         
             preds = self.selectedMLmodel.GetPredictions(Xtest_df)
@@ -311,55 +256,39 @@ class PredictiveModelingView:
             ytr_pred = self.selectedMLmodel.GetPredictions(Xtrain_df)
             ytr_pred = ytr_pred.tolist()
             ytrain_df = ytrain_df.to_list()
-        
-                                
+         
             trpred_df['y_true'] = ytrain_df
             trpred_df['y_pred'] = ytr_pred
             trpred_df['tag'] = ['train' for i in ytr_pred]
         
             pred_df = pd.concat([pred_df, trpred_df], ignore_index=True)
         
-        
             g = sns.lmplot(x='y_true', y ='y_pred', data=pred_df, hue='tag')
             g.fig.suptitle('True Vs Pred', y= 1.02)
             g.set_axis_labels('y_true', 'y_pred');
             plt.show()  
 
-        
-        
-        
         self.plt_btn.disabled = True
-
-
         return 
 
 
     def TrainModel(self,event): 
-
-
         self.trnml_btn.disabled = True
 
         self.progress.value += 'Train Model...'+str(self.selectedmodel)+'\n'
-
-        
         params= dict()
 
         for param,val in self.mlmodelparams[self.selectedmodel].items():
             params[param] = val
 
         self.progress.value += 'Params...'+str(params)+'\n'
-
-        
+  
         self.controller.train_Model(self.selectedmodel,self.progress,self.trmodels ,params)
- 
 
         self.trnml_btn.disabled = False
         return
 
     def get_predictive_modeling_tab(self):
-        
-   
- 
         self.trnml_btn= widgets.Button(description="Train")
         self.trnml_btn.layout.width = '98px'
         self.trnml_btn.on_click(self.TrainModel)
@@ -379,7 +308,6 @@ class PredictiveModelingView:
         self.mlmodels = dict()
         self.mlmodelparams = dict()
    
-
         self.mlmodels['Decision Tree'] = dict()
         self.mlmodels['KNN'] = dict()
         self.mlmodels['Random Forest'] = dict()
@@ -396,23 +324,16 @@ class PredictiveModelingView:
         self.mlmodelparams['Linear Model'] = dict()
         self.mlmodelparams['Gaussian NB'] = dict()
 
-        
-
         self.mdltitle = widgets.HTML("")
         color = "gray"
         mytext ="ML Models"
         
         self.mdltitle.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
        
-
-
         self.trmodels = widgets.Select(options=[],description = '')
         self.trmodels.layout.width = '220px'
         self.trmodels.layout.height = '140px'
         self.trmodels.observe(self.models_click, 'value')
-     
-
-
      
         self.mlmodels['Decision Tree']['max_depth'] = [x for x in range(1,16)]
         self.mlmodels['Decision Tree']['criterion'] = ['entropy','gini']
@@ -421,9 +342,6 @@ class PredictiveModelingView:
         self.mlmodelparams['Decision Tree']['max_depth'] = 5
         self.mlmodelparams['Decision Tree']['criterion'] = 'gini'
         self.mlmodelparams['Decision Tree']['min_samples_split'] = 3
-
-
-        
 
         self.mlmodels['KNN']['n_neighbors'] = [x for x in range(1,16)]
         self.mlmodels['KNN']['weights'] = ['uniform','distance']
@@ -449,15 +367,11 @@ class PredictiveModelingView:
         self.mlmodelparams['SVM']['C'] = 1.0
         self.mlmodelparams['SVM']['degree'] = 'minkowski'
 
-
-        
         self.mlmodels['Logistic Regression']['C'] = [round(0.1*i,2) for i in range(10,1,-1)]
         self.mlmodels['Logistic Regression']['penalty'] = ['l1', 'l2', 'elasticnet']
 
-
         self.mlmodelparams['Logistic Regression']['C'] = 1.0
         self.mlmodelparams['Logistic Regression']['penalty'] = 'l1'
-
 
         self.mlmodels['Linear Model']['validation_fraction'] = [round(0.1*i,2) for i in range(10,0,-1)]
         self.mlmodels['Linear Model']['penalty'] = ['l1', 'l2', 'elasticnet']
@@ -465,16 +379,12 @@ class PredictiveModelingView:
         self.mlmodelparams['Linear Model']['validation_fraction'] = 0.1
         self.mlmodelparams['Linear Model']['penalty'] = 'l2'
 
-        
-
-
         self.modelmenu = widgets.Select(options=[x for x in self.mlmodels.keys()])
         self.modelmenu.layout.height = '175px'
         self.modelmenu.layout.width = '120px'
         self.modelmenu.observe(self.ShowModel)
 
         self.tasklbl = widgets.Label(value ='Perdiction task: -')
-        
      
         mdsmrylbl = widgets.Label( value="Model summary: ")
 
@@ -486,12 +396,10 @@ class PredictiveModelingView:
         self.paramvalues = widgets.Select(options=[],disabled = True)
         self.paramvalues.layout.height = '80px'
         self.paramvalues.layout.width = '120px'
-       
 
         self.paramoptions = widgets.Dropdown(options=[],description = '')
         self.paramoptions.layout.width = '100px'
         self.paramoptions.observe(self.ChangeParamVal)
-
 
         self.prm1lbl = widgets.Label( value="")
         self.prm1lbl.layout.width = '120px'
@@ -502,7 +410,6 @@ class PredictiveModelingView:
         self.performlbl = widgets.Label( value="")
 
         self.paramlbls = [self.prm1lbl,self.prm2lbl,self.prm3lbl]
-
         
         self.dtdepth = widgets.Dropdown(options=[i for i in range(1,16)],description = 'MaxDepth')
         self.dtdepth.layout.width = '125px'
@@ -532,7 +439,6 @@ class PredictiveModelingView:
         self.lmlib.layout.width = '125px'
         self.lmlib.layout.display = 'none'
 
-
         self.svcc =widgets.Dropdown(options=[0.1*i for i in range(10,1,-1)],description = 'C')
         self.svcc.layout.display = 'none'
         self.svckrnl = widgets.Dropdown(options=['linear','poly','rbf','sigmoid'],description = 'kernel')
@@ -542,7 +448,6 @@ class PredictiveModelingView:
         self.rfnrest.layout.display = 'none'
         self.rfcrit = widgets.Dropdown(options=['entropy','gini'],description = 'criterion')
         self.rfcrit.layout.display = 'none'
-
 
         self.paramtitle = widgets.HTML("")
         color = "gray"
@@ -567,7 +472,6 @@ class PredictiveModelingView:
         mytext ="Trained Models"
         self.modelslbl.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
         self.modelslbl.layout.width = '120px'
-
 
         self.perlbl = widgets.HTML("")
         color = "gray"
@@ -597,10 +501,8 @@ class PredictiveModelingView:
 
         vbox1 = VBox(children = [HBox(children=[self.f_box,sel_box],layout = prboxlay),self.progress],layout = vb1lay)
 
-
         self.performpage = widgets.Output()
         separator = widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='1px', height='90%', margin='5px 0px',style={'background': "#C7EFFF"}))
-
 
         vbox2 = VBox(children = [self.performpage])
 

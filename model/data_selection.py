@@ -26,7 +26,6 @@ class DataSelectionModel:
                 if (file.find('.csv')>-1) or (file.find('.xlsx')>-1) or (file.find('.xls')>-1) or(file.find('.tsv')>-1):
                     dtsetnames.append(file)
         else:
-            
             rel_path = foldername
             abs_file_path = os.path.join(Path.cwd(), rel_path)
             
@@ -36,14 +35,12 @@ class DataSelectionModel:
                     if (file.find('.csv')>-1) or (file.find('.xlsx')>-1)or (file.find('.xls')>-1)  or(file.find('.tsv')>-1):
                         dtsetnames.append(file)
 
-
         datasets.options = dtsetnames
         if len(dtsetnames) > 0:
             datasets.value = dtsetnames[0]
         return
 
     def read_data_set(self,online_version,foldername,filename,sheetname):
-
         stemfile = filename[:filename.find(".")]
         rel_path = foldername+'\\'+filename
         infopath = foldername+'\\'+"Info_"+stemfile+".txt"
@@ -74,22 +71,19 @@ class DataSelectionModel:
                     except:
                         pass
       
-            
         if (abs_file_path.find('.xlsx') > -1) or (filename.find('.xls') > -1):
             xls = pd.ExcelFile(abs_file_path)
             self.main_model.curr_df = pd.read_excel(xls,sheetname)
         if abs_file_path.find('.tsv') > -1:    
             self.main_model.curr_df = pd.read_csv(abs_file_path, sep="\t")
 
-       
         try: 
             f = open(abs_info_path)
             self.main_model.currinfo = f.read()
             f.close()
         except: 
             self.main_model.currinfo = "No info found for this file"
-            
-            
+               
         self.main_model.curr_df.convert_dtypes()
         
         filename[:filename.find('.')]  
@@ -108,7 +102,6 @@ class DataSelectionModel:
             script_dir = Path.cwd()
             abs_file_path = os.path.join(script_dir, rel_path)
 
-        
         if filename.find('.csv') > -1:
             wsheets.description = 'Separator'
             wsheets.options = [',',';']
@@ -118,11 +111,9 @@ class DataSelectionModel:
             wsheets.options = ['\\t']
             
         if (filename.find('.xlsx') > -1) or (filename.find('.xls') > -1) :
-    
             wsheets.description = 'Worksheets'
             xls = pd.ExcelFile(abs_file_path)
             wsheets.options = xls.sheet_names
-            
         return
     
     def get_datafolder(self):

@@ -6,7 +6,6 @@ from sklearn.naive_bayes import GaussianNB
 
 class MLModel:
     def __init__(self,target,tasktype,mytype,report,myname,params,xtrain,ytrain):
-  
         self.modelparams = dict()
         self.performance = dict()
         self.roc = None
@@ -20,13 +19,9 @@ class MLModel:
 
         for param,val in params.items():
             self.modelparams[param]= val
-            
-
-        write_log(self.Type+"__"+self.myTask, report, 'Predictive modeling')
-
-        write_log(str(params), report, 'Predictive modeling')
-
         
+        write_log(self.Type+"__"+self.myTask, report, 'Predictive modeling')
+        write_log(str(params), report, 'Predictive modeling')
 
         if self.Type == 'Gaussian NB':
             if self.myTask == 'Classification': 
@@ -41,8 +36,6 @@ class MLModel:
         if self.Type == 'Decision Tree':
             if self.myTask == 'Classification': 
                 write_log('DT: Classification', report, 'Predictive modeling')
-
-    
                 self.PythonObject = tree.DecisionTreeClassifier(criterion=params['criterion'],max_depth=int(params['max_depth']))
                 self.PythonObject.fit(xtrain,ytrain) 
             if self.myTask == 'Regression': 
@@ -93,7 +86,6 @@ class MLModel:
 
     def istraindatachanged(self):
         return self.traindatachanged 
-       
 
     def setConfMatrix(self,myitm):
         self.ConfMatrix = myitm
@@ -144,10 +136,6 @@ class PredictiveModelingModel:
         self.logger = logger
 
     def train_Model(self,tasktype,mytype,results,trmodels,params):
-
-        #self.controller.predictiontask
-        
-        #data = [self.main_model.Xtrain_df,self.main_model.ytrain_df,self.main_model.Xtest_df,self.main_model.ytest_df]
         write_log('Train Model-> '+ mytype,results,'Predictive modeling')
 
         Xtest_df = self.main_model.get_XTest()
@@ -164,28 +152,14 @@ class PredictiveModelingModel:
         success = False
         try: 
             mymodel = MLModel(self.main_model.targetcolumn,tasktype,mytype,results,mytype+"_"+str(len(models)),params,Xtrain_df,ytrain_df)
-
             write_log('*Train Model-> model'+str(type(mymodel)),results,'Predictive modeling')
-
-            write_log('++Train Model-> '+str(len(Xtrain_df)),results,'Predictive modeling')
-            
-            #mymodel.getSkLearnModel().fit(Xtrain_df,ytrain_df) 
+            write_log('++Train Model-> '+str(len(Xtrain_df)),results,'Predictive modeling')  
             write_log('Train Model-> trained..',results,'Predictive modeling')
-            
             y_pred = mymodel.GetPredictions(Xtest_df)
-
-            #mymodel.setROC(roc_curve(ytest_df, y_pred))
-            
-
             write_log('>>Train Model-> predcts'+str(len(y_pred))+", "+tasktype,results,'Predictive modeling')
 
             if tasktype == 'Classification': 
                 mymodel.setConfMatrix(confusion_matrix(ytest_df,y_pred))
-                
-                #mymodel.GetPerformanceDict()['True-Positive'] = mymodel.getConfMatrix()[1][1]
-                #mymodel.GetPerformanceDict()['False-Positive'] = mymodel.getConfMatrix()[0][1]
-                #mymodel.GetPerformanceDict()['True-Negative'] = mymodel.getConfMatrix()[0][0]
-                #mymodel.GetPerformanceDict()['False-Negative'] = mymodel.getConfMatrix()[1][0]
                 mymodel.GetPerformanceDict()['Accuracy'] = round(accuracy_score(ytest_df, y_pred),2)
                 mymodel.GetPerformanceDict()['Precision'] = precision_score(ytest_df, y_pred,average='micro')
                 mymodel.GetPerformanceDict()['Recall'] = recall_score(ytest_df, y_pred,average='micro')
@@ -209,19 +183,6 @@ class PredictiveModelingModel:
             performance += [("range", str(ytrain_df.min()) + "-" + str(ytrain_df.max()))]
             self.logger.add_action(['ModelDevelopment', 'ParameterFinetuning'], [mytype] + list(params.values()))
             self.logger.add_action(['ModelDevelopment', 'ModelPerformance'], (performance))
-
-
-
-
-            # write_log('**Train Model-> '+ mytype, results, 'Predictive modeling')
-            
-
-            # self.logger.add_action(['ModelDevelopment', 'SelectModel'], mytype)
-            
-            # for prf,val in mymodel.GetPerformanceDict().items():
-            #     write_log('Model Performance-> '+prf+': '+str(val), results, 'Predictive modeling')
-            #     self.logger.add_action(['ModelDevelopment', 'ModelPerformance'], (prf, val))
-
             trmodels.options = [mdl.getName() for mdl in self.trainedModels]
             
         except Exception as e: 

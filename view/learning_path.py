@@ -87,7 +87,6 @@ class LearningPathView:
             plt.show()
             return plt
 
-    
     def update_line_chart(self, value):
         value = value["new"]
         self.line_chart.clear_output()

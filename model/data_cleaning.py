@@ -91,7 +91,6 @@ class DataCleaningModel:
                                 ytrain_df[colname].fillna(ytrain_df[colname].median(), inplace=True)
                                           
                             if handling == 'Remove-Missing': 
-                                # ytrain_df[colname] = ytrain_df[colname].replace(["", " ", "None", "nan", "NaN"], np.nan)
                                 ytrain_df = ytrain_df.dropna(subset = [colname], how='any')
     
                                 

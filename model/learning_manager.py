@@ -1,6 +1,9 @@
 import copy
 import os
 from datetime import datetime
+import pandas as pd
+from pathlib import Path
+from sklearn.model_selection import train_test_split
 
 from model.student_performance import StudentPerformance
 
@@ -10,6 +13,11 @@ class LearningManagerModel:
         self.performances = []
         self.current_competence_vector = None
         self.dataset_performances = {}
+        self.competence_sequence = {}
+        self.learning_rate = 0
+        self.competence_vectors_with_tasks = []
+        self.learning_rate = 0
+
 
     def get_learning_path(self):
         return self.performances
@@ -249,8 +257,12 @@ class LearningManagerModel:
                                 else:
                                     #weighted average
                                     updated_competence_vector[skill] =  (max(5,len(self.performances))*skill_level + new_level) / (max(5,len(self.performances))+1)
-                    self.current_competence_vector = updated_competence_vector                
+                    self.current_competence_vector = updated_competence_vector 
+                    self.competence_vectors_with_tasks.append({"date": date,
+                                                               "competence_vector": copy.deepcopy(updated_competence_vector),
+                                                               "dataset": dataset})
                     self.controller.add_competence_vector(updated_competence_vector)
+                    print(updated_competence_vector)
             except:
                 None #updating competence vector failed
 
@@ -264,20 +276,46 @@ class LearningManagerModel:
                     skills.append(skill[0])
         return skills
 
+                
+    def set_competence_sequence(self):
+        performances = self.performances
+        for performance in performances:
+            current_task = self.controller.convert_performance_to_task(performance, "", "")
+            target_column = self.controller.get_target_task(current_task)
+            dataset_name = current_task["dataset"].replace(".csv", "")
+            reference_task = self.controller.get_reference_task(target_column, dataset_name)
+            if reference_task:       
+                performance_score = self.calculate_performance_score(performance,reference_task)
+                if performance_score:
+                    previous_best = self.competence_sequence.get(dataset_name)
+                    current_predictive_modeling_score = performance_score["Predictive Modeling"]
+                    if previous_best != None:
+                        # only keep the oldest date
+                        date = min(performance.performance['General']['Date'][0], previous_best["date"])
+                        if previous_best["score"] <  current_predictive_modeling_score:
+                            #update best score on dataset
+                            self.competence_sequence[dataset_name] = {"performance": performance, "score": current_predictive_modeling_score, "date": date}
+                    else:
+                        date = performance.performance['General']['Date'][0]
+                        self.competence_sequence[dataset_name] = {"performance": performance, "score": current_predictive_modeling_score, "date": date}
 
     def set_competence_vectors(self):
+        performances = [
+            entry["performance"] 
+            for entry in sorted(
+                self.competence_sequence.values(), 
+                key=lambda x: x["date"]
+            )
+        ]
         initial_competence_vector = {}
 
         for skill in self.get_skills_from_tasks():
             initial_competence_vector[skill] = 0
-        
-        performances = self.performances
-        performances.sort(key=lambda x: x.performance['General']['Date'][0])
-
         if len(performances) == 0:
             date = datetime.now()
         else:
             date = performances[0].performance['General']['Date'][0]
+        
         
         initial_competence_vector["date"] = date
         self.controller.add_competence_vector(initial_competence_vector)
@@ -293,7 +331,119 @@ class LearningManagerModel:
                 task_difficulty = reference_task["difficulty"]
                 performance_score = self.calculate_performance_score(performance,reference_task)
                 if performance_score:
-                    self.update_competence_vector(performance_score, current_competence_vector, task_difficulty, performance.performance['General']['Date'][0], dataset_name)
+                    date = performance.performance['General']['Date'][0]
+                    self.update_competence_vector(performance_score, current_competence_vector, task_difficulty, date, dataset_name)
                     current_competence_vector = self.current_competence_vector
 
+    def read_file(self, filename):
+        if self.controller.get_online_version():
+            abs_file_path = f"/content/ML_Dashboard/DataSets/{filename}"
+        else:
+            abs_file_path = os.path.join(Path.cwd(), "DataSets", filename)
 
+        if filename.endswith(".csv"):
+            df = pd.read_csv(abs_file_path)
+        elif filename.endswith(".tsv"):
+            df = pd.read_csv(abs_file_path, sep="\t")
+        elif filename.endswith((".xls", ".xlsx")):
+            df = pd.read_excel(abs_file_path)
+
+        return df
+
+    def set_learning_rate(self):
+       previous_competence_vector = None
+       for next_competence_vector in self.competence_vectors_with_tasks:
+            if previous_competence_vector == None:
+               previous_competence_vector = {'date': None, 'competence_vector': {'Data Cleaning': 0, 'Data Translation': 0, 'Data Transformation': 0, 'Statistics': 0, 'Model Training': 0, 'Predictive Modeling': 0, 'date': None}, 'dataset': None}
+
+            previous_competence_vector["competence_vector"].pop("date", None)
+            next_competence_vector["competence_vector"].pop("date", None)
+            amount_of_skills = len(previous_competence_vector["competence_vector"])
+            next_task = self.controller.get_reference_task_using_dataset(next_competence_vector["dataset"])
+            print("previous competence_vector:")
+            print(previous_competence_vector["competence_vector"])
+            print("next competence_vector:")
+            print(next_competence_vector["competence_vector"])
+            print("task difficulty:")
+            print(next_task["difficulty"])
+            print("----")
+            #calculate max_jump
+            max_jump = 0
+            for skill,task_skill_difficulty in next_task["difficulty"]:
+                if skill == "Predictive Modeling":
+                    print("max jump = "+ str(task_skill_difficulty) + "- " + str(previous_competence_vector["competence_vector"][skill]) )
+                    max_jump += task_skill_difficulty - previous_competence_vector["competence_vector"][skill] 
+            print(str(max_jump))
+            print("max_jump: " + str(max_jump))
+
+            #calculate std_jump
+            std_jump = 0
+            for skill, skill_level in next_competence_vector["competence_vector"].items():
+                if skill == "Predictive Modeling":
+                    std_jump += skill_level - previous_competence_vector["competence_vector"][skill]
+        
+            print("std_jump: " + str(std_jump))
+
+            learning_rate = max(0,std_jump)/max_jump
+            print("learning rate " + str(learning_rate))
+            print("----")
+
+            self.learning_rate = learning_rate
+            previous_competence_vector = next_competence_vector
+        #    else:
+        #        previous_competence_vector = next_competence_vector
+        #        continue
+
+
+        
+    #    competence_vectors = self.controller.get_competence_vectors()
+    #    print(competence_vectors)
+    #    second_to_last_competence_vector = competence_vectors[:-2]
+    #    last_competence_vector = competence_vectors[:-1]
+
+       
+
+
+
+    #    print(self.competence_sequence)
+
+
+
+    #    performances = [
+    #         entry["performance"] 
+    #         for entry in sorted(
+    #             self.competence_sequence.values(), 
+    #             key=lambda x: x["date"]
+    #         )
+    #     ]
+       
+    #    for index, performance in enumerate(performances):
+    #        current_task = self.controller.convert_performance_to_task(performance, "", "")
+    #        target_column = self.controller.get_target_task(current_task)
+    #        dataset_name = current_task["dataset"].replace(".csv", "")
+    #        score = self.competence_sequence[dataset_name]["score"]
+    #        reference_task = self.controller.get_reference_task(target_column, dataset_name)
+    #        if reference_task:
+    #            dataset_pd = self.read_file(reference_task["dataset"])
+
+    #            if reference_task["model_metric"][0] == "MSE":
+    #                train_col, test_col = train_test_split(
+    #                     dataset_pd[target_column],
+    #                     test_size=0.2,
+    #                     random_state=42  # for reproducibility
+    #                 )
+    #                minimum_score = test_col.var()
+    #            if reference_task["model_metric"][0] == "accuracy":
+    #                number_of_classes = dataset_pd[target_column].nunique()
+    #                minimum_score =  1/number_of_classes
+
+            #    print(competence_vectors[-1]["Predictive Modeling"])
+            #    print("-----------")
+            #    print("max score: 1")
+            #    print("min score: " + str(minimum_score))
+            #    print("score: " + str(score))
+            #    print("learning rate: " + str((score - minimum_score)/(1-minimum_score)*100))
+            #    print("-----------")
+        
+    def get_learning_rate(self):
+        return self.learning_rate

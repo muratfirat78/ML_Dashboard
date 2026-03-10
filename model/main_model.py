@@ -65,6 +65,29 @@ class MainModel:
                                 return task
         return None
     
+    def get_reference_task(self, target_column, dataset):
+        tasks = self.tasks_data
+        
+        for task in tasks:
+            if task["dataset"].replace('.csv','') == dataset and task["mode"] == "monitored":
+                for subtask in task["subtasks"]:
+                    for subsubtask in subtask["subtasks"]:
+                        if subsubtask["action"][0] == "DataProcessing" and subsubtask["action"][1]== "AssignTarget":
+                            if subsubtask["value"][0] == target_column:
+                                return task
+        return None
+    
+    def get_reference_task_using_dataset(self, dataset):
+        tasks = self.tasks_data
+        
+        for task in tasks:
+            if task["dataset"].replace('.csv','') == dataset and task["mode"] == "monitored":
+                for subtask in task["subtasks"]:
+                    for subsubtask in subtask["subtasks"]:
+                        if subsubtask["action"][0] == "DataProcessing" and subsubtask["action"][1]== "AssignTarget":
+                            return task
+        return None
+    
     def read_tasks_data(self):
         tasks_data = []
         for filename in os.listdir('./tasks'):

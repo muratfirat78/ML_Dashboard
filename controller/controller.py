@@ -254,7 +254,9 @@ class Controller:
             userid = self.login_model.get_userid()
             self.learning_manager_model.set_learning_path(userid)
             # self.learning_path_model.set_performance_data()
+            self.learning_manager_model.set_competence_sequence()
             self.learning_manager_model.set_competence_vectors()
+            self.learning_manager_model.set_learning_rate()
             self.learning_path_view.set_graph_data(self.get_graph_data())
             self.learning_path_view.set_last_performance_data()
 
@@ -322,6 +324,9 @@ class Controller:
     
     def get_reference_task(self, target_column, dataset):
         return self.main_model.get_reference_task(target_column, dataset)
+        
+    def get_reference_task_using_dataset(self, dataset):
+        return self.main_model.get_reference_task_using_dataset(dataset)
     
     def get_model_performance(self, task):
         return self.task_model.get_model_performance(task)
@@ -364,3 +369,8 @@ class Controller:
     def get_dataset_performances(self):
         return self.learning_manager_model.dataset_performances
 
+    def get_competence_vectors(self):
+        return self.learning_path_model.get_competence_vectors()
+    
+    def get_learning_rate(self):
+        return self.learning_manager_model.get_learning_rate()

@@ -41,6 +41,7 @@ class StudentPerformance:
         self.index += 1
         
     def string_to_student_performance(self, input_str, date):
+        #This function converts a log file in text form to a StudentPerformance object
         input_str = re.sub(r'array\((\[.*?\])\)', r'\1', input_str)
         
         data_dict = ast.literal_eval(input_str)
@@ -52,7 +53,6 @@ class StudentPerformance:
                         self.addAction([category, action_type], item[0])
                 else:
                     self.addAction([category, action_type], value[0])
-                
 
     def get_score(self):
         return self.performance

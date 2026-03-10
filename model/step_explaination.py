@@ -1,4 +1,4 @@
-
+#This class contains the description shown in monitored mode, when the user selects an action
 class StepExplainationModel:
     def __init__(self):
         self.explaination_dict = {    'Scaling':'Normalization: This method scales each feature so that all values are within the range of 0 and 1. \nStandardization: Here, each feature is transformed to have a mean of 0 and a standard deviation of 1.',

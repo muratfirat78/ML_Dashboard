@@ -60,7 +60,7 @@ class ConvertPerformanceToTask:
         return title_map.get(action, "Unknown Task")        
 
     def load_actions(self):
-        filename="./config/actions.txt"
+        filename="./model/actions.txt"
         actions = {}
         with open(filename, "r") as file:
             for line in file:

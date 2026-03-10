@@ -1,3 +1,4 @@
+#This class contains functions/variables that are shared between the models
 import pandas as pd
 import os
 import json

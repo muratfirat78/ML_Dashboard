@@ -1,3 +1,4 @@
+#In offline mode this class is used, in online mode the google_drive.py file is used
 import os
 import random
 from datetime import datetime

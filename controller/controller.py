@@ -20,7 +20,6 @@ from view.learning_path import LearningPathView
 from view.main_view import MainView
 from view.predictive_modeling import PredictiveModelingView
 from view.login import LoginView
-from view.task import TaskView
 from view.task_menu import TaskMenuView
 from view.task_selection import TaskSelectionView
 import json
@@ -45,7 +44,6 @@ class Controller:
         self.predictive_modeling_view = PredictiveModelingView(self, self.main_view, task_menu)
         self.predictive_modeling_model = PredictiveModelingModel(self.main_model, self, self.logger)
         self.task_model = TaskModel(self)
-        self.task_view = TaskView(self)
         self.learning_path_model = LearningPathModel(self)
         self.learning_path_view = LearningPathView(self)
         self.learning_manager_model = LearningManagerModel(self)
@@ -201,21 +199,16 @@ class Controller:
     
     def set_task_model(self,reference_task, monitored_mode):
         self.monitored_mode = monitored_mode
-        self.task_view.set_monitored_mode(monitored_mode)
         if self.monitored_mode:
             current_task = self.convertPerformanceToTask.convert_performance_to_task(self.logger.get_performance(), reference_task["title"],reference_task["description"])
             self.task_model.set_current_task(current_task)
             self.task_menu.set_current_task(current_task,"monitored")
             self.task_model.set_reference_task(reference_task)
-            self.task_view.set_current_task(self.task_model.get_current_task())
-            self.task_view.set_reference_task(reference_task)
             self.task_model.update_statusses_and_set_current_tasks()
         else:
             self.task_model.set_current_task(reference_task) # current task is what is displayed on the left side, so set current task to reference task in guided mode
-            self.task_view.set_current_task(self.task_model.get_current_task())
             self.task_menu.set_current_task(self.task_model.get_current_task(), "guided")
             self.task_model.update_statusses_and_set_current_tasks()
-            self.task_view.update_task_statuses(self.task_model.get_current_task())
 
     def hide_task_selection_and_show_tabs(self):
         self.task_selection_view.hide_task_selection()
@@ -228,7 +221,6 @@ class Controller:
     def get_ui(self):
         login_view = self.login_view.get_login_view()
         task_selection_view = self.task_selection_view.get_task_selection_view()
-        task_view = self.task_view.get_task_view()
         tabs = self.get_tab_set()
         return self.main_view.get_ui(login_view, tabs, task_selection_view)
     
@@ -262,16 +254,13 @@ class Controller:
             if self.monitored_mode:
                 task = self.convertPerformanceToTask.convert_performance_to_task(self.logger.get_performance(), self.task_model.get_title(), self.task_model.get_description())
                 self.task_model.set_current_task(task)
-                self.task_view.set_current_task(self.task_model.get_current_task())
                 self.task_menu.set_current_task(self.task_model.get_current_task(), 'monitored')
             else:
                 self.task_model.perform_action(action, value)
                 self.task_model.update_statusses_and_set_current_tasks()
-                self.task_view.update_task_statuses(self.task_model.get_current_task())
                 self.task_menu.set_current_task(self.task_model.get_current_task(), 'guided')
                 if self.task_finished == True:
                     self.task_menu.finished_task(None)
-                    self.task_view.finished_task(None)
 
 
     def read_dataset_view(self, dataset):

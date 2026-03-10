@@ -260,7 +260,6 @@ class LearningManagerModel:
                                                                "competence_vector": copy.deepcopy(updated_competence_vector),
                                                                "dataset": dataset})
                     self.controller.add_competence_vector(updated_competence_vector)
-                    print(updated_competence_vector)
             except:
                 None #updating competence vector failed
 

@@ -1,6 +1,5 @@
 import math
 
-
 class TaskSelectionModel:
     def __init__(self, controller):
         self.controller = controller
@@ -33,9 +32,6 @@ class TaskSelectionModel:
         amount_of_tasks = len(filtered_tasks)
         learning_rate = self.controller.get_learning_rate()
 
-        for task in filtered_tasks:
-            print(task[1]["title"] + ": " + str(task[0]))
-
         if amount_of_tasks > 3:
             first_idx = 0
             second_idx = max(first_idx+1, round((learning_rate * 0.5) * amount_of_tasks - 1))
@@ -47,6 +43,7 @@ class TaskSelectionModel:
         return recommended_tasks
 
     def get_filtered_tasks(self, tasks, guided_mode, recommendations_only, current_skill_vector):
+        #filter the tasks on guided/monitored mode and recommendations
         if guided_mode:
             filtered_tasks = [task for task in tasks if task["mode"] == "guided"]
         else:

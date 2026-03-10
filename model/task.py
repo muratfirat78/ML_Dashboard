@@ -1,4 +1,4 @@
-
+#This class keeps track of the current task and the status of the subtasks
 class TaskModel:
   def __init__(self, controller):
     self.controller = controller

@@ -20,14 +20,14 @@ from imblearn.under_sampling import RandomUnderSampler
 from sklearn.impute import KNNImputer
 
 class DataProcessingModel:
+    # The model class for the data processing tab.
+    # It focuses on handling the data and performs all necessary calculations and processing for the data processing tab.
     def __init__(self, main_model, logger):
         self.main_model = main_model
         self.logger = logger
 
     def showCorrHeatMap(self,ProcssPage,processtype,result2exp):
-
         write_log('Correlation: '+processtype,result2exp, 'Correlation')
-
         if processtype == "Correlation":
             current_df = self.main_model.get_curr_df()
 
@@ -49,8 +49,7 @@ class DataProcessingModel:
         return 
 
     def ApplyPCA(self,features2,pca_features,result2exp):
-
-
+        # apply principal component analysis
         pcafeats = [ftname for ftname in pca_features.options]
         self.logger.add_action(['DataProcessing', 'PCA'], pcafeats)
 
@@ -58,9 +57,8 @@ class DataProcessingModel:
             write_log('PCA: Returned due to inclusion of target in PCA',result2exp, 'PCA')
             return
 
-        if self.main_model.datasplit:
-
-                  
+        if self.main_model.datasplit:    
+            #the dataset is split
             Xtest = self.main_model.get_XTest()
             XTrain = self.main_model.get_XTrain()
 
@@ -121,9 +119,8 @@ class DataProcessingModel:
             self.main_model.set_XTest(Xtest)
           
             write_log('PCA (split): done, size of final df'+str(len(self.main_model.get_XTrain())),result2exp, 'PCA')
-
-    
         else:
+            #the dataset is not split yet
             current_df = self.main_model.get_curr_df()
 
             for col in pcafeats:
@@ -148,8 +145,7 @@ class DataProcessingModel:
             write_log('PCA: explained variance'+str(pca.explained_variance_ratio_),result2exp, 'PCA')
             
             pcacols = [int(col[col.find(pcacolname)+11:]) for col in pcacols]
-    
-    
+
             pcid = 0
             if len(pcacols)>0:
                 pcid = max(pcacols)+1
@@ -163,19 +159,16 @@ class DataProcessingModel:
             self.main_model.set_curr_df(current_df)
             
             write_log('PCA: done, size of final df '+str(len(self.main_model.get_curr_df())),result2exp, 'PCA')
-
-
         return
      
     def remove_outliers(self,dt_features,methodtype,result2exp): 
-
         colname = dt_features.value
         write_log('Outlier removal: '+colname,result2exp, 'Outlier removal')
         self.logger.add_action(['DataProcessing', 'outlier'], colname)
       
         
         if self.main_model.datasplit:
-            
+            #the dataset is split
             write_log('Outlier removal: (split)-> '+': '+colname, result2exp, 'Data processing')
             Xtest_df = self.main_model.get_XTest()
             Xtrain_df = self.main_model.get_XTrain()
@@ -287,7 +280,7 @@ class DataProcessingModel:
 
        
         else:
-            
+            #the dataset is not split yet
             write_log('Outlier removal: (no split)-> '+': '+colname, result2exp, 'Data processing')
             curr_df = self.main_model.get_curr_df()
 
@@ -296,23 +289,16 @@ class DataProcessingModel:
                 imputer = KNNImputer(n_neighbors=8)
                 curr_df[colname] = imputer.fit_transform(curr_df[colname])
                 self.main_model.set_curr_df(curr_df)
-                   
-                  
-               
 
             if methodtype == "Remove (IQR)":
-                
                 quantiles = curr_df[colname].quantile([0.25,0.5,0.75])
                 IQR = quantiles[0.75] - quantiles[0.25]
                 boxplot_outlierLB =  quantiles[0.25]-1.5*IQR
                 boxplot_outlierUB =  quantiles[0.75]+1.5*IQR
-    
-    
                 prev_size = len(curr_df)
-                
                 outliers = curr_df[(curr_df[colname]>boxplot_outlierUB) | (curr_df[colname]<boxplot_outlierLB)]
                 curr_df = curr_df.drop(outliers.index)
-    
+     
                 write_log('Outlier removal: (no split)-> '+str(prev_size)+'->'+str(len(curr_df))+': '+colname, result2exp, 'Data processing')
                 self.main_model.set_curr_df(curr_df)
 
@@ -337,7 +323,7 @@ class DataProcessingModel:
     ##################################################################################
 
     def assign_target(self,trg_lbl,dt_features,prdtsk_lbl,result2exp):
-
+        # assign the target feature
         predictiontask = ''
 
         self.main_model.targetcolumn = dt_features.value
@@ -363,12 +349,14 @@ class DataProcessingModel:
         return predictiontask
     
     def make_featconvert(self,dt_features,result2exp):
+        #convert feature to a different datatype
         colname = dt_features.value
         self.logger.add_action(['DataProcessing', 'ConvertToBoolean'], colname)
                     
         write_log('Convert Feature Type-> '+colname, result2exp, 'Data processing')
 
         if self.main_model.datasplit:
+            #the dataset is split
             Xtrain_df = self.main_model.get_XTrain()
             ytrain_df = self.main_model.getYtrain().to_frame()
             ytest_df = self.main_model.get_YTest().to_frame()
@@ -398,6 +386,7 @@ class DataProcessingModel:
                     
 
         else:
+            #the dataset has not been split yet
             curr_df = self.main_model.get_curr_df()
             write_log('Convert Feature Type (no split)-> '+': '+str(len(curr_df)), result2exp, 'Data processing')
             if curr_df[colname].dtype in ['float64','int64','int32']:
@@ -416,16 +405,14 @@ class DataProcessingModel:
         return
 
     def make_scaling(self,dt_features,FeatPage,scalingtype,result2exp):
-                    
+        #apply scaling to the selected feature
         write_log('Scaling-> '+scalingtype, result2exp, 'Data processing')
-       
         colname = dt_features.value
       
         if colname is None:
             return
 
         write_log('Scaling-> '+scalingtype+': '+colname, result2exp, 'Data processing')
-    
         
         if scalingtype == 'Standardize':
             
@@ -440,7 +427,6 @@ class DataProcessingModel:
 
                 # use parameters of training data for scaling
                 write_log('Scaling (split)-> '+scalingtype+': '+colname, result2exp, 'Data processing')
-                
                 
                 if colname in Xtrain_df.columns:
 
@@ -522,6 +508,7 @@ class DataProcessingModel:
             self.logger.add_action(['DataProcessing', 'Normalize'], colname)
             logging.info('Data preprocessing, feature scaling: normalization of column '+ colname)
 
+        #display boxplot
         with FeatPage:
             clear_output()
             fig, (axbox, axhist) = plt.subplots(1,2)
@@ -566,6 +553,7 @@ class DataProcessingModel:
         return
     
     def make_balanced(self,features2,balancetype,ProcssPage,result2exp):  
+        # apply class balancing to a feature
         write_log('Balancing-> '+balancetype, result2exp, 'Data processing')     
         colname = features2.value
         if not self.main_model.datasplit:
@@ -612,6 +600,7 @@ class DataProcessingModel:
         return
 
     def make_split(self,splt_txt,result2exp):
+        #split the dataset
         curr_df = self.main_model.curr_df
         targetcolumn = self.main_model.targetcolumn
         if targetcolumn is None:
@@ -648,13 +637,14 @@ class DataProcessingModel:
         return
     
     def make_encoding(self,features2,encodingtype,ordselect,result2exp):
+        #apply encoding to a feature
         colname = features2.value
         if (colname is None) or (colname == ''):
             return
         
         # Encode column  
         if self.main_model.datasplit:
-
+            #The data has been split
             Xtest_df = self.main_model.get_XTest()
             Xtrain_df = self.main_model.get_XTrain()
             ytrain_df = self.main_model.getYtrain().to_frame()
@@ -748,6 +738,7 @@ class DataProcessingModel:
         return
 
     def savedata(self, dataFolder, datasetname):
+        #export the modified dataset to a csv file
         datasetname = os.path.splitext(os.path.basename(datasetname))[0]
         current_datetime = datetime.now().strftime('%Y%m%d_%H%M%S')
         filename = dataFolder + '/' + datasetname + '_' + current_datetime
@@ -756,6 +747,7 @@ class DataProcessingModel:
         version = 0
 
     def ReorderColumns(self):
+        #order the features so the objects are displayed at the top of the list
         objects = []
         if self.main_model.datasplit:
             for col in self.controller.main_model.get_XTrain().columns:

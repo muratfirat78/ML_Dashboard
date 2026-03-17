@@ -1,10 +1,13 @@
 import math
 
 class TaskSelectionModel:
+    # The model class for the data selection tab.
+    # It focuses on handling the data and performs all necessary calculations and processing for the data selection tab.
     def __init__(self, controller):
         self.controller = controller
 
     def get_recommended_tasks(self, tasks, current_skill_vector):
+        #This function calculates which tasks are to be recommended to the student
         tasks_above_skill_level = tasks
         task_differences = []
         # order tasks on difficulty and get the first three

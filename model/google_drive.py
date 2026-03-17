@@ -1,4 +1,3 @@
-#In online mode this class is used, in offline mode the local_drive.py file is used
 import os
 import random
 from datetime import datetime
@@ -12,6 +11,8 @@ import numpy as np
 import io
 
 class GoogleDrive:
+    # In online mode this class is used, in offline mode the local_drive.py file is used
+    # This class contains the functions to write to Google Drive and save the users performances
     def __init__(self):
         auth.authenticate_user()
         self.drive_service = build('drive', 'v3')
@@ -19,6 +20,7 @@ class GoogleDrive:
         self.userid = None
 
     def get_folder(self, userid):
+        #get the folder id of the Google Drive share
         query = f"name='{userid}' and '{self.folderid}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false"
         results = self.drive_service.files().list(q=query, fields="files(id)").execute()
         files = results.get('files', [])
@@ -27,6 +29,7 @@ class GoogleDrive:
             return files[0]['id']
     
     def download(self, file_id, file_name, userid):
+        #download a file
         request = self.drive_service.files().get_media(fileId=file_id)
 
         #create the userid folder if not existing
@@ -42,6 +45,7 @@ class GoogleDrive:
             status, done = downloader.next_chunk()
 
     def get_performances(self,userid):
+        #this function goes through the files in the shared Google Drive and downloads the files in the folder of the user
         folderid = self.get_folder(userid)
         query = f"'{folderid}' in parents and trashed=false"
         results = self.drive_service.files().list(q=query, fields="files(id, name)").execute()
@@ -55,6 +59,7 @@ class GoogleDrive:
                 self.download(file['id'], file['name'], userid)
 
     def login_correct(self,userid):
+        #This function returns if the user id exists in the Google Drive
         query = f"name='{userid}' and '{self.folderid}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false"
         results = self.drive_service.files().list(q=query, fields="files(id)").execute()
         if len(results['files']) > 0:
@@ -63,6 +68,7 @@ class GoogleDrive:
             return False
 
     def register(self):
+        #This function creates a user account by creating a user folder in the shared Google Drive
         if self.userid !=None:
             return "User already exists, your username is: " + self.userid
 
@@ -93,6 +99,7 @@ class GoogleDrive:
     
 
     def to_serializable(self, obj):
+        # This function is used to convert different type to the correct JSON format
         if isinstance(obj, np.generic):
             return obj.item()
         elif isinstance(obj, dict):
@@ -106,6 +113,7 @@ class GoogleDrive:
 
 
     def upload_log(self, result, userid, timestamp):
+        #upload the performance to the Google Drive
         with open('./drive/'+ userid + '/' + timestamp +
                     '.txt', 'w') as f:
             f.write(str(self.to_serializable(result)))

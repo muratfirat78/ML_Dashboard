@@ -1,4 +1,6 @@
 class ConvertPerformanceToTask:
+    # This model class is used for converting a perfromance to a task
+    # After a performance is made in the developer mode, the performance is converted to a task using this class
     def get_action_category(self,action):
         if action in ["Replace-Median", "Replace-Mean", "Replace-Mode", "Remove-Missing", "Drop Column", "Edit Range"]:
             return "Data Cleaning"
@@ -18,7 +20,13 @@ class ConvertPerformanceToTask:
         if action in ["ModelPerformance"]:
             return "Predictive Modeling"
         
-    
+    # the task following structure:
+    #task
+    #   subtask
+    #       subsubtask
+    #       subsubtask
+    #....
+    # Use get_subtask() and get_subsubtask() to retrieve existing sub/subsubtasks
     def get_subtask(self, subtasks, action):
         for subtask in subtasks:
             if subtask["title"] == self.get_action_category(action):
@@ -32,6 +40,7 @@ class ConvertPerformanceToTask:
         return None
 
     def get_title_subsubtask(self, subsubtask):
+        #convert action name to the subsubtask title
         action = subsubtask["action"][1]
 
         title_map = {
@@ -60,6 +69,7 @@ class ConvertPerformanceToTask:
         return title_map.get(action, "Unknown Task")        
 
     def load_actions(self):
+        # load the action descriptions from the actions.txt file
         filename="./model/actions.txt"
         actions = {}
         with open(filename, "r") as file:
@@ -80,6 +90,8 @@ class ConvertPerformanceToTask:
             return f"No description available for action: {action}"
 
     def order_matters_subtask(self, subtask):
+        # Returns if the order of the execution of the subsubtasks matters
+        # The order is used to check if the students performed the actions in the right order in guided mode
         if subtask["title"] == "Data Selection":
             return True
         elif subtask["title"] == "Data Cleaning":
@@ -179,6 +191,7 @@ class ConvertPerformanceToTask:
         return hints
 
     def convert_performance_to_task(self, performance, title, description):
+        #the function to convert the performance to task
         subtasks = []
         task = {}
         actions = []

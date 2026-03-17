@@ -9,12 +9,15 @@ import os
 colabpath = '/content/ML_Dashboard/DataSets'
 
 class DataSelectionModel:
+    # The model class for the data selection tab.
+    # It focuses on handling the data and performs all necessary calculations and processing for the data selection tab.
     def __init__(self, main_model, logger):
         self.main_model = main_model
         self.datafolder = None
         self.logger = logger
         
     def on_submitfunc(self,online_version,foldername,datasets):
+        # handle the selecting of a data folder
         self.datafolder = foldername
         dtsetnames = [] 
         
@@ -93,6 +96,7 @@ class DataSelectionModel:
         return 
     
     def file_Click(self,online_version,foldername,filename,wsheets): 
+        # Handle clicking on a filename in the list of files
         abs_file_path = ''
         
         if online_version:

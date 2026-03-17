@@ -3,6 +3,9 @@ import copy
 from model.student_performance import StudentPerformance
 
 class LearningPathModel:
+    # The model class for the my competence tab.
+    # It focuses on handling the data and performs all necessary calculations and processing for the my competence tab.
+
     def __init__(self, controller):
         self.controller = controller
         self.performance_data = []

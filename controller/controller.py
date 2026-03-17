@@ -329,8 +329,8 @@ class Controller:
     def get_predictive_modeling_score(self, reference_task):
         return self.learning_manager_model.get_predictive_modeling_score(reference_task, self.logger.get_performance())
     
-    def calculate_competence_vector(self, performance, reference_task, date):
-        return self.learning_manager_model.calculate_competence_vector(performance, reference_task, date)
+    def calculate_last_performance_score(self, performance, reference_task, date):
+        return self.learning_manager_model.calculate_last_performance_score(performance, reference_task, date)
 
     def calculate_performance_score(self, performance, reference_task):
         return self.learning_manager_model.calculate_performance_score(performance, reference_task)

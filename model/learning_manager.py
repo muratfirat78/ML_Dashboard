@@ -8,6 +8,7 @@ from sklearn.model_selection import train_test_split
 from model.student_performance import StudentPerformance
 
 class LearningManagerModel:
+    # This class is responsible for tracking the competence of the student. It also calculates the scores for the student performances
     def __init__(self, controller):
         self.controller = controller
         self.performances = []
@@ -17,35 +18,70 @@ class LearningManagerModel:
         self.learning_rate = 0
         self.competence_vectors_with_tasks = []
         self.learning_rate = 0
+        
+    def validate_performance(self, reference_task, current_performance):
+            # Check data size
+            data_size = current_performance.get_metric("data_size")
+            min_data_size_threshold = reference_task["data_size"] * 0.9
+            max_data_size_threshold = reference_task["data_size"] * 1.1
 
-
-    def get_learning_path(self):
-        return self.performances
-
-    def set_learning_path(self,userid):
-        self.performances = []
-        path = os.path.join('drive', str(userid))
-        for filename in os.listdir(path):
-            with open(os.path.join(path,filename),'r') as file:
-                for line in file:
-                    try:
-                        performance = StudentPerformance(self.controller)
-                        performance.string_to_student_performance(line, filename.replace('.txt', ''))
-                        self.performances.append(performance)
-                    except:
-                        # print("Error reading performance")
-                        None
-
-
-    def subsubtask_in_current_task(self, action, value, current_task):
-        for subtask in current_task["subtasks"]:
-            for subsubtask in subtask["subtasks"]:
-                if subsubtask["action"] == action:
-                    if value in subsubtask["value"]:
-                        return True
-        return False
+            # # Data size smaller than the minimum or larger than the maximum data size
+            # if data_size < min_data_size_threshold or data_size > max_data_size_threshold:
+            #     return False
             
+            # Missing values
+            missing_values= current_performance.get_metric("missing_values")
+            if missing_values > 0:
+                return False
+            
+            # Type
+            d_type = current_performance.get_metric("type")
+            if d_type != reference_task["type"]:
+                return False
+
+            # # Range
+            # range = current_performance.get_metric("range")
+            
+            # try:
+            #     # check number range
+            #     min_max = range.split("-")
+            #     min_val = int(min_max[0])
+            #     max_val = int(min_max[1])
+
+            #     ref_range = reference_task["range"]
+            #     min_max_ref = ref_range.split("-")
+            #     ref_min = int(min_max_ref[0])
+            #     ref_max = int(min_max_ref[1])
+
+            #     deviation_margin = 10
+
+            #     min_threshold = ref_min * (1 - (deviation_margin/100))
+            #     max_threshold = ref_max * (1 + (deviation_margin/100))
+
+            #     if min_val < min_threshold or min_val > max_threshold:
+            #         return False
+                
+            #     if max_val < min_threshold or max_val > max_threshold:
+            #         return False
+            # except:
+            #     # If parsing fails, fall back to simple string comparison
+            #     if range != reference_task["range"]:
+            #         return False
+                
+            return True
+      
+      
+    
+    def get_overlap_scores(self, reference_task, current_performance):
+        #calculates the overlap scores for all the skill types
+            result = {}
+            for skill, difficulty in reference_task['difficulty']:
+                result[skill] = self.get_overlap_score(reference_task, skill, current_performance)
+            result['Predictive Modeling'] = self.get_predictive_modeling_score(reference_task,current_performance)
+            return result
+        
     def get_overlap_score(self, reference_task, skill, current_performance):
+        #This function calculates the overlap score for one skill, it calculates how much the performance overlaps with the reference performance
         for subtask in reference_task["subtasks"]:
             if subtask["title"] == skill:
                 if subtask["title"] == 'Predictive Modeling':
@@ -73,13 +109,32 @@ class LearningManagerModel:
                     score = correct / amount_of_subsubtasks
                 return score
         return 0
-    
-    def get_overlap_scores(self, reference_task, current_performance):
-        result = {}
-        for skill, difficulty in reference_task['difficulty']:
-            result[skill] = self.get_overlap_score(reference_task, skill, current_performance)
-        result['Predictive Modeling'] = self.get_predictive_modeling_score(reference_task,current_performance)
-        return result
+            
+    def calculate_performance_score(self, performance, reference_task):
+        #this is the main function for checking the performance and calculating the scores
+        try:
+            current_task = self.controller.convert_performance_to_task(performance, "", "")
+            target_column = self.controller.get_target_task(current_task)
+            dataset_name = current_task["dataset"].replace(".csv", "")
+
+            if reference_task == None:
+                reference_task = self.controller.get_reference_task(target_column, dataset_name)       
+                if not reference_task:
+                    # reference task not found
+                    return None
+            valid_performance = self.validate_performance(reference_task, performance)
+            if valid_performance:
+                overlap_score = self.get_overlap_scores(reference_task, performance) #for example: {data_cleaning: 0.3,...}
+                predictive_modeling_score = overlap_score["Predictive Modeling"]
+
+                for skill,score in overlap_score.items():
+                    overlap_score[skill] = max(score, predictive_modeling_score)
+                
+                return overlap_score
+            return None
+             
+        except Exception as e:
+            return None
 
     def get_predictive_modeling_score(self, reference_task, performance):
         reference_metric = reference_task["model_metric"]
@@ -102,110 +157,9 @@ class LearningManagerModel:
                 score = max(0, score) # take the max of the score and 0 to prevent score being lower than 0
                 return score
         return 0
-    
-    def get_competence_vector(self, overlap_score, task_difficulty, date):
-        final_score = {}
-        final_score['date'] = date
 
-        predictive_modeling_score = overlap_score["Predictive Modeling"]
-        for skill, difficulty in task_difficulty:
-            overlap = overlap_score.get(skill, 0.0) * difficulty
-            predictive_modeling = predictive_modeling_score * difficulty
-            final_score[skill] = max(overlap,predictive_modeling)
-        
-        return final_score
-    
-    def get_performance_score(self, overlap_score, task_difficulty, date):
-        final_score = {}
-        final_score['date'] = date
-
-        predictive_modeling_score = overlap_score["Predictive Modeling"]
-        for skill, difficulty in task_difficulty:
-            overlap = overlap_score.get(skill, 0.0) * difficulty
-            predictive_modeling = predictive_modeling_score * difficulty
-            final_score[skill] = max(overlap,predictive_modeling)
-        
-        return final_score
-
-    def validate_performance(self, reference_task, current_performance):
-        # Check data size
-        data_size = current_performance.get_metric("data_size")
-        min_data_size_threshold = reference_task["data_size"] * 0.9
-        max_data_size_threshold = reference_task["data_size"] * 1.1
-
-        # # Data size smaller than the minimum or larger than the maximum data size
-        # if data_size < min_data_size_threshold or data_size > max_data_size_threshold:
-        #     return False
-        
-        # Missing values
-        missing_values= current_performance.get_metric("missing_values")
-        if missing_values > 0:
-            return False
-        
-        # Type
-        d_type = current_performance.get_metric("type")
-        if d_type != reference_task["type"]:
-            return False
-
-        # # Range
-        # range = current_performance.get_metric("range")
-        
-        # try:
-        #     # check number range
-        #     min_max = range.split("-")
-        #     min_val = int(min_max[0])
-        #     max_val = int(min_max[1])
-
-        #     ref_range = reference_task["range"]
-        #     min_max_ref = ref_range.split("-")
-        #     ref_min = int(min_max_ref[0])
-        #     ref_max = int(min_max_ref[1])
-
-        #     deviation_margin = 10
-
-        #     min_threshold = ref_min * (1 - (deviation_margin/100))
-        #     max_threshold = ref_max * (1 + (deviation_margin/100))
-
-        #     if min_val < min_threshold or min_val > max_threshold:
-        #         return False
-            
-        #     if max_val < min_threshold or max_val > max_threshold:
-        #         return False
-        # except:
-        #     # If parsing fails, fall back to simple string comparison
-        #     if range != reference_task["range"]:
-        #         return False
-            
-        return True
-    
-    def calculate_performance_score(self, performance, reference_task):
-        try:
-            current_task = self.controller.convert_performance_to_task(performance, "", "")
-            target_column = self.controller.get_target_task(current_task)
-            dataset_name = current_task["dataset"].replace(".csv", "")
-
-            if reference_task == None:
-                reference_task = self.controller.get_reference_task(target_column, dataset_name)       
-                if not reference_task:
-                    # reference task not found
-                    return None
-            valid_performance = self.validate_performance(reference_task, performance)
-            if valid_performance:
-                overlap_score = self.get_overlap_scores(reference_task, performance) #for example: {data_cleaning: 0.3,...}
-                predictive_modeling_score = overlap_score["Predictive Modeling"]
-
-                for skill,score in overlap_score.items():
-                    overlap_score[skill] = max(score, predictive_modeling_score)
-                
-                return overlap_score
-
-            return None
-
-        
-        except Exception as e:
-            return None
-
-    def calculate_competence_vector(self, performance, reference_task, date):
+    def calculate_last_performance_score(self, performance, reference_task, date):
+        # This function is used to generate the data for the visualisations of the scores of the last performance
         try:
             current_task = self.controller.convert_performance_to_task(performance, "", "")
             target_column = self.controller.get_target_task(current_task)
@@ -221,7 +175,7 @@ class LearningManagerModel:
                 if not date:
                     date = performance.performance['General']['Date'][0]
                 overlap_score = self.get_overlap_scores(reference_task, performance) #for example: {data_cleaning: 0.3,...}
-                competence_vector = self.get_competence_vector(overlap_score, reference_task['difficulty'], date)
+                competence_vector = self.get_score_scaled_with_task_difficulty(overlap_score, reference_task['difficulty'], date)
                 return competence_vector
 
         except Exception as e:
@@ -231,7 +185,6 @@ class LearningManagerModel:
         for task_skill in task_difficulty:
             if task_skill[0] == skill:
                 return task_skill[1]
-        
         return None
 
     def update_competence_vector(self, performance_score, current_competence_vector, task_difficulty, date, dataset):
@@ -273,29 +226,6 @@ class LearningManagerModel:
                     skills.append(skill[0])
         return skills
 
-                
-    def set_competence_sequence(self):
-        performances = self.performances
-        for performance in performances:
-            current_task = self.controller.convert_performance_to_task(performance, "", "")
-            target_column = self.controller.get_target_task(current_task)
-            dataset_name = current_task["dataset"].replace(".csv", "")
-            reference_task = self.controller.get_reference_task(target_column, dataset_name)
-            if reference_task:       
-                performance_score = self.calculate_performance_score(performance,reference_task)
-                if performance_score:
-                    previous_best = self.competence_sequence.get(dataset_name)
-                    current_predictive_modeling_score = performance_score["Predictive Modeling"]
-                    if previous_best != None:
-                        # only keep the oldest date
-                        date = min(performance.performance['General']['Date'][0], previous_best["date"])
-                        if previous_best["score"] <  current_predictive_modeling_score:
-                            #update best score on dataset
-                            self.competence_sequence[dataset_name] = {"performance": performance, "score": current_predictive_modeling_score, "date": date}
-                    else:
-                        date = performance.performance['General']['Date'][0]
-                        self.competence_sequence[dataset_name] = {"performance": performance, "score": current_predictive_modeling_score, "date": date}
-
     def set_competence_vectors(self):
         performances = [
             entry["performance"] 
@@ -331,23 +261,33 @@ class LearningManagerModel:
                     date = performance.performance['General']['Date'][0]
                     self.update_competence_vector(performance_score, current_competence_vector, task_difficulty, date, dataset_name)
                     current_competence_vector = self.current_competence_vector
+                    
+    def set_competence_sequence(self):
+        # the competence sequence is used for calculating the learning rate
+        performances = self.performances
+        for performance in performances:
+            current_task = self.controller.convert_performance_to_task(performance, "", "")
+            target_column = self.controller.get_target_task(current_task)
+            dataset_name = current_task["dataset"].replace(".csv", "")
+            reference_task = self.controller.get_reference_task(target_column, dataset_name)
+            if reference_task:       
+                performance_score = self.calculate_performance_score(performance,reference_task)
+                if performance_score:
+                    previous_best = self.competence_sequence.get(dataset_name)
+                    current_predictive_modeling_score = performance_score["Predictive Modeling"]
+                    if previous_best != None:
+                        # only keep the oldest date
+                        date = min(performance.performance['General']['Date'][0], previous_best["date"])
+                        if previous_best["score"] <  current_predictive_modeling_score:
+                            #update best score on dataset
+                            self.competence_sequence[dataset_name] = {"performance": performance, "score": current_predictive_modeling_score, "date": date}
+                    else:
+                        date = performance.performance['General']['Date'][0]
+                        self.competence_sequence[dataset_name] = {"performance": performance, "score": current_predictive_modeling_score, "date": date}
 
-    def read_file(self, filename):
-        if self.controller.get_online_version():
-            abs_file_path = f"/content/ML_Dashboard/DataSets/{filename}"
-        else:
-            abs_file_path = os.path.join(Path.cwd(), "DataSets", filename)
-
-        if filename.endswith(".csv"):
-            df = pd.read_csv(abs_file_path)
-        elif filename.endswith(".tsv"):
-            df = pd.read_csv(abs_file_path, sep="\t")
-        elif filename.endswith((".xls", ".xlsx")):
-            df = pd.read_excel(abs_file_path)
-
-        return df
 
     def set_learning_rate(self):
+       #calulcate the learning rate
        previous_competence_vector = None
        for next_competence_vector in self.competence_vectors_with_tasks:
             if previous_competence_vector == None:
@@ -372,6 +312,35 @@ class LearningManagerModel:
             learning_rate = max(0,std_jump)/max_jump
             self.learning_rate = learning_rate
             previous_competence_vector = next_competence_vector
-        
+    
     def get_learning_rate(self):
         return self.learning_rate
+    
+    def get_learning_path(self):
+        return self.performances
+
+    def set_learning_path(self,userid):
+        self.performances = []
+        path = os.path.join('drive', str(userid))
+        for filename in os.listdir(path):
+            with open(os.path.join(path,filename),'r') as file:
+                for line in file:
+                    try:
+                        performance = StudentPerformance(self.controller)
+                        performance.string_to_student_performance(line, filename.replace('.txt', ''))
+                        self.performances.append(performance)
+                    except:
+                        None
+
+    def get_score_scaled_with_task_difficulty(self, overlap_score, task_difficulty, date):
+        # get the updated competence vector scaled with the task difficulty
+        final_score = {}
+        final_score['date'] = date
+
+        predictive_modeling_score = overlap_score["Predictive Modeling"]
+        for skill, difficulty in task_difficulty:
+            overlap = overlap_score.get(skill, 0.0) * difficulty
+            predictive_modeling = predictive_modeling_score * difficulty
+            final_score[skill] = max(overlap,predictive_modeling)
+        
+        return final_score

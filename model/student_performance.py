@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 import re
 
 class StudentPerformance:
+    # this class is used to track the students actions in a structured way
     def __init__(self, controller):
         self.controller = controller
         self.performance = { 

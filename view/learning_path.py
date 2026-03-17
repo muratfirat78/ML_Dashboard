@@ -152,7 +152,7 @@ class LearningPathView:
 
                 self.label2.value = "Previous result (" + reference_task["title"] + "):"
 
-                competence_vector = self.controller.calculate_competence_vector(last_performance,reference_task, current_datetime)
+                competence_vector = self.controller.calculate_last_performance_score(last_performance,reference_task, current_datetime)
                 img_html = self.controller.get_result_bar_chart(competence_vector, difficulty_data) 
                 self.previous_performance.value = img_html
                 return

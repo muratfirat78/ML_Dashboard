@@ -5,6 +5,8 @@ import statsmodels.api as sm
 from sklearn.naive_bayes import GaussianNB 
 
 class MLModel:
+    # The MLModel is used to store the machine learning and all its associated informations.
+    # It is mainly used in the PredictiveModelingModel class
     def __init__(self,target,tasktype,mytype,report,myname,params,xtrain,ytrain):
         self.modelparams = dict()
         self.performance = dict()
@@ -128,6 +130,8 @@ class MLModel:
         return self.performance
 
 class PredictiveModelingModel: 
+    # The model class for the predictive modeling tab.
+    # It focuses on handling the data and performs all necessary calculations and processing for the predictive modeling tab.
 
     def __init__(self, main_model, controller, logger):
         self.main_model = main_model

@@ -1,9 +1,11 @@
-#In offline mode this class is used, in online mode the google_drive.py file is used
+
 import os
 import random
 from datetime import datetime
 
 class GoogleDrive():
+    # In offline mode this class is used, in online mode the google_drive.py file is used
+    # This class contains the functions to write to local folder and save the users performances
     def login_correct(self,userid):
         if userid == '':
            return False

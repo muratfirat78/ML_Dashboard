@@ -3,6 +3,8 @@ from datetime import datetime
 from model.student_performance import StudentPerformance
 
 class Logger:
+    #this logger is used to keep track of the actions the student does. 
+    #The list of actions is displayed in the log tab
     def __init__(self, controller):
         self.student_performance = StudentPerformance(controller)
         self.controller = controller

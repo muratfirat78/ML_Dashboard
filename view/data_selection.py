@@ -11,6 +11,9 @@ display.display(HTML("<style>.blue_label { color:blue }</style>"))
 
 
 class DataSelectionView:
+    # The view class for the data selection tab.
+    # It focuses on the UI and user interactions for data selection.
+
     def __init__(self, controller, main_view, task_menu):
         self.controller = controller
         self.datafolder = None
@@ -25,6 +28,7 @@ class DataSelectionView:
         self.statlbl = None
 
     def fileClick(self, event):
+        # Handle clicking on a filename
         global wslay,wsheets,butlay
 
         self.controller.file_Click(self.controller.get_datafolder(),self.main_view.datasets.value,wsheets)
@@ -36,6 +40,7 @@ class DataSelectionView:
         return
 
     def read_dataset(self,b):  
+        # Read the dataset
         global InfoPage,wsheets
         rowheight = 20
         featurelist_width = '100%'
@@ -65,6 +70,7 @@ class DataSelectionView:
         self.main_view.right_page.layout.display = 'block'
         self.main_view.right_page.layout.visibility = 'visible'
         
+        #show info about the dataset
         with self.main_view.right_page:
             clear_output()
             totalmisses = 0
@@ -105,19 +111,12 @@ class DataSelectionView:
         return
 
     def on_submit_func(self, event):
+        # handle the selecting of a data folder
         self.controller.on_submitfunc(self.datafolder.value,self.main_view.datasets)
         return
 
-    def settaskmenu(self,monitormode):
-        if not monitormode:
-            self.task_menu.layout.display = 'block'
-            self.task_menu.layout.visibility  = 'visible'
-        else:
-            self.task_menu.layout.visibility  = 'hidden'
-            self.task_menu.layout.display = 'none'
-        return
-
     def get_data_selection_tab(self):
+        #create the view of the data selection tab
         global wsheets, wslay, butlay, DFPage
         wslay =  widgets.Layout()
         wslay.display = 'none'

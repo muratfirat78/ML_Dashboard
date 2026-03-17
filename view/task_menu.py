@@ -2,10 +2,9 @@ import ipywidgets as widgets
 from IPython.display import display, HTML
 
 class TaskMenuView:
-    
+    # The view class for the task menu, used to show hints, explain steps and track student actions.
     def __init__(self, controller):
         self.slider = widgets.IntSlider(layout=widgets.Layout(width="99%"), min=1,max=1)
-        
         self.slider.style.handle_color = 'lightblue'
         self.slider.observe(self.slider_change)
         self.previous_button = widgets.Button(description='<< Previous', button_style="primary")
@@ -69,6 +68,7 @@ class TaskMenuView:
             self.slider.value = self.slider.value + 1
 
     def slider_change(self, change):
+        # update the information in the task menu based on the value selected with the slider
         if len(self.task_list) == 0:
             return
         
@@ -164,6 +164,7 @@ class TaskMenuView:
         return self.ui
     
     def set_current_task(self, task, mode):
+        #set the data for the current task to display in the task menu
         slider_value = self.slider.value        
         task_list = []
         for subtask in task["subtasks"]:
@@ -216,6 +217,7 @@ class TaskMenuView:
 
 
     def finished_task(self, competence_vector):
+        #display that the student has finished the task
         self.finishedtask = True
         self.competence_vector = competence_vector
         self.slider.max = len(self.task_list)+1

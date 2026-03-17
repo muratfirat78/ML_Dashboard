@@ -1,6 +1,9 @@
 from ipywidgets import *
 
 class TaskSelectionView:
+    # The view class for the task selection tab, in this menu the student can choose the task and the mode.
+    # It focuses on the UI and user interactions for the task selection tab
+
     def __init__(self, controller):
         self.controller = controller
         self.recommmended_radio_buttons = None
@@ -57,7 +60,6 @@ class TaskSelectionView:
         self.recommmended_radio_buttons.layout.visibility = 'hidden'
         self.recommmended_radio_buttons.layout.display = 'none'
 
-
         self.select_button = widgets.Button(
             description='Start Task',
             button_style='success'
@@ -103,6 +105,7 @@ class TaskSelectionView:
         self.description_label.value = self.get_description(new_title)
 
     def filter_task_selection(self, change):
+        # filter the options in the tasks list, based on the chosen guided/monitored mode and if tasks need to be recommended
         if change != None:
             if change["new"] == "Recommend me tasks":
                 self.recommendations_only = True
@@ -126,6 +129,7 @@ class TaskSelectionView:
             self.task_dropdown.options=list(self.task_map.keys())
 
     def start_task(self, event):
+        #handle the starting of the task
         if self.mode_dropdown.value == "myself":
             monitored_mode = True
         elif self.mode_dropdown.value == "in a guided way":
@@ -137,6 +141,7 @@ class TaskSelectionView:
         self.controller.hide_task_selection_and_show_tabs()
 
     def start_developer_mode(self, event):
+        #developer mode for creating tasks
         self.controller.set_developer_mode()
         self.controller.hide_task_selection_and_show_tabs()
 

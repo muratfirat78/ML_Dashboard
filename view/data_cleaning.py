@@ -6,6 +6,9 @@ import seaborn as sns
 from ipywidgets import *
 
 class DataCleaningView:
+    # The view class for the data cleaning tab.
+    # It focuses on the UI and user interactions for data cleaning.
+
     def __init__(self, controller, main_view, task_menu):
         self.controller = controller
         self.main_view = main_view
@@ -23,6 +26,7 @@ class DataCleaningView:
         
 
     def featureclclick(self,trgcl_lbl,featurescl,miss_lbl):  
+        # handle click on a feature
         colname = featurescl.value
         missng_vals = 0
         totalmisses  = 0
@@ -76,6 +80,7 @@ class DataCleaningView:
         return
 
     def makecleaning(self,event):
+        # Handle the performing of a data cleaning action
         global result2aexp
         params = []
         if  self.missacts.value == "Edit Range":
@@ -109,6 +114,7 @@ class DataCleaningView:
         
 
         with self.main_view.right_page:
+            #show graph of the selected feature
             clear_output()
             missing_df = pd.DataFrame(columns=['feature','missing values'])
             totalmisses  = 0
@@ -149,12 +155,14 @@ class DataCleaningView:
 
    
     def missacts_changed(self,change):
+        #show the explaination of the selected step
         if change['name'] == 'value':         
             step = change['new']              
             self.controller.show_step_explaination(step)
 
 
     def get_data_cleaning_tab(self):
+        #create the view of the data cleaning tab
         global trgcl_lbl,miss_lbl, result2aexp
         RP_lay=Layout(align_items='center',overflow="visible")
         self.main_view.right_page = widgets.Output(layout = RP_lay)

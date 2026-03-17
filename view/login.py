@@ -1,6 +1,8 @@
 from ipywidgets import *
 
 class LoginView:
+    # The view class for login and register screen.
+    # It focuses on the UI and user interactions for the login and register screen.
     def __init__(self, controller):
         self.controller = controller
         self.login_input = None
@@ -34,9 +36,6 @@ class LoginView:
         
         register_text = "If you don't have a userid yet, please click register to get a userid."
         self.register_label = widgets.HTML(value = f"<b><font color='red'>{register_text}</b>")
-        # widgets.Label(
-        #     value = r'\(\color{red} {' + register_text  + '}\)'
-        # )
 
         self.loading_text = widgets.Label(
             value="Downloading user data..."

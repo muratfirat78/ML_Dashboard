@@ -9,6 +9,9 @@ import numpy as np
 from array import array
 
 class PredictiveModelingView:
+    # The view class for the predictive modeling tab.
+    # It focuses on the UI and user interactions for predictive modeling.
+
     def __init__(self, controller, main_view,task_menu):
         self.controller = controller
         self.main_view = main_view
@@ -51,7 +54,8 @@ class PredictiveModelingView:
         self.progress = None
         self.selectedMLmodel = None
         
-    def models_click(self,change):     
+    def models_click(self,change):
+        #handle the selection of a model type     
         self.plt_btn.layout.visibility = 'hidden'
 
         for mdl in self.controller.get_trained_models():
@@ -121,6 +125,7 @@ class PredictiveModelingView:
         return
 
     def ShowParamOpts(self,event):
+        #show the available parameters for the model
         self.paramchangective = True
         self.progress.value+="********** ShowOptions***********"+"\n"
         self.progress.value+="Model "+str(self.selectedmodel)+"\n"
@@ -147,6 +152,7 @@ class PredictiveModelingView:
         return
 
     def ChangeParamVal(self,event):
+        #handle the modification of a parameter
         self.progress.value+="**********ChangeParam***********"+"\n"
         self.progress.value+="in change paramter..."+"\n"
 
@@ -172,6 +178,7 @@ class PredictiveModelingView:
     
 
     def ShowModel(self,event):
+        #show the performance and parameters of the ML model
         self.dtcrit.layout.visibility = 'hidden'
         self.dtcrit.layout.display = 'none'
         self.dtminseg.layout.visibility = 'hidden'
@@ -237,6 +244,7 @@ class PredictiveModelingView:
         return
 
     def PlotGraph(self,event):
+        #visualize the performance of the ML model
         with self.performpage:          
             clear_output()
             Xtrain_df = self.controller.main_model.get_XTrain()
@@ -273,6 +281,7 @@ class PredictiveModelingView:
 
 
     def TrainModel(self,event): 
+        #handle the training of the model
         self.trnml_btn.disabled = True
 
         self.progress.value += 'Train Model...'+str(self.selectedmodel)+'\n'
@@ -289,6 +298,7 @@ class PredictiveModelingView:
         return
 
     def get_predictive_modeling_tab(self):
+        #create the view of the predictive modeling tab
         self.trnml_btn= widgets.Button(description="Train")
         self.trnml_btn.layout.width = '98px'
         self.trnml_btn.on_click(self.TrainModel)
@@ -507,8 +517,6 @@ class PredictiveModelingView:
         vbox2 = VBox(children = [self.performpage])
 
         tab_4 = VBox([self.task_menu,HBox([vbox1,vbox2])])
-        
-        #tab_4 = VBox([self.task_menu, HBox([VBox(children=[self.mdltitle,self.modelmenu]), separator,vbox1,vbox2])])
         
         tab_4.layout.height = '700px'
         return tab_4

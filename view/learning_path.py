@@ -7,6 +7,8 @@ import matplotlib.colors as mcolors
 
 class LearningPathView:
     def __init__(self, controller):
+        # The view class for the my competence tab.
+        # It focuses on the UI and user interactions for my competence.
         self.controller = controller
         self.graph_data = [{"date":None}]
         self.label = widgets.Label(value="Log current model:")
@@ -40,6 +42,7 @@ class LearningPathView:
 
 
     def get_icon(self, category):
+        #add name of the action types to the action log
         if category == 'SelectData':
             return '(Data selection)'
         if category == 'DataCleaning':
@@ -51,6 +54,7 @@ class LearningPathView:
         return ''
 
     def update_actions(self):
+        #update the action log
         actions = self.controller.get_list_of_actions()
         updated_action_array = []
 
@@ -60,6 +64,7 @@ class LearningPathView:
         self.list.options = updated_action_array
 
     def update_bar_chart(self):
+        #Update the bar chart visualizing the competence types and levels
         self.bar_chart.clear_output()
         with self.bar_chart:
             stat_data = self.graph_data[-1].copy()
@@ -88,6 +93,7 @@ class LearningPathView:
             return plt
 
     def update_line_chart(self, value):
+        # Update the line chart with the histery of the competence levels
         value = value["new"]
         self.line_chart.clear_output()
         with self.line_chart:
@@ -122,16 +128,18 @@ class LearningPathView:
         return self.hbox
     
     def set_graph_data(self, graph_data):
+        #set the graph data used for visualisations of the competence levels
         self.graph_data = graph_data
         if len(graph_data) > 0:
             self.update_bar_chart()
             self.update_line_chart({"new": "Predictive Modeling"})
     
     def set_last_performance_data(self):
+        #set the performance data used for the visualisations
         learning_path = self.controller.get_learning_path()
         if len(learning_path) > 0:
             last_performance = learning_path[-1]
-            # Convert to task to get target and dataset name more easily
+            # Convert to task to get target and dataset name
             task = self.controller.convert_performance_to_task(last_performance, "", "")
             target_column = self.controller.get_target_task(task)
             dataset_name = task["dataset"].replace(".csv", "")

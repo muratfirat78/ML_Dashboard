@@ -4,11 +4,12 @@ from ipywidgets import *
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-
-
 predictiontask = None
 
 class DataProcessingView:
+    # The view class for the data processing tab.
+    # It focuses on the UI and user interactions for data processing.
+
     def __init__(self, controller, main_view, task_menu):
         self.controller = controller
         self.main_view = main_view
@@ -37,6 +38,7 @@ class DataProcessingView:
         self.methodsmenu = None
 
     def featureprclick(self,features2,FeatPage,processtypes,ProcssPage):  
+        # handle click on a feature
         colname = features2.value
         display_df = self.controller.get_curr_df()
 
@@ -91,6 +93,7 @@ class DataProcessingView:
         return
     
     def savecurrdata(self,event):
+        #save the current dataset
         self.controller.savedata(self.controller.get_datafolder(), self.main_view.datasets.value)
 
     def makebalanced(self,event):  
@@ -101,6 +104,7 @@ class DataProcessingView:
         return
 
     def selectProcessType(self,event):   
+        # Handle the selection the type of action
         self.methodslbl.layout.visibility = 'hidden'
         self.methodslbl.layout.display = 'none'
 
@@ -147,6 +151,7 @@ class DataProcessingView:
 
 
     def ApplyMethod(self,event):  
+        # Handle the performing of a data processing action
         global predictiontask
         refreshFeatures = True
         self.ApplyButton.disabled = True
@@ -216,6 +221,7 @@ class DataProcessingView:
    
 
     def get_data_processing_tab(self):
+        #create the view of the data processing tab
         self.main_view.feat_page = widgets.Output()
         self.main_view.process_page = widgets.Output()
     

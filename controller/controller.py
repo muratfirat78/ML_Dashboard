@@ -26,6 +26,8 @@ import json
 import numpy as np
 
 class Controller:
+    # This controller class is used to facilitate the communication between the view and the model.
+    # It contains the instances for the classes of the models and views.
     def __init__(self, drive, online_version):
         self.monitored_mode = None
         self.main_model = MainModel(online_version)
@@ -55,8 +57,6 @@ class Controller:
         self.task_finished = False
         self.developer_mode = False
         self.predictiontask = None
-        # performance = {'General': {}, 'SelectData': {'DataSet': ('titanic.csv', 0)}, 'DataCleaning': {'Drop Column': [(['Fare'], 1), (['Ticket'], 2), (['Parch'], 3), (['SibSp'], 4), (['Name'], 5), (['Pclass'], 6), (['PassengerId'], 7), (['Cabin'], 9)], 'Remove-Missing': (['Embarked'], 8), 'Replace-Median': (['Age'], 10)}, 'DataProcessing': {'LabelEncoding': [(['Embarked'], 11), (['Sex'], 12)], 'ConvertToBoolean': ('Survived', 13), 'AssignTarget': ('Survived', 14), 'Split': ('20%', 15)}, 'ModelDevelopment': {'ModelPerformance': (('Logistic Regression()', [('True-Positive', 56), ('False-Positive', 16), ('True-Negative', 86), ('False-Negative', 20), ('Accuracy', 0.797752808988764), ('Precision', 0.7777777777777778), ('Recall', 0.7368421052631579), ('ROCFPR', ([0.        , 0.15686275, 1.        ])), ('ROCTPR',([0.        , 0.73684211, 1.        ]))]), 16)}}
-        # self.convertPerformanceToTask.convert_performance_to_task(performance)
         if drive != None:
             self.drive = drive
         else:
@@ -191,7 +191,6 @@ class Controller:
                 self.login_view.hide_login()
                 self.main_view.set_title(4, 'Log (userid:' + str(userid) + ')')
                 self.task_selection_view.show_task_selection()
-
             else:
                 print("login incorrect")
         else:
@@ -206,7 +205,7 @@ class Controller:
             self.task_model.set_reference_task(reference_task)
             self.task_model.update_statusses_and_set_current_tasks()
         else:
-            self.task_model.set_current_task(reference_task) # current task is what is displayed on the left side, so set current task to reference task in guided mode
+            self.task_model.set_current_task(reference_task) 
             self.task_menu.set_current_task(self.task_model.get_current_task(), "guided")
             self.task_model.update_statusses_and_set_current_tasks()
 
@@ -262,7 +261,6 @@ class Controller:
                 if self.task_finished == True:
                     self.task_menu.finished_task(None)
 
-
     def read_dataset_view(self, dataset):
         self.set_datafolder("DataSets")
         self.main_view.datasets.options = [dataset]
@@ -288,7 +286,6 @@ class Controller:
             elif not self.monitored_mode:
                 self.task_finished = True
             
-
     def get_learning_path_view(self):
         return self.learning_path_view.get_learning_path_tab()
     

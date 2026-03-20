@@ -1,6 +1,6 @@
 from sklearn import preprocessing 
 from sklearn.decomposition import PCA
-from log import *
+from model.debug_logger import *
 from sklearn.model_selection import train_test_split 
 from IPython.display import clear_output
 from IPython import display

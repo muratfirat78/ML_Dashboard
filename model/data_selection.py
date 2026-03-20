@@ -1,4 +1,4 @@
-from log import *
+from model.debug_logger import *
 import pandas as pd
 from IPython.display import clear_output
 from IPython import display

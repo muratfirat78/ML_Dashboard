@@ -1,4 +1,4 @@
-from model.debug_logger import *
+from log import *
 from sklearn import tree,neighbors,linear_model,ensemble,svm
 from sklearn.metrics import accuracy_score,mean_squared_error,confusion_matrix,roc_curve,precision_score,recall_score,mean_absolute_error,r2_score
 import statsmodels.api as sm

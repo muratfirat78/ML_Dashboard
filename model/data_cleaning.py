@@ -1,4 +1,4 @@
-from model.debug_logger import *
+from log import *
 import numpy as np
 
 class DataCleaningModel:

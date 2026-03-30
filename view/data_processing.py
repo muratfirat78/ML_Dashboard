@@ -355,7 +355,7 @@ class DataProcessingView:
         
         self.progress = widgets.Textarea(value='', placeholder='',description='',disabled=True,layout = res2lay)
 
-        vbox1 = VBox(children = [HBox(children=[self.f_box,sel_box])])
+        vbox1 = VBox(children = [HBox(children=[self.f_box,sel_box,]),self.progress])
         vbox2 = VBox(children = [self.main_view.feat_page,self.main_view.process_page])
         
         tab_3 = VBox([self.task_menu,HBox([vbox1,vbox2])])

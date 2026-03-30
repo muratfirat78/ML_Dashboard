@@ -524,7 +524,7 @@ class PredictiveModelingView:
         vb1lay =  widgets.Layout(width='55%')
         prboxlay = widgets.Layout(width= '99%')
 
-        vbox1 = VBox(children = [HBox(children=[self.f_box,sel_box],layout = prboxlay)],layout = vb1lay)
+        vbox1 = VBox(children = [HBox(children=[self.f_box,sel_box],layout = prboxlay),self.progress],layout = vb1lay)
 
         self.performpage = widgets.Output()
         separator = widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='1px', height='90%', margin='5px 0px',style={'background': "#C7EFFF"}))

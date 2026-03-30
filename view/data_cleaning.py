@@ -211,7 +211,7 @@ class DataCleaningView:
         
         self.f_box = VBox(children=[self.feattitle,HBox(children=[self.main_view.featurescl])])
 
-        vbox1 = VBox(children = [HBox(children=[self.f_box,selcl_box])]) 
+        vbox1 = VBox(children = [HBox(children=[self.f_box,selcl_box]),result2aexp]) 
         vbox2 = VBox(children = [self.main_view.right_page])   
         tab_2 = VBox([self.task_menu,HBox([vbox1,vbox2])])
 

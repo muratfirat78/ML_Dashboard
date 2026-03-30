@@ -19,6 +19,7 @@ class Logger:
             format='%(asctime)s - %(levelname)s - %(message)s'
         )
         logging.info('Application started')
+        self.starttime = datetime.now()
 
     def write_log(msg, log_display, category):
         if log_display != None:

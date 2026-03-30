@@ -48,6 +48,7 @@ class TaskMenuView:
 
         self.subsubtask_textarea = widgets.Textarea(description="Tasks", disabled=True, layout=widgets.Layout(width="99%"),style={'background': "#C7EFFF"})
         self.hint_textarea = widgets.Textarea(disabled=True,description="Hints",style={'background': '#C7EFFF'})
+        
         self.subsubtask_box = widgets.VBox([self.subsubtask_textarea,self.hint_textarea], layout=widgets.Layout(width="99%",height="110px"))
         self.task_list = []
         self.ui = widgets.VBox([
@@ -206,6 +207,7 @@ class TaskMenuView:
             self.statusbox.layout.display = 'none'
             self.slider.layout.visibility  = 'hidden'
             self.slider.layout.display = 'none'
+            self.hint_textarea = widgets.HTML(value="<pre>Hints will appear here</pre>", layout=widgets.Layout(width="99%", border='1px solid #C7EFFF', padding='4px', height="90px"))
             self.hint_textarea.layout.display = 'block'
             self.hint_textarea.layout.width = "99%"
             self.hint_textarea.layout.visibility  = 'visible'
@@ -213,6 +215,8 @@ class TaskMenuView:
             self.ui.layout=widgets.Layout(height="150px")
             self.button_box.layout.display = 'none'
             self.subsubtask_textarea.layout.display = 'none'
+            self.subsubtask_box.children = [self.subsubtask_textarea, self.hint_textarea]
+
         self.mode = mode
 
 

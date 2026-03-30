@@ -158,7 +158,7 @@ class DataCleaningView:
         #show the explaination of the selected step
         if change['name'] == 'value':         
             step = change['new']              
-            self.controller.show_step_explaination(step)
+            self.controller.show_message(step)
 
 
     def get_data_cleaning_tab(self):
@@ -211,7 +211,7 @@ class DataCleaningView:
         
         self.f_box = VBox(children=[self.feattitle,HBox(children=[self.main_view.featurescl])])
 
-        vbox1 = VBox(children = [HBox(children=[self.f_box,selcl_box]),result2aexp]) 
+        vbox1 = VBox(children = [HBox(children=[self.f_box,selcl_box])]) 
         vbox2 = VBox(children = [self.main_view.right_page])   
         tab_2 = VBox([self.task_menu,HBox([vbox1,vbox2])])
 

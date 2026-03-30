@@ -129,7 +129,7 @@ class DataProcessingView:
                         methoditem.layout.display = 'none'   
 
         selectedprocess = self.main_view.process_types.value
-        self.controller.show_step_explaination(selectedprocess)
+        self.controller.show_message(selectedprocess)
         self.progress.value+="Select process type.."+selectedprocess+"\n"
 
         if selectedprocess in self.processmethods:
@@ -165,11 +165,15 @@ class DataProcessingView:
             model.settraindatachanged()
 
         if self.main_view.process_types.value == "Data Split":
-            if not self.controller.main_model.datasplit: 
-                self.controller.make_split(self.splt_txt,self.progress)
-                self.controller.main_model.datasplit = True
+            if self.controller.main_model.targetcolumn == None:
+                self.controller.show_message("no_target_error")
+                #target needs to be selected before split
             else:
-                self.progress.value+="> Data is already split... "+"\n"
+                if not self.controller.main_model.datasplit: 
+                    self.controller.make_split(self.splt_txt,self.progress)
+                    self.controller.main_model.datasplit = True
+                else:
+                    self.progress.value+="> Data is already split... "+"\n"
                 
         if self.main_view.process_types.value == "Assign Target":
             self.progress.value+="> Target ... "+"\n"  
@@ -351,7 +355,7 @@ class DataProcessingView:
         
         self.progress = widgets.Textarea(value='', placeholder='',description='',disabled=True,layout = res2lay)
 
-        vbox1 = VBox(children = [HBox(children=[self.f_box,sel_box]),self.progress])
+        vbox1 = VBox(children = [HBox(children=[self.f_box,sel_box])])
         vbox2 = VBox(children = [self.main_view.feat_page,self.main_view.process_page])
         
         tab_3 = VBox([self.task_menu,HBox([vbox1,vbox2])])

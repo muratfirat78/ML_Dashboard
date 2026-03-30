@@ -1,7 +1,7 @@
 from datetime import datetime
+from model.alert_messages import AlertMessagesModel
 from model.convert_performance_to_task import ConvertPerformanceToTask
 from model.learning_manager import LearningManagerModel
-from model.step_explaination import StepExplainationModel
 from model.task import TaskModel
 from model.data_cleaning import DataCleaningModel
 from model.data_processing import DataProcessingModel
@@ -40,9 +40,9 @@ class Controller:
         self.data_selection_view = DataSelectionView(self, self.main_view, task_menu)
         self.data_selection_model = DataSelectionModel(self.main_model, self.logger)
         self.data_cleaning_view = DataCleaningView(self, self.main_view, task_menu)
-        self.data_cleaning_model = DataCleaningModel(self.main_model, self.logger)
+        self.data_cleaning_model = DataCleaningModel(self.main_model, self.logger, self)
         self.data_processing_view = DataProcessingView(self, self.main_view, task_menu)
-        self.data_processing_model = DataProcessingModel(self.main_model, self.logger)
+        self.data_processing_model = DataProcessingModel(self.main_model, self.logger, self)
         self.predictive_modeling_view = PredictiveModelingView(self, self.main_view, task_menu)
         self.predictive_modeling_model = PredictiveModelingModel(self.main_model, self, self.logger)
         self.task_model = TaskModel(self)
@@ -51,12 +51,14 @@ class Controller:
         self.learning_manager_model = LearningManagerModel(self)
         self.task_selection_model = TaskSelectionModel(self)
         self.task_selection_view = TaskSelectionView(self)
-        self.step_explaination_model = StepExplainationModel()
         self.learning_path = None
         self.convertPerformanceToTask = ConvertPerformanceToTask()
         self.task_finished = False
         self.developer_mode = False
         self.predictiontask = None
+
+        self.alert_messages_model = AlertMessagesModel()
+
         if drive != None:
             self.drive = drive
         else:
@@ -111,6 +113,9 @@ class Controller:
         self.predictiontask = self.data_processing_model.assign_target(trg_lbl,dt_features,prdtsk_lbl,result2exp) 
         self.predictive_modeling_view.tasklbl.value ='Prediction task: '+str(self.predictiontask)
         
+    def show_message(self, name):
+        message = self.alert_messages_model.get_message_html(name)
+        self.show_hint(message)
 
     def make_balanced(self,features2,balncetype,ProcssPage,result2exp):
         self.data_processing_model.make_balanced(features2,balncetype,ProcssPage,result2exp)
@@ -344,10 +349,6 @@ class Controller:
     def show_hint(self,hint_text):
         if self.monitored_mode:
             self.task_menu.show_hint_text(hint_text)
-
-    def show_step_explaination(self,step):
-        explaination_text = self.step_explaination_model.get_explaination(step)
-        self.show_hint(explaination_text)
 
     def get_dataset_performances(self):
         return self.learning_manager_model.dataset_performances

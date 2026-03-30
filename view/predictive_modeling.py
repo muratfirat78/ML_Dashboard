@@ -8,6 +8,7 @@ import pandas as pd
 import numpy as np
 from array import array
 
+
 class PredictiveModelingView:
     # The view class for the predictive modeling tab.
     # It focuses on the UI and user interactions for predictive modeling.
@@ -139,6 +140,12 @@ class PredictiveModelingView:
             return
 
         if self.selectedparam in self.mlmodels[self.selectedmodel]:
+
+            self.paramvalues.options = [self.mlmodelparams[self.selectedmodel][x] 
+                                        for x in self.mlmodels[self.selectedmodel].keys()]
+            param_index = list(self.mlmodels[self.selectedmodel].keys()).index(self.selectedparam)
+            self.paramvalues.index = param_index
+
             self.progress.value+="parameter options..: "+str(self.selectedparam)+"\n"
 
             self.paramoptions.options = [x for x in self.mlmodels[self.selectedmodel][self.selectedparam]] 
@@ -169,10 +176,12 @@ class PredictiveModelingView:
 
         if self.paramoptions.value == ''  or self.paramoptions.value==  None:
             return
-
+    
         self.selectedparamval = self.paramoptions.value
         self.mlmodelparams[self.selectedmodel][self.selectedparam] = self.selectedparamval
+        param_index = list(self.mlmodels[self.selectedmodel].keys()).index(self.selectedparam)
         self.paramvalues.options = [self.mlmodelparams[self.selectedmodel][x] for x in self.mlmodels[self.selectedmodel].keys()] 
+        self.paramvalues.index = param_index
         return
         
     
@@ -281,6 +290,10 @@ class PredictiveModelingView:
 
 
     def TrainModel(self,event): 
+        if not self.selectedmodel:
+            self.controller.show_message("no_model_error")
+            return
+
         #handle the training of the model
         self.trnml_btn.disabled = True
 
@@ -288,7 +301,8 @@ class PredictiveModelingView:
         params= dict()
 
         for param,val in self.mlmodelparams[self.selectedmodel].items():
-            params[param] = val
+            if param != "datetime_start" and param != "datetime_end":
+                params[param] = val
 
         self.progress.value += 'Params...'+str(params)+'\n'
   
@@ -492,9 +506,10 @@ class PredictiveModelingView:
         horzbar = widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"}))
       
         sel_box = VBox(children=[ self.tasklbl,
-            HBox(children=[self.paramtitle,self.paramedit,self.paramvals]),
+            HBox(children=[self.paramtitle,self.paramvals,self.paramedit,]),
                                horzbar,
-                                 HBox(children=[self.parammenu,VBox(children=[self.paramoptions, self.trnml_btn]),self.paramvalues]),
+                                 HBox(children=[self.parammenu,self.paramvalues, VBox(children=[self.paramoptions, ]),]),
+                                 self.trnml_btn,
                                  self.modelslbl,horzbar,
                                  HBox(children=[
                                      VBox(children = [self.trmodels,self.plt_btn]),
@@ -509,7 +524,7 @@ class PredictiveModelingView:
         vb1lay =  widgets.Layout(width='55%')
         prboxlay = widgets.Layout(width= '99%')
 
-        vbox1 = VBox(children = [HBox(children=[self.f_box,sel_box],layout = prboxlay),self.progress],layout = vb1lay)
+        vbox1 = VBox(children = [HBox(children=[self.f_box,sel_box],layout = prboxlay)],layout = vb1lay)
 
         self.performpage = widgets.Output()
         separator = widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='1px', height='90%', margin='5px 0px',style={'background': "#C7EFFF"}))

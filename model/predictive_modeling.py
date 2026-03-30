@@ -3,6 +3,7 @@ from sklearn import tree,neighbors,linear_model,ensemble,svm
 from sklearn.metrics import accuracy_score,mean_squared_error,confusion_matrix,roc_curve,precision_score,recall_score,mean_absolute_error,r2_score
 import statsmodels.api as sm
 from sklearn.naive_bayes import GaussianNB 
+from datetime import datetime
 
 class MLModel:
     # The MLModel is used to store the machine learning and all its associated informations.
@@ -167,6 +168,8 @@ class PredictiveModelingModel:
                 mymodel.GetPerformanceDict()['Accuracy'] = round(accuracy_score(ytest_df, y_pred),2)
                 mymodel.GetPerformanceDict()['Precision'] = precision_score(ytest_df, y_pred,average='micro')
                 mymodel.GetPerformanceDict()['Recall'] = recall_score(ytest_df, y_pred,average='micro')
+                mymodel.GetPerformanceDict()['datetime_start'] = self.logger.starttime.strftime("%Y-%m-%d %H:%M:%S")
+                mymodel.GetPerformanceDict()['datetime_end'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                     
                 
             
@@ -174,6 +177,8 @@ class PredictiveModelingModel:
                 mymodel.GetPerformanceDict()['MSE'] = round(mean_squared_error(ytest_df, y_pred),2)
                 mymodel.GetPerformanceDict()['MAE'] = mean_absolute_error(ytest_df, y_pred)
                 mymodel.GetPerformanceDict()['RSquared'] = r2_score(ytest_df, y_pred)
+                mymodel.GetPerformanceDict()['datetime_start'] = self.logger.starttime.strftime("%Y-%m-%d %H:%M:%S")
+                mymodel.GetPerformanceDict()['datetime_end'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
             self.trainedModels.append(mymodel)
 
@@ -191,11 +196,11 @@ class PredictiveModelingModel:
             
         except Exception as e: 
             if "can only concatenate str" in str(e):
-                self.controller.show_hint("Error: Can only concatenate str, probably a target needs to be selected.")
+                self.controller.show_message("no_target_error")
             if "at least one array or dtype" in str(e):
-                self.controller.show_hint("Error: at least one array or dtype is required, probably the data needs to be split.")
+                self.controller.show_message("data_split_error")
             if "could not convert" in str(e) and "to float" in str(e):
-                self.controller.show_hint("Error: could not convert ... to float, probably there are non numerical values in the dataset")
+                self.controller.show_message("non_numerical_error")
             write_log('Train Model-> exception raised \"'+str(e)+'\"',results,'Predictive modeling')
             write_log('Train Model-> unsuccessful trial',results,'Predictive modeling')
         

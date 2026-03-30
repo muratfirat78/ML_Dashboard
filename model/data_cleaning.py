@@ -4,9 +4,10 @@ import numpy as np
 class DataCleaningModel:
     # The model class for the data cleaning tab.
     # It focuses on handling the data and performs all necessary calculations and processing for the data cleaning tab.
-    def __init__(self, main_model, logger):
+    def __init__(self, main_model, logger, controller):
         self.main_model = main_model
         self.logger = logger
+        self.controller = controller
 
     def make_cleaning(self,featurescl,result2aexp,missacts,dt_features,params): 
         #perform the data cleaning action
@@ -61,6 +62,7 @@ class DataCleaningModel:
                                 Xtest_df = Xtest_df.dropna(subset = [colname], how='any')
                         else:
                             write_log('Improper action is selected.. ',  result2aexp, 'Data cleaning')
+                            self.controller.show_message("improper_action_error")
                             return
                     
             if  colname == self.main_model.targetcolumn:
@@ -92,6 +94,7 @@ class DataCleaningModel:
                                 ytrain_df = ytrain_df.dropna(subset = [colname], how='any')
                         else:
                             write_log('Improper action is selected.. ',  result2aexp, 'Data cleaning')
+                            self.controller.show_message("improper_action_error")
                             return
                     else:                 
                         if handling == 'Replace-Mode': 
@@ -112,6 +115,7 @@ class DataCleaningModel:
             self.main_model.set_XTest(Xtest_df)
             self.main_model.set_YTest(ytest_df.squeeze())
             write_log('Data size (split) '+str(prev_size)+"->"+str(final_size),  result2aexp, 'Data cleaning')
+            self.controller.show_hint(f"{handling} on {colname} completed successfully")
         else:
             #The data is not split yet, perform the action on the original/non split dataset
             curr_df = self.main_model.get_curr_df()
@@ -152,6 +156,7 @@ class DataCleaningModel:
                             curr_df = curr_df.dropna(subset = [colname], how='any')
                     else:
                         write_log('Improper action is selected.. ',  result2aexp, 'Data cleaning')
+                        self.controller.show_message("improper_action_error")
                         return
                 else: 
                     write_log('mode.. '+str(curr_df[colname].mode()[0]), result2aexp, 'Data cleaning')
@@ -163,5 +168,7 @@ class DataCleaningModel:
             self.main_model.set_curr_df(curr_df)
             write_log('Cleaning action done..'+str(self.main_model.get_curr_df().columns),  result2aexp, 'Data cleaning') 
             write_log('Final data size'+str(len(self.main_model.get_curr_df())),  result2aexp, 'Data cleaning')  
+
+            self.controller.show_hint(f"{handling} on {colname} completed successfully")
 
         return

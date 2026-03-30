@@ -22,9 +22,10 @@ from sklearn.impute import KNNImputer
 class DataProcessingModel:
     # The model class for the data processing tab.
     # It focuses on handling the data and performs all necessary calculations and processing for the data processing tab.
-    def __init__(self, main_model, logger):
+    def __init__(self, main_model, logger, controller):
         self.main_model = main_model
         self.logger = logger
+        self.controller = controller
 
     def showCorrHeatMap(self,ProcssPage,processtype,result2exp):
         write_log('Correlation: '+processtype,result2exp, 'Correlation')
@@ -119,6 +120,7 @@ class DataProcessingModel:
             self.main_model.set_XTest(Xtest)
           
             write_log('PCA (split): done, size of final df'+str(len(self.main_model.get_XTrain())),result2exp, 'PCA')
+            self.controller.show_hint(f"PCA applied on {', '.join(pcafeats)}")
         else:
             #the dataset is not split yet
             current_df = self.main_model.get_curr_df()
@@ -183,8 +185,7 @@ class DataProcessingModel:
                     Xtest_df[colname] = imputer.transform(Xtest_df[[colname]])
 
                     self.main_model.set_XTest(Xtest_df)
-                    self.main_model.set_XTrain(Xtrain_df)
-                  
+                    self.main_model.set_XTrain(Xtrain_df)              
                 else:
                     ytrain_df = ytrain_df.to_frame()
                     if colname in ytrain_df.columns:   
@@ -277,8 +278,8 @@ class DataProcessingModel:
                         self.main_model.set_YTest(ytest_df.squeeze())
 
                 write_log('Outlier removal: (split)-> '+str(prev_size)+'->'+str(len(Xtrain_df))+': '+colname, result2exp, 'Data processing')
-
-       
+            
+            self.controller.show_hint(f"{methodtype} applied on {colname}")
         else:
             #the dataset is not split yet
             write_log('Outlier removal: (no split)-> '+': '+colname, result2exp, 'Data processing')
@@ -319,6 +320,7 @@ class DataProcessingModel:
     
                 write_log('Outlier removal: (no split)-> '+str(prev_size)+'->'+str(len(curr_df))+': '+colname, result2exp, 'Data processing')
                 self.main_model.set_curr_df(curr_df)
+            self.controller.show_hint(f"{methodtype} applied on {colname}")
         return
     ##################################################################################
 
@@ -342,10 +344,9 @@ class DataProcessingModel:
 
   
         prdtsk_lbl.value = "| Prediction Task: "+predictiontask 
-        write_log('Target assigned: '+target_column, result2exp, 'Data processing')
         self.logger.add_action(['DataProcessing', 'AssignTarget'], target_column)
         result2exp.value+="assign target done..."+"\n"
-
+    
         return predictiontask
     
     def make_featconvert(self,dt_features,result2exp):
@@ -451,6 +452,7 @@ class DataProcessingModel:
                 write_log('Scaling (no split)-> '+': '+str(len(curr_df)), result2exp, 'Data processing')
                 if (curr_df[colname].dtype == 'object') or (curr_df[colname].dtype== 'string'):
                     write_log('Scaling (split)-> Returned due to non-numerical feature: '+colname, result2exp, 'Data processing')
+                    self.controller.show_hint(f"{scalingtype} applied on {colname}")
                     return
                 # standardization before splitting data
                 colmean = curr_df[colname].mean();colstd = curr_df[colname].std()

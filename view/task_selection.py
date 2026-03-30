@@ -20,7 +20,7 @@ class TaskSelectionView:
         self.tasks_data = controller.get_tasks_data()
         
         self.filter_task_selection(None)
-        self.tasks_label = widgets.Label('Let me work on...')
+        self.tasks_label = widgets.Label('Challenges to work on:')
         self.task_dropdown = widgets.Select(
             options=list(self.task_map.keys()),
             # description='Let me work on...',
@@ -79,7 +79,7 @@ class TaskSelectionView:
 
         learning_path_view = self.controller.get_learning_path_view()
 
-        display_items = [widgets.HBox([self.mode_label,self.mode_dropdown]),self.guided_mode_items, self.recommmended_radio_buttons,widgets.HBox([self.tasks_label,self.task_dropdown]), self.select_button]
+        display_items = [widgets.HBox([self.mode_label,self.mode_dropdown]), self.recommmended_radio_buttons,widgets.HBox([self.tasks_label,self.task_dropdown]), self.guided_mode_items,self.select_button]
 
         if not self.controller.get_online_version():
             display_items += [self.start_developer_mode_button]
@@ -97,7 +97,18 @@ class TaskSelectionView:
 
     def get_description(self, title):
         task = self.task_map.get(title, {})
-        return f"{task['description']}" if task else ""
+        if not task:
+            return ""
+        
+        difficulty = ''
+        if '(Easy)' in title:
+            difficulty = 'This task is considered easy for you given your current skill level. '
+        elif '(Moderate)' in title:
+            difficulty = 'This task is considered moderately challenging for you given your current skill level. '
+        elif '(Hard)' in title:
+            difficulty = 'This task is considered hard for you given your current skill level. '
+            
+        return task['description'] + '<br /> ' +difficulty
 
     def update_title_and_description(self, change):
         new_title = change['new']
@@ -120,10 +131,18 @@ class TaskSelectionView:
                 self.guided_mode = False
 
         filtered_tasks = self.controller.get_filtered_tasks(self.tasks_data,self.recommendations_only, self.guided_mode)
+        if (not self.guided_mode) and self.recommendations_only:
+            labels = ["(Easy)", "(Moderate)", "(Hard)"]
 
-        self.task_map = {
-            task["title"]: task for task in filtered_tasks
-        }
+            self.task_map = {
+                f"{task['title']} {labels[i]}": task
+                for i, task in enumerate(filtered_tasks)
+            }
+        else:
+            self.task_map = {
+                task["title"]: task for task in filtered_tasks
+            }
+                        
         
         if self.task_dropdown != None:
             self.task_dropdown.options=list(self.task_map.keys())

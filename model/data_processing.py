@@ -320,7 +320,6 @@ class DataProcessingModel:
     
                 write_log('Outlier removal: (no split)-> '+str(prev_size)+'->'+str(len(curr_df))+': '+colname, result2exp, 'Data processing')
                 self.main_model.set_curr_df(curr_df)
-            self.controller.show_hint(f"{methodtype} applied on {colname}")
         return
     ##################################################################################
 

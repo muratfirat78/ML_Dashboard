@@ -18,6 +18,7 @@ from sklearn.preprocessing import StandardScaler
 from imblearn.over_sampling import RandomOverSampler
 from imblearn.under_sampling import RandomUnderSampler
 from sklearn.impute import KNNImputer
+from pandas.api.types import is_datetime64_any_dtype as is_datetime
 
 class DataProcessingModel:
     # The model class for the data processing tab.
@@ -161,6 +162,58 @@ class DataProcessingModel:
             self.main_model.set_curr_df(current_df)
             
             write_log('PCA: done, size of final df '+str(len(self.main_model.get_curr_df())),result2exp, 'PCA')
+        return
+
+    def extract_time_feats(self,dt_features,featset,result2exp): 
+        colname = dt_features.value
+       
+        if not self.main_model.datasplit:   
+            curr_df = self.main_model.get_curr_df()
+
+            write_log("FYI "+str(curr_df[colname].dtypes),result2exp, 'Extract Time Features')
+            
+            if curr_df[colname].dtypes== 'object' or curr_df[colname].dtypes== 'str':    
+                write_log("Inside object..",result2exp, 'Extract Time Features')
+                try:
+                    tmpdt = pd.to_datetime(curr_df[colname])
+                    try:
+                        tmpfloat = curr_df[colname].astype(np.float64)
+                        write_log("Warning, NOT converting column because it is ALSO convertible to float64.",result2exp, 'Extract Time Features')
+                    except:
+                        curr_df[colname] = tmpdt
+                        write_log("FYI, converted column to datetime.",result2exp, 'Extract Time Features')
+                        
+                except: #Can't convert some elements of the column to dt...
+                    write_log('We leave whole column as-is unconverted',result2exp, 'Extract Time Features')
+                    return 
+            else: 
+                write_log("checking datetime...",result2exp, 'Extract Time Features')
+                if not 'datetime' in str(curr_df[colname].dtypes):
+                    write_log('Column is no datetime',result2exp, 'Extract Time Features')
+                    
+                    return
+            
+            
+            if 'Year' in featset:
+                curr_df['year']=[x.year for x  in curr_df[colname]]
+            if 'Month' in featset:
+                curr_df['month']=[x.month for x  in curr_df[colname]]
+            if 'Week' in featset:
+                minyear = min([x.year for x  in curr_df[colname]])
+                curr_df['week']=[x.isocalendar()[1]+52*((x+timedelta(days= 7-x.weekday())).year-minyear) for x in curr_df[colname]]
+            if 'Weekday' in featset:
+                curr_df['weekday']=[x.weekday() for x  in curr_df[colname]]
+            if 'Hour' in featset:
+                curr_df['hour']=[x.hour for x  in curr_df[colname]]
+                write_log('Unique of column '+str(curr_df['hour'].unique()),result2exp, 'Extract Time Features')
+                if len(curr_df['hour'].unique()) == 1 and 0 in list(curr_df['hour'].unique()):
+                    write_log("Conversion not successful..",result2exp, 'Extract Time Features')
+                    del curr_df['hour']
+
+                
+                 
+            
+
         return
      
     def remove_outliers(self,dt_features,methodtype,result2exp): 
@@ -357,6 +410,7 @@ class DataProcessingModel:
 
         if self.main_model.datasplit:
             #the dataset is split
+            Xtest_df = self.main_model.get_XTest()
             Xtrain_df = self.main_model.get_XTrain()
             ytrain_df = self.main_model.getYtrain().to_frame()
             ytest_df = self.main_model.get_YTest().to_frame()
@@ -364,10 +418,13 @@ class DataProcessingModel:
             write_log('Convert Feature Type-> (split)-> '+colname, result2exp, 'Data processing')
                          
             if colname in Xtrain_df.columns:
-                write_log('Convert Feature Type (split)-> Returned, only target variable can be converted..', result2exp, 'Data processing')
+                Xtrain_df[colname] = [str(x) for x in Xtrain_df[colname]] 
+                Xtest_df[colname] = [str(x) for x in Xtest_df[colname]]  
+                
+                write_log('Convert Feature Type (split)-> Non-target variable converted..', result2exp, 'Data processing')
                 return
             if colname in ytrain_df.columns:
-                if ytrain_df[colname].dtype in ['float64','int64','int32']:
+                if ytrain_df[colname].dtype in ['float64','int64','int32','Float64','Int64','Int32']:
                     if len(ytrain_df[colname].unique()) == 2:
                         ytrain_df.iloc[:,ytrain_df.columns.get_loc(colname)] = ytrain_df.iloc[:,ytrain_df.columns.get_loc(colname)].astype(bool)
                         ytest_df.iloc[:,ytest_df.columns.get_loc(colname)] = ytest_df.iloc[:,ytest_df.columns.get_loc(colname)].astype(bool)
@@ -375,6 +432,8 @@ class DataProcessingModel:
                         self.main_model.set_YTrain(ytrain_df.squeeze())
                         self.main_model.set_YTest(ytest_df.squeeze())
                     else:
+                        ytrain_df[colname] = [str(x) for x in ytrain_df[colname]] 
+                        ytest_df[colname] = [str(x) for x in ytest_df[colname]]    
                         write_log('Convert Feature Type (split)-> Returned, target variable has more than two levels..', result2exp, 'Data processing')
                         return
                 else:
@@ -389,12 +448,13 @@ class DataProcessingModel:
             #the dataset has not been split yet
             curr_df = self.main_model.get_curr_df()
             write_log('Convert Feature Type (no split)-> '+': '+str(len(curr_df)), result2exp, 'Data processing')
-            if curr_df[colname].dtype in ['float64','int64','int32']:
+            if curr_df[colname].dtype in ['float64','int64','int32','Float64','Int64','Int32']:
                 if len(curr_df[colname].unique()) == 2:
                     curr_df.iloc[:,curr_df.columns.get_loc(colname)] = curr_df.iloc[:,curr_df.columns.get_loc(colname)].astype(bool)
                     write_log('Convert Feature Type -> done.. '+'  feat type '+str(curr_df[colname].dtype), result2exp, 'Data processing')
                     self.main_model.set_curr_df(curr_df)
                 else:
+                    curr_df[colname] = [str(x) for x in curr_df[colname]]    
                     write_log('Convert Feature Type-> Returned, feature has more than two levels..', result2exp, 'Data processing')
                     return 
             else:
@@ -654,7 +714,7 @@ class DataProcessingModel:
             if encodingtype == "Label Encoding":
                 
                 if colname in Xtrain_df.columns:
-                    if Xtrain_df[colname].dtype in ['float64','int64','int32']:
+                    if Xtrain_df[colname].dtype in ['float64','int64','int32','Float64','Int64','Int32']:
                         write_log('Encoding (split)-> Attempt to encode a numerical feature '+str(colname), result2exp, 'Data processing')
                         return
 
@@ -677,7 +737,7 @@ class DataProcessingModel:
 
                 if colname in Xtrain_df.columns:
 
-                    if Xtrain_df[colname].dtype in ['float64','int64','int32']:
+                    if Xtrain_df[colname].dtype in ['float64','int64','int32','Float64','Int64','Int32']:
                         write_log('Encoding (split) -> | Returned attempt to encode a numerical feature '+str(colname), result2exp, 'Data processing')
                         return
                     
@@ -700,7 +760,7 @@ class DataProcessingModel:
 
             curr_df = self.main_model.get_curr_df()
 
-            if curr_df[colname].dtype in ['float64','int64','int32']:
+            if curr_df[colname].dtype in ['float64','int64','int32','Float64','Int64','Int32']:
                 write_log('Encoding-> Attempt to encode a numerical feature '+str(colname), result2exp, 'Data processing')
                 return
 

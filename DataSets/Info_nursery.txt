@@ -1,0 +1,30 @@
+Context
+Nursery Database was derived from a hierarchical decision model originally developed to rank applications for nursery schools. It was used during several years in 1980's when there was excessive enrollment to these schools in Ljubljana, Slovenia, and the rejected applications frequently needed an objective explanation. The final decision depended on three subproblems: occupation of parents and child's nursery, family structure and financial standing, and social and health picture of the family. The model was developed within expert system shell for decision making DEX (M. Bohanec, V. Rajkovic: Expert system for decision making. Sistemica 1(1), pp. 145-157, 1990.).
+
+Content
+The hierarchical model ranks nursery-school applications according to the following concept structure:
+
+1 - Occupation of parents and characteristics of the nursery
+
+a) Parents' Occupation (parents): (1) usual, (2) pretentious, (3) of great pretension;
+b) Child's Nursery (has_nurs): (1) proper, (2) less proper, (3) improper, (4) critical, (5) very critical;
+
+2 - Family structure and financial standing
+
+c) Form of the family (form): (1) complete, (2) completed, (3) incomplete, (4) foster;
+d) Number of children (children): 1, 2, 3 or more;
+e) Housing conditions (housing): (1) convenient, (2) less convenient, (3) critical;
+f) Financial standing of the family (finance): (1) convenient, (2) inconvenient;
+
+3 - Social and health status of the family
+
+g) Social conditions (social): (1) non-problematic, (2) slightly problematic, (3) problematic;
+h) Health conditions (health): (1) acceptance is not recommended, (2) acceptance is recommended, (3) priority acceptance is recommended;
+
+Final Evaluation (Target)
+
+not recommended (1)
+recommend (2)
+very recommend (3)
+priority acceptance (4)
+special priority (5)

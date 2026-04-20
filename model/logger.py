@@ -64,16 +64,25 @@ class Logger:
             '[\'DataProcessing\', \'Unbalancedness UpSample\']': self.controller.data_processing_model.make_balanced,
             '[\'DataProcessing\', \'Split\']': self.controller.data_processing_model.make_split,
             '[\'DataProcessing\', \'LabelEncoding\']': self.controller.data_processing_model.make_encoding,
-            '[\'DataProcessing\', \'OneHotEncoding\']': self.controller.data_processing_model.make_encoding
+            '[\'DataProcessing\', \'OneHotEncoding\']': self.controller.data_processing_model.make_encoding,
+            '[\'DataProcessing\', \'ExtractTimeFeatures\']': self.controller.data_processing_model.extract_time_feats
+            
 
             }
         return actions_to_function.get(str(action))
     
-    def undo(self):
-        call_stack_backup = self.call_stack[:-1]
+    def undo(self, actions_to_undo):
+        call_stack_backup = self.call_stack[:-actions_to_undo]
         #reset performance
         self.student_performance = StudentPerformance(self.controller)
         self.controller.task_menu.clear_actions_monitored_mode()
+        split = False
+        for action in call_stack_backup: 
+            if 'Split' in str(action[0]):
+                split = True
+ 
+        self.controller.main_model.datasplit = split
+
         for action in call_stack_backup:
             function = self.action_to_function(action[0])
             parameters = action[1]

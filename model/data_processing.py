@@ -164,8 +164,7 @@ class DataProcessingModel:
             write_log('PCA: done, size of final df '+str(len(self.main_model.get_curr_df())),result2exp, 'PCA')
         return
 
-    def extract_time_feats(self,dt_features,featset,result2exp): 
-        colname = dt_features.value
+    def extract_time_feats(self,colname,featset,result2exp): 
        
         if not self.main_model.datasplit:   
             curr_df = self.main_model.get_curr_df()
@@ -213,7 +212,7 @@ class DataProcessingModel:
                 
                  
             
-
+        self.logger.add_action(['DataProcessing', 'ExtractTimeFeatures'], colname, [colname,featset,result2exp])
         return
      
     def remove_outliers(self,colname,methodtype,result2exp): 

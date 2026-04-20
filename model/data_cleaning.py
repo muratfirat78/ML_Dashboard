@@ -122,12 +122,6 @@ class DataCleaningModel:
             write_log('col '+colname+', action '+handling+', coltype '+str(curr_df[colname].dtype), result2aexp, 'Data cleaning')
             write_log('Initial data size'+str(len(curr_df)),  result2aexp, 'Data cleaning')  
     
-
-            if handling == 'Edit Range':
-                self.logger.add_action(['DataCleaning', handling], colname + '(' + params[0].value + '-' + params[1].value +')', [colname,result2aexp,missacts,dt_features,params])
-            else:
-                self.logger.add_action(['DataCleaning', handling], colname, [colname,result2aexp,missacts,dt_features,params])
-    
             if handling == 'Edit Range':
                 prev_size = len(curr_df)      
                 minval = params[0].value; maxval = params[1].value       
@@ -168,6 +162,10 @@ class DataCleaningModel:
             write_log('Cleaning action done..'+str(self.main_model.get_curr_df().columns),  result2aexp, 'Data cleaning') 
             write_log('Final data size'+str(len(self.main_model.get_curr_df())),  result2aexp, 'Data cleaning')  
 
-            self.controller.show_hint(f"{handling} on {colname} completed successfully")
+        if handling == 'Edit Range':
+            self.logger.add_action(['DataCleaning', handling], colname + '(' + params[0].value + '-' + params[1].value +')', [colname,result2aexp,missacts,dt_features,params])
+        else:
+            self.logger.add_action(['DataCleaning', handling], colname, [colname,result2aexp,missacts,dt_features,params])
+        self.controller.show_hint(f"{handling} on {colname} completed successfully")
 
         return

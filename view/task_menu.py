@@ -13,7 +13,7 @@ class TaskMenuView:
         self.next_button.on_click(self.next_button_click)
         self.topic_explaination_button = widgets.Button(description="More info")
         self.topic_explaination_button.on_click(self.topic_explaination_button_click)
-        self.undo_button = widgets.Button(description="Undo last action")
+        self.undo_button = widgets.Button(description="Revert to this action")
         self.undo_button.on_click(self.undo_click)
         self.undo_button.layout.visibility  = 'hidden'
         self.task_box = widgets.HBox([])
@@ -67,7 +67,8 @@ class TaskMenuView:
         self.controller = controller
 
     def undo_click(self,button):
-        self.controller.logger.undo()
+        actions_to_undo = self.slider.max - self.slider.value
+        self.controller.logger.undo(actions_to_undo)
 
     def topic_explaination_button_click(self, button):
         self.controller.main_view.switch_tab_to_topic_info()
@@ -81,7 +82,6 @@ class TaskMenuView:
             self.slider.value = self.slider.value + 1
 
     def slider_change(self, change):
-        print("hier")
         # update the information in the task menu based on the value selected with the slider
         if len(self.task_list) == 0:
             return
@@ -157,6 +157,8 @@ class TaskMenuView:
         self.slider_change({"new":self.slider.value})
 
     def show_hint_text(self, text):
+        if text == None:
+            text = ''
         self.hint_textarea.value = text
 
     def get_task_menu(self):
@@ -176,15 +178,13 @@ class TaskMenuView:
             subsubtask_object["value"] = str(action[1])
             task_list.append(subsubtask_object)
         self.refresh_menu(task_list)
-        slider_value = self.slider.value 
-        # self.slider_change({"new":slider_value+1})
+        self.slider_change({"new":self.slider.max-1})
+        self.slider.value = self.slider.max
     
     def clear_actions_monitored_mode(self):
         self.actions = []
 
-
     def set_current_task(self, task, mode):
-        print(task)
         #set the data for the current task to display in the task menu
              
         task_list = []
@@ -217,7 +217,6 @@ class TaskMenuView:
                         subsubtask_object["value"] = [val]
 
                         task_list.append(subsubtask_object)
-        print(task_list)
         self.current_task = task
         self.refresh_menu(task_list)
 

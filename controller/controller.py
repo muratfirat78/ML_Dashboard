@@ -143,6 +143,9 @@ class Controller:
         
     def make_split(self,splt_txt,result2exp):
         self.data_processing_model.make_split(splt_txt,result2exp)
+        
+    def extract_time_feats(self,dt_features,featset,result2exp):
+        self.data_processing_model.extract_time_feats(dt_features,featset,result2exp)
 
     def remove_outliers(self,dt_features,methodtype,result2exp):
         self.data_processing_model.remove_outliers(dt_features.value,methodtype,result2exp)

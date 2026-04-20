@@ -1,0 +1,14 @@
+Personalized Recommendation Systems Dataset (150,000 Entries)
+
+This dataset is a fictional representation of user interactions within an e-commerce or streaming platform, created specifically for educational and training purposes. It simulates realistic user behavior and interactions to aid in developing and testing machine learning models for personalized recommendation systems. With 150,000 entries, it offers a rich variety of features suitable for building and evaluating algorithms in recommendation systems, user behavior analysis, and predictive modeling.
+
+Dataset Features:
+
+User_ID: A unique identifier for each user (e.g., User_1, User_2, etc.), representing individual profiles on the platform.
+Item_ID: A unique identifier for each item, such as a product, movie, or song.
+Category: The type of item interacted with (e.g., Electronics, Books, Music, Movies, etc.), providing insights into user preferences.
+Timestamp: The exact date and time of the interaction, useful for time-based analysis.
+Price: The price of the item at the time of interaction, recorded in USD.
+Platform: The platform or device used to interact with the system (e.g., Web, Mobile App, Smart TV, Tablet), capturing multi-device behavior.
+Location: The geographic region of the user, categorized into areas such as North America, Europe, Asia, etc., for regional behavioral analysis.
+Rating (Target): User-assigned ratings on a scale of 1.0 to 5.0, reflecting the level of satisfaction with the item.

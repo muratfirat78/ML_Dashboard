@@ -1,0 +1,2 @@
+Data features are: date, precipitation, temp_max, temp_min, wind, weather
+Target is weather to predict the weather condition : * drizzle * rain * sun * snow * fog.

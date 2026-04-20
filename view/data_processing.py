@@ -57,8 +57,13 @@ class DataProcessingView:
 
         color = "gray"
         mytext =str(colname)
-        mytext2 = " -> "+str(display_df[colname].dtype)
-        self.selcl.value = f'<span style="color:{color};"><b>{mytext}</b>{mytext2}</span>'
+        mytext2 = " -> "+str(display_df[colname].dtype)+", "
+        mytext3 =  " Unique values: "
+        mytext4 = str(len(display_df[colname].unique()))
+        
+      
+            
+        self.selcl.value = f'<span style="color:{color};"><b>{mytext}</b>{mytext2}<b>{mytext3}</b>{mytext4}</span>'
 
         with FeatPage:
             clear_output()
@@ -190,8 +195,10 @@ class DataProcessingView:
             self.controller.make_encoding(self.main_view.dt_features,processtype,self.ordinalenconding,self.progress)
         if self.main_view.process_types.value == "Outlier":
             self.controller.remove_outliers(self.main_view.dt_features,self.methodsmenu.value,self.progress)
-        if self.main_view.process_types.value == "Imbalancedness":
+        if self.main_view.process_types.value == "Class Balance":
             self.controller.make_balanced(self.main_view.dt_features,processtype,self.main_view.process_page,self.progress)
+        if self.main_view.process_types.value == "Extract Time Features":
+            self.controller.extract_time_feats(self.main_view.dt_features,processtype,self.progress)
         if self.main_view.process_types.value == "Feature Extraction":
             if processtype == "Correlation":
                 self.controller.showCorrHeatMap(self.main_view.feat_page,processtype,self.progress)
@@ -204,7 +211,7 @@ class DataProcessingView:
                 self.pcaselect.layout.visibility = 'hidden'
                 self.pcaselect.layout.display = 'none'
                 
-        if self.main_view.process_types.value == "Convert Feature 0/1->Bool":
+        if self.main_view.process_types.value == "Convert Feature num->cat":
             self.controller.make_featconvert(self.main_view.dt_features,self.progress)
             
         if refreshFeatures:
@@ -234,12 +241,13 @@ class DataProcessingView:
         self.processmethods['Encoding'] = ['Label Encoding','One Hot Encoding','Ordinal Encoding']
         self.processmethods['Feature Extraction'] = ['PCA','Correlation']
         self.processmethods['Outlier'] = ['Remove (IQR)','Remove (Z-scores)','Impute (KNN)']
-        self.processmethods['Imbalancedness'] = ['Upsample','DownSample']
-
+        self.processmethods['Class Balance'] = ['Upsample','DownSample']
+        self.processmethods['Extract Time Features'] = ['Year', 'Month', 'Week','Weekday','Hour']
+        
         self.processvisuals = dict()
        
         processmethods = [ x for x in self.processmethods.keys()]
-        processmethods.insert(2,'Convert Feature 0/1->Bool')
+        processmethods.insert(2,'Convert Feature num->cat')
         processmethods.insert(3,'Assign Target')
         processmethods.insert(4,'Data Split')
 

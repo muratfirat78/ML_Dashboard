@@ -237,10 +237,10 @@ class DataProcessingView:
         self.main_view.process_page = widgets.Output()
     
         self.processmethods = dict()
-        self.processmethods['Scaling'] = ['Standardize','Normalize']
+        self.processmethods['Scaling'] = ['Standardize','Normalize','Log Transform']
         self.processmethods['Encoding'] = ['Label Encoding','One Hot Encoding','Ordinal Encoding']
         self.processmethods['Feature Extraction'] = ['PCA','Correlation']
-        self.processmethods['Outlier'] = ['Remove (IQR)','Remove (Z-scores)','Impute (KNN)']
+        self.processmethods['Outlier'] = ['Remove (IQR)','Remove (Z-scores)','Impute (IQR)']
         self.processmethods['Class Balance'] = ['Upsample','DownSample']
         self.processmethods['Extract Time Features'] = ['Year', 'Month', 'Week','Weekday','Hour']
         

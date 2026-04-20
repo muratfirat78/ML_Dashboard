@@ -138,12 +138,13 @@ class DataCleaningModel:
                 del curr_df[colname]
                 
             else:    
-                if (curr_df[colname].dtype == 'float64') or (curr_df[colname].dtype == 'int64') or (curr_df[colname].dtype == 'int32'):
+                if curr_df[colname].dtype in ['float64','int64','int32','Float64','Int64','Int32']:
                     if handling in ['Replace-Mean','Replace-Median','Remove-Missing']:
                         if handling == 'Replace-Mean': 
-                            curr_df[colname].fillna(curr_df[colname].mean(), inplace=True)
+                            curr_df[colname] = curr_df[colname].fillna(curr_df[colname].mean(), inplace=True)
+                            write_log('Replace mean done, size: '+str(len(curr_df)),  result2aexp, 'Data cleaning') 
                         if handling == 'Replace-Median': 
-                            curr_df[colname].fillna(curr_df[colname].median(), inplace=True)
+                            curr_df[colname] =  curr_df[colname].fillna(curr_df[colname].median(), inplace=True)
         
                         if handling == 'Remove-Missing': 
                             curr_df = curr_df.dropna(subset = [colname], how='any')
@@ -154,7 +155,7 @@ class DataCleaningModel:
                 else: 
                     write_log('mode.. '+str(curr_df[colname].mode()[0]), result2aexp, 'Data cleaning')
                     if handling == 'Replace-Mode': 
-                        curr_df[colname].fillna(curr_df[colname].mode()[0], inplace=True)
+                        curr_df[colname] =curr_df[colname].fillna(curr_df[colname].mode()[0], inplace=True)
                     if handling == 'Remove-Missing': 
                         curr_df = curr_df.dropna(subset = [colname], how='any')
        

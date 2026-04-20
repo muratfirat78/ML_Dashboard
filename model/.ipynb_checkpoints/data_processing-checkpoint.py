@@ -1,4 +1,5 @@
 from sklearn import preprocessing 
+from sklearn.decomposition import PCA
 from log import *
 from sklearn.model_selection import train_test_split 
 from IPython.display import clear_output
@@ -7,111 +8,548 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.utils import resample
 import pandas as pd
+import numpy as np
 import os
 import shutil
 from datetime import timedelta,date, datetime
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.preprocessing import StandardScaler
+from imblearn.over_sampling import RandomOverSampler
+from imblearn.under_sampling import RandomUnderSampler
+from sklearn.impute import KNNImputer
+from pandas.api.types import is_datetime64_any_dtype as is_datetime
 
 class DataProcessingModel:
-    def __init__(self, main_model, logger):
+    # The model class for the data processing tab.
+    # It focuses on handling the data and performs all necessary calculations and processing for the data processing tab.
+    def __init__(self, main_model, logger, controller):
         self.main_model = main_model
         self.logger = logger
+        self.controller = controller
 
-    def remove_outliers(self): 
-        self.main_model.curr_df[self.main_model.curr_df["outlier"] == False]
-        self.main_model.curr_df.drop(["outlier"], axis=1)
-        logging.info('Data preprocessing, outlier detection and removal')
-        self.logger.add_action(['DataProcessing', 'outlier'], 'All columns')
+    def showCorrHeatMap(self,ProcssPage,processtype,result2exp):
+        write_log('Correlation: '+processtype,result2exp, 'Correlation')
+        if processtype == "Correlation":
+            current_df = self.main_model.get_curr_df()
+
+            if self.main_model.datasplit:
+                
+                Xtrain_df = self.main_model.get_XTrain()
+                ytrain_df = self.main_model.getYtrain()
+                current_df = pd.concat([Xtrain_df,ytrain_df],axis=1)
+
+            corrcols = [col for col in current_df.columns if current_df[col].dtype in ['float64','int64','int32']]
+
+            with ProcssPage:
+                clear_output()
+                fig, ax = plt.subplots(figsize=(5,5))     
+                sns.heatmap( current_df[corrcols].corr(), vmin=-1, vmax=1, center=0,cmap=sns.diverging_palette(50, 500, n=500),square=True,ax=ax)
+                plt.show()
+
+
+        return 
+
+    def ApplyPCA(self,features2,pca_features,result2exp):
+        # apply principal component analysis
+        pcafeats = [ftname for ftname in pca_features.options]
+        self.logger.add_action(['DataProcessing', 'PCA'], pcafeats)
+
+        if self.main_model.targetcolumn in pcafeats:
+            write_log('PCA: Returned due to inclusion of target in PCA',result2exp, 'PCA')
+            return
+
+        if self.main_model.datasplit:    
+            #the dataset is split
+            Xtest = self.main_model.get_XTest()
+            XTrain = self.main_model.get_XTrain()
+
+            for col in pcafeats:
+                if (XTrain[col].dtype == 'object') or (XTrain[col].dtype== 'string'):
+                    write_log('PCA: Returned due to categorical feature selection',result2exp, 'PCA')
+                    return
+                if XTrain[col].isnull().sum()  > 0:
+                    write_log('PCA: Returned feature '+col+' has missing values in train',result2exp, 'PCA')
+                    return
+                if Xtest[col].isnull().sum()  > 0:
+                    write_log('PCA: Returned feature '+col+' has missing values in test ',result2exp, 'PCA')
+                    return
+      
+            tr_prev_indices = XTrain.index
+            test_prev_indices = Xtest.index
+
+            ss  = StandardScaler()
+            XTrain_0 = XTrain.loc[:,pcafeats].values
+            XTrain_sc = ss.fit_transform(XTrain_0) 
+
+            Xtest_0 = Xtest.loc[:,pcafeats].values
+            Xtest_sc = ss.transform(Xtest_0)
+            
+            pca = PCA(n_components=1)
+           
+            pca.fit(XTrain_sc)
+
+            Xtrain_pca = pca.transform(XTrain_sc)
+            Xtest_pca = pca.transform(Xtest_sc)
+
+            pcacolname = 'Princ_Comp'
         
+            pcacols = [col for col in XTrain.columns if col.find(pcacolname) > -1]
+            write_log('PCA: explained variance'+str(pca.explained_variance_ratio_),result2exp, 'PCA')
+            
+            pcacols = [int(col[col.find(pcacolname)+11:]) for col in pcacols]
+
+            pcid = 0
+            if len(pcacols)>0:
+                pcid = max(pcacols)+1
+         
+
+            Xtrain_pca_df = pd.DataFrame(Xtrain_pca, index=tr_prev_indices) 
+            Xtest_pca_df = pd.DataFrame(Xtest_pca, index=test_prev_indices) 
+          
+            for col in pcafeats:
+                del XTrain[col]
+                del Xtest[col]
+
+            XTrain = pd.concat([XTrain,Xtrain_pca_df],axis=1)
+            Xtest = pd.concat([Xtest,Xtest_pca_df],axis=1)
+
+            XTrain.rename(columns={XTrain.columns[-1]: pcacolname+"_"+str(pcid)},inplace=True) 
+            Xtest.rename(columns={Xtest.columns[-1]: pcacolname+"_"+str(pcid)},inplace=True) 
+
+            self.main_model.set_XTrain(XTrain)
+            self.main_model.set_XTest(Xtest)
+          
+            write_log('PCA (split): done, size of final df'+str(len(self.main_model.get_XTrain())),result2exp, 'PCA')
+            self.controller.show_hint(f"PCA applied on {', '.join(pcafeats)}")
+        else:
+            #the dataset is not split yet
+            current_df = self.main_model.get_curr_df()
+
+            for col in pcafeats:
+                if (current_df[col].dtype == 'object') or (current_df[col].dtype== 'string'):
+                    write_log('PCA: Returned due to categorical feature selection',result2exp, 'PCA')
+                    return
+                if current_df[col].isnull().sum()  > 0:
+                    write_log('PCA: Returned feature '+col+' has missing values',result2exp, 'PCA')
+                    return
+            
+            
+            write_log('PCA: '+str(pcafeats),result2exp, 'PCA')
+            x = current_df.loc[:,pcafeats].values
+            x = StandardScaler().fit_transform(x) # normalizing the features
+
+            pca = PCA(n_components=1)
+            principalComponents = pca.fit_transform(x)
+ 
+            pcacolname = 'Princ_Comp'
+        
+            pcacols = [col for col in current_df.columns if col.find(pcacolname) > -1]
+            write_log('PCA: explained variance'+str(pca.explained_variance_ratio_),result2exp, 'PCA')
+            
+            pcacols = [int(col[col.find(pcacolname)+11:]) for col in pcacols]
+
+            pcid = 0
+            if len(pcacols)>0:
+                pcid = max(pcacols)+1
+
+            principal_Df = pd.DataFrame(data = principalComponents, columns = [pcacolname+"_"+str(pcid)])
+    
+            for col in pcafeats:
+                del current_df[col]
+
+            current_df = pd.concat([current_df,principal_Df],axis=1)
+            self.main_model.set_curr_df(current_df)
+            
+            write_log('PCA: done, size of final df '+str(len(self.main_model.get_curr_df())),result2exp, 'PCA')
+        return
+
+    def extract_time_feats(self,dt_features,featset,result2exp): 
+        colname = dt_features.value
+       
+        if not self.main_model.datasplit:   
+            curr_df = self.main_model.get_curr_df()
+
+            write_log("FYI "+str(curr_df[colname].dtypes),result2exp, 'Extract Time Features')
+            
+            if curr_df[colname].dtypes== 'object' or curr_df[colname].dtypes== 'str':    
+                write_log("Inside object..",result2exp, 'Extract Time Features')
+                try:
+                    tmpdt = pd.to_datetime(curr_df[colname])
+                    try:
+                        tmpfloat = curr_df[colname].astype(np.float64)
+                        write_log("Warning, NOT converting column because it is ALSO convertible to float64.",result2exp, 'Extract Time Features')
+                    except:
+                        curr_df[colname] = tmpdt
+                        write_log("FYI, converted column to datetime.",result2exp, 'Extract Time Features')
+                        
+                except: #Can't convert some elements of the column to dt...
+                    write_log('We leave whole column as-is unconverted',result2exp, 'Extract Time Features')
+                    return 
+            else: 
+                write_log("checking datetime...",result2exp, 'Extract Time Features')
+                if not 'datetime' in str(curr_df[colname].dtypes):
+                    write_log('Column is no datetime',result2exp, 'Extract Time Features')
+                    
+                    return
+            
+            
+            if 'Year' in featset:
+                curr_df['year']=[x.year for x  in curr_df[colname]]
+            if 'Month' in featset:
+                curr_df['month']=[x.month for x  in curr_df[colname]]
+            if 'Week' in featset:
+                minyear = min([x.year for x  in curr_df[colname]])
+                curr_df['week']=[x.isocalendar()[1]+52*((x+timedelta(days= 7-x.weekday())).year-minyear) for x in curr_df[colname]]
+            if 'Weekday' in featset:
+                curr_df['weekday']=[x.weekday() for x  in curr_df[colname]]
+            if 'Hour' in featset:
+                curr_df['hour']=[x.hour for x  in curr_df[colname]]
+                write_log('Unique of column '+str(curr_df['hour'].unique()),result2exp, 'Extract Time Features')
+                if len(curr_df['hour'].unique()) == 1 and 0 in list(curr_df['hour'].unique()):
+                    write_log("Conversion not successful..",result2exp, 'Extract Time Features')
+                    del curr_df['hour']
+
+                
+                 
+            
+
+        return
+     
+    def remove_outliers(self,dt_features,methodtype,result2exp): 
+        colname = dt_features.value
+        write_log('Outlier removal: '+colname,result2exp, 'Outlier removal')
+        self.logger.add_action(['DataProcessing', 'outlier'], colname)
+      
+        
+        if self.main_model.datasplit:
+            #the dataset is split
+            write_log('Outlier removal: (split)-> '+': '+colname, result2exp, 'Data processing')
+            Xtest_df = self.main_model.get_XTest()
+            Xtrain_df = self.main_model.get_XTrain()
+            ytrain_df = self.main_model.getYtrain()
+            ytest_df = self.main_model.get_YTest().to_frame()
+
+
+            if methodtype == "Impute (KNN)":
+                if colname in Xtrain_df.columns:                          
+                    imputer = KNNImputer(n_neighbors=8)
+                    Xtrain_df[colname] = imputer.fit_transform(Xtrain_df[[colname]])
+                    Xtest_df[colname] = imputer.transform(Xtest_df[[colname]])
+
+                    self.main_model.set_XTest(Xtest_df)
+                    self.main_model.set_XTrain(Xtrain_df)              
+                else:
+                    ytrain_df = ytrain_df.to_frame()
+                    if colname in ytrain_df.columns:   
+                        write_log('Outlier removal-target: (split): '+colname, result2exp, 'Data processing')
+
+                    imputer = KNNImputer(n_neighbors=8)
+                    ytrain_df[colname] = imputer.fit_transform(ytrain_df[[colname]])          
+                    self.main_model.set_YTrain(ytrain_df)
+           
+
+            if methodtype == "Remove (IQR)":
+   
+                if colname in Xtrain_df.columns:                                                                     
+    
+                    quantiles = Xtrain_df[colname].quantile([0.25,0.5,0.75])
+                    IQR = quantiles[0.75] - quantiles[0.25]
+                    boxplot_outlierLB =  quantiles[0.25]-1.5*IQR
+                    boxplot_outlierUB =  quantiles[0.75]+1.5*IQR
+    
+                    prev_size = len(Xtrain_df)
+                    outliers = Xtrain_df[(Xtrain_df[colname]>boxplot_outlierUB) | (Xtrain_df[colname]<boxplot_outlierLB)]
+                    Xtrain_df = Xtrain_df.drop(outliers.index)
+    
+                   
+                    ytrain_df = ytrain_df.drop(outliers.index)
+    
+                    self.main_model.set_XTest(Xtest_df)
+                    self.main_model.set_XTrain(Xtrain_df)
+                    self.main_model.set_YTrain(ytrain_df)
+                    self.main_model.set_YTest(ytest_df.squeeze())
+    
+                else:
+                    ytrain_df = ytrain_df.to_frame()
+                    
+                    if colname in ytrain_df.columns:   
+                        write_log('Outlier removal-target: (split): '+colname, result2exp, 'Data processing')
+          
+                        quantiles = ytrain_df[colname].quantile([0.25,0.5,0.75])
+                        IQR = quantiles[0.75] - quantiles[0.25]
+                        boxplot_outlierLB =  quantiles[0.25]-1.5*IQR
+                        boxplot_outlierUB =  quantiles[0.75]+1.5*IQR
+                        prev_size = len(ytrain_df)
+                        outliers = ytrain_df[(ytrain_df[colname]>boxplot_outlierUB) | (ytrain_df[colname]<boxplot_outlierLB)]
+                        
+                        ytrain_df = ytrain_df.drop(outliers.index)
+                        Xtrain_df = Xtrain_df.drop(outliers.index)
+        
+                      
+                        self.main_model.set_XTest(Xtest_df)
+                        self.main_model.set_XTrain(Xtrain_df)
+                        self.main_model.set_YTrain(ytrain_df.squeeze())
+                        self.main_model.set_YTest(ytest_df.squeeze())
+                        
+            if methodtype == "Remove (Z-scores)":
+
+                negthreshold = -3
+                posthreshold = 3
+                prev_size = len(Xtrain_df)
+                if colname in Xtrain_df.columns:     
+
+                    outlierLB =  negthreshold*Xtrain_df[colname].std()+Xtrain_df[colname].mean()
+                    outlierUB =  posthreshold*Xtrain_df[colname].std()+Xtrain_df[colname].mean()
+
+                    outliers = Xtrain_df[(Xtrain_df[colname]>outlierUB) | (Xtrain_df[colname]<outlierLB)]   
+                    Xtrain_df = Xtrain_df.drop(outliers.index)
+                    ytrain_df = ytrain_df.drop(outliers.index)
+    
+                    self.main_model.set_XTest(Xtest_df)
+                    self.main_model.set_XTrain(Xtrain_df)
+                    self.main_model.set_YTrain(ytrain_df)
+                    self.main_model.set_YTest(ytest_df.squeeze())
+
+                else:
+                    ytrain_df = ytrain_df.to_frame()
+                    
+                    if colname in ytrain_df.columns:   
+                        write_log('Outlier removal-target: (split): '+colname, result2exp, 'Data processing')
+          
+                        outlierLB =  negthreshold*ytrain_df[colname].std()+ytrain_df[colname].mean()
+                        outlierUB =  posthreshold*ytrain_df[colname].std()+ytrain_df[colname].mean()
+
+                        outliers = ytrain_df[(ytrain_df[colname]>outlierUB) | (ytrain_df[colname]<outlierLB)]
+                        
+                        Xtrain_df = Xtrain_df.drop(outliers.index)
+                        ytrain_df = ytrain_df.drop(outliers.index)
+    
+                        self.main_model.set_XTest(Xtest_df)
+                        self.main_model.set_XTrain(Xtrain_df)
+                        self.main_model.set_YTrain(ytrain_df.squeeze())
+                        self.main_model.set_YTest(ytest_df.squeeze())
+
+                write_log('Outlier removal: (split)-> '+str(prev_size)+'->'+str(len(Xtrain_df))+': '+colname, result2exp, 'Data processing')
+            
+            self.controller.show_hint(f"{methodtype} applied on {colname}")
+        else:
+            #the dataset is not split yet
+            write_log('Outlier removal: (no split)-> '+': '+colname, result2exp, 'Data processing')
+            curr_df = self.main_model.get_curr_df()
+
+            if methodtype == "Impute (IQR)":
+                quantiles = curr_df[colname].quantile([0.25,0.5,0.75])
+                IQR = quantiles[0.75] - quantiles[0.25]
+                outlierLB =  quantiles[0.25]-1.5*IQR
+                outlierUB =  quantiles[0.75]+1.5*IQR
+
+                write_log('outlierLB-> '+': '+str(outlierLB)+'outlierUB->'+str(outlierUB), result2exp, 'Data processing')
+
+                curr_df[colname] = [y if y <= outlierUB else outlierUB for y in curr_df[colname]]
+                curr_df[colname] = [y if y >= outlierLB else outlierLB for y in curr_df[colname]]
+                
+                self.main_model.set_curr_df(curr_df)
+
+            if methodtype == "Remove (IQR)":
+                quantiles = curr_df[colname].quantile([0.25,0.5,0.75])
+                IQR = quantiles[0.75] - quantiles[0.25]
+                boxplot_outlierLB =  quantiles[0.25]-1.5*IQR
+                boxplot_outlierUB =  quantiles[0.75]+1.5*IQR
+                prev_size = len(curr_df)
+                outliers = curr_df[(curr_df[colname]>boxplot_outlierUB) | (curr_df[colname]<boxplot_outlierLB)]
+                curr_df = curr_df.drop(outliers.index)
+     
+                write_log('Outlier removal: (no split)-> '+str(prev_size)+'->'+str(len(curr_df))+': '+colname, result2exp, 'Data processing')
+                self.main_model.set_curr_df(curr_df)
+
+            
+
+            if methodtype == "Remove (Z-scores)":
+
+                negthreshold = -3
+                posthreshold = 3
+
+                prev_size = len(curr_df)
+                
+                outlierLB =  negthreshold*curr_df[colname].std()+curr_df[colname].mean()
+                outlierUB =  posthreshold*curr_df[colname].std()+curr_df[colname].mean()
+
+                outliers = curr_df[(curr_df[colname]>outlierUB) | (curr_df[colname]<outlierLB)]
+                curr_df = curr_df.drop(outliers.index)
+    
+                write_log('Outlier removal: (no split)-> '+str(prev_size)+'->'+str(len(curr_df))+': '+colname, result2exp, 'Data processing')
+                self.main_model.set_curr_df(curr_df)
         return
     ##################################################################################
 
-    def assign_target(self,trg_lbl,dt_features,prdtsk_lbl,result2exp,trg_btn,predictiontask):
+    def assign_target(self,trg_lbl,dt_features,prdtsk_lbl,result2exp):
+        # assign the target feature
+        predictiontask = ''
 
         self.main_model.targetcolumn = dt_features.value
 
-        trg_lbl.value = self.main_model.targetcolumn
-        trg_btn.disabled = True
+        trg_lbl.value = "Target: ["+self.main_model.targetcolumn+"]"
 
-        curr_df = self.main_model.curr_df
+        result2exp.value+="In assign target..."+"\n"
+
+        curr_df = self.main_model.get_curr_df()
         target_column = self.main_model.targetcolumn
 
-        if (curr_df[self.main_model.targetcolumn].dtype == 'float64') or (curr_df[target_column].dtype == 'int64'):
+        if curr_df[target_column].dtype in ['float64','int64','int32','Float64','Int64','Int32']:
             predictiontask = "Regression"
         else:
             predictiontask = "Classification" 
 
-        prdtsk_lbl.value = predictiontask 
-        write_log('Target assigned: '+target_column, result2exp, 'Data processing')
-        self.logger.add_action(['ModelDevelopment', 'AssignTarget'], target_column)
-        
-
-        return 
-    ##################################################################################
-
-    def NormalizeColumn(self,df,colname):
-        logging.info('Data preprocessing, feature scaling: normalization of column '+ colname)
-        self.logger.add_action(['DataProcessing', 'Normalization'], [colname])
-        col_min = min(df[colname])
-        col_max = max(df[colname])
-        
-        if col_max == col_min: 
-            return
-        
-        df[colname] = (df[colname]- col_min)/(col_max-col_min)
-        
-        return df
-
-    ############################################################################################################    
-
-    def make_scaling(self,dt_features,ProcssPage,scalingacts,result2exp):  
-        curr_df = self.main_model.curr_df
-        Xtest_df = self.main_model.Xtest_df
-        ytrain_df = self.main_model.ytrain_df
-        ytest_df = self.main_model.ytest_df
-
+  
+        prdtsk_lbl.value = "| Prediction Task: "+predictiontask 
+        self.logger.add_action(['DataProcessing', 'AssignTarget'], target_column)
+        result2exp.value+="assign target done..."+"\n"
+    
+        return predictiontask
+    
+    def make_featconvert(self,dt_features,result2exp):
+        #convert feature to a different datatype
         colname = dt_features.value
-        print(ytrain_df)
-        print(ytrain_df.columns)
-        print(type(ytrain_df))
+        self.logger.add_action(['DataProcessing', 'ConvertToBoolean'], colname)
+                    
+        write_log('Convert Feature Type-> '+colname, result2exp, 'Data processing')
+
+        if self.main_model.datasplit:
+            #the dataset is split
+            Xtest_df = self.main_model.get_XTest()
+            Xtrain_df = self.main_model.get_XTrain()
+            ytrain_df = self.main_model.getYtrain().to_frame()
+            ytest_df = self.main_model.get_YTest().to_frame()
+            
+            write_log('Convert Feature Type-> (split)-> '+colname, result2exp, 'Data processing')
+                         
+            if colname in Xtrain_df.columns:
+                Xtrain_df[colname] = [str(x) for x in Xtrain_df[colname]] 
+                Xtest_df[colname] = [str(x) for x in Xtest_df[colname]]  
+                
+                write_log('Convert Feature Type (split)-> Non-target variable converted..', result2exp, 'Data processing')
+                return
+            if colname in ytrain_df.columns:
+                if ytrain_df[colname].dtype in ['float64','int64','int32','Float64','Int64','Int32']:
+                    if len(ytrain_df[colname].unique()) == 2:
+                        ytrain_df.iloc[:,ytrain_df.columns.get_loc(colname)] = ytrain_df.iloc[:,ytrain_df.columns.get_loc(colname)].astype(bool)
+                        ytest_df.iloc[:,ytest_df.columns.get_loc(colname)] = ytest_df.iloc[:,ytest_df.columns.get_loc(colname)].astype(bool)
+                        
+                        self.main_model.set_YTrain(ytrain_df.squeeze())
+                        self.main_model.set_YTest(ytest_df.squeeze())
+                    else:
+                        ytrain_df[colname] = [str(x) for x in ytrain_df[colname]] 
+                        ytest_df[colname] = [str(x) for x in ytest_df[colname]]    
+                        write_log('Convert Feature Type (split)-> Returned, target variable has more than two levels..', result2exp, 'Data processing')
+                        return
+                else:
+                    write_log('Convert Feature Type-> Returned, feature is not convenient for num->bool conversion..', result2exp, 'Data processing')
+                    return
+            else:
+                write_log('Convert Feature Type (split)-> Returned, feature is unknown', result2exp, 'Data processing')
+                return
+                    
+
+        else:
+            #the dataset has not been split yet
+            curr_df = self.main_model.get_curr_df()
+            write_log('Convert Feature Type (no split)-> '+': '+str(len(curr_df)), result2exp, 'Data processing')
+            if curr_df[colname].dtype in ['float64','int64','int32','Float64','Int64','Int32']:
+                if len(curr_df[colname].unique()) == 2:
+                    curr_df.iloc[:,curr_df.columns.get_loc(colname)] = curr_df.iloc[:,curr_df.columns.get_loc(colname)].astype(bool)
+                    write_log('Convert Feature Type -> done.. '+'  feat type '+str(curr_df[colname].dtype), result2exp, 'Data processing')
+                    self.main_model.set_curr_df(curr_df)
+                else:
+                    curr_df[colname] = [str(x) for x in curr_df[colname]]    
+                    write_log('Convert Feature Type-> Returned, feature has more than two levels..', result2exp, 'Data processing')
+                    return 
+            else:
+                write_log('Convert Feature Type-> Returned, feature is not convenient for num->bool conversion..', result2exp, 'Data processing')
+                return
+                
+      
+        return
+
+    def make_scaling(self,dt_features,FeatPage,scalingtype,result2exp):
+        #apply scaling to the selected feature
+        write_log('Scaling-> '+scalingtype, result2exp, 'Data processing')
+        colname = dt_features.value
+      
         if colname is None:
             return
 
-        write_log('Scaling-> '+scalingacts.value+': '+colname, result2exp, 'Data processing')
-        if (curr_df[colname].dtype == 'object') or (curr_df[colname].dtype== 'string'):
-            with ProcssPage:
-                clear_output()
-                display.display('Selected column is not a numerical type..')
-            return
+        write_log('Scaling-> '+scalingtype+': '+colname, result2exp, 'Data processing')
+        
+        if scalingtype == 'Standardize':
+            
+            if self.main_model.datasplit:
 
-        if scalingacts.value == 'Standardize':
-            if len(Xtest_df)>0:
-                if colname in Xtest_df.columns:
-                    colmean = Xtest_df[colname].mean(); colstd = Xtest_df[colname].std()
+                write_log('Scaling (split)-> '+scalingtype+': '+colname, result2exp, 'Data processing')
+
+                Xtest_df = self.main_model.get_XTest()
+                Xtrain_df = self.main_model.get_XTrain()
+                ytrain_df = self.main_model.getYtrain().to_frame()
+                ytest_df = self.main_model.get_YTest().to_frame()
+
+                # use parameters of training data for scaling
+                write_log('Scaling (split)-> '+scalingtype+': '+colname, result2exp, 'Data processing')
+                
+                if colname in Xtrain_df.columns:
+
+                    if (Xtrain_df[colname].dtype == 'object') or (Xtrain_df[colname].dtype== 'string'):
+                        write_log('Scaling (split)-> Returned due to non-numerical feature: '+colname, result2exp, 'Data processing')
+                        return
+                    
+                    colmean = Xtrain_df[colname].mean(); colstd = Xtrain_df[colname].std()
                     Xtest_df[colname] = (Xtest_df[colname]- colmean)/colstd
-                    Xtest_df[colname] = (Xtest_df[colname]- colmean)/colstd
+                    Xtrain_df[colname] = (Xtrain_df[colname]- colmean)/colstd
+                
                 if colname in ytrain_df.columns:
+                    if (ytrain_df[colname].dtype == 'object') or (ytrain_df[colname].dtype== 'string'):
+                        write_log('Scaling (split)-> Returned due to non-numerical target feature: '+colname, result2exp, 'Data processing')
+                        return
+                        
                     colmean = ytrain_df[colname].mean(); colstd = ytrain_df[colname].std()
                     ytrain_df[colname] = (ytrain_df[colname]- colmean)/colstd
                     ytest_df[colname] = (ytest_df[colname]- colmean)/colstd
-                    
-            colmean = curr_df[colname].mean()
-            curr_df[colname] = (curr_df[colname]- colmean)/curr_df[colname].std()
-            self.logger.add_action(['DataProcessing', 'Standardize'], [colname])
+            else:
+                curr_df = self.main_model.get_curr_df()
+                write_log('Scaling (no split)-> '+': '+str(len(curr_df)), result2exp, 'Data processing')
+                if (curr_df[colname].dtype == 'object') or (curr_df[colname].dtype== 'string'):
+                    write_log('Scaling (split)-> Returned due to non-numerical feature: '+colname, result2exp, 'Data processing')
+                    self.controller.show_hint(f"{scalingtype} applied on {colname}")
+                    return
+                # standardization before splitting data
+                colmean = curr_df[colname].mean();colstd = curr_df[colname].std()
+                curr_df[colname] = (curr_df[colname]- colmean)/colstd
+
+           
+            self.logger.add_action(['DataProcessing', 'Standardize'], colname)
             logging.info('Data preprocessing, feature scaling: standardization of column '+ colname)
 
 
-        if scalingacts.value == 'Normalize':
+        if scalingtype == 'Normalize':
 
-            if len(Xtest_df)>0:
-                if colname in Xtest_df.columns:
-                    col_min = min(Xtest_df[colname]); col_max = max(Xtest_df[colname])
+            if self.main_model.datasplit:
+                Xtest_df = self.main_model.get_XTest()
+                Xtrain_df = self.main_model.get_XTrain()
+                ytrain_df = self.main_model.getYtrain().to_frame()
+                ytest_df = self.main_model.get_YTest().to_frame()
+                if colname in Xtrain_df.columns:
+
+                    if (Xtrain_df[colname].dtype == 'object') or (Xtrain_df[colname].dtype== 'string'):
+                        write_log('Scaling (split)-> Selected column is not a numerical type..'+colname, result2exp, 'Data processing')
+                        return
+  
+                    col_min = min(Xtrain_df[colname]); col_max = max(Xtrain_df[colname])
                     denominator = (col_max-col_min)
                     if denominator== 0:
                         Xtest_df[colname] = (Xtest_df[colname]/col_min)
-                        Xtest_df[colname] = (Xtest_df[colname]/col_min)
+                        Xtrain_df[colname] = (Xtrain_df[colname]/col_min)
                     else:
                         Xtest_df[colname] = (Xtest_df[colname]-col_min)/denominator
-                        Xtest_df[colname] = (Xtest_df[colname]-col_min)/denominator
+                        Xtrain_df[colname] = (Xtrain_df[colname]-col_min)/denominator
                 
                 if colname in ytrain_df.columns:
                     col_min = min(ytrain_df[colname]); col_max = max(ytrain_df[colname])
@@ -122,66 +560,115 @@ class DataProcessingModel:
                     else:
                         ytrain_df[colname] = (ytrain_df[colname]-col_min)/denominator
                         ytest_df[colname] = (ytest_df[colname]-col_min)/denominator
+            else:    
+                curr_df = self.main_model.get_curr_df() 
+                if (curr_df[colname].dtype == 'object') or (curr_df[colname].dtype== 'string'):
+                    write_log('Scaling (split)-> Selected column is not a numerical type..'+colname, result2exp, 'Data processing')
+                    return
+                col_min = min(curr_df[colname]); col_max = max(curr_df[colname])
+                denominator = (col_max-col_min)
+                
+                if denominator== 0:
+                    curr_df[colname] = (curr_df[colname]/col_min)
+                else:
+                    curr_df[colname] = (curr_df[colname]-col_min)/denominator
 
-            
-            col_min = min(curr_df[colname]); col_max = max(curr_df[colname])
-            denominator = (col_max-col_min)
-
-            if denominator== 0:
-                curr_df[colname] = (curr_df[colname]/col_min)
-            else:
-                curr_df[colname] = (curr_df[colname]-col_min)/denominator
-
-            self.logger.add_action(['DataProcessing', 'Normalize'], [colname])
+            self.logger.add_action(['DataProcessing', 'Normalize'], colname)
             logging.info('Data preprocessing, feature scaling: normalization of column '+ colname)
 
-        with ProcssPage:
+        #display boxplot
+        with FeatPage:
             clear_output()
             fig, (axbox, axhist) = plt.subplots(1,2)
-        
-            sns.boxplot(x=colname,data=curr_df, ax=axbox)
-            axbox.set_title('Box plot') 
-            sns.distplot(curr_df[colname],ax=axhist)
-            axhist.set_title('Histogram') 
-            plt.legend(['Mean '+str(round(curr_df[colname].mean(),2)),'Stdev '+str(round(curr_df[colname].std(),2))], bbox_to_anchor=(0.6, 0.6))
-            plt.show()
+
+            if self.main_model.datasplit:
+                Xtrain_df=  self.main_model.get_XTrain()
+                if colname in Xtrain_df.columns:
+
+                    sns.boxplot(x=colname,data=Xtrain_df, ax=axbox)
+                    axbox.set_title('Box plot (train)') 
+                    sns.distplot(Xtrain_df[colname],ax=axhist)
+                    axhist.set_title('Histogram (train)') 
+                    plt.legend(['Mean '+str(round(Xtrain_df[colname].mean(),2)),'Stdev '+str(round(Xtrain_df[colname].std(),2))], bbox_to_anchor=(0.6, 0.6))
+                    plt.show()
+                else: 
+                    ytrain_df = self.main_model.getYtrain().to_frame()
+                    if colname in ytrain_df.columns:
+                        sns.boxplot(x=colname,data=ytrain_df, ax=axbox)
+                        axbox.set_title('Box plot (train)') 
+                        sns.distplot(ytrain_df[colname],ax=axhist)
+                        axhist.set_title('Histogram (train)') 
+                        plt.legend(['Mean '+str(round(ytrain_df[colname].mean(),2)),'Stdev '+str(round(ytrain_df[colname].std(),2))], bbox_to_anchor=(0.6, 0.6))
+                        plt.show()
+                    
+            else:
+                sns.boxplot(x=colname,data=curr_df, ax=axbox)
+                axbox.set_title('Box plot') 
+                sns.distplot(curr_df[colname],ax=axhist)
+                axhist.set_title('Histogram') 
+                plt.legend(['Mean '+str(round(curr_df[colname].mean(),2)),'Stdev '+str(round(curr_df[colname].std(),2))], bbox_to_anchor=(0.6, 0.6))
+                plt.show()
+
+        if self.main_model.datasplit:
+            self.main_model.set_XTest(Xtest_df)
+            self.main_model.set_XTrain(Xtrain_df)
+            self.main_model.set_YTrain(ytrain_df.squeeze())
+            self.main_model.set_YTest(ytest_df.squeeze())
+        else:
+            self.main_model.set_curr_df(curr_df)
         
     
         return
-    #################################################################################################################
-    def make_balanced(self,features2,balncacts,ProcssPage):  
-        curr_df = self.main_model.curr_df
+    
+    def make_balanced(self,features2,balancetype,ProcssPage,result2exp):  
+        # apply class balancing to a feature
+        write_log('Balancing-> '+balancetype, result2exp, 'Data processing')     
         colname = features2.value
+        if not self.main_model.datasplit:
+            write_log('Balancing-> No split, improper balancing ', result2exp, 'Data processing')
+            return
 
-        if balncacts.value == 'Upsample':
-            
-            if len(curr_df[colname].unique()) == 2: # binary detection
-                colvals = curr_df[colname].unique()
-                ColmFirst = curr_df[curr_df[colname] == colvals[0]]
-                ColmOther = curr_df[curr_df[colname] == colvals[1]]
-            
-                if len(ColmFirst) < len(ColmOther):
-                    upsampled_First = resample(ColmFirst, replace=True, n_samples=len(ColmOther), random_state=27) 
-                    self.main_model.curr_df = pd.concat([ColmOther, upsampled_First])
-                else:
-                    upsampled_Other= resample(ColmOther, replace=True, n_samples=len(ColmFirst), random_state=27) 
-                    self.main_model.curr_df = pd.concat([ColmFirst, upsampled_Other])
+        if colname != self.main_model.targetcolumn:
+            write_log('Balancing-> Non-target feature is attempted for balancing', result2exp, 'Data processing')
+            return
+      
+        if colname is None:
+            return
+
+        Xtrain_df = self.main_model.get_XTrain()
+        ytrain_df = self.main_model.getYtrain()
+        prev_size = len(ytrain_df)
+        write_log('Balancing (split)-> '+colname, result2exp, 'Data processing')
+    
+        if len(ytrain_df.to_frame()[colname].unique()) == 2: # binary detection      
+
+            if balancetype == 'Upsample':
+                oversampler = RandomOverSampler()
+                X_oversampled, y_oversampled = oversampler.fit_resample(Xtrain_df,ytrain_df)
                     
-                with ProcssPage:
-                    clear_output()
-                    plt.figure(figsize=(6, 2))
-                    ax = sns.countplot(x=colname,data=self.main_model.curr_df, palette="cool_r")
-                    for p in ax.patches:
-                        ax.annotate("{:.1f}".format(p.get_height()), (p.get_x()+0.25, p.get_height()+0.01))
-                    plt.show()
+                self.main_model.set_XTrain(X_oversampled)
+                self.main_model.set_YTrain(y_oversampled)
+
+                write_log('Balancing: (split)-> '+str(prev_size)+'->'+str(len(y_oversampled))+': '+colname, result2exp, 'Data processing')
+                
+            if balancetype == 'DownSample':
+                downsampler = RandomUnderSampler(random_state=42)
+                X_res, y_res = downsampler.fit_resample(Xtrain_df, ytrain_df)
+
+                self.main_model.set_XTrain(X_res)
+                self.main_model.set_YTrain(y_res)
+                write_log('Balancing: (split)-> '+str(prev_size)+'->'+str(len(y_res))+': '+colname, result2exp, 'Data processing')
+    
+        else:
+            write_log('Balancing (split)-> Feature has more than 2 unique values', result2exp, 'Data processing')
+                    
+            
         logging.info('Data preprocessing, checking and handling unbalancedness')
-        self.logger.add_action(['DataProcessing', 'Unbalancedness'], [colname])
+        self.logger.add_action(['DataProcessing', 'Unbalancedness ' + balancetype ], colname)
         return
 
-    #####################################################################################################################
-
-
-    def make_split(self,splt_txt,splt_btn,result2exp):
+    def make_split(self,splt_txt,result2exp):
+        #split the dataset
         curr_df = self.main_model.curr_df
         targetcolumn = self.main_model.targetcolumn
         if targetcolumn is None:
@@ -194,89 +681,153 @@ class DataProcessingModel:
         
         ratio_percnt = int(splt_txt.value) 
         write_log('Split ratio, '+str(ratio_percnt/100), result2exp, 'Data processing')
-        self.main_model.Xtrain_df,self.main_model.Xtest_df, self.main_model.ytrain_df, self.main_model.ytest_df = train_test_split(X, y, test_size=ratio_percnt/100, random_state=16)
-        splt_btn.disabled = True
+        X_indices = X.index
+        y_indices = y.index
 
-        write_log('Split, Train size: '+str(len(self.main_model.Xtest_df)), result2exp, 'Data processing')
+        xtrain,xtest, ytrain, ytest = train_test_split(X, y, test_size=ratio_percnt/100, random_state=16)
+        self.main_model.set_XTest(xtest)
+        self.main_model.set_XTrain(xtrain)
+        self.main_model.set_YTrain(ytrain)
+        self.main_model.set_YTest(ytest)
+        splt_txt.layout.visibility = 'hidden'
+        splt_txt.layout.display = 'none'
+
+        write_log('Split, XTrain size: '+str(len(self.main_model.get_XTrain())), result2exp, 'Data processing')
+        write_log('Split, XTest size: '+str(len(self.main_model.get_XTest())), result2exp, 'Data processing')
+        write_log('Split, yTrain size: '+str(len(self.main_model.getYtrain())), result2exp, 'Data processing')
+        write_log('Split, yTrain indices: '+str(len(self.main_model.getYtrain().index)), result2exp, 'Data processing')
+        write_log('Split, yTest size: '+str(len(self.main_model.get_YTest())), result2exp, 'Data processing')
         self.logger.add_action(['DataProcessing', 'Split'], str(ratio_percnt) + '%')
-        return
-    ############################################################################################################    
-    def make_encoding(self,features2,encodingacts,result2exp):
+        self.main_model.datasplit = True
 
-        colname = features2.value
-
-        write_log('Encoding.. col '+colname+' is list:'+str(int(isinstance(self.main_model.curr_df, list))), result2exp, 'Data processing')
-
-        if colname is None:
-            return
-
+ 
         
-        curr_df = self.main_model.curr_df
+        return
+    
+    def make_encoding(self,features2,encodingtype,ordselect,result2exp):
+        #apply encoding to a feature
+        colname = features2.value
+        if (colname is None) or (colname == ''):
+            return
+        
         # Encode column  
-        if len(self.main_model.Xtest_df) > 0:
-            
-            
-            if encodingacts.value == "Label Encoding":
+        if self.main_model.datasplit:
+            #The data has been split
+            Xtest_df = self.main_model.get_XTest()
+            Xtrain_df = self.main_model.get_XTrain()
+            ytrain_df = self.main_model.getYtrain().to_frame()
+            ytest_df = self.main_model.get_YTest().to_frame()
+    
+            if encodingtype == "Label Encoding":
+                
+                if colname in Xtrain_df.columns:
+                    if Xtrain_df[colname].dtype in ['float64','int64','int32','Float64','Int64','Int32']:
+                        write_log('Encoding (split)-> Attempt to encode a numerical feature '+str(colname), result2exp, 'Data processing')
+                        return
+
+                    label_encoder = preprocessing.LabelEncoder() 
+
+                    label_encoder.fit(Xtrain_df[colname]) 
+                    Xtrain_df[colname] = label_encoder.transform(Xtrain_df[colname]) # train 
+                    Xtrain_df[colname] = Xtrain_df[colname].apply(np.int64)
+   
+                    Xtest_df[colname] = label_encoder.fit_transform(Xtest_df[colname]) # test
+                    Xtest_df[colname] = Xtest_df[colname].apply(np.int64)
+
+                    write_log('Encoding (split) -> '+colname+' done.', result2exp, 'Data processing')
+                    self.logger.add_action(['DataProcessing', 'LabelEncoding'], colname)
+                else: 
+                    write_log('Encoding (split) -> '+colname+'| Returned due to target feature ', result2exp, 'Data processing')
+                    return
+                    
+            if encodingtype == "One Hot Encoding":
+
+                if colname in Xtrain_df.columns:
+
+                    if Xtrain_df[colname].dtype in ['float64','int64','int32','Float64','Int64','Int32']:
+                        write_log('Encoding (split) -> | Returned attempt to encode a numerical feature '+str(colname), result2exp, 'Data processing')
+                        return
+                    
+                    categorical_columns = [colname]
+
+                    Xtrain_df = pd.concat([Xtrain_df.drop(categorical_columns, axis = 1), pd.get_dummies(Xtrain_df[categorical_columns])], axis=1)
+                    Xtest_df = pd.concat([Xtest_df.drop(categorical_columns, axis = 1), pd.get_dummies(Xtest_df[categorical_columns])], axis=1)
+  
+                    self.logger.add_action(['DataProcessing', 'OneHotEncoding'], colname)
+                    write_log('Encoding (split) -> '+encodingtype+', col '+colname+' done.', result2exp, 'Data processing')
+                else: 
+                    write_log('Encoding (split) ->'+encodingtype+', col '+colname+', | Returned due to target feature ', result2exp, 'Data processing')
+                    return
+                
+            self.main_model.set_XTest(Xtest_df)
+            self.main_model.set_XTrain(Xtrain_df)
+            self.main_model.set_YTrain(ytrain_df.squeeze())
+            self.main_model.set_YTest(ytest_df.squeeze())
+        else: #before split
+
+            curr_df = self.main_model.get_curr_df()
+
+            if curr_df[colname].dtype in ['float64','int64','int32','Float64','Int64','Int32']:
+                write_log('Encoding-> Attempt to encode a numerical feature '+str(colname), result2exp, 'Data processing')
+                return
+
+            if encodingtype == "Label Encoding":
                 label_encoder = preprocessing.LabelEncoder() 
-                write_log('Encoding-> '+features2.value+' (train) current classes: '+str(curr_df[0][colname].unique()), result2exp, 'Data processing')
-                curr_df[0][colname] = label_encoder.fit_transform(curr_df[0][colname]) # train 
-                write_log('Encoding-> '+features2.value+' (train) after labeling classes: '+str(curr_df[0][colname].unique()), result2exp, 'Data processing')
-                write_log('Encoding-> '+features2.value+' (test) current classes: '+str(curr_df[1][colname].unique()), result2exp, 'Data processing')
-                curr_df[1][colname] = label_encoder.fit_transform(curr_df[1][colname]) # test
-                write_log('Encoding-> '+features2.value+' (test) after labeling classes: '+str(curr_df[1][colname].unique()), result2exp, 'Data processing')
-
-                curr_df = curr_df[0],curr_df[1]
-                self.logger.add_action(['DataProcessing', 'LabelEncoding'], [colname])
+    
+                label_encoder.fit(curr_df[colname]) 
+                curr_df[colname] = label_encoder.transform(curr_df[colname]) 
+                curr_df[colname] = curr_df[colname].apply(np.int64)
+  
+                self.logger.add_action(['DataProcessing', 'LabelEncoding'], colname)
                 
-            if encodingacts.value == "One Hot Encoding":
-                categorical_columns = [colname]
+                write_log('Encoding->'+encodingtype+', col '+colname+', done. ', result2exp, 'Data processing')
                 
-                encoder = preprocessing.OneHotEncoder(sparse_output=False)  # Initialize OneHotEncoder
-                one_hot_encoded = encoder.fit_transform(curr_df[0][categorical_columns])  # Fit and transform the categorical columns          
-                one_hot_df = pd.DataFrame(one_hot_encoded,columns=encoder.get_feature_names_out(categorical_columns)) # Create a DataFrame
-                data1_df = pd.concat([curr_df[0].drop(categorical_columns, axis=1), one_hot_df], axis=1)
-                write_log('One Hot Encoding-> (train) after one-hot features: '+str(data1_df.columns), result2exp, 'Data processing')
-
-                encoder = preprocessing.OneHotEncoder(sparse_output=False)  # Initialize OneHotEncoder
-                one_hot_encoded = encoder.fit_transform(curr_df[1][categorical_columns])  # Fit and transform the categorical columns          
-                one_hot_df = pd.DataFrame(one_hot_encoded,columns=encoder.get_feature_names_out(categorical_columns)) # Create a DataFrame 
-                data2_df = pd.concat([curr_df[1].drop(categorical_columns, axis=1), one_hot_df], axis=1)
-                write_log('One Hot Encoding-> (test) after one-hot features: '+str(data2_df.columns), result2exp, 'Data processing')
-
-                curr_df = data1_df,data2_df
-
-                features2.options = [col+'('+str(data1_df[col].isnull().sum())+')' for col in data1_df.columns]
-                self.logger.add_action(['DataProcessing', 'OneHotEncoding'], [colname])
-        else:
-            write_log('Encoding-> '+encodingacts.value+', '+str(encodingacts.value == "One Hot Encoding"), result2exp, 'Data processing')
-            write_log('Encoding-> '+colname+' current classes: '+str(len(curr_df)), result2exp, 'Data processing')
-            if encodingacts.value == "Label Encoding":
-                label_encoder = preprocessing.LabelEncoder() 
-                write_log('Encoding-> '+features2.value+' current classes: '+str(curr_df[colname].unique()), result2exp, 'Data processing')
-                curr_df[colname] = label_encoder.fit_transform(curr_df[colname]) 
-                write_log('Encoding-> '+features2.value+' after labeling classes: '+str([cls for cls in curr_df[colname].unique()]), result2exp, 'Data processing')
-                self.logger.add_action(['DataProcessing', 'LabelEncoding'], [colname])
-                
-            if encodingacts.value == "One Hot Encoding":
-                write_log('Encoding-> '+colname+' current classes: '+str(curr_df[colname].unique()), result2exp, 'Data processing')
+            if encodingtype == "One Hot Encoding":
                 categorical_columns = [colname]
                 encoder = preprocessing.OneHotEncoder(sparse_output=False)  # Initialize OneHotEncoder
                 one_hot_encoded = encoder.fit_transform(curr_df[categorical_columns])  # Fit and transform the categorical columns          
                 one_hot_df = pd.DataFrame(one_hot_encoded,columns=encoder.get_feature_names_out(categorical_columns)) # Create a DataFrame
+                curr_df = curr_df.reset_index(drop=True)
+                one_hot_df = one_hot_df.reset_index(drop=True)
                 curr_df = pd.concat([curr_df.drop(categorical_columns, axis=1), one_hot_df], axis=1)
-                write_log('One Hot Encoding-> after one-hot features: '+str(curr_df.columns), result2exp, 'Data processing')
-                self.logger.add_action(['DataProcessing', 'OneHotEncoding'], [colname])
+                self.logger.add_action(['DataProcessing', 'OneHotEncoding'], colname)
+                write_log('Encoding->'+encodingtype+', col '+colname+', done. ', result2exp, 'Data processing')
 
-            features2.options = [col for col in curr_df.columns]
-        
+            if encodingtype == 'Ordinal Encoding':
+                classorder =[x for x in ordselect.options]
+
+                mapping = dict()
+
+                for i in range(len(classorder)):
+                    mapping[classorder[i]] = len(classorder)-i
+ 
+                curr_df[colname] = curr_df[colname].replace(mapping)
+            self.main_model.set_curr_df(curr_df)
         return
 
     def savedata(self, dataFolder, datasetname):
+        #export the modified dataset to a csv file
         datasetname = os.path.splitext(os.path.basename(datasetname))[0]
         current_datetime = datetime.now().strftime('%Y%m%d_%H%M%S')
         filename = dataFolder + '/' + datasetname + '_' + current_datetime
         shutil.copy('output.log', filename + '.txt')
         self.main_model.curr_df.to_csv(filename + '.csv')
-
-        
         version = 0
+
+    def ReorderColumns(self):
+        #order the features so the objects are displayed at the top of the list
+        objects = []
+        if self.main_model.datasplit:
+            for col in self.controller.main_model.get_XTrain().columns:
+                objects.append((int(self.controller.main_model.get_XTrain()[col].dtype == 'object'),col))
+                
+            for col in self.controller.main_model.getYtrain().to_frame().columns: 
+                objects.append((int(self.controller.main_model.getYtrain().to_frame()[col].dtype == 'object'),col))
+        else:
+            curr_df = self.main_model.get_curr_df()
+            for col in curr_df.columns:
+                objects.append((int(curr_df[col].dtype == 'object'),col))
+            
+        new_list = sorted(objects, key=lambda x: x[0], reverse=True)
+        self.main_view.dt_features.options = [col for (objtype,col) in new_list]      
+        return

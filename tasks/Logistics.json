@@ -1,0 +1,348 @@
+{
+    "title": "Logistics - Predict KPI",
+    "description": "Predcit KPI value using other informative features.",
+    "mode": "monitored",
+    "model_metric": [
+        "MAE",
+        0.025
+    ],
+    "data_size": 1891,
+    "missing_values": 0,
+    "type": "float64",
+    "range": "0.259-0.895",
+    "difficulty": [
+        [
+            "Data Cleaning",
+            75
+        ],
+        [
+            "Data Translation",
+            80
+        ],
+        [
+            "Data Transformation",
+            85
+        ],
+        [
+            "Statistics",
+            50
+        ],
+        [
+            "Model Training",
+            85
+        ],
+        [
+            "Predictive Modeling",
+            97
+        ]
+    ],
+    "dataset": "logistics.csv",
+    "subtasks": [
+        {
+            "title": "Data Cleaning",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataCleaning",
+                        "Drop Column"
+                    ],
+                    "value": [
+                        "Unnamed: 0",
+                        "item_id",
+                        "storage_location_id",
+                        "last_restock_date"
+                    ],
+                    "title": "Drop Columns",
+                    "description": "Remove columns that are irrelevant or redundant for the model.",
+                    "hints": [
+                        "Go to the Data Cleaning tab. Select the column(s), choose 'drop column', then click apply.",
+                        "Drop the following column(s): Unnamed: 0, item_id, storage_location_id, last_restock_date."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataCleaning",
+                        "Replace-Mean"
+                    ],
+                    "value": [
+                        "reorder_frequency_days",
+                        "item_popularity_score",
+                        "lead_time_days",
+                        "unit_price"
+                    ],
+                    "title": "Replace Missing Values (Mean)",
+                    "description": "Replace missing values in columns using the mean.",
+                    "hints": [
+                        "Go to the Data Cleaning tab. Select the column, choose 'replace mean', then click apply.",
+                        "Apply replace mean to reorder_frequency_days, item_popularity_score, lead_time_days, unit_price."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataCleaning",
+                        "Replace-Median"
+                    ],
+                    "value": [
+                        "stock_level",
+                        "demand_std_dev",
+                        "turnover_ratio"
+                    ],
+                    "title": "Replace Missing Values (Median)",
+                    "description": "Replace missing values in columns using the median.",
+                    "hints": [
+                        "Go to the Data Cleaning tab. Select the column, choose 'replace median', then click apply.",
+                        "Apply replace median to stock_level, demand_std_dev, turnover_ratio."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataCleaning",
+                        "Remove-Missing"
+                    ],
+                    "value": [
+                        "zone",
+                        "forecasted_demand_next_7d",
+                        "last_restock_date"
+                    ],
+                    "title": "Remove Rows with Missing Values",
+                    "description": "Remove rows that contain missing values in columns.",
+                    "hints": [
+                        "Go to the Data Cleaning tab. Select the column, choose 'remove missing', then click apply.",
+                        "Remove rows with missing values in zone, forecasted_demand_next_7d, last_restock_date."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": 2
+        },
+        {
+            "title": "Model Training",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "AssignTarget"
+                    ],
+                    "value": [
+                        "KPI_score"
+                    ],
+                    "title": "Assign Target Variable",
+                    "description": "Assign columns as the target variables for model training.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'Assign Target', then click apply.",
+                        "Assign 'KPI_score' as the target column."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "Split"
+                    ],
+                    "value": [
+                        "20%"
+                    ],
+                    "title": "Train/Test Split",
+                    "description": "Split dataset into training and testing sets.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, assign the target, set the test ratio, then click split.",
+                        "Use a test ratio of 20% for splitting the dataset."
+                    ],
+                    "applied_values": [],
+                    "order": 2
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "ModelDevelopment",
+                        "ParameterFinetuning"
+                    ],
+                    "value": [
+                        [
+                            "KNN",
+                            8,
+                            "uniform",
+                            "euclidean"
+                        ]
+                    ],
+                    "title": "Parameter Finetuning",
+                    "description": "Optimize model performance by modifying the parameters of the model.",
+                    "hints": [
+                        "Go to the Predictive Modeling tab. Select the model type, adjust parameters if needed, then click train.",
+                        "Train the model using the following parameters: [['KNN', 8, 'uniform', 'euclidean']]."
+                    ],
+                    "applied_values": [],
+                    "order": 3
+                }
+            ],
+            "applied_values": [],
+            "order": 7
+        },
+        {
+            "title": "Statistics",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "outlier"
+                    ],
+                    "value": [
+                        "turnover_ratio",
+                        "stock_level",
+                        "unit_price",
+                        "lead_time_days",
+                        "item_popularity_score",
+                        "reorder_point",
+                        "daily_demand",
+                        "picking_time_seconds",
+                        "handling_cost_per_unit",
+                        "holding_cost_per_unit_day",
+                        "layout_efficiency_score"
+                    ],
+                    "title": "Handle Outliers",
+                    "description": "Detect and handle outliers in columns.",
+                    "hints": [
+                        "Go to the Data Processing tab. Select the column, choose 'outlier', then click apply.",
+                        "Handle outliers in turnover_ratio, stock_level, unit_price, lead_time_days, item_popularity_score, reorder_point, daily_demand, picking_time_seconds, handling_cost_per_unit, holding_cost_per_unit_day, layout_efficiency_score."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": 5
+        },
+        {
+            "title": "Data Translation",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "OneHotEncoding"
+                    ],
+                    "value": [
+                        "zone",
+                        "category"
+                    ],
+                    "title": "One-Hot Encoding",
+                    "description": "Convert categorical columns into one-hot encoded vectors.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'encoding', choose 'One Hot Encoding', then click apply.",
+                        "Apply one-hot encoding to zone, category."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "LabelEncoding"
+                    ],
+                    "value": [
+                        "zone_A",
+                        "zone_B",
+                        "zone_C",
+                        "zone_D",
+                        "category_Apparel",
+                        "category_Automotive",
+                        "category_Electronics",
+                        "category_Groceries",
+                        "category_Pharma"
+                    ],
+                    "title": "Label Encoding",
+                    "description": "Convert categorical columns into numeric codes.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'encoding', choose 'Label Encoding', then click apply.",
+                        "Apply label encoding to zone_A, zone_B, zone_C, zone_D, category_Apparel, category_Automotive, category_Electronics, category_Groceries, category_Pharma."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": 3
+        },
+        {
+            "title": "Predictive Modeling",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "ModelDevelopment",
+                        "ModelPerformance"
+                    ],
+                    "value": [
+                        [
+                            [
+                                "MSE",
+                                0.01
+                            ],
+                            [
+                                "MAE",
+                                0.08932102763385147
+                            ],
+                            [
+                                "RSquared",
+                                -0.08170261715852467
+                            ],
+                            [
+                                "datetime_start",
+                                "2026-04-20 09:27:53"
+                            ],
+                            [
+                                "datetime_end",
+                                "2026-04-20 09:35:29"
+                            ],
+                            [
+                                "data_size",
+                                1891
+                            ],
+                            [
+                                "missing_values",
+                                0
+                            ],
+                            [
+                                "type",
+                                "float64"
+                            ],
+                            [
+                                "range",
+                                "0.259-0.895"
+                            ]
+                        ]
+                    ],
+                    "title": "Model Training",
+                    "description": "Train a model and evaluate its performance.",
+                    "hints": [],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": null
+        }
+    ]
+}

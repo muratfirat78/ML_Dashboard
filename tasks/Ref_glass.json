@@ -1,0 +1,195 @@
+{
+    "title": "Predicting Glass Type",
+    "description": "Given 9 properties of glass predct its type",
+    "mode": "monitored",
+    "model_metric": [
+        "accuracy",
+        0.75
+    ],
+    "data_size": 171,
+    "missing_values": 0,
+    "type": "str",
+    "range": "1-7",
+    "difficulty": [
+        [
+            "Data Cleaning",
+            0
+        ],
+        [
+            "Data Translation",
+            30
+        ],
+        [
+            "Data Transformation",
+            0
+        ],
+        [
+            "Statistics",
+            0
+        ],
+        [
+            "Model Training",
+            30
+        ],
+        [
+            "Predictive Modeling",
+            35
+        ]
+    ],
+    "dataset": "glass.csv",
+    "subtasks": [
+        {
+            "title": "Data Translation",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "ConvertToBoolean"
+                    ],
+                    "value": [
+                        "Type"
+                    ],
+                    "title": "Convert to Boolean",
+                    "description": "Convert 1 and 0 values in columns to boolean (True/False).",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'Convert to Boolean', then click apply.",
+                        "Convert 'Type' to boolean (True/False)."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": 3
+        },
+        {
+            "title": "Model Training",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "AssignTarget"
+                    ],
+                    "value": [
+                        "Type"
+                    ],
+                    "title": "Assign Target Variable",
+                    "description": "Assign columns as the target variables for model training.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, select 'Assign Target', then click apply.",
+                        "Assign 'Type' as the target column."
+                    ],
+                    "applied_values": [],
+                    "order": 1
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "DataProcessing",
+                        "Split"
+                    ],
+                    "value": [
+                        "20%"
+                    ],
+                    "title": "Train/Test Split",
+                    "description": "Split dataset into training and testing sets.",
+                    "hints": [
+                        "Go to the Data Processing tab. Choose the column, assign the target, set the test ratio, then click split.",
+                        "Use a test ratio of 20% for splitting the dataset."
+                    ],
+                    "applied_values": [],
+                    "order": 2
+                },
+                {
+                    "status": "todo",
+                    "action": [
+                        "ModelDevelopment",
+                        "ParameterFinetuning"
+                    ],
+                    "value": [
+                        [
+                            "Random Forest",
+                            90,
+                            "entropy",
+                            4
+                        ]
+                    ],
+                    "title": "Parameter Finetuning",
+                    "description": "Optimize model performance by modifying the parameters of the model.",
+                    "hints": [
+                        "Go to the Predictive Modeling tab. Select the model type, adjust parameters if needed, then click train.",
+                        "Train the model using the following parameters: [['Random Forest', 90, 'entropy', 4]]."
+                    ],
+                    "applied_values": [],
+                    "order": 3
+                }
+            ],
+            "applied_values": [],
+            "order": 7
+        },
+        {
+            "title": "Predictive Modeling",
+            "status": "todo",
+            "subtasks": [
+                {
+                    "status": "todo",
+                    "action": [
+                        "ModelDevelopment",
+                        "ModelPerformance"
+                    ],
+                    "value": [
+                        [
+                            [
+                                "Accuracy",
+                                0.74
+                            ],
+                            [
+                                "Precision",
+                                0.7441860465116279
+                            ],
+                            [
+                                "Recall",
+                                0.7441860465116279
+                            ],
+                            [
+                                "datetime_start",
+                                "2026-04-13 17:42:33"
+                            ],
+                            [
+                                "datetime_end",
+                                "2026-04-13 17:44:08"
+                            ],
+                            [
+                                "data_size",
+                                171
+                            ],
+                            [
+                                "missing_values",
+                                0
+                            ],
+                            [
+                                "type",
+                                "str"
+                            ],
+                            [
+                                "range",
+                                "1-7"
+                            ]
+                        ]
+                    ],
+                    "title": "Model Training",
+                    "description": "Train a model and evaluate its performance.",
+                    "hints": [],
+                    "applied_values": [],
+                    "order": 1
+                }
+            ],
+            "applied_values": [],
+            "order": null
+        }
+    ]
+}

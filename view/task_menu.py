@@ -67,8 +67,7 @@ class TaskMenuView:
         self.controller = controller
 
     def undo_click(self,button):
-        actions_to_undo = self.slider.max - self.slider.value
-        self.controller.logger.undo(actions_to_undo)
+        self.controller.logger.undo(self.slider.value)
 
     def topic_explaination_button_click(self, button):
         self.controller.main_view.switch_tab_to_topic_info()
@@ -98,18 +97,20 @@ class TaskMenuView:
             if id >= len(self.task_list) and self.finishedtask:
                 self.subsubtask_textarea.description = "Results:"
                 if self.mode == "monitored":
-                    difficulty_data = dict(self.current_task["difficulty"])
-                    competence_vector = self.competence_vector or {}
-                    formatted = [f"{skill}: {round(competence_vector.get(skill,0)*100)}/100" 
-                                for skill, diff in difficulty_data.items()]
+                    None
+                    # difficulty_data = dict(self.current_task["difficulty"])
+                    # competence_vector = self.competence_vector or {}
+                    # formatted = [f"{skill}: {round(competence_vector.get(skill,0)*100)}/100" 
+                    #             for skill, diff in difficulty_data.items()]
 
-                    pad = max(len(formatted[i*2]) for i in range((len(formatted)+1)//2)) + 4
+                    # pad = max(len(formatted[i*2]) for i in range((len(formatted)+1)//2)) + 4
 
-                    lines = [f"{formatted[i*2].ljust(pad)}{formatted[i*2+1] if i*2+1 < len(formatted) else ''}"
-                            for i in range((len(formatted)+1)//2)]
+                    # lines = [f"{formatted[i*2].ljust(pad)}{formatted[i*2+1] if i*2+1 < len(formatted) else ''}"
+                    #         for i in range((len(formatted)+1)//2)]
 
-                    self.subsubtask_textarea.value = "\n".join(lines)
+                    # self.subsubtask_textarea.value = "\n".join(lines)
                 else:
+                    self.subsubtask_textarea.description = "Results:"
                     self.subsubtask_textarea.value = "Task completed 🎉"
 
             else:

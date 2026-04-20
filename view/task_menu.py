@@ -11,9 +11,15 @@ class TaskMenuView:
         self.previous_button.on_click(self.previous_button_click)
         self.next_button = widgets.Button(description="Next >>", button_style="primary")
         self.next_button.on_click(self.next_button_click)
+        self.topic_explaination_button = widgets.Button(description="More info")
+        self.topic_explaination_button.on_click(self.topic_explaination_button_click)
+        self.undo_button = widgets.Button(description="Undo last action")
+        self.undo_button.on_click(self.undo_click)
+        self.undo_button.layout.visibility  = 'hidden'
         self.task_box = widgets.HBox([])
         self.mode = ""
         self.competence_vector = None
+        self.actions = []
         
         self.hint_button = widgets.Button(
             description="Instructions",
@@ -27,9 +33,9 @@ class TaskMenuView:
         
         self.status_label = widgets.HTML(" Status: todo", layout=widgets.Layout(height="35px", width="25%", text_align="center"))
         self.button_box = widgets.GridBox(
-            children=[self.previous_button, self.hint_button, self.next_button],
+            children=[self.previous_button, self.topic_explaination_button, self.hint_button, self.undo_button, self.next_button],
             layout=widgets.Layout(
-                grid_template_columns="33% 33% 33%",   
+                grid_template_columns="20% 20% 20% 20% 20%",
                 justify_items="center",                
                 width="100%",
                 height="50px"
@@ -57,8 +63,14 @@ class TaskMenuView:
             self.subsubtask_box,
             self.statusbox,
             widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"}))
-        ], layout=widgets.Layout(height="280px"))
+        ], layout=widgets.Layout(height="230px"))
         self.controller = controller
+
+    def undo_click(self,button):
+        self.controller.logger.undo()
+
+    def topic_explaination_button_click(self, button):
+        self.controller.main_view.switch_tab_to_topic_info()
 
     def previous_button_click(self,button):
         if self.slider.value > 1:
@@ -69,6 +81,7 @@ class TaskMenuView:
             self.slider.value = self.slider.value + 1
 
     def slider_change(self, change):
+        print("hier")
         # update the information in the task menu based on the value selected with the slider
         if len(self.task_list) == 0:
             return
@@ -106,7 +119,9 @@ class TaskMenuView:
                 description = self.task_list[id]["description"]
 
                 if self.mode != "monitored": 
-                    textarea_value = category + ": " + title + "\n" + "Description: " + description
+                    textarea_value = str(category) + ": " + str(title) + "\n" + "Description: " + str(description)
+                else:
+                    textarea_value = str(category) + "\n" + str(title)
 
                 status = self.task_list[id]["status"]
                 if status == "todo":
@@ -123,33 +138,16 @@ class TaskMenuView:
                     color = "red"
                 else:
                     color = "black"
-
+                self.subsubtask_textarea.value = textarea_value
                 if self.mode != "monitored": 
                     self.status_label.value = f'<b> Status: </b> <span style="color:{color};">{status}</span>'
-                    self.subsubtask_textarea.value = textarea_value
-            
+                    
                     # Hints
                     hints = ""
                     for x in range(self.hint_display_list[id]):
                         if x < len(self.task_list[id]["hints"]):
                             hints += self.task_list[id]["hints"][x] + "\n" 
                     self.hint_textarea.value = hints
-
-    def setmonitoring(self,monitormode):
-        if monitormode:
-            self.subsubtask_textarea.layout.visibility  = 'hidden'
-            self.subsubtask_textarea.layout.display = 'none'
-            self.button_box.layout.visibility  = 'hidden'
-            self.button_box.layout.display = 'none'
-            self.statusbox.layout.visibility  = 'hidden'
-            self.statusbox.layout.display = 'none'
-            self.slider.layout.visibility  = 'hidden'
-            self.slider.layout.display = 'none'
-            self.hint_textarea.layout.display = 'block'
-            self.hint_textarea.layout.width = "99%"
-            self.hint_textarea.layout.visibility  = 'visible'
-        return
-
     
     def hint(self, button):
         #increase the hint display by 1
@@ -164,22 +162,78 @@ class TaskMenuView:
     def get_task_menu(self):
         return self.ui
     
+    def add_action_monitored_mode(self, action, value):
+        self.actions.append((action,value))
+
+        task_list = []
+        for action in self.actions:
+            subsubtask_object = {}
+            subsubtask_object["category"] = action[0]
+            subsubtask_object["title"] = action[1]
+            subsubtask_object["description"] = action[0]
+            subsubtask_object["hints"] = ''
+            subsubtask_object["status"] = 'ready'
+            subsubtask_object["value"] = str(action[1])
+            task_list.append(subsubtask_object)
+        self.refresh_menu(task_list)
+        slider_value = self.slider.value 
+        # self.slider_change({"new":slider_value+1})
+    
+    def clear_actions_monitored_mode(self):
+        self.actions = []
+
+
     def set_current_task(self, task, mode):
+        print(task)
         #set the data for the current task to display in the task menu
-        slider_value = self.slider.value        
+             
         task_list = []
         for subtask in task["subtasks"]:
             category = subtask["title"]
             for subsubtask in subtask["subtasks"]:
-                subsubtask_object = {}
-                subsubtask_object["category"] = category
-                subsubtask_object["title"] = subsubtask["title"]
-                subsubtask_object["description"] = subsubtask["description"]
-                subsubtask_object["hints"] = subsubtask["hints"]
-                subsubtask_object["status"] = subsubtask["status"]
-                subsubtask_object["value"] = subsubtask["value"]
+                if mode == 'guided':
+                    subsubtask_object = {}
+                    subsubtask_object["category"] = category
+                    subsubtask_object["title"] = subsubtask["title"]
+                    subsubtask_object["description"] = subsubtask["description"]
+                    subsubtask_object["hints"] = subsubtask["hints"]
+                    subsubtask_object["status"] = subsubtask["status"]
+                    subsubtask_object["value"] = subsubtask["value"]
 
-                task_list.append(subsubtask_object)
+                    task_list.append(subsubtask_object)
+                if mode == 'monitored':
+                    values = subsubtask["value"]
+                    
+                    if not isinstance(values, list):
+                        values = [values]
+
+                    for val in values:
+                        subsubtask_object = {}
+                        subsubtask_object["category"] = category
+                        subsubtask_object["title"] = f'{subsubtask["title"]}: {val}'
+                        subsubtask_object["description"] = subsubtask["description"]
+                        subsubtask_object["hints"] = subsubtask["hints"]
+                        subsubtask_object["status"] = subsubtask["status"]
+                        subsubtask_object["value"] = [val]
+
+                        task_list.append(subsubtask_object)
+        print(task_list)
+        self.current_task = task
+        self.refresh_menu(task_list)
+
+        if mode == "monitored":
+            self.statusbox.layout.visibility  = 'hidden'
+            self.statusbox.layout.display = 'none'
+            self.hint_textarea.layout.width = "99%"
+            self.undo_button.layout.visibility  = 'visible'
+            self.hint_button.layout.visibility = 'hidden'
+            self.subsubtask_textarea.description = "Action"
+            self.subsubtask_box.children = [self.subsubtask_textarea, self.hint_textarea,]
+
+        self.mode = mode
+
+    def refresh_menu(self, task_list):
+        slider_value = self.slider.value   
         self.task_list = task_list
         if len(self.hint_display_list) == 0:
             #initialize hint display list
@@ -194,30 +248,10 @@ class TaskMenuView:
                 self.slider.max = len(task_list)
         else:
             self.slider.max = 1
-
-        self.current_task = task
-        self.slider_change({"new":slider_value})
-
-        if mode == "monitored":
-            self.subsubtask_textarea.layout.visibility  = 'hidden'
-            self.subsubtask_textarea.layout.display = 'none'
-            self.button_box.layout.visibility  = 'hidden'
-            self.button_box.layout.display = 'none'
-            self.statusbox.layout.visibility  = 'hidden'
-            self.statusbox.layout.display = 'none'
-            self.slider.layout.visibility  = 'hidden'
-            self.slider.layout.display = 'none'
-            self.hint_textarea = widgets.HTML(value="<pre>Hints will appear here</pre>", layout=widgets.Layout(width="99%", border='1px solid #C7EFFF', padding='4px', height="90px"))
-            self.hint_textarea.layout.display = 'block'
-            self.hint_textarea.layout.width = "99%"
-            self.hint_textarea.layout.visibility  = 'visible'
-            self.status_label.layout.display = 'none'
-            self.ui.layout=widgets.Layout(height="150px")
-            self.button_box.layout.display = 'none'
-            self.subsubtask_textarea.layout.display = 'none'
-            self.subsubtask_box.children = [self.subsubtask_textarea, self.hint_textarea]
-
-        self.mode = mode
+        if slider_value <= self.slider.max:
+            self.slider_change({"new":slider_value})
+        else:
+            self.slider_change({"new":self.slider.max})
 
 
     def finished_task(self, competence_vector):

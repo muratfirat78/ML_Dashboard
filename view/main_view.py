@@ -22,15 +22,16 @@ class MainView:
             self.cleaningoutput = None
 
     
-    def set_tabs(self,tab_1,tab_2,tab_3,tab_4, tab_5):
+    def set_tabs(self,tab_1,tab_2,tab_3,tab_4, tab_5, tab_6):
         #initialize the tabs
-        self.tabs = [tab_1,tab_2,tab_3, tab_4, tab_5]
+        self.tabs = [tab_1,tab_2,tab_3, tab_4, tab_5, tab_6]
         tab_set = widgets.Tab(self.tabs)
         tab_set.set_title(0, 'Data Information')
         tab_set.set_title(1, 'Data Cleaning')
         tab_set.set_title(2, 'Data Processing')
         tab_set.set_title(3, 'Predictive Modeling')
         tab_set.set_title(4, 'Logging')
+        tab_set.set_title(5, 'Topic information')
         tab_set.layout.width='100%'
         tab_set.layout.display = 'none' 
         self.tab_set = tab_set
@@ -55,3 +56,6 @@ class MainView:
      
     def set_title(self, index, titlename):
          self.tab_set.set_title(index, titlename)
+
+    def switch_tab_to_topic_info(self):
+         self.tab_set.selected_index = 5

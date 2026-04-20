@@ -75,7 +75,7 @@ class DataSelectionModel:
         
         filename[:filename.find('.')]  
 
-        self.logger.add_action(['SelectData', 'DataSet'], filename)
+        self.logger.add_action(['SelectData', 'DataSet'], filename, [online_version, foldername,filename,sheetname])
         logging.info('Data Selection: Read data set' + filename)
         return 
     

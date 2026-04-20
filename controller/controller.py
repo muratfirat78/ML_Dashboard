@@ -10,6 +10,7 @@ from model.learning_path import LearningPathModel
 from model.local_drive import GoogleDrive
 from model.logger import Logger
 from model.login import LoginModel
+from model.topic import TopicModel
 from model.predictive_modeling import PredictiveModelingModel
 from model.task_selection import TaskSelectionModel
 from view.data_cleaning import DataCleaningView
@@ -22,6 +23,7 @@ from view.predictive_modeling import PredictiveModelingView
 from view.login import LoginView
 from view.task_menu import TaskMenuView
 from view.task_selection import TaskSelectionView
+from view.topic import TopicView
 import json
 import numpy as np
 
@@ -45,6 +47,8 @@ class Controller:
         self.data_processing_model = DataProcessingModel(self.main_model, self.logger, self)
         self.predictive_modeling_view = PredictiveModelingView(self, self.main_view, task_menu)
         self.predictive_modeling_model = PredictiveModelingModel(self.main_model, self, self.logger)
+        self.topic_model = TopicModel(self)
+        self.topic_view = TopicView(self)
         self.task_model = TaskModel(self)
         self.learning_path_model = LearningPathModel(self)
         self.learning_path_view = LearningPathView(self)
@@ -73,8 +77,9 @@ class Controller:
         tab_3 = self.data_processing_view.get_data_processing_tab()
         tab_4 = self.predictive_modeling_view.get_predictive_modeling_tab()
         tab_5 = self.learning_path_view.get_learning_path_tab()
+        tab_6 = self.topic_view.get_topic_tab()
 
-        self.main_view.set_tabs(tab_1, tab_2, tab_3, tab_4, tab_5)
+        self.main_view.set_tabs(tab_1, tab_2, tab_3, tab_4, tab_5, tab_6)
         tab_set = self.main_view.get_tabs()
         
         return tab_set
@@ -107,39 +112,40 @@ class Controller:
             self.finished_task()
     
     def make_cleaning(self,featurescl,result2aexp,missacts,dt_features,params):
-         self.data_cleaning_model.make_cleaning(featurescl,result2aexp,missacts,dt_features,params)
+         self.data_cleaning_model.make_cleaning(featurescl.value,result2aexp,missacts,dt_features,params)
 
     def assign_target(self,trg_lbl,dt_features,prdtsk_lbl,result2exp,predictiontask):
-        self.predictiontask = self.data_processing_model.assign_target(trg_lbl,dt_features,prdtsk_lbl,result2exp) 
+        self.predictiontask = self.data_processing_model.assign_target(trg_lbl,dt_features.value,prdtsk_lbl,result2exp) 
         self.predictive_modeling_view.tasklbl.value ='Prediction task: '+str(self.predictiontask)
         
     def show_message(self, name):
         message = self.alert_messages_model.get_message_html(name)
+        self.topic_model.set_topic(name)
         self.show_hint(message)
 
     def make_balanced(self,features2,balncetype,ProcssPage,result2exp):
-        self.data_processing_model.make_balanced(features2,balncetype,ProcssPage,result2exp)
+        self.data_processing_model.make_balanced(features2.value,balncetype,ProcssPage,result2exp)
 
     def make_encoding(self,features2,encodingtype,ordinalenconding,result2exp):
-        self.data_processing_model.make_encoding(features2,encodingtype,ordinalenconding,result2exp)
+        self.data_processing_model.make_encoding(features2.value,encodingtype,ordinalenconding,result2exp)
 
     def make_featconvert(self,dt_features,result2exp):
-        self.data_processing_model.make_featconvert(dt_features,result2exp)
+        self.data_processing_model.make_featconvert(dt_features.value,result2exp)
 
     def make_scaling(self,dt_features,FeatPage,scalingtype,result2exp):
-        self.data_processing_model.make_scaling(dt_features,FeatPage,scalingtype,result2exp)
+        self.data_processing_model.make_scaling(dt_features.value,FeatPage,scalingtype,result2exp)
 
     def showCorrHeatMap(self,ProcssPage,processtype,result2exp):
         self.data_processing_model.showCorrHeatMap(ProcssPage,processtype,result2exp)
 
     def ApplyPCA(self,features2,pca_features,result2exp):
-        self.data_processing_model.ApplyPCA(features2,pca_features,result2exp)
+        self.data_processing_model.ApplyPCA(features2.value,pca_features,result2exp)
         
     def make_split(self,splt_txt,result2exp):
         self.data_processing_model.make_split(splt_txt,result2exp)
 
     def remove_outliers(self,dt_features,methodtype,result2exp):
-        self.data_processing_model.remove_outliers(dt_features,methodtype,result2exp)
+        self.data_processing_model.remove_outliers(dt_features.value,methodtype,result2exp)
         self.refresh_data_processing()
 
     def savedata(self,dataFolder, datasetname):
@@ -216,7 +222,6 @@ class Controller:
 
     def hide_task_selection_and_show_tabs(self):
         self.task_selection_view.hide_task_selection()
-        self.task_menu.setmonitoring(self.monitored_mode)
         self.main_view.show_tabs()
     
     def register(self):
@@ -259,6 +264,7 @@ class Controller:
                 task = self.convertPerformanceToTask.convert_performance_to_task(self.logger.get_performance(), self.task_model.get_title(), self.task_model.get_description())
                 self.task_model.set_current_task(task)
                 self.task_menu.set_current_task(self.task_model.get_current_task(), 'monitored')
+                self.task_menu.add_action_monitored_mode(action[1], value)
             else:
                 self.task_model.perform_action(action, value)
                 self.task_model.update_statusses_and_set_current_tasks()

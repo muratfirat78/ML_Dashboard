@@ -190,8 +190,8 @@ class PredictiveModelingModel:
             performance += [("missing_values", ytrain_df.isnull().sum())]
             performance += [("type", str(ytrain_df.dtype))]
             performance += [("range", str(ytrain_df.min()) + "-" + str(ytrain_df.max()))]
-            self.logger.add_action(['ModelDevelopment', 'ParameterFinetuning'], [mytype] + list(params.values()))
-            self.logger.add_action(['ModelDevelopment', 'ModelPerformance'], (performance))
+            self.logger.add_action(['ModelDevelopment', 'ParameterFinetuning'], [mytype] + list(params.values()),[tasktype,mytype,results,trmodels,params])
+            self.logger.add_action(['ModelDevelopment', 'ModelPerformance'], (performance),[tasktype,mytype,results,trmodels,params])
             trmodels.options = [mdl.getName() for mdl in self.trainedModels]
             
         except Exception as e: 

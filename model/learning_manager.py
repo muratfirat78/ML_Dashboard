@@ -156,6 +156,16 @@ class LearningManagerModel:
                 score = min(1, score) # If the current MSE is lower (better than reference), the score will be 100% (1)
                 score = max(0, score) # take the max of the score and 0 to prevent score being lower than 0
                 return score
+            
+        if reference_metric[0] == "MAE":
+            current_mae = performance.get_metric("MAE")
+            reference_mae = reference_metric[1]
+            if current_mae != None:
+                score = reference_mae / current_mae
+                score = min(1, score) # If the current MAE is lower (better than reference), the score will be 100% (1)
+                score = max(0, score) # take the max of the score and 0 to prevent score being lower than 0
+                return score
+            
         return 0
 
     def calculate_last_performance_score(self, performance, reference_task, date):

@@ -86,6 +86,10 @@ class DataCleaningView:
         if  self.missacts.value == "Edit Range":
             params = [self.min_text,self.max_text]
         self.controller.make_cleaning(self.main_view.featurescl,result2aexp,self.missacts,self.main_view.dt_features,params) 
+        self.refresh_data()
+
+
+    def refresh_data(self):
         missings = []
         if not self.controller.main_model.datasplit:
             for col in self.controller.get_curr_df().columns:
@@ -153,7 +157,8 @@ class DataCleaningView:
       
         return
 
-   
+
+
     def missacts_changed(self,change):
         #show the explaination of the selected step
         if change['name'] == 'value':         

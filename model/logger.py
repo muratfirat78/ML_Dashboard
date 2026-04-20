@@ -7,6 +7,7 @@ class Logger:
     #The list of actions is displayed in the log tab
     def __init__(self, controller):
         self.student_performance = StudentPerformance(controller)
+        self.call_stack = []
         self.controller = controller
         # clear log
         with open('output.log', 'w'):
@@ -20,16 +21,18 @@ class Logger:
         )
         logging.info('Application started')
         self.starttime = datetime.now()
+        self.call_stack = []
 
     def write_log(msg, log_display, category):
         if log_display != None:
             log_display.value +=  msg + '\n'
         logging.info(category + ': ' +msg)
 
-    def add_action(self, action, value):
+    def add_action(self, action, value, parameters):
         self.student_performance.addAction(action, value)
         self.controller.update_task_view(action, value)
         self.controller.update_log_view()
+        self.call_stack.append((action, parameters))
     
     def get_result(self):
         return self.student_performance.performance
@@ -43,3 +46,38 @@ class Logger:
     def get_list_of_actions(self):
         return self.student_performance.get_list_of_actions()
     
+    def action_to_function(self, action):
+        actions_to_function = {
+            '[\'SelectData\', \'DataSet\']': self.controller.data_selection_model.read_data_set,
+            '[\'DataCleaning\', \'Drop Column\']': self.controller.data_cleaning_model.make_cleaning,
+            '[\'DataCleaning\', \'Remove-Missing\']': self.controller.data_cleaning_model.make_cleaning,
+            '[\'DataCleaning\', \'Replace-Mean\']': self.controller.data_cleaning_model.make_cleaning,
+            '[\'DataCleaning\', \'Replace-Median\']': self.controller.data_cleaning_model.make_cleaning,
+            '[\'DataCleaning\', \'Replace-Mode\']': self.controller.data_cleaning_model.make_cleaning,
+            '[\'DataProcessing\', \'PCA\']': self.controller.data_processing_model.ApplyPCA,
+            '[\'DataProcessing\', \'outlier\']': self.controller.data_processing_model.remove_outliers,
+            '[\'DataProcessing\', \'AssignTarget\']': self.controller.data_processing_model.assign_target,
+            '[\'DataProcessing\', \'ConvertToBoolean\']': self.controller.data_processing_model.make_featconvert,
+            '[\'DataProcessing\', \'Standardize\']': self.controller.data_processing_model.make_scaling,
+            '[\'DataProcessing\', \'Normalize\']': self.controller.data_processing_model.make_scaling,
+            '[\'DataProcessing\', \'Unbalancedness DownSample\']': self.controller.data_processing_model.make_balanced,
+            '[\'DataProcessing\', \'Unbalancedness UpSample\']': self.controller.data_processing_model.make_balanced,
+            '[\'DataProcessing\', \'Split\']': self.controller.data_processing_model.make_split,
+            '[\'DataProcessing\', \'LabelEncoding\']': self.controller.data_processing_model.make_encoding,
+            '[\'DataProcessing\', \'OneHotEncoding\']': self.controller.data_processing_model.make_encoding
+
+            }
+        return actions_to_function.get(str(action))
+    
+    def undo(self):
+        call_stack_backup = self.call_stack[:-1]
+        #reset performance
+        self.student_performance = StudentPerformance(self.controller)
+        self.controller.task_menu.clear_actions_monitored_mode()
+        for action in call_stack_backup:
+            function = self.action_to_function(action[0])
+            parameters = action[1]
+            function(*parameters)
+        self.call_stack = call_stack_backup
+        self.controller.data_cleaning_view.refresh_data()
+        self.controller.data_processing_view.featurepr_click(None)

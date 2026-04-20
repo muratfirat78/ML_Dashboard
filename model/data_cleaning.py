@@ -9,9 +9,8 @@ class DataCleaningModel:
         self.logger = logger
         self.controller = controller
 
-    def make_cleaning(self,featurescl,result2aexp,missacts,dt_features,params): 
+    def make_cleaning(self,colname,result2aexp,missacts,dt_features,params): 
         #perform the data cleaning action
-        colname = featurescl.value
         handling = missacts.value
         prev_size = 0
 
@@ -119,15 +118,15 @@ class DataCleaningModel:
         else:
             #The data is not split yet, perform the action on the original/non split dataset
             curr_df = self.main_model.get_curr_df()
-
+            
             write_log('col '+colname+', action '+handling+', coltype '+str(curr_df[colname].dtype), result2aexp, 'Data cleaning')
             write_log('Initial data size'+str(len(curr_df)),  result2aexp, 'Data cleaning')  
     
 
             if handling == 'Edit Range':
-                self.logger.add_action(['DataCleaning', handling], colname + '(' + params[0].value + '-' + params[1].value +')')
+                self.logger.add_action(['DataCleaning', handling], colname + '(' + params[0].value + '-' + params[1].value +')', [colname,result2aexp,missacts,dt_features,params])
             else:
-                self.logger.add_action(['DataCleaning', handling], colname)
+                self.logger.add_action(['DataCleaning', handling], colname, [colname,result2aexp,missacts,dt_features,params])
     
             if handling == 'Edit Range':
                 prev_size = len(curr_df)      

@@ -338,10 +338,17 @@ class DataProcessingModel:
             write_log('Outlier removal: (no split)-> '+': '+colname, result2exp, 'Data processing')
             curr_df = self.main_model.get_curr_df()
 
-            if methodtype == "Impute (KNN)":
-                       
-                imputer = KNNImputer(n_neighbors=8)
-                curr_df[colname] = imputer.fit_transform(curr_df[colname])
+            if methodtype == "Impute (IQR)":
+                quantiles = curr_df[colname].quantile([0.25,0.5,0.75])
+                IQR = quantiles[0.75] - quantiles[0.25]
+                outlierLB =  quantiles[0.25]-1.5*IQR
+                outlierUB =  quantiles[0.75]+1.5*IQR
+
+                write_log('outlierLB-> '+': '+str(outlierLB)+'outlierUB->'+str(outlierUB), result2exp, 'Data processing')
+
+                curr_df[colname] = [y if y <= outlierUB else outlierUB for y in curr_df[colname]]
+                curr_df[colname] = [y if y >= outlierLB else outlierLB for y in curr_df[colname]]
+                
                 self.main_model.set_curr_df(curr_df)
 
             if methodtype == "Remove (IQR)":
@@ -389,7 +396,7 @@ class DataProcessingModel:
         curr_df = self.main_model.get_curr_df()
         target_column = self.main_model.targetcolumn
 
-        if (curr_df[self.main_model.targetcolumn].dtype == 'float64') or (curr_df[target_column].dtype == 'int64'):
+        if curr_df[target_column].dtype in ['float64','int64','int32','Float64','Int64','Int32']:
             predictiontask = "Regression"
         else:
             predictiontask = "Classification" 
@@ -400,7 +407,10 @@ class DataProcessingModel:
         result2exp.value+="assign target done..."+"\n"
     
         return predictiontask
+
     
+
+        
     def make_featconvert(self,dt_features,result2exp):
         #convert feature to a different datatype
         colname = dt_features.value
@@ -490,7 +500,7 @@ class DataProcessingModel:
                 
                 if colname in Xtrain_df.columns:
 
-                    if (Xtrain_df[colname].dtype == 'object') or (Xtrain_df[colname].dtype== 'string'):
+                    if Xtrain_df[colname].dtype in ['object','string','str']:
                         write_log('Scaling (split)-> Returned due to non-numerical feature: '+colname, result2exp, 'Data processing')
                         return
                     
@@ -499,7 +509,7 @@ class DataProcessingModel:
                     Xtrain_df[colname] = (Xtrain_df[colname]- colmean)/colstd
                 
                 if colname in ytrain_df.columns:
-                    if (ytrain_df[colname].dtype == 'object') or (ytrain_df[colname].dtype== 'string'):
+                    if ytrain_df[colname].dtype in ['object','string','str']:
                         write_log('Scaling (split)-> Returned due to non-numerical target feature: '+colname, result2exp, 'Data processing')
                         return
                         
@@ -569,6 +579,62 @@ class DataProcessingModel:
             self.logger.add_action(['DataProcessing', 'Normalize'], colname)
             logging.info('Data preprocessing, feature scaling: normalization of column '+ colname)
 
+        if scalingtype == 'Log Transform':
+            
+            if self.main_model.datasplit:
+
+                write_log('Scaling (split)-> '+scalingtype+': '+colname, result2exp, 'Data processing')
+
+                Xtest_df = self.main_model.get_XTest()
+                Xtrain_df = self.main_model.get_XTrain()
+                ytrain_df = self.main_model.getYtrain().to_frame()
+                ytest_df = self.main_model.get_YTest().to_frame()
+
+                # use parameters of training data for scaling
+                write_log('Scaling (split)-> '+scalingtype+': '+colname, result2exp, 'Data processing')
+                
+                if colname in Xtrain_df.columns:
+
+                    if Xtrain_df[colname].dtype in ['object','string','str']:
+                        write_log('Scaling (split)-> Returned due to non-numerical feature: '+colname, result2exp, 'Data processing')
+                        return
+
+                    if min(Xtest_df[colname]) <= 0:
+                        write_log('Scaling (split)-> Returned due to non-positive (test) feature values: '+colname, result2exp, 'Data processing')
+                        return
+                    if min(Xtrain_df[colname]) <= 0:
+                        write_log('Scaling (split)-> Returned due to non-positive (train) feature values: '+colname, result2exp, 'Data processing')
+                        return
+                        
+                      
+                    Xtest_df[colname] = [np.log(x) for x in Xtest_df[colname]]
+                    Xtrain_df[colname] = [np.log(x) for x in Xtrain_df[colname]] 
+                
+                if colname in ytrain_df.columns:
+                    if ytrain_df[colname].dtype in ['object','string','str']:
+                        write_log('Scaling (split)-> Returned due to non-numerical target feature: '+colname, result2exp, 'Data processing')
+                        return
+                        
+                    if min(ytrain_df[colname]) <= 0:
+                        write_log('Scaling (split)-> Returned due to non-positive (ytrain) feature values: '+colname, result2exp, 'Data processing')
+                        return                
+                   
+                    ytrain_df[colname] =  [np.log(x) for x in  ytrain_df[colname]]
+                    ytest_df[colname] = [np.log(x) for x in ytest_df[colname]]
+            else:
+                curr_df = self.main_model.get_curr_df()
+                write_log('Scaling (no split)-> '+': '+str(len(curr_df)), result2exp, 'Data processing')
+                if curr_df[colname].dtype in ['object','string','str']:
+                    write_log('Scaling (split)-> Returned due to non-numerical feature: '+colname, result2exp, 'Data processing')
+                    self.controller.show_hint(f"{scalingtype} applied on {colname}")
+                    return
+                if min(curr_df[colname]) <= 0:
+                    write_log('Scaling (split)-> Returned due to non-positive (test) feature values: '+colname, result2exp, 'Data processing')
+                    return
+                # standardization before splitting data
+                curr_df[colname] = [np.log(x) for x in curr_df[colname] ]
+            
+        
         #display boxplot
         with FeatPage:
             clear_output()

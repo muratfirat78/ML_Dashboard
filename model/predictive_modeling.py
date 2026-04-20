@@ -1,6 +1,6 @@
 from log import *
 from sklearn import tree,neighbors,linear_model,ensemble,svm
-from sklearn.metrics import accuracy_score,mean_squared_error,confusion_matrix,roc_curve,precision_score,recall_score,mean_absolute_error,r2_score
+from sklearn.metrics import accuracy_score,mean_squared_error,confusion_matrix,roc_curve,precision_score,recall_score,mean_absolute_error,mean_absolute_percentage_error,r2_score
 import statsmodels.api as sm
 from sklearn.naive_bayes import GaussianNB 
 from datetime import datetime
@@ -161,7 +161,8 @@ class PredictiveModelingModel:
             write_log('++Train Model-> '+str(len(Xtrain_df)),results,'Predictive modeling')  
             write_log('Train Model-> trained..',results,'Predictive modeling')
             y_pred = mymodel.GetPredictions(Xtest_df)
-            write_log('>>Train Model-> predcts'+str(len(y_pred))+", "+tasktype,results,'Predictive modeling')
+            write_log('>>Train Model-> test: '+str(list(ytest_df))+", "+tasktype,results,'Predictive modeling')
+            write_log('>>Train Model-> predcts'+str(len(y_pred))+", test: "+str(len(ytest_df))+", "+tasktype,results,'Predictive modeling')
 
             if tasktype == 'Classification': 
                 mymodel.setConfMatrix(confusion_matrix(ytest_df,y_pred))
@@ -176,6 +177,8 @@ class PredictiveModelingModel:
             if tasktype == 'Regression': 
                 mymodel.GetPerformanceDict()['MSE'] = round(mean_squared_error(ytest_df, y_pred),2)
                 mymodel.GetPerformanceDict()['MAE'] = mean_absolute_error(ytest_df, y_pred)
+               
+                #mymodel.GetPerformanceDict()['MAPE'] == mean_absolute_percentage_error(ytest_df, y_pred)
                 mymodel.GetPerformanceDict()['RSquared'] = r2_score(ytest_df, y_pred)
                 mymodel.GetPerformanceDict()['datetime_start'] = self.logger.starttime.strftime("%Y-%m-%d %H:%M:%S")
                 mymodel.GetPerformanceDict()['datetime_end'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")

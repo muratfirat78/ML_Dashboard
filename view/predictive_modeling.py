@@ -82,8 +82,8 @@ class PredictiveModelingView:
                 if 'Accuracy' in mdl.GetPerformanceDict():
                     self.performlbl.value = " Accuracy: "+str(mdl.GetPerformanceDict()['Accuracy'])
 
-                if 'MSE' in mdl.GetPerformanceDict():
-                    self.performlbl.value = " MSE: "+str(mdl.GetPerformanceDict()['MSE'])
+                if 'MAE' in mdl.GetPerformanceDict():
+                    self.performlbl.value = " MAE: "+str(mdl.GetPerformanceDict()['MAE'])
 
                 self.progress.value += 'labels set...'+'\n'
 

@@ -855,6 +855,8 @@ class DataProcessingModel:
                     mapping[classorder[i]] = len(classorder)-i
  
                 curr_df[colname] = curr_df[colname].replace(mapping)
+                self.logger.add_action(['DataProcessing', 'OrdinalEncoding'], colname, [colname,encodingtype,ordselect,result2exp])
+                write_log('Ordinal encoding->'+encodingtype+', col '+colname+', done. ', result2exp, 'Data processing')
             self.main_model.set_curr_df(curr_df)
         return
 

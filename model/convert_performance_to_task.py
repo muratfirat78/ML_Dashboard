@@ -5,7 +5,7 @@ class ConvertPerformanceToTask:
         if action in ["Replace-Median", "Replace-Mean", "Replace-Mode", "Remove-Missing", "Drop Column", "Edit Range"]:
             return "Data Cleaning"
         
-        if action in ["LabelEncoding", "OneHotEncoding", "ConvertToBoolean"]:
+        if action in ["LabelEncoding", "OneHotEncoding", "ConvertToBoolean", "OrdinalEncoding"]:
             return "Data Translation"
         
         if action in ["Normalize", "Unbalancedness Upsample", "Unbalancedness DownSample"]:
@@ -61,6 +61,7 @@ class ConvertPerformanceToTask:
             "Split": "Train/Test Split",
             "LabelEncoding": "Label Encoding",
             "OneHotEncoding": "One-Hot Encoding",
+            "OrdinalEncoding": "Ordinal encoding",
             "DataSet": "Load Dataset",
             "ParameterFinetuning": "Parameter Finetuning", 
             "ModelPerformance": "Model Training"
@@ -142,6 +143,7 @@ class ConvertPerformanceToTask:
             "ConvertToBoolean": "Go to the Data Processing tab. Choose the column, select 'Convert to Boolean', then click apply.",
             "Standardize": "Go to the Data Processing tab. Choose the column, select 'scaling' as process type, then choose 'standardize' as method, and click apply.",
             "Normalize": "Go to the Data Processing tab. Choose the column, select 'scaling' as process type, then choose 'normalize' as method, and click apply.",
+            "OrdinalEncoding": "",
             "Unbalancedness Upsample": "Go to the Data Processing tab. Choose the column, select 'imbalanceness', choose 'upsample', then click apply.",
             "Unbalancedness DownSample": "Go to the Data Processing tab. Choose the column, select 'imbalanceness', choose 'downsample', then click apply.",
             "Split": "Go to the Data Processing tab. Choose the column, assign the target, set the test ratio, then click split.",
@@ -169,6 +171,7 @@ class ConvertPerformanceToTask:
             "Split": "Use a test ratio of {} for splitting the dataset.",
             "LabelEncoding": "Apply label encoding to {}.",
             "OneHotEncoding": "Apply one-hot encoding to {}.",
+            "OrdinalEncoding": "",
             "DataSet": "Select the dataset: {}.",
             "ParameterFinetuning": "Train the model using the following parameters: {}."
         }

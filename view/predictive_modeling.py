@@ -54,7 +54,25 @@ class PredictiveModelingView:
         
         self.progress = None
         self.selectedMLmodel = None
-        
+
+        self.action_list = widgets.SelectMultiple(
+                    options=[],
+                    value=[],
+                    disabled=True,
+        )
+        self.action_list.layout.height = '140px'
+    def get_icon(self, category):
+        #add name of the action types to the action log
+        if category == 'SelectData':
+            return '(Data selection)'
+        if category == 'DataCleaning':
+            return '(Data cleaning)'
+        if category == 'DataProcessing':
+            return '(Data processing)'
+        if category == 'ModelDevelopment':
+            return '(Model development)'
+        return '' 
+    
     def models_click(self,change):
         #handle the selection of a model type     
         self.plt_btn.layout.visibility = 'hidden'
@@ -86,6 +104,16 @@ class PredictiveModelingView:
                     self.performlbl.value = " MAE: "+str(mdl.GetPerformanceDict()['MAE'])
 
                 self.progress.value += 'labels set...'+'\n'
+
+                
+                actions = []
+
+                for action in self.selectedMLmodel.action_log:
+                    actions += [str(action[2]) + ': ' + action[1]  + ' ' + self.get_icon(action[0])]
+                
+                self.action_list.options = actions
+
+
 
                 with self.performpage:          
                     clear_output()
@@ -503,18 +531,50 @@ class PredictiveModelingView:
         self.perlbl.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
         self.perlbl.layout.width = '120px'
 
+        self.actionlbl = widgets.HTML("")
+        self.actionlbl.value = f'<span style="color:gray;"><b>Action Log</b></span>'
+        self.actionlbl.layout.width = '120px'
+
         horzbar = widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"}))
       
-        sel_box = VBox(children=[ self.tasklbl,
-            HBox(children=[self.paramtitle,self.paramvals,self.paramedit,]),
-                               horzbar,
-                                 HBox(children=[self.parammenu,self.paramvalues, VBox(children=[self.paramoptions, ]),]),
-                                 self.trnml_btn,
-                                 self.modelslbl,horzbar,
-                                 HBox(children=[
-                                     VBox(children = [self.trmodels,self.plt_btn]),
-                                     VBox(children = [self.prm1lbl,self.prm2lbl,self.prm3lbl,self.perlbl,horzbar,self.performlbl])])
-                                ])
+        sel_box = VBox(children=[
+        self.tasklbl,
+        horzbar,
+
+        HBox(children=[
+            self.paramtitle,
+            self.paramvals,
+            self.paramedit,
+        ]),
+        horzbar,
+
+        HBox(children=[
+            self.parammenu,
+            self.paramvalues,
+            VBox(children=[self.paramoptions]),
+        ]),
+        horzbar,
+
+        self.trnml_btn,
+        horzbar,
+
+        # Models section
+        self.modelslbl,
+        horzbar,
+        HBox(children=[
+            VBox(children=[self.trmodels, self.plt_btn]),
+
+            VBox(children=[
+                self.prm1lbl,
+                self.prm2lbl,
+                self.prm3lbl,
+                self.perlbl,
+                horzbar,
+                self.performlbl,
+            ]),
+
+        ]),
+    ])
 
         fbox2alay = widgets.Layout(width = '35%')
 
@@ -530,8 +590,12 @@ class PredictiveModelingView:
         separator = widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='1px', height='90%', margin='5px 0px',style={'background': "#C7EFFF"}))
 
         vbox2 = VBox(children = [self.performpage])
+        vbox3 = VBox(children=[
+                self.actionlbl,
+                self.action_list,
+            ])
 
-        tab_4 = VBox([self.task_menu,HBox([vbox1,vbox2])])
+        tab_4 = VBox([self.task_menu,HBox([vbox1,VBox([vbox2, vbox3])])])
         
         tab_4.layout.height = '700px'
         return tab_4

@@ -4,7 +4,7 @@ from IPython.display import display, HTML
 class TaskMenuView:
     # The view class for the task menu, used to show hints, explain steps and track student actions.
     def __init__(self, controller):
-        self.slider = widgets.IntSlider(layout=widgets.Layout(width="99%"), min=1,max=1)
+        self.slider = widgets.IntSlider(layout=widgets.Layout(width="99%", display="none"), min=1,max=1)
         self.slider.style.handle_color = 'lightblue'
         self.slider.observe(self.slider_change)
         self.previous_button = widgets.Button(description='<< Previous', button_style="primary")
@@ -20,6 +20,15 @@ class TaskMenuView:
         self.mode = ""
         self.competence_vector = None
         self.actions = []
+        self.vertical_seperator = widgets.Box(
+            layout=widgets.Layout(
+                border='solid 1px lightblue',
+                width='1px',
+                align_self='stretch',
+                margin='0px 8px'
+            )
+        )
+        
         
         self.hint_button = widgets.Button(
             description="Instructions",
@@ -55,16 +64,57 @@ class TaskMenuView:
         self.subsubtask_textarea = widgets.Textarea(description="Tasks", disabled=True, layout=widgets.Layout(width="99%"),style={'background': "#C7EFFF"})
         self.hint_textarea = widgets.Textarea(disabled=True,description="Hints",style={'background': '#C7EFFF'})
         
-        self.subsubtask_box = widgets.VBox([self.subsubtask_textarea,self.hint_textarea], layout=widgets.Layout(width="99%",height="110px"))
+        self.subsubtask_box = widgets.VBox([self.subsubtask_textarea,self.hint_textarea], layout=widgets.Layout(width="99%",height="100px"))
         self.task_list = []
-        self.ui = widgets.VBox([
-            self.slider, 
-            self.button_box,
-            self.subsubtask_box,
-            self.statusbox,
-            widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"}))
-        ], layout=widgets.Layout(height="230px"))
+        self.timeline = self.get_timeline(1,1)
+        self.ui = widgets.VBox(self.get_ui(), layout=widgets.Layout(height="230px"))
         self.controller = controller
+
+    def get_timeline(self, number_of_buttons, active):
+        buttons = []
+        for i in range(1, number_of_buttons + 1):
+            button = widgets.Button(
+                description=str(i),
+                layout=widgets.Layout(width='40px')
+            )
+
+            if i == active or number_of_buttons == 1:
+                button.style.button_color = '#0d6efd' 
+                button.style.text_color = 'white'
+
+            button.index = i
+
+            button.on_click(self.timeline_button_click)
+
+            buttons.append(button)
+
+        timeline = widgets.GridBox(
+            children=buttons,
+            layout=widgets.Layout(
+                grid_template_columns=f"repeat({number_of_buttons}, 40px)",
+                justify_content="flex-start",
+                align_items="center",
+                grid_gap="10px",
+                width="100%"
+            )
+        )
+        # timeline = widgets.GridBox(
+        #     children=buttons,
+        #     layout=widgets.Layout(
+        #         grid_template_columns=f"repeat({number_of_buttons}, 1fr)",
+        #         justify_items="center",
+        #         align_items="center",
+        #         width="100%",
+        #         height="60px",
+        #         grid_gap="10px"
+        #     )
+        # )
+
+        return timeline
+
+    def timeline_button_click(self, button):
+        step = button.index
+        self.slider.value = step
 
     def undo_click(self,button):
         self.controller.logger.undo(self.slider.value)
@@ -92,6 +142,9 @@ class TaskMenuView:
             id = change_new
         
         if id is not None:
+            
+            self.timeline = self.get_timeline(self.slider.max, id)
+            self.ui.children = self.get_ui()
             id -= 1
 
             if id >= len(self.task_list) and self.finishedtask:
@@ -123,6 +176,7 @@ class TaskMenuView:
                     textarea_value = str(category) + ": " + str(title) + "\n" + "Description: " + str(description)
                 else:
                     textarea_value = str(category) + "\n" + str(title)
+                    self.controller.show_message(str(category))
 
                 status = self.task_list[id]["status"]
                 if status == "todo":
@@ -241,18 +295,75 @@ class TaskMenuView:
         else:
             #extend the hint list
             self.hint_display_list += [0] * (len(task_list) - len(self.hint_display_list))
+
         if len(task_list) > 0:
             if self.finishedtask:
+                timeline_length = len(task_list) + 1
                 self.slider.max = len(task_list) + 1
+                self.timeline = self.get_timeline(timeline_length, self.slider.value)
             else:
+                timeline_length = len(task_list)
+                self.timeline = self.get_timeline(timeline_length, self.slider.value)
                 self.slider.max = len(task_list)
         else:
             self.slider.max = 1
+            self.timeline = self.get_timeline(1,1)
         if slider_value <= self.slider.max:
             self.slider_change({"new":slider_value})
         else:
             self.slider_change({"new":self.slider.max})
+        
 
+        self.ui.children = self.get_ui()
+
+    def get_ui(self):
+        if self.mode == "monitored":
+            return (
+                self.subsubtask_box,
+                self.statusbox,
+                widgets.HBox(
+                    [
+                        widgets.VBox(
+                            [
+                                widgets.Label("Actions"),
+                                self.timeline
+                            ],
+                            layout=widgets.Layout(
+                                align_items='flex-start',
+                                gap='2px',
+                                width='100%' 
+                            )
+                        ),
+                        self.vertical_seperator,
+                        widgets.VBox(
+                            [self.undo_button, self.topic_explaination_button],
+                            layout=widgets.Layout(
+                                width='15%',
+                                justify_content='center',
+                                align_items='stretch',
+                                gap='4px',
+                                padding='0px 4px'
+                            )
+                        )
+                    ],
+                    layout=widgets.Layout(
+                        align_items='stretch',
+                        width='99%',
+                        padding='4px 0px'
+                    )
+                ),
+                widgets.Box(layout=widgets.Layout(
+                    border='solid 1px lightblue', width='99%',
+                    height='1px', margin='4px 0px',
+                ))
+            )
+        else:
+            return ([
+            self.slider, 
+            self.button_box,
+            self.subsubtask_box,
+            self.statusbox,
+            widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"}))])
 
     def finished_task(self, competence_vector):
         #display that the student has finished the task

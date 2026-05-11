@@ -8,7 +8,7 @@ from datetime import datetime
 class MLModel:
     # The MLModel is used to store the machine learning and all its associated informations.
     # It is mainly used in the PredictiveModelingModel class
-    def __init__(self,target,tasktype,mytype,report,myname,params,xtrain,ytrain):
+    def __init__(self,target,tasktype,mytype,report,myname,params,xtrain,ytrain, action_log):
         self.modelparams = dict()
         self.performance = dict()
         self.roc = None
@@ -19,6 +19,7 @@ class MLModel:
         self.Name = myname
         self.ConfMatrix = None
         self.traindatachanged = False
+        self.action_log = action_log
 
         for param,val in params.items():
             self.modelparams[param]= val
@@ -156,7 +157,8 @@ class PredictiveModelingModel:
 
         success = False
         try: 
-            mymodel = MLModel(self.main_model.targetcolumn,tasktype,mytype,results,mytype+"_"+str(len(models)),params,Xtrain_df,ytrain_df)
+            action_log = self.controller.get_list_of_actions()
+            mymodel = MLModel(self.main_model.targetcolumn,tasktype,mytype,results,mytype+"_"+str(len(models)),params,Xtrain_df,ytrain_df, action_log)
             write_log('*Train Model-> model'+str(type(mymodel)),results,'Predictive modeling')
             write_log('++Train Model-> '+str(len(Xtrain_df)),results,'Predictive modeling')  
             write_log('Train Model-> trained..',results,'Predictive modeling')

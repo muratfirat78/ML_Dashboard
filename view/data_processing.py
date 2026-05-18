@@ -212,7 +212,8 @@ class DataProcessingView:
                 self.controller.showCorrHeatMap(self.main_view.feat_page,processtype,self.progress)
                 refreshFeatures = False
             if processtype == "PCA":
-                self.controller.ApplyPCA(self.main_view.dt_features,self.pcaselect,self.progress)
+                pcafeats = [ftname for ftname in self.pcaselect.options]
+                self.controller.ApplyPCA(self.main_view.dt_features,pcafeats,self.progress)
                 self.pcaselect.options = []
                 self.pca_btn.layout.visibility = 'hidden'
                 self.pca_btn.layout.display = 'none'

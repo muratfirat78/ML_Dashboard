@@ -50,10 +50,9 @@ class DataProcessingModel:
 
         return 
 
-    def ApplyPCA(self,colname,pca_features,result2exp):
+    def ApplyPCA(self,colname,pcafeats,result2exp):
         # apply principal component analysis
-        pcafeats = [ftname for ftname in pca_features.options]
-        self.logger.add_action(['DataProcessing', 'PCA'], pcafeats, [colname,pca_features,result2exp])
+        self.logger.add_action(['DataProcessing', 'PCA'], pcafeats, [colname,pcafeats,result2exp])
 
         if self.main_model.targetcolumn in pcafeats:
             write_log('PCA: Returned due to inclusion of target in PCA',result2exp, 'PCA')

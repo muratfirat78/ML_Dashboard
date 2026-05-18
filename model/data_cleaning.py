@@ -167,7 +167,6 @@ class DataCleaningModel:
                     else:
                         self.controller.show_message("no_mode_error")
                         return
-                    print(value)
                     write_log('mode.. '+str(value), result2aexp, 'Data cleaning')
                     if handling == 'Replace-Mode': 
                         curr_df[colname] = curr_df[colname].fillna(value)

@@ -28,6 +28,19 @@ class TaskMenuView:
                 margin='0px 8px'
             )
         )
+        self._timeline_buttons = [] 
+        self.timeline = widgets.GridBox(
+            children=[],
+            layout=widgets.Layout(
+                grid_template_columns="repeat(1, 40px)",
+                justify_content="flex-start",
+                align_items="center",
+                grid_gap="10px",
+                width="100%"
+            )
+        )
+        self.timeline = self.get_timeline(1, 1)
+        
         
         
         self.hint_button = widgets.Button(
@@ -71,46 +84,29 @@ class TaskMenuView:
         self.controller = controller
 
     def get_timeline(self, number_of_buttons, active):
-        buttons = []
-        for i in range(1, number_of_buttons + 1):
+        while len(self._timeline_buttons) < number_of_buttons:
+            i = len(self._timeline_buttons) + 1
             button = widgets.Button(
                 description=str(i),
                 layout=widgets.Layout(width='40px')
             )
-
-            if i == active or number_of_buttons == 1:
-                button.style.button_color = '#0d6efd' 
-                button.style.text_color = 'white'
-
             button.index = i
-
             button.on_click(self.timeline_button_click)
+            self._timeline_buttons.append(button)
 
-            buttons.append(button)
+        buttons = self._timeline_buttons[:number_of_buttons]
 
-        timeline = widgets.GridBox(
-            children=buttons,
-            layout=widgets.Layout(
-                grid_template_columns=f"repeat({number_of_buttons}, 40px)",
-                justify_content="flex-start",
-                align_items="center",
-                grid_gap="10px",
-                width="100%"
-            )
-        )
-        # timeline = widgets.GridBox(
-        #     children=buttons,
-        #     layout=widgets.Layout(
-        #         grid_template_columns=f"repeat({number_of_buttons}, 1fr)",
-        #         justify_items="center",
-        #         align_items="center",
-        #         width="100%",
-        #         height="60px",
-        #         grid_gap="10px"
-        #     )
-        # )
+        for btn in buttons:
+            if btn.index == active or number_of_buttons == 1:
+                btn.style.button_color = '#0d6efd'
+                btn.style.text_color = 'white'
+            else:
+                btn.style.button_color = None
+                btn.style.text_color = None
 
-        return timeline
+        self.timeline.children = tuple(buttons)
+        self.timeline.layout.grid_template_columns = f"repeat({number_of_buttons}, 40px)"
+        return self.timeline
 
     def timeline_button_click(self, button):
         step = button.index

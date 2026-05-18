@@ -298,8 +298,8 @@ class TaskMenuView:
 
         if len(task_list) > 0:
             if self.finishedtask:
-                timeline_length = len(task_list) + 1
-                self.slider.max = len(task_list) + 1
+                timeline_length = len(task_list)
+                self.slider.max = len(task_list)
                 self.timeline = self.get_timeline(timeline_length, self.slider.value)
             else:
                 timeline_length = len(task_list)

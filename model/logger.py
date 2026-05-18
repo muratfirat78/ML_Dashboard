@@ -68,7 +68,7 @@ class Logger:
             '[\'DataProcessing\', \'OrdinalEncoding\']': self.controller.data_processing_model.make_encoding,
             '[\'DataProcessing\', \'ExtractTimeFeatures\']': self.controller.data_processing_model.extract_time_feats,
             '[\'ModelDevelopment\', \'ParameterFinetuning\']': self.controller.predictive_modeling_model.train_Model,
-            '[\'ModelDevelopment\', \'ModelPerformance\']': self.controller.predictive_modeling_model.train_Model
+            # '[\'ModelDevelopment\', \'ModelPerformance\']': self.controller.predictive_modeling_model.train_Model
             }
         return actions_to_function.get(str(action))
     
@@ -97,6 +97,8 @@ class Logger:
 
         for action in call_stack_backup:
             function = self.action_to_function(action[0])
+            if function is None:
+                continue
             parameters = action[1]
             function(*parameters)
         self.call_stack = call_stack_backup

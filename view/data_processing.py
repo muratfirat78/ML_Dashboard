@@ -134,12 +134,14 @@ class DataProcessingView:
                         methoditem.layout.display = 'none'   
 
         selectedprocess = self.main_view.process_types.value
+        
         self.controller.show_message(selectedprocess)
         self.progress.value+="Select process type.."+selectedprocess+"\n"
 
         if selectedprocess in self.processmethods:
             self.methodsmenu.options = [x for x in self.processmethods[selectedprocess]]
             self.methodsmenu.value = self.methodsmenu.options[0]
+
 
             self.methodslbl.layout.display = 'block'
             self.methodslbl.layout.visibility = 'visible'
@@ -151,6 +153,12 @@ class DataProcessingView:
                 for visitem in self.processvisuals[selectedprocess]:
                     visitem.layout.display = 'block'
                     visitem.layout.visibility = 'visible'
+            elif isinstance(self.processvisuals[selectedprocess], dict):
+                selectedmethod = self.methodsmenu.value
+                if selectedmethod in self.processvisuals[selectedprocess]:
+                    for methoditem in self.processvisuals[selectedprocess][selectedmethod]:
+                        methoditem.layout.display = 'block'
+                        methoditem.layout.visibility = 'visible'
         return
 
 

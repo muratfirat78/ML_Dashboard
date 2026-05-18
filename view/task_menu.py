@@ -127,79 +127,77 @@ class TaskMenuView:
             self.slider.value = self.slider.value + 1
 
     def slider_change(self, change):
-        return
-        # update the information in the task menu based on the value selected with the slider
-        if len(self.task_list) == 0:
+
+        if not self.task_list:
             return
-        
+
         change_new = change["new"]
+
         if isinstance(change_new, dict):
-            id = change_new.get("value", None)
+            idx = change_new.get("value")
         else:
-            id = change_new
-        
-        if id is not None:
-            
-            self.timeline = self.get_timeline(self.slider.max, id)
-            self.ui.children = self.get_ui()
-            id -= 1
+            idx = change_new
 
-            if id >= len(self.task_list) and self.finishedtask:
-                self.subsubtask_textarea.description = "Results:"
-                if self.mode == "monitored":
-                    None
-                    # difficulty_data = dict(self.current_task["difficulty"])
-                    # competence_vector = self.competence_vector or {}
-                    # formatted = [f"{skill}: {round(competence_vector.get(skill,0)*100)}/100" 
-                    #             for skill, diff in difficulty_data.items()]
+        if idx is None:
+            return
 
-                    # pad = max(len(formatted[i*2]) for i in range((len(formatted)+1)//2)) + 4
+        self.timeline = self.get_timeline(self.slider.max, idx)
 
-                    # lines = [f"{formatted[i*2].ljust(pad)}{formatted[i*2+1] if i*2+1 < len(formatted) else ''}"
-                    #         for i in range((len(formatted)+1)//2)]
+        idx -= 1
 
-                    # self.subsubtask_textarea.value = "\n".join(lines)
-                else:
-                    self.subsubtask_textarea.description = "Results:"
-                    self.subsubtask_textarea.value = "Task completed 🎉"
+        if idx >= len(self.task_list) and self.finishedtask:
 
-            else:
-                self.hint_textarea.layout.width = self.subsubtask_textarea.layout.width 
-                category = self.task_list[id]["category"]
-                title = self.task_list[id]["title"]
-                description = self.task_list[id]["description"]
+            self.subsubtask_textarea.description = "Results:"
 
-                if self.mode != "monitored": 
-                    textarea_value = str(category) + ": " + str(title) + "\n" + "Description: " + str(description)
-                else:
-                    textarea_value = str(category) + "\n" + str(title)
-                    self.controller.show_message(str(category))
+            if self.mode != "monitored":
+                self.subsubtask_textarea.value = "Task completed 🎉"
 
-                status = self.task_list[id]["status"]
-                if status == "todo":
-                    color = "black"
-                elif status == "ready":
-                    color = "blue"
-                elif status == "inprogress":
-                    color = "orange"
-                    status = "in progress"
-                elif status == "done":
-                    color = "green"
-                    status = "done (press Next >>)"
-                elif status == "incorrect":
-                    color = "red"
-                else:
-                    color = "black"
-                self.subsubtask_textarea.value = textarea_value
-                if self.mode != "monitored": 
-                    self.status_label.value = f'<b> Status: </b> <span style="color:{color};">{status}</span>'
-                    
-                    # Hints
-                    hints = ""
-                    for x in range(self.hint_display_list[id]):
-                        if x < len(self.task_list[id]["hints"]):
-                            hints += self.task_list[id]["hints"][x] + "\n" 
-                    self.hint_textarea.value = hints
+            return
+
+        task = self.task_list[idx]
+
+        category = task["category"]
+        title = task["title"]
+        description = task["description"]
+        status = task["status"]
+
+        # Text content
+        if self.mode != "monitored":
+            textarea_value = (
+                f"{category}: {title}\n"
+                f"Description: {description}"
+            )
+        else:
+            textarea_value = f"{category}\n{title}"
+            self.controller.show_message(str(category))
+
+        status_styles = {
+            "todo": ("black", "todo"),
+            "ready": ("blue", "ready"),
+            "inprogress": ("orange", "in progress"),
+            "done": ("green", "done (press Next >>)"),
+            "incorrect": ("red", "incorrect"),
+        }
+
+        color, status_text = status_styles.get(
+            status,
+            ("black", status)
+        )
+
+        self.subsubtask_textarea.value = textarea_value
+
+        if self.mode != "monitored":
+
+            self.status_label.value = (
+                f'<b>Status:</b> '
+                f'<span style="color:{color};">{status_text}</span>'
+            )
+
+            hints = "\n".join(
+                task["hints"][:self.hint_display_list[idx]]
+            )
+
+            self.hint_textarea.value = hints
     
     def hint(self, button):
         #increase the hint display by 1

@@ -11,6 +11,7 @@ class AlertMessagesModel:
             "no_model_error":"Error: A ML model needs to be selected first.",
             "improper_action_error": "Error: improper action selected",
             "no_mode_error": "Error: Mode not found for this column.",
+            "no_feature_selected_error": "Error: A feature must be selected before applying the action.",
 
             #step explaination
             'Scaling':'Normalization: This method scales each feature so that all values are within the range of 0 and 1. \nStandardization: Here, each feature is transformed to have a mean of 0 and a standard deviation of 1.',
@@ -45,4 +46,5 @@ class AlertMessagesModel:
             r'style="color:#1a73e8; text-decoration:underline; font-weight:500;">\1 ↗</a>',
             message
         )
+
         return message_html

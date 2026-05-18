@@ -10,6 +10,9 @@ class DataCleaningModel:
         self.controller = controller
 
     def make_cleaning(self,colname,result2aexp,missacts,dt_features,params): 
+        if colname is None:
+            self.controller.show_message("no_feature_selected_error")
+            return
         #perform the data cleaning action
         handling = missacts.value
         prev_size = 0

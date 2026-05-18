@@ -212,8 +212,13 @@ class TaskMenuView:
         self.slider_change({"new":self.slider.value})
 
     def show_hint_text(self, text):
-        if text == None:
+        if text is None:
             text = ''
+
+        if text.startswith("Error:"):
+            self.hint_textarea.style.text_color = 'red'
+        else:
+            self.hint_textarea.style.text_color = None 
         self.hint_textarea.value = text
 
     def get_task_menu(self):

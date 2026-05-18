@@ -127,6 +127,7 @@ class TaskMenuView:
             self.slider.value = self.slider.value + 1
 
     def slider_change(self, change):
+        return
         # update the information in the task menu based on the value selected with the slider
         if len(self.task_list) == 0:
             return

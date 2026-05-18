@@ -97,8 +97,13 @@ class DataCleaningModel:
                             return
                     else:                 
                         if handling == 'Replace-Mode': 
-                            ytrain_df[colname].fillna(ytrain_df[colname].mode(), inplace=True) 
-                            write_log('mode (split) . '+str(ytrain_df[colname].mode()), result2aexp, 'Data cleaning')
+                            mode = curr_df[colname].mode()
+                            if mode is None:
+                                self.controller.show_message("no_mode_error")
+                                return
+
+                            ytrain_df[colname].fillna(mode) 
+                            write_log('mode (split) . '+str(mode), result2aexp, 'Data cleaning')
                         if handling == 'Remove-Missing': 
                             ytrain_df = ytrain_df.dropna(subset = [colname], how='any')
 
@@ -153,9 +158,16 @@ class DataCleaningModel:
                         self.controller.show_message("improper_action_error")
                         return
                 else: 
-                    write_log('mode.. '+str(curr_df[colname].mode()[0]), result2aexp, 'Data cleaning')
+                    modes = curr_df[colname].mode()
+                    if not modes.empty:
+                        value = modes.iloc[0]
+                    else:
+                        self.controller.show_message("no_mode_error")
+                        return
+                    print(value)
+                    write_log('mode.. '+str(value), result2aexp, 'Data cleaning')
                     if handling == 'Replace-Mode': 
-                        curr_df[colname] =curr_df[colname].fillna(curr_df[colname].mode()[0], inplace=True)
+                        curr_df[colname] = curr_df[colname].fillna(value)
                     if handling == 'Remove-Missing': 
                         curr_df = curr_df.dropna(subset = [colname], how='any')
        

@@ -10,6 +10,7 @@ class AlertMessagesModel:
             "no_target_error": "Error: Can only concatenate str, probably a target needs to be selected.",
             "no_model_error":"Error: A ML model needs to be selected first.",
             "improper_action_error": "Error: improper action selected",
+            "no_mode_error": "Error: Mode not found for this column.",
 
             #step explaination
             'Scaling':'Normalization: This method scales each feature so that all values are within the range of 0 and 1. \nStandardization: Here, each feature is transformed to have a mean of 0 and a standard deviation of 1.',

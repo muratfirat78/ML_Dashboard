@@ -98,8 +98,12 @@ class TaskMenuView:
             new_text  = 'white'   if (btn.index == active or number_of_buttons == 1) else None
             if btn.style.button_color != new_color:
                 btn.style.button_color = new_color
-            if btn.style.text_color != new_text:
-                btn.style.text_color = new_text
+            try:
+                if btn.style.text_color != new_text:
+                    btn.style.text_color = new_text
+            except AttributeError:
+                if btn.style.font_color != new_text:
+                    btn.style.font_color = new_text
 
         new_cols     = f"repeat({number_of_buttons}, 40px)"
         new_children = tuple(buttons)

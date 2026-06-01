@@ -320,42 +320,6 @@ class TaskMenuView:
         if self.mode == "monitored":
             return (
                 self.subsubtask_box,
-                self.statusbox,
-                widgets.HBox(
-                    [
-                        widgets.VBox(
-                            [
-                                widgets.Label("Actions"),
-                                self.timeline
-                            ],
-                            layout=widgets.Layout(
-                                align_items='flex-start',
-                                gap='2px',
-                                width='100%' 
-                            )
-                        ),
-                        self.vertical_seperator,
-                        widgets.VBox(
-                            [self.undo_button, self.topic_explaination_button],
-                            layout=widgets.Layout(
-                                width='15%',
-                                justify_content='center',
-                                align_items='stretch',
-                                gap='4px',
-                                padding='0px 4px'
-                            )
-                        )
-                    ],
-                    layout=widgets.Layout(
-                        align_items='stretch',
-                        width='99%',
-                        padding='4px 0px'
-                    )
-                ),
-                widgets.Box(layout=widgets.Layout(
-                    border='solid 1px lightblue', width='99%',
-                    height='1px', margin='4px 0px',
-                ))
             )
         else:
             return ([])

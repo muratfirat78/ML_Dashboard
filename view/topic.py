@@ -14,7 +14,8 @@ class TopicView:
         self.set_topic('no topic info')
 
     def set_topic(self,html):
-        self.tab.children = (HTML(html),)
+        None
+        # self.tab.children = (HTML(html),)
 
     def get_topic_tab(self):
         return self.tab

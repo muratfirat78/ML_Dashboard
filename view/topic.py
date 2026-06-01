@@ -12,10 +12,13 @@ class TopicView:
             ))
         self.controller = controller
         self.set_topic('no topic info')
+        self.html = ''
 
     def set_topic(self,html):
-        None
-        # self.tab.children = (HTML(html),)
+        self.html = html
+    
+    def display_html(self):
+        self.tab.children = (HTML(self.html),)
 
     def get_topic_tab(self):
         return self.tab

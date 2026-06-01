@@ -33,7 +33,7 @@ class Controller:
     def __init__(self, drive, online_version):
         self.monitored_mode = None
         self.main_model = MainModel(online_version)
-        self.main_view = MainView()
+        self.main_view = MainView(self)
         self.logger = Logger(self)
         self.login_view = LoginView(self)
         self.login_model = LoginModel(self)
@@ -122,6 +122,13 @@ class Controller:
         message = self.alert_messages_model.get_message_html(name)
         self.topic_model.set_topic(name)
         self.show_hint(message)
+    
+    def set_topic(self, topic):
+        self.topic_model.set_topic(topic)
+
+    def switch_tab_to_topic_info(self):
+        self.topic_view.display_html()
+        self.main_view.switch_tab_to_topic_info()
 
     def make_balanced(self,features2,balncetype,ProcssPage,result2exp):
         self.data_processing_model.make_balanced(features2.value,balncetype,ProcssPage,result2exp)

@@ -5,7 +5,7 @@ from io import BytesIO
 
 class MainView:
     # The view class for variables and elements shared across views or affecting multiple views
-    def __init__(self):
+    def __init__(self, controller):
             self.dt_features = None
             self.feat_page = None
             self.process_page = None
@@ -20,6 +20,7 @@ class MainView:
             self.tab_set = None
             self.tabs = None
             self.cleaningoutput = None
+            self.controller = controller
 
     
     def set_tabs(self,tab_1,tab_2,tab_3,tab_4, tab_5, tab_6):
@@ -34,7 +35,13 @@ class MainView:
         tab_set.set_title(5, 'Topic information')
         tab_set.layout.width='100%'
         tab_set.layout.display = 'none' 
+        tab_set.observe(self.on_tab_change, names='selected_index')
         self.tab_set = tab_set
+
+
+    def on_tab_change(self,change):
+          if change['name'] == 'selected_index' and change['new'] == 5:
+               self.controller.topic_view.display_html()
 
     def show_tabs(self):
          self.tab_set.layout = widgets.Layout(visibility = 'visible')

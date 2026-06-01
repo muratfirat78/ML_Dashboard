@@ -116,7 +116,7 @@ class TaskMenuView:
         self.controller.logger.undo(self.slider.value)
 
     def topic_explaination_button_click(self, button):
-        self.controller.main_view.switch_tab_to_topic_info()
+        self.controller.switch_tab_to_topic_info()
 
     def previous_button_click(self, button):
         if self.slider.value > 1:
@@ -175,7 +175,7 @@ class TaskMenuView:
         }
 
         color, status_text = status_styles.get(status, ("black", status))
-
+        self.controller.set_topic(task["topic"])
         self.subsubtask_textarea.value = textarea_value
 
         if self.mode != "monitored":
@@ -213,8 +213,10 @@ class TaskMenuView:
             "description": action,
             "hints":       '',
             "status":      'ready',
-            "value":       str(value)
+            "value":       str(value),
+            "topic":       action
         }
+
         self.task_list.append(new_obj)
         self.hint_display_list.append(0)
 
@@ -241,6 +243,7 @@ class TaskMenuView:
                     subsubtask_object["hints"]       = subsubtask["hints"]
                     subsubtask_object["status"]      = subsubtask["status"]
                     subsubtask_object["value"]       = subsubtask["value"]
+                    subsubtask_object["topic"]       = subsubtask["title"]
                     task_list.append(subsubtask_object)
 
                 if mode == 'monitored':
@@ -255,6 +258,7 @@ class TaskMenuView:
                         subsubtask_object["hints"]       = subsubtask["hints"]
                         subsubtask_object["status"]      = subsubtask["status"]
                         subsubtask_object["value"]       = [val]
+                        subsubtask_object["topic"]       = subsubtask["action"][1]
                         task_list.append(subsubtask_object)
 
         self.current_task = task

@@ -358,12 +358,7 @@ class TaskMenuView:
                 ))
             )
         else:
-            return ([
-            self.slider, 
-            self.button_box,
-            self.subsubtask_box,
-            self.statusbox,
-            widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"}))])
+            return ([])
 
     def finished_task(self, competence_vector):
         #display that the student has finished the task

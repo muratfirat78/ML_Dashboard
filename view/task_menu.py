@@ -326,7 +326,7 @@ class TaskMenuView:
                         widgets.VBox(
                             [
                                 widgets.Label("Actions"),
-                                # self.timeline
+                                self.timeline
                             ],
                             layout=widgets.Layout(
                                 align_items='flex-start',
@@ -334,17 +334,17 @@ class TaskMenuView:
                                 width='100%' 
                             )
                         ),
-                        self.vertical_seperator,
-                        widgets.VBox(
-                            [self.undo_button, self.topic_explaination_button],
-                            layout=widgets.Layout(
-                                width='15%',
-                                justify_content='center',
-                                align_items='stretch',
-                                gap='4px',
-                                padding='0px 4px'
-                            )
-                        )
+                        # self.vertical_seperator,
+                        # widgets.VBox(
+                        #     [self.undo_button, self.topic_explaination_button],
+                        #     layout=widgets.Layout(
+                        #         width='15%',
+                        #         justify_content='center',
+                        #         align_items='stretch',
+                        #         gap='4px',
+                        #         padding='0px 4px'
+                        #     )
+                        # )
                     ],
                     layout=widgets.Layout(
                         align_items='stretch',

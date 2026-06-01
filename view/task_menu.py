@@ -102,6 +102,7 @@ class TaskMenuView:
                 if btn.style.text_color != new_text:
                     btn.style.text_color = new_text
             except AttributeError:
+                print(dir(widgets.Button().style))
                 if btn.style.font_color != new_text:
                     btn.style.font_color = new_text
 

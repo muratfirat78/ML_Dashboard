@@ -95,16 +95,8 @@ class TaskMenuView:
 
         for btn in buttons:
             new_color = '#0d6efd' if (btn.index == active or number_of_buttons == 1) else None
-            new_text  = 'white'   if (btn.index == active or number_of_buttons == 1) else None
             if btn.style.button_color != new_color:
                 btn.style.button_color = new_color
-            try:
-                if btn.style.text_color != new_text:
-                    btn.style.text_color = new_text
-            except AttributeError:
-                print(dir(widgets.Button().style))
-                if btn.style.font_color != new_text:
-                    btn.style.font_color = new_text
 
         new_cols     = f"repeat({number_of_buttons}, 40px)"
         new_children = tuple(buttons)

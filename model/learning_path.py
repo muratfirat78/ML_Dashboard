@@ -48,6 +48,7 @@ class LearningPathModel:
     def upload_performance(self, files):
         user_id = self.controller.login_model.get_userid()
         path = f"./drive/{user_id}"
+        print(files)
         file = files[0]
         name = file["name"]
         content = file["content"]

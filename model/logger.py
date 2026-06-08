@@ -1,13 +1,13 @@
 import logging
 from datetime import datetime
 from model.student_performance import StudentPerformance
+import json
 
 class Logger:
     #this logger is used to keep track of the actions the student does. 
     #The list of actions is displayed in the log tab
     def __init__(self, controller):
         self.student_performance = StudentPerformance(controller)
-        self.call_stack = []
         self.controller = controller
         # clear log
         with open('output.log', 'w'):
@@ -45,7 +45,30 @@ class Logger:
     
     def get_list_of_actions(self):
         return self.student_performance.get_list_of_actions()
-    
+
+    # def find_title(filename)
+
+    def load_session(self, filename):
+        self.controller.replay = True
+        drive_path = './drive/'+ self.controller.login_model.get_userid()
+        with open(drive_path + "/" + filename, "rb") as f:
+            self.call_stack = json.load(f)
+
+        monitored_mode = True
+        print(filename)
+        csv_filename = next(v for v in str(self.call_stack).replace("'", '"').split('"') if v.endswith(".csv"))
+        print(csv_filename)
+        task = self.controller.main_model.get_task_with_csv(csv_filename)
+        
+        # selected_title = self.task_dropdown.value
+        # print(self.controller.task_selection_view.task_map
+        # selected_task = self.controller.task_selection_view.task_map[task["title"]]
+        self.controller.set_task_model(task, True)
+        self.controller.read_dataset_view(task["dataset"])
+        self.controller.hide_task_selection_and_show_tabs()
+        self.undo(len(self.call_stack))           
+
+
     def action_to_function(self, action):
         actions_to_function = {
             '[\'SelectData\', \'DataSet\']': self.controller.data_selection_model.read_data_set,
@@ -85,14 +108,14 @@ class Logger:
             if 'Target' in str(action[0]):
                 selectTarget = True
  
-        self.controller.main_model.datasplit = split
+        self.controller.main_model.datasplit = False
 
-        if selectTarget == False:
-            self.controller.main_model.targetcolumn = None
-            self.controller.main_model.predictiontask = None
-            self.controller.main_view.trg_lbl.value ='Target: - |' 
-            self.controller.main_view.prdtsk_lbl.value = 'Prediction Task: -'
-            self.controller.predictive_modeling_view.tasklbl.value = 'Prediction task: - | Prediction Task: -'
+        # if selectTarget == False:
+        self.controller.main_model.targetcolumn = None
+        self.controller.main_model.predictiontask = None
+        self.controller.main_view.trg_lbl.value ='Target: - |' 
+        self.controller.main_view.prdtsk_lbl.value = 'Prediction Task: -'
+        self.controller.predictive_modeling_view.tasklbl.value = 'Prediction task: - | Prediction Task: -'
 
 
         for action in call_stack_backup:

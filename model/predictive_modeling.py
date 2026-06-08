@@ -141,7 +141,7 @@ class PredictiveModelingModel:
         self.controller = controller
         self.logger = logger
 
-    def train_Model(self,tasktype,mytype,results,trmodels,params):
+    def train_Model(self,tasktype,mytype,results,params):
         write_log('Train Model-> '+ mytype,results,'Predictive modeling')
 
         Xtest_df = self.main_model.get_XTest()
@@ -195,9 +195,9 @@ class PredictiveModelingModel:
             performance += [("missing_values", ytrain_df.isnull().sum())]
             performance += [("type", str(ytrain_df.dtype))]
             performance += [("range", str(ytrain_df.min()) + "-" + str(ytrain_df.max()))]
-            self.logger.add_action(['ModelDevelopment', 'ParameterFinetuning'], [mytype] + list(params.values()),[tasktype,mytype,results,trmodels,params])
-            self.logger.add_action(['ModelDevelopment', 'ModelPerformance'], (performance),[tasktype,mytype,results,trmodels,params])
-            trmodels.options = [mdl.getName() for mdl in self.trainedModels]
+            self.logger.add_action(['ModelDevelopment', 'ParameterFinetuning'], [mytype] + list(params.values()),[tasktype,mytype,None,params])
+            self.logger.add_action(['ModelDevelopment', 'ModelPerformance'], (performance),[tasktype,mytype,None,params])
+            self.controller.predictive_modeling_view.trmodels.options = [mdl.getName() for mdl in self.trainedModels]
             
         except Exception as e: 
             if "can only concatenate str" in str(e):
@@ -208,8 +208,11 @@ class PredictiveModelingModel:
                 self.controller.show_message("non_numerical_error")
             write_log('Train Model-> exception raised \"'+str(e)+'\"',results,'Predictive modeling')
             write_log('Train Model-> unsuccessful trial',results,'Predictive modeling')
-        
-        self.controller.upload_log()
-    
+        if self.controller.replay == False:
+            self.controller.upload_log()
+        else:
+            self.controller.replay = True
+            
+            
     def get_trained_models(self):
         return self.trainedModels

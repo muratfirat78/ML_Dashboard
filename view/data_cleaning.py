@@ -85,7 +85,7 @@ class DataCleaningView:
         params = []
         if  self.missacts.value == "Edit Range":
             params = [self.min_text,self.max_text]
-        self.controller.make_cleaning(self.main_view.featurescl,result2aexp,self.missacts,self.main_view.dt_features,params) 
+        self.controller.make_cleaning(self.main_view.featurescl,result2aexp,self.missacts,params) 
         self.refresh_data()
 
 

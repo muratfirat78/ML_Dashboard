@@ -24,6 +24,7 @@ from view.login import LoginView
 from view.task_menu import TaskMenuView
 from view.task_selection import TaskSelectionView
 from view.topic import TopicView
+import pickle
 import json
 import numpy as np
 
@@ -60,6 +61,7 @@ class Controller:
         self.task_finished = False
         self.developer_mode = False
         self.predictiontask = None
+        self.replay = False
 
         self.alert_messages_model = AlertMessagesModel()
 
@@ -101,7 +103,7 @@ class Controller:
             return obj
 
     def train_Model(self,mytype,results,trmodels,params):
-        self.predictive_modeling_model.train_Model(self.predictiontask,mytype,results,trmodels,params)
+        self.predictive_modeling_model.train_Model(self.predictiontask,mytype,results,params)
         if self.developer_mode:
             data = self.convertPerformanceToTask.convert_performance_to_task(self.logger.get_performance(), 'todo', 'todo')
             converted_data = self.convert_numpy(data)
@@ -111,12 +113,11 @@ class Controller:
             # Only try to finish the task in monitored mode, in guided mode the task finished when all tasks are complete
             self.finished_task()
     
-    def make_cleaning(self,featurescl,result2aexp,missacts,dt_features,params):
-         self.data_cleaning_model.make_cleaning(featurescl.value,result2aexp,missacts,dt_features,params)
+    def make_cleaning(self,featurescl,result2aexp,missacts,params):
+         self.data_cleaning_model.make_cleaning(featurescl.value,result2aexp,missacts.value,params)
 
     def assign_target(self,trg_lbl,dt_features,prdtsk_lbl,result2exp,predictiontask):
-        self.predictiontask = self.data_processing_model.assign_target(trg_lbl,dt_features.value,prdtsk_lbl,result2exp) 
-        self.predictive_modeling_view.tasklbl.value ='Prediction task: '+str(self.predictiontask)
+        self.predictiontask = self.data_processing_model.assign_target(dt_features.value,result2exp) 
         
     def show_message(self, name):
         message = self.alert_messages_model.get_message_html(name)
@@ -130,11 +131,11 @@ class Controller:
         self.topic_view.display_html()
         self.main_view.switch_tab_to_topic_info()
 
-    def make_balanced(self,features2,balncetype,ProcssPage,result2exp):
-        self.data_processing_model.make_balanced(features2.value,balncetype,ProcssPage,result2exp)
+    def make_balanced(self,features2,balncetype,result2exp):
+        self.data_processing_model.make_balanced(features2.value,balncetype,result2exp)
 
     def make_encoding(self,features2,encodingtype,ordinalenconding,result2exp):
-        self.data_processing_model.make_encoding(features2.value,encodingtype,ordinalenconding,result2exp)
+        self.data_processing_model.make_encoding(features2.value,encodingtype,ordinalenconding.options,result2exp)
 
     def make_featconvert(self,dt_features,result2exp):
         self.data_processing_model.make_featconvert(dt_features.value,result2exp)
@@ -149,7 +150,9 @@ class Controller:
         self.data_processing_model.ApplyPCA(features2.value,pca_features,result2exp)
         
     def make_split(self,splt_txt,result2exp):
-        self.data_processing_model.make_split(splt_txt,result2exp)
+        self.data_processing_model.make_split(int(splt_txt.value) ,result2exp)
+        splt_txt.layout.visibility = 'hidden'
+        splt_txt.layout.display = 'none'
         
     def extract_time_feats(self,dt_features,featset,result2exp):
         self.data_processing_model.extract_time_feats(dt_features.value,featset,result2exp)
@@ -200,7 +203,11 @@ class Controller:
         return self.main_model.get_online_version()
     
     def upload_log(self):
-        self.drive.upload_log(self.logger.get_result(), self.login_model.get_userid(), self.logger.get_timestamp())
+        self.drive.upload_log(self.logger.get_result(), self.login_model.get_userid(), self.logger.get_timestamp(),self.logger.call_stack)
+        with open("session.pkl", "wb") as f:
+            pickle.dump(self.logger.call_stack, f)
+
+
 
     def login(self, userid, terms_checkbox):
         if terms_checkbox:
@@ -212,6 +219,7 @@ class Controller:
                 self.login_view.hide_login()
                 self.main_view.set_title(4, 'Log (userid:' + str(userid) + ')')
                 self.task_selection_view.show_task_selection()
+                self.learning_path_view.set_performance_options()
             else:
                 print("login incorrect")
         else:
@@ -374,3 +382,6 @@ class Controller:
     
     def get_learning_rate(self):
         return self.learning_manager_model.get_learning_rate()
+    
+    def load_session(self, filename):
+        self.logger.load_session(filename)

@@ -2,6 +2,7 @@
 import os
 import random
 from datetime import datetime
+import json
 
 class GoogleDrive():
     # In offline mode this class is used, in online mode the google_drive.py file is used
@@ -15,9 +16,11 @@ class GoogleDrive():
         else:
            return False
         
-    def upload_log(self, result, userid, timestamp):
+    def upload_log(self, result, userid, timestamp, call_stack):
        with open('./drive/'+ userid + '/' + timestamp + '.txt', 'w') as f:
           f.write(str(result))
+       with open('./drive/'+ userid + '/' + timestamp +'.json', 'w') as f:
+          json.dump(call_stack, f, indent=2, default=str)
 
     def get_performances(self, userid):
        None

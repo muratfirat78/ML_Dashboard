@@ -52,7 +52,7 @@ class DataProcessingModel:
 
     def ApplyPCA(self,colname,pcafeats,result2exp):
         # apply principal component analysis
-        self.logger.add_action(['DataProcessing', 'PCA'], pcafeats, [colname,pcafeats,result2exp])
+        self.logger.add_action(['DataProcessing', 'PCA'], pcafeats, [colname,pcafeats,None])
 
         if self.main_model.targetcolumn in pcafeats:
             write_log('PCA: Returned due to inclusion of target in PCA',result2exp, 'PCA')
@@ -211,12 +211,12 @@ class DataProcessingModel:
                 
                  
             
-        self.logger.add_action(['DataProcessing', 'ExtractTimeFeatures'], colname, [colname,featset,result2exp])
+        self.logger.add_action(['DataProcessing', 'ExtractTimeFeatures'], colname, [colname,featset,None])
         return
      
     def remove_outliers(self,colname,methodtype,result2exp): 
         write_log('Outlier removal: '+colname,result2exp, 'Outlier removal')
-        self.logger.add_action(['DataProcessing', 'outlier'], colname, [colname,methodtype,result2exp])
+        self.logger.add_action(['DataProcessing', 'outlier'], colname, [colname,methodtype,None])
       
         
         if self.main_model.datasplit:
@@ -380,15 +380,13 @@ class DataProcessingModel:
         return
     ##################################################################################
 
-    def assign_target(self,trg_lbl,colname,prdtsk_lbl,result2exp):
+    def assign_target(self,colname,result2exp):
         # assign the target feature
         predictiontask = ''
 
         self.main_model.targetcolumn = colname
 
-        trg_lbl.value = "Target: ["+self.main_model.targetcolumn+"]"
-
-        result2exp.value+="In assign target..."+"\n"
+        write_log('In assign target...', result2exp, 'Data processing')
 
         curr_df = self.main_model.get_curr_df()
         target_column = self.main_model.targetcolumn
@@ -398,11 +396,12 @@ class DataProcessingModel:
         else:
             predictiontask = "Classification" 
 
-  
-        prdtsk_lbl.value = "| Prediction Task: "+predictiontask 
-        self.logger.add_action(['DataProcessing', 'AssignTarget'], target_column, [trg_lbl,colname,prdtsk_lbl,result2exp])
-        result2exp.value+="assign target done..."+"\n"
-    
+        self.logger.add_action(['DataProcessing', 'AssignTarget'], target_column, [colname,None])
+        write_log("assign target done...", result2exp, 'Data processing')
+        self.controller.main_view.trg_lbl.value = "Target: ["+self.main_model.targetcolumn+"]"
+        self.controller.main_view.prdtsk_lbl.value = "| Prediction Task: "+str(predictiontask)
+        self.controller.predictive_modeling_view.tasklbl.value ='Prediction task: '+str(predictiontask)
+
         return predictiontask
 
      
@@ -410,7 +409,7 @@ class DataProcessingModel:
     def make_featconvert(self,colname,result2exp):
 
         #convert feature to a different datatype
-        self.logger.add_action(['DataProcessing', 'ConvertToBoolean'], colname, [colname,result2exp])
+        self.logger.add_action(['DataProcessing', 'ConvertToBoolean'], colname, [colname,None])
                     
         write_log('Convert Feature Type-> '+colname, result2exp, 'Data processing')
 
@@ -523,7 +522,7 @@ class DataProcessingModel:
                 curr_df[colname] = (curr_df[colname]- colmean)/colstd
 
            
-            self.logger.add_action(['DataProcessing', 'Standardize'], colname, [colname,FeatPage,scalingtype,result2exp])
+            self.logger.add_action(['DataProcessing', 'Standardize'], colname, [colname,None,scalingtype,None])
             logging.info('Data preprocessing, feature scaling: standardization of column '+ colname)
 
 
@@ -571,7 +570,7 @@ class DataProcessingModel:
                 else:
                     curr_df[colname] = (curr_df[colname]-col_min)/denominator
 
-            self.logger.add_action(['DataProcessing', 'Normalize'], colname, [colname,FeatPage,scalingtype,result2exp])
+            self.logger.add_action(['DataProcessing', 'Normalize'], colname, [colname,None,scalingtype,None])
             logging.info('Data preprocessing, feature scaling: normalization of column '+ colname)
 
         if scalingtype == 'Log Transform':
@@ -631,37 +630,38 @@ class DataProcessingModel:
             
         
         #display boxplot
-        with FeatPage:
-            clear_output()
-            fig, (axbox, axhist) = plt.subplots(1,2)
+        if FeatPage is not None:
+            with FeatPage:
+                clear_output()
+                fig, (axbox, axhist) = plt.subplots(1,2)
 
-            if self.main_model.datasplit:
-                Xtrain_df=  self.main_model.get_XTrain()
-                if colname in Xtrain_df.columns:
+                if self.main_model.datasplit:
+                    Xtrain_df=  self.main_model.get_XTrain()
+                    if colname in Xtrain_df.columns:
 
-                    sns.boxplot(x=colname,data=Xtrain_df, ax=axbox)
-                    axbox.set_title('Box plot (train)') 
-                    sns.distplot(Xtrain_df[colname],ax=axhist)
-                    axhist.set_title('Histogram (train)') 
-                    plt.legend(['Mean '+str(round(Xtrain_df[colname].mean(),2)),'Stdev '+str(round(Xtrain_df[colname].std(),2))], bbox_to_anchor=(0.6, 0.6))
-                    plt.show()
-                else: 
-                    ytrain_df = self.main_model.getYtrain().to_frame()
-                    if colname in ytrain_df.columns:
-                        sns.boxplot(x=colname,data=ytrain_df, ax=axbox)
+                        sns.boxplot(x=colname,data=Xtrain_df, ax=axbox)
                         axbox.set_title('Box plot (train)') 
-                        sns.distplot(ytrain_df[colname],ax=axhist)
+                        sns.distplot(Xtrain_df[colname],ax=axhist)
                         axhist.set_title('Histogram (train)') 
-                        plt.legend(['Mean '+str(round(ytrain_df[colname].mean(),2)),'Stdev '+str(round(ytrain_df[colname].std(),2))], bbox_to_anchor=(0.6, 0.6))
+                        plt.legend(['Mean '+str(round(Xtrain_df[colname].mean(),2)),'Stdev '+str(round(Xtrain_df[colname].std(),2))], bbox_to_anchor=(0.6, 0.6))
                         plt.show()
-                    
-            else:
-                sns.boxplot(x=colname,data=curr_df, ax=axbox)
-                axbox.set_title('Box plot') 
-                sns.distplot(curr_df[colname],ax=axhist)
-                axhist.set_title('Histogram') 
-                plt.legend(['Mean '+str(round(curr_df[colname].mean(),2)),'Stdev '+str(round(curr_df[colname].std(),2))], bbox_to_anchor=(0.6, 0.6))
-                plt.show()
+                    else: 
+                        ytrain_df = self.main_model.getYtrain().to_frame()
+                        if colname in ytrain_df.columns:
+                            sns.boxplot(x=colname,data=ytrain_df, ax=axbox)
+                            axbox.set_title('Box plot (train)') 
+                            sns.distplot(ytrain_df[colname],ax=axhist)
+                            axhist.set_title('Histogram (train)') 
+                            plt.legend(['Mean '+str(round(ytrain_df[colname].mean(),2)),'Stdev '+str(round(ytrain_df[colname].std(),2))], bbox_to_anchor=(0.6, 0.6))
+                            plt.show()
+                        
+                else:
+                    sns.boxplot(x=colname,data=curr_df, ax=axbox)
+                    axbox.set_title('Box plot') 
+                    sns.distplot(curr_df[colname],ax=axhist)
+                    axhist.set_title('Histogram') 
+                    plt.legend(['Mean '+str(round(curr_df[colname].mean(),2)),'Stdev '+str(round(curr_df[colname].std(),2))], bbox_to_anchor=(0.6, 0.6))
+                    plt.show()
 
         if self.main_model.datasplit:
             self.main_model.set_XTest(Xtest_df)
@@ -674,7 +674,7 @@ class DataProcessingModel:
     
         return
     
-    def make_balanced(self,colname,balancetype,ProcssPage,result2exp):  
+    def make_balanced(self,colname,balancetype,result2exp):  
         # apply class balancing to a feature
         write_log('Balancing-> '+balancetype, result2exp, 'Data processing')    
         if not self.main_model.datasplit:
@@ -717,10 +717,10 @@ class DataProcessingModel:
                     
             
         logging.info('Data preprocessing, checking and handling unbalancedness')
-        self.logger.add_action(['DataProcessing', 'Unbalancedness ' + balancetype ], colname, [colname,balancetype,ProcssPage,result2exp])
+        self.logger.add_action(['DataProcessing', 'Unbalancedness ' + balancetype ], colname, [colname,balancetype,None])
         return
 
-    def make_split(self,splt_txt,result2exp):
+    def make_split(self,ratio_percnt,result2exp):
         #split the dataset
         curr_df = self.main_model.curr_df
         targetcolumn = self.main_model.targetcolumn
@@ -731,8 +731,6 @@ class DataProcessingModel:
         column_list = [col for col in curr_df.columns]
         column_list.remove(targetcolumn)
         X = curr_df[column_list]
-        
-        ratio_percnt = int(splt_txt.value) 
         write_log('Split ratio, '+str(ratio_percnt/100), result2exp, 'Data processing')
         X_indices = X.index
         y_indices = y.index
@@ -742,15 +740,13 @@ class DataProcessingModel:
         self.main_model.set_XTrain(xtrain)
         self.main_model.set_YTrain(ytrain)
         self.main_model.set_YTest(ytest)
-        splt_txt.layout.visibility = 'hidden'
-        splt_txt.layout.display = 'none'
 
         write_log('Split, XTrain size: '+str(len(self.main_model.get_XTrain())), result2exp, 'Data processing')
         write_log('Split, XTest size: '+str(len(self.main_model.get_XTest())), result2exp, 'Data processing')
         write_log('Split, yTrain size: '+str(len(self.main_model.getYtrain())), result2exp, 'Data processing')
         write_log('Split, yTrain indices: '+str(len(self.main_model.getYtrain().index)), result2exp, 'Data processing')
         write_log('Split, yTest size: '+str(len(self.main_model.get_YTest())), result2exp, 'Data processing')
-        self.logger.add_action(['DataProcessing', 'Split'], str(ratio_percnt) + '%', [splt_txt,result2exp])
+        self.logger.add_action(['DataProcessing', 'Split'], str(ratio_percnt) + '%', [ratio_percnt,None])
         self.main_model.datasplit = True
 
  
@@ -787,7 +783,7 @@ class DataProcessingModel:
                     Xtest_df[colname] = Xtest_df[colname].apply(np.int64)
 
                     write_log('Encoding (split) -> '+colname+' done.', result2exp, 'Data processing')
-                    self.logger.add_action(['DataProcessing', 'LabelEncoding'], colname, [colname,encodingtype,ordselect,result2exp])
+                    self.logger.add_action(['DataProcessing', 'LabelEncoding'], colname, [colname,encodingtype,ordselect,None])
                 else: 
                     write_log('Encoding (split) -> '+colname+'| Returned due to target feature ', result2exp, 'Data processing')
                     return
@@ -805,7 +801,7 @@ class DataProcessingModel:
                     Xtrain_df = pd.concat([Xtrain_df.drop(categorical_columns, axis = 1), pd.get_dummies(Xtrain_df[categorical_columns])], axis=1)
                     Xtest_df = pd.concat([Xtest_df.drop(categorical_columns, axis = 1), pd.get_dummies(Xtest_df[categorical_columns])], axis=1)
   
-                    self.logger.add_action(['DataProcessing', 'OneHotEncoding'], colname, [colname,encodingtype,ordselect,result2exp])
+                    self.logger.add_action(['DataProcessing', 'OneHotEncoding'], colname, [colname,encodingtype,ordselect,None])
                     write_log('Encoding (split) -> '+encodingtype+', col '+colname+' done.', result2exp, 'Data processing')
                 else: 
                     write_log('Encoding (split) ->'+encodingtype+', col '+colname+', | Returned due to target feature ', result2exp, 'Data processing')
@@ -830,7 +826,7 @@ class DataProcessingModel:
                 curr_df[colname] = label_encoder.transform(curr_df[colname]) 
                 curr_df[colname] = curr_df[colname].apply(np.int64)
   
-                self.logger.add_action(['DataProcessing', 'LabelEncoding'], colname, [colname,encodingtype,ordselect,result2exp])
+                self.logger.add_action(['DataProcessing', 'LabelEncoding'], colname, [colname,encodingtype,ordselect,None])
                 
                 write_log('Encoding->'+encodingtype+', col '+colname+', done. ', result2exp, 'Data processing')
                 
@@ -842,11 +838,11 @@ class DataProcessingModel:
                 curr_df = curr_df.reset_index(drop=True)
                 one_hot_df = one_hot_df.reset_index(drop=True)
                 curr_df = pd.concat([curr_df.drop(categorical_columns, axis=1), one_hot_df], axis=1)
-                self.logger.add_action(['DataProcessing', 'OneHotEncoding'], colname, [colname,encodingtype,ordselect,result2exp])
+                self.logger.add_action(['DataProcessing', 'OneHotEncoding'], colname, [colname,encodingtype,ordselect,None])
                 write_log('Encoding->'+encodingtype+', col '+colname+', done. ', result2exp, 'Data processing')
 
             if encodingtype == 'Ordinal Encoding':
-                classorder =[x for x in ordselect.options]
+                classorder =[x for x in ordselect]
 
                 mapping = dict()
 
@@ -854,7 +850,7 @@ class DataProcessingModel:
                     mapping[classorder[i]] = len(classorder)-i
  
                 curr_df[colname] = curr_df[colname].replace(mapping)
-                self.logger.add_action(['DataProcessing', 'OrdinalEncoding'], colname, [colname,encodingtype,ordselect,result2exp])
+                self.logger.add_action(['DataProcessing', 'OrdinalEncoding'], colname, [colname,encodingtype,ordselect,None])
                 write_log('Ordinal encoding->'+encodingtype+', col '+colname+', done. ', result2exp, 'Data processing')
             self.main_model.set_curr_df(curr_df)
         return

@@ -9,12 +9,12 @@ class DataCleaningModel:
         self.logger = logger
         self.controller = controller
 
-    def make_cleaning(self,colname,result2aexp,missacts,dt_features,params): 
+    def make_cleaning(self,colname,result2aexp,missacts,params): 
         if colname is None:
             self.controller.show_message("no_feature_selected_error")
             return
         #perform the data cleaning action
-        handling = missacts.value
+        handling = missacts
         prev_size = 0
 
         if self.main_model.datasplit:
@@ -178,9 +178,9 @@ class DataCleaningModel:
             write_log('Final data size'+str(len(self.main_model.get_curr_df())),  result2aexp, 'Data cleaning')  
 
         if handling == 'Edit Range':
-            self.logger.add_action(['DataCleaning', handling], colname + '(' + params[0].value + '-' + params[1].value +')', [colname,result2aexp,missacts,dt_features,params])
+            self.logger.add_action(['DataCleaning', handling], colname + '(' + params[0].value + '-' + params[1].value +')', [colname,None,missacts,params])
         else:
-            self.logger.add_action(['DataCleaning', handling], colname, [colname,result2aexp,missacts,dt_features,params])
+            self.logger.add_action(['DataCleaning', handling], colname, [colname,None,missacts,params])
         self.controller.show_hint(f"{handling} on {colname} completed successfully")
 
         return

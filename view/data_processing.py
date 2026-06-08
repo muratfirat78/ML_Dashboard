@@ -204,7 +204,7 @@ class DataProcessingView:
         if self.main_view.process_types.value == "Outlier":
             self.controller.remove_outliers(self.main_view.dt_features,self.methodsmenu.value,self.progress)
         if self.main_view.process_types.value == "Class Balance":
-            self.controller.make_balanced(self.main_view.dt_features,processtype,self.main_view.process_page,self.progress)
+            self.controller.make_balanced(self.main_view.dt_features,processtype,self.progress)
         if self.main_view.process_types.value == "Extract Time Features":
             self.controller.extract_time_feats(self.main_view.dt_features,processtype,self.progress)
         if self.main_view.process_types.value == "Feature Extraction":

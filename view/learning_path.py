@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from datetime import datetime
 import matplotlib.colors as mcolors
+import os
+import ast
 
 class LearningPathView:
     def __init__(self, controller):
@@ -36,10 +38,51 @@ class LearningPathView:
         self.log.layout = widgets.Layout(width='50%')
         self.previous_performance.layout = widgets.Layout(width='50%')
         self.last_result = widgets.VBox([self.label2,self.previous_performance])
+        self.performance_select = widgets.Select(
+            options=[],
+            disabled=False,
+            rows=5,
+            layout={'width': '50%'}
+        )
+        self.load_performance_button = widgets.Button(description="Load performance")
+        self.load_performance_button.on_click(self.load_performance)
+        self.download_performance_button =widgets.Button(description="Download performance")
+        self.download_performance_button.on_click(self.download_performance)
      
         self.hbox = widgets.VBox([widgets.HBox([self.bar_chart, self.line_chart])
-                                , widgets.HBox([self.log,self.last_result])])
+                                , widgets.HBox([self.log,self.last_result])
+                                , widgets.HBox([self.performance_select, self.load_performance_button, self.download_performance_button])])
 
+    def load_performance(self, event):
+        self.controller.load_performance(self.performance_select.value.replace(".txt", ".json"))
+
+    def download_performance(self, event):
+        if self.controller.get_online_version():
+            from google.colab import files
+
+            path = './drive/' + self.performance_select.value.replace(".txt", ".json")
+            files.download(path)
+
+
+    def set_performance_options(self):
+        drive_path = './drive/'+ self.controller.login_model.get_userid()
+        options = []
+        for txt_file in sorted(os.listdir(drive_path), reverse=True):
+            if not txt_file.endswith(".txt"):
+                continue
+            json_file = txt_file.replace(".txt", ".json")
+            if not os.path.exists(os.path.join(drive_path, json_file)):
+                continue
+            timestamp = txt_file.replace(".txt", "")
+            try:
+                with open(os.path.join(drive_path, txt_file)) as f:
+                    data = ast.literal_eval(f.read())
+                dataset = data.get("SelectData", {}).get("DataSet", ("Unknown",))[0]
+            except:
+                dataset = "Unknown"
+            options.append((f"{timestamp} - {dataset}", txt_file))
+        self.performance_select.options = options
+    
 
     def get_icon(self, category):
         #add name of the action types to the action log

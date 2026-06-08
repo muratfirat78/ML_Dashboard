@@ -9,6 +9,7 @@ import googleapiclient.http
 import random
 import numpy as np
 import io
+import json
 
 class GoogleDrive:
     # In online mode this class is used, in offline mode the local_drive.py file is used
@@ -112,7 +113,7 @@ class GoogleDrive:
             return obj
 
 
-    def upload_log(self, result, userid, timestamp):
+    def upload_log(self, result, userid, timestamp, call_stack):
         #upload the performance to the Google Drive
         with open('./drive/'+ userid + '/' + timestamp +
                     '.txt', 'w') as f:
@@ -138,6 +139,36 @@ class GoogleDrive:
             #file does not exist yet, create
             file_metadata = {
             "name": timestamp + ".txt",
+            "parents": [folderid]
+            }
+            
+            uploaded_file = self.drive_service.files().create(
+                body=file_metadata,
+                media_body=media,
+                fields="id"
+            ).execute()
+
+        with open('./drive/'+ userid + '/' + timestamp + '.json', "wb") as f:
+            json.dump(call_stack, f, indent=2, default=str)
+
+        #see if the file already exists
+        query = f"name='{timestamp}.json' and '{folderid}' in parents and trashed = false"
+        response = self.drive_service.files().list(q=query, spaces='drive', fields='files(id)').execute()
+        files = response.get('files', [])
+
+        media = googleapiclient.http.MediaFileUpload('./drive/'+ userid + '/' + timestamp + '.json', mimetype="text/plain", resumable=True)
+
+        if files:
+            #file already exists, overwrite
+            file_id = files[0]['id']
+            uploaded_file = self.drive_service.files().update(
+                fileId=file_id,
+                media_body=media
+            ).execute()
+        else:
+            #file does not exist yet, create
+            file_metadata = {
+            "name": timestamp + ".json",
             "parents": [folderid]
             }
             

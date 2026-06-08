@@ -1,8 +1,9 @@
 import logging
 #this logger is used for debugging, the logs are written to the output.log file
 def write_log(msg, log_display, category):
-    log_display.value +=  msg + '\n'
-    logging.info(category + ': ' +msg)
+    if log_display != None:
+        log_display.value +=  msg + '\n'
+        logging.info(category + ': ' +msg)
 
 def write_to_drive():
     from model.google_drive import GoogleDriveModel

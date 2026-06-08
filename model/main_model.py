@@ -98,3 +98,10 @@ class MainModel:
                     loaded_data = json.load(f)
                     tasks_data += [loaded_data]
         self.tasks_data = tasks_data
+
+    def get_task_with_csv(self, csv):
+        for task in self.tasks_data:
+            s = json.dumps(task)
+            if csv in s:
+                return task
+        return None

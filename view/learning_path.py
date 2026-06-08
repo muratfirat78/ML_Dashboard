@@ -60,7 +60,7 @@ class LearningPathView:
         if self.controller.get_online_version():
             from google.colab import files
 
-            path = './drive/' + self.performance_select.value.replace(".txt", ".json")
+            path = './drive/' + self.controller.login_model.get_userid() + '/' +  self.performance_select.value.replace(".txt", ".json")
             files.download(path)
 
 

@@ -148,7 +148,7 @@ class GoogleDrive:
                 fields="id"
             ).execute()
 
-        with open('./drive/'+ userid + '/' + timestamp + '~' + pred_modeling_score + '.json', "wb") as f:
+        with open('./drive/'+ userid + '/' + timestamp + '~' + pred_modeling_score + '.json', "w") as f:
             json.dump(call_stack, f, indent=2, default=str)
 
         #see if the file already exists

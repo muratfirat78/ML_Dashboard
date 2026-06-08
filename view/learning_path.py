@@ -6,6 +6,7 @@ from datetime import datetime
 import matplotlib.colors as mcolors
 import os
 import ast
+import json
 
 class LearningPathView:
     def __init__(self, controller):
@@ -46,15 +47,20 @@ class LearningPathView:
         )
         self.load_performance_button = widgets.Button(description="Load performance")
         self.load_performance_button.on_click(self.load_performance)
-        self.download_performance_button =widgets.Button(description="Download performance")
+        self.download_performance_button =widgets.Button(description="Download")
         self.download_performance_button.on_click(self.download_performance)
+        self.upload_performance_button = widgets.FileUpload(accept='.json', multiple=False)
+        self.upload_performance_button.observe(self.upload_performance, names="value")
      
         self.hbox = widgets.VBox([widgets.HBox([self.bar_chart, self.line_chart])
                                 , widgets.HBox([self.log,self.last_result])
-                                , widgets.HBox([self.performance_select, self.load_performance_button, self.download_performance_button])])
+                                , widgets.HBox([self.performance_select, widgets.VBox([self.load_performance_button, self.download_performance_button, self.upload_performance_button])])])
 
     def load_performance(self, event):
         self.controller.load_performance(self.performance_select.value.replace(".txt", ".json"))
+    
+    def upload_performance(self, event):
+        self.controller.upload_performance(self.upload_performance_button.value)
 
     def download_performance(self, event):
         if self.controller.get_online_version():
@@ -67,20 +73,16 @@ class LearningPathView:
     def set_performance_options(self):
         drive_path = './drive/'+ self.controller.login_model.get_userid()
         options = []
-        for txt_file in sorted(os.listdir(drive_path), reverse=True):
-            if not txt_file.endswith(".txt"):
-                continue
-            json_file = txt_file.replace(".txt", ".json")
-            if not os.path.exists(os.path.join(drive_path, json_file)):
-                continue
-            timestamp = txt_file.replace(".txt", "")
-            try:
-                with open(os.path.join(drive_path, txt_file)) as f:
-                    data = ast.literal_eval(f.read())
-                dataset = data.get("SelectData", {}).get("DataSet", ("Unknown",))[0]
-            except:
-                dataset = "Unknown"
-            options.append((f"{timestamp} - {dataset}", txt_file))
+        for file in sorted(os.listdir(drive_path), reverse=True):
+            if file.endswith(".json"):
+                with open(os.path.join(drive_path, file)) as f:
+                    performance = json.load(f)
+                    csv_filename = next(v for v in str(performance).replace("'", '"').split('"') if v.endswith(".csv"))
+                    options_str = file.replace('~',' | predictive-modeling_score = ') + ' | ' +  csv_filename
+                    options_str = options_str.replace('.csv', '')
+                    options_str = options_str.replace('.json', '')
+                    options.append((options_str, file))
+            
         self.performance_select.options = options
     
 

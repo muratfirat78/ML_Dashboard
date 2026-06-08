@@ -24,7 +24,6 @@ from view.login import LoginView
 from view.task_menu import TaskMenuView
 from view.task_selection import TaskSelectionView
 from view.topic import TopicView
-import pickle
 import json
 import numpy as np
 
@@ -203,10 +202,18 @@ class Controller:
         return self.main_model.get_online_version()
     
     def upload_log(self):
-        self.drive.upload_log(self.logger.get_result(), self.login_model.get_userid(), self.logger.get_timestamp(),self.logger.call_stack)
-        with open("session.pkl", "wb") as f:
-            pickle.dump(self.logger.call_stack, f)
-
+        predictive_modeling_score = 0
+        try:
+            current_performance = self.logger.get_performance()
+            reference_task = self.task_model.get_reference_task()
+            current_datetime = datetime.now()
+            if self.monitored_mode:
+                performance_score = self.calculate_performance_score(current_performance,reference_task)
+                predictive_modeling_score = performance_score.get("Predictive Modeling")
+        except:
+            None
+        print(performance_score)
+        self.drive.upload_log(self.logger.get_result(), self.login_model.get_userid(), self.logger.get_timestamp(),self.logger.call_stack, str(round(predictive_modeling_score, 2)))
 
 
     def login(self, userid, terms_checkbox):
@@ -383,5 +390,8 @@ class Controller:
     def get_learning_rate(self):
         return self.learning_manager_model.get_learning_rate()
     
-    def load_session(self, filename):
-        self.logger.load_session(filename)
+    def load_performance(self, filename):
+        self.logger.load_performance(filename)
+
+    def upload_performance(self, files):
+        self.learning_path_model.upload_performance(files)

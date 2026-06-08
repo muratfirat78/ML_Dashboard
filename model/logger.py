@@ -48,7 +48,7 @@ class Logger:
 
     # def find_title(filename)
 
-    def load_session(self, filename):
+    def load_performance(self, filename):
         self.controller.replay = True
         drive_path = './drive/'+ self.controller.login_model.get_userid()
         with open(drive_path + "/" + filename, "rb") as f:

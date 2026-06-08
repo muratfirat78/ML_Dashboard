@@ -16,10 +16,10 @@ class GoogleDrive():
         else:
            return False
         
-    def upload_log(self, result, userid, timestamp, call_stack):
+    def upload_log(self, result, userid, timestamp, call_stack, pred_modeling_score):
        with open('./drive/'+ userid + '/' + timestamp + '.txt', 'w') as f:
           f.write(str(result))
-       with open('./drive/'+ userid + '/' + timestamp +'.json', 'w') as f:
+       with open('./drive/'+ userid + '/' + timestamp + '~' + pred_modeling_score + '.json', 'w') as f:
           json.dump(call_stack, f, indent=2, default=str)
 
     def get_performances(self, userid):

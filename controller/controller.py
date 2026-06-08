@@ -212,7 +212,6 @@ class Controller:
                 predictive_modeling_score = performance_score.get("Predictive Modeling")
         except:
             None
-        print(performance_score)
         self.drive.upload_log(self.logger.get_result(), self.login_model.get_userid(), self.logger.get_timestamp(),self.logger.call_stack, str(round(predictive_modeling_score, 2)))
 
 

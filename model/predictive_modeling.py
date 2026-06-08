@@ -211,7 +211,7 @@ class PredictiveModelingModel:
         if self.controller.replay == False:
             self.controller.upload_log()
         else:
-            self.controller.replay = True
+            self.controller.replay = False
             
             
     def get_trained_models(self):

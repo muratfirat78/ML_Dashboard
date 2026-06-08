@@ -44,15 +44,24 @@ class LearningPathModel:
             return self.competence_vectors[-1]
         else:
             return None
-
+        
     def upload_performance(self, files):
         user_id = self.controller.login_model.get_userid()
         path = f"./drive/{user_id}"
-        print(files)
-        file = files[0]
-        name = file["name"]
-        content = file["content"]
+
+        if isinstance(files, (list, tuple)):
+            file = files[0]
+            name = file["name"]
+            content = file["content"]
+
+            if isinstance(content, memoryview):
+                content = content.tobytes()
+
+        elif isinstance(files, dict):
+            name, file = next(iter(files.items()))
+            content = file["content"]
 
         with open(f"{path}/{name}", "wb") as f:
             f.write(content)
+
         self.controller.load_performance(name)

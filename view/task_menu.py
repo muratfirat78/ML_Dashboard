@@ -39,6 +39,7 @@ class TaskMenuView:
                 width="100%"
             )
         )
+        self.userid = widgets.Label(value="User id: ..")
         self.timeline = self.get_timeline(1, 1)
 
         self.hint_button = widgets.Button(
@@ -77,7 +78,7 @@ class TaskMenuView:
         self.subsubtask_box = widgets.VBox([self.subsubtask_textarea,self.hint_textarea], layout=widgets.Layout(width="99%",height="100px"))
         self.task_list = []
         self.timeline = self.get_timeline(1,1)
-        self.ui = widgets.VBox(self.get_ui(), layout=widgets.Layout(height="230px"))
+        self.ui = widgets.VBox(self.get_ui(), layout=widgets.Layout(height="250px"))
         self.controller = controller
 
     def get_timeline(self, number_of_buttons, active):
@@ -304,6 +305,8 @@ class TaskMenuView:
     def get_ui(self):
         if self.mode == "monitored":
             return (
+                widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"})),
+                self.userid,
                 self.subsubtask_box,
                 self.statusbox,
                 widgets.HBox(
@@ -344,12 +347,16 @@ class TaskMenuView:
             )
         else:
             return ([
+                self.userid,
                 self.slider,
                 self.button_box,
                 self.subsubtask_box,
                 self.statusbox,
                 widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px', style={'background': "#C7EFFF"}))
             ])
+
+    def getUserInfo(self):
+        return self.userid
 
     def finished_task(self, competence_vector):
         self.finishedtask = True

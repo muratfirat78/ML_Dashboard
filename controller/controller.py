@@ -72,6 +72,9 @@ class Controller:
     def perform_action(self):
         None
 
+    def getLearningManager(self):
+        return self.self.learning_manager_model
+
     def get_tab_set(self):
         tab_1 = self.data_selection_view.get_data_selection_tab()
         tab_2 = self.data_cleaning_view.get_data_cleaning_tab()
@@ -300,6 +303,15 @@ class Controller:
         self.set_datafolder("DataSets")
         self.main_view.datasets.options = [dataset]
         self.main_view.datasets.value = dataset
+
+        perfs = "   Performances: "+str(len(self.get_dataset_performances()))
+        pred_score = "   Predictive Modeling: "+str(self.get_competence_vectors()[-1]["Predictive Modeling"])
+        last_act = "   Current Dataset: "+str(dataset)
+
+
+        self.task_menu.getUserInfo().value = "User id: "+str(self.login_model.get_userid())+" | "+perfs+" | "+pred_score+"    |    "+last_act
+        
+        self.data_selection_view.setUserID("User id: "+str(self.login_model.get_userid())+" | "+perfs+" | "+pred_score+"    |    "+last_act)
         self.data_selection_view.read_dataset(None)
 
     def finished_task(self):

@@ -197,6 +197,8 @@ class LearningManagerModel:
                 return task_skill[1]
         return None
 
+    
+
     def update_competence_vector(self, performance_score, current_competence_vector, task_difficulty, date, dataset):
             try:
                 dataset_pred_score = self.dataset_performances.get(dataset,0)
@@ -237,13 +239,8 @@ class LearningManagerModel:
         return skills
 
     def set_competence_vectors(self):
-        performances = [
-            entry["performance"] 
-            for entry in sorted(
-                self.competence_sequence.values(), 
-                key=lambda x: x["date"]
-            )
-        ]
+        performances = [entry["performance"] for entry in sorted(self.competence_sequence.values(), key=lambda x: x["date"])]
+        
         initial_competence_vector = {}
 
         for skill in self.get_skills_from_tasks():
@@ -271,6 +268,10 @@ class LearningManagerModel:
                     date = performance.performance['General']['Date'][0]
                     self.update_competence_vector(performance_score, current_competence_vector, task_difficulty, date, dataset_name)
                     current_competence_vector = self.current_competence_vector
+
+    def getCompetenceVector(self):
+        return self.current_competence_vector
+                
                     
     def set_competence_sequence(self):
         # the competence sequence is used for calculating the learning rate

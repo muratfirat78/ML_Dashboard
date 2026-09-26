@@ -20,12 +20,21 @@ class DataSelectionView:
         self.main_view = main_view
         self.DFPage = None
         self.HeadPage = None
+        self.SamplePage = None
         self.InfoPage = None
         self.task_menu = task_menu
         self.infotext = None
         self.infolbl = None 
         self.spacelbl = None
         self.statlbl = None
+        self.dataselect = None
+        self.maintab = None
+        self.userid = None
+
+    def setUserID(self,usid):
+        self.userid.value = usid
+        return
+
 
     def fileClick(self, event):
         # Handle clicking on a filename
@@ -69,6 +78,16 @@ class DataSelectionView:
 
         self.main_view.right_page.layout.display = 'block'
         self.main_view.right_page.layout.visibility = 'visible'
+
+
+        self.dataselect.layout.visibility = 'hidden'
+        self.dataselect.layout.display = 'none'
+
+
+       
+        mytext ="Dataset selected: "+str(self.main_view.datasets.value)
+        
+     
         
         #show info about the dataset
         with self.main_view.right_page:
@@ -92,22 +111,38 @@ class DataSelectionView:
             clear_output()
         with self.main_view.process_page:
             clear_output()
-        
+
         with self.DFPage:
             clear_output()
+            display.display(mytext)
             display.display(df.info())            
         with self.HeadPage:
             clear_output()
             display.display(df.describe()) 
-            display.display(df) 
+        with self.SamplePage:
+            clear_output()
+            display.display(df.head(5)) 
         nrlines = 0
         self.InfoPage.value = ''
 
         infotxt = str(info)
-        self.InfoPage.value=infotxt
+        self.InfoPage.value=infotxt 
         self.InfoPage.layout.visibility = 'visible'
 
+
         self.readfile.disabled = True
+
+        #self.maintab.layout.height = '900px'
+
+        nrextracols = (len(df.columns)-3)
+        self.DFPage.layout.height = str(200+20*nrextracols)+'px'
+
+        if len(df.select_dtypes(include=["number","bool"]).columns.tolist()) == 0:
+            self.HeadPage.layout.height = '180px'
+            
+
+        self.maintab.layout.height = str(1250+20*nrextracols)+'px'
+
         return
 
     def on_submit_func(self, event):
@@ -125,6 +160,8 @@ class DataSelectionView:
         self.datafolder=widgets.Text(description ='Folder name:',value = 'DataSets')
         self.main_view.datasets = widgets.Dropdown(options=[], description='DataSets:',layout = Layout(width='50%'))
 
+        self.userid = widgets.Label(value="")
+
         butlay = Layout(width='75px')
         butlay.display = 'none'
         self.readfile = widgets.Button(description="Read",layout = butlay)
@@ -134,6 +171,7 @@ class DataSelectionView:
         self.readfile.on_click(self.read_dataset)
 
         self.infolbl = widgets.HTML("")
+        #self.infolbl.layout.height = "25px"
         color = "gray"
         mytext ="Dataset Information"
         
@@ -143,7 +181,14 @@ class DataSelectionView:
 
         self.DFPage = widgets.Output(layout=Layout(width='50%',height='150px',align_items='center',overflow="visible"))
         self.HeadPage = widgets.Output(layout=Layout(width='99%',height='200px',align_items='center',overflow="visible"))
-        self.InfoPage = widgets.Textarea(layout=Layout(width='500px',height='150px',align_items='center',overflow="visible", visibility="hidden"))
+        self.SamplePage = widgets.Output(layout=Layout(width='99%',height='200px',align_items='center',overflow="visible"))
+        self.InfoPage = widgets.Textarea(layout=Layout(width='500px',height='150px',align_items='center',overflow="visible", visibility="hidden"),style={'background': "#ECF9F6"})
+
+        self.InfoPage.layout.width = '99%'
+        self.InfoPage.layout.height = '250px'
+        self.HeadPage.layout.height = '275px'
+        self.SamplePage.layout.height = '190px'
+        self.DFPage.layout.height = '200px'
 
         self.infotext = widgets.HTML("")
         color = "gray"
@@ -158,17 +203,39 @@ class DataSelectionView:
     
         self.statlbl.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
 
+        self.samplbl =  widgets.HTML("")
+        color = "gray"
+        mytext ="Sample Data Instances"
+    
+        self.samplbl.value = f'<span style="color:{color};"><b>{mytext}</b></span>'
+
         separator = widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='1px', height='90%', margin='5px 0px',style={'background': "#C7EFFF"}))
 
-        tab_1 = VBox(children=[
-            self.task_menu,
-            HBox(children = [self.datafolder,self.main_view.datasets,wsheets,self.readfile]),
-            HBox(children = [self.infolbl,separator,self.infotext]),
+        self.dataselect = HBox(children = [self.datafolder,self.main_view.datasets,wsheets,self.readfile])
+
+
+        self.maintab = VBox(children=[
+            #self.task_menu,
+            self.dataselect,
             widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"})),
-            HBox(children = [self.DFPage,separator,VBox(children=[widgets.Label(value="  "),self.InfoPage])]),
+            self.userid,
+            widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"})),
+            self.infotext, 
+             widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"})),
+            self.InfoPage,
+            widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"})),
+            self.infolbl,
+            widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"})),
+            self.DFPage,
+            widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"})),
+            self.samplbl,
+            widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"})),
+            self.SamplePage,
             widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"})),
             self.statlbl,
-            HBox(children = [self.HeadPage]) ])
-        tab_1.layout.height = '720px'
-        return tab_1
+            widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"})),
+            self.HeadPage,
+            widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"}))])
+        self.maintab.layout.height = '1100px'
+        return self.maintab
         

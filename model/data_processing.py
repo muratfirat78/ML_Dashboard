@@ -770,10 +770,10 @@ class DataProcessingModel:
                 classorder =[x for x in ordselect]
                 encoder = OrdinalEncoder(categories=[classorder])
 
-                Xtrain_df[colname] = encoder.fit_transform(Xtrain_df[colname]) # train 
+                Xtrain_df[colname] = encoder.fit_transform(Xtrain_df[[colname]]) # train 
                 Xtrain_df[colname] = Xtrain_df[colname].apply(np.int64)
    
-                Xtest_df[colname] = encoder.transform(Xtest_df[colname]) # test
+                Xtest_df[colname] = encoder.transform(Xtest_df[[colname]]) # test
                 Xtest_df[colname] = Xtest_df[colname].apply(np.int64)
                
                 self.logger.add_action(['DataProcessing', 'OrdinalEncoding'], colname, [colname,encodingtype,ordselect,None])

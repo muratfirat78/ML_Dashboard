@@ -17,6 +17,7 @@ import seaborn as sns
 from sklearn.preprocessing import StandardScaler
 from imblearn.over_sampling import RandomOverSampler
 from imblearn.under_sampling import RandomUnderSampler
+from sklearn.preprocessing import OrdinalEncoder
 from sklearn.impute import KNNImputer
 from pandas.api.types import is_datetime64_any_dtype as is_datetime
 

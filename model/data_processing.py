@@ -748,8 +748,6 @@ class DataProcessingModel:
         write_log('Split, yTest size: '+str(len(self.main_model.get_YTest())), result2exp, 'Data processing')
         self.logger.add_action(['DataProcessing', 'Split'], str(ratio_percnt) + '%', [ratio_percnt,None])
         self.main_model.datasplit = True
-
- 
         
         return
     
@@ -842,14 +840,13 @@ class DataProcessingModel:
                 write_log('Encoding->'+encodingtype+', col '+colname+', done. ', result2exp, 'Data processing')
 
             if encodingtype == 'Ordinal Encoding':
+                
                 classorder =[x for x in ordselect]
 
-                mapping = dict()
 
-                for i in range(len(classorder)):
-                    mapping[classorder[i]] = len(classorder)-i
- 
-                curr_df[colname] = curr_df[colname].replace(mapping)
+                encoder = OrdinalEncoder(categories=[classorder])
+                curr_df[colname]  = encoder.fit_transform(curr_df[colname])
+
                 self.logger.add_action(['DataProcessing', 'OrdinalEncoding'], colname, [colname,encodingtype,ordselect,None])
                 write_log('Ordinal encoding->'+encodingtype+', col '+colname+', done. ', result2exp, 'Data processing')
             self.main_model.set_curr_df(curr_df)

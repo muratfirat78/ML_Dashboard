@@ -174,7 +174,7 @@ class DataCleaningModel:
                         curr_df = curr_df.dropna(subset = [colname], how='any')
        
             self.main_model.set_curr_df(curr_df)
-            write_log('Cleaning action done..'+str(self.main_model.get_curr_df().columns),  result2aexp, 'Data cleaning') 
+            write_log('Cleaning action done..'+str(self.main_model.get_curr_df().columns)," missing vals: "+str(self.controller.get_curr_df().isnull().sum()),  result2aexp, 'Data cleaning') 
             write_log('Final data size'+str(len(self.main_model.get_curr_df())),  result2aexp, 'Data cleaning')  
 
         if handling == 'Edit Range':

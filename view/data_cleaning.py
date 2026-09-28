@@ -123,8 +123,9 @@ class DataCleaningView:
             missing_df = pd.DataFrame(columns=['feature','missing values'])
             totalmisses  = 0
             if not self.controller.main_model.datasplit:
-                for col in self.controller.get_curr_df().columns:
-                    curr_miss = self.controller.get_curr_df()[col].isnull().sum()
+                curr_df = self.controller.get_curr_df()
+                for col in curr_df.columns:
+                    curr_miss = curr_df[col].isnull().sum()
                     row = {'feature': col, 'missing values':curr_miss}
                     new_df = pd.DataFrame([row])
                     missing_df = pd.concat([missing_df, new_df], axis=0, ignore_index=True)

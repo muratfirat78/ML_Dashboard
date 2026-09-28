@@ -85,7 +85,7 @@ class DataSelectionView:
 
 
        
-        mytext ="Dataset selected: "+str(self.main_view.datasets.value)
+        mytext ="Dataset selected: "+str(self.main_view.datasets.value)+", size: "+str(len(self.controller.get_curr_df()))
         
      
         
@@ -114,7 +114,7 @@ class DataSelectionView:
 
         with self.DFPage:
             clear_output()
-            display.display(mytext)
+            #display.display(mytext)
             display.display(df.info())            
         with self.HeadPage:
             clear_output()

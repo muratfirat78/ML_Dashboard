@@ -304,15 +304,17 @@ class Controller:
         self.main_view.datasets.options = [dataset]
         self.main_view.datasets.value = dataset
 
+       
+        self.data_selection_view.read_dataset(None)
+
         perfs = "   Performances: "+str(len(self.get_dataset_performances()))
         pred_score = "   Predictive Modeling: "+str(self.get_competence_vectors()[-1]["Predictive Modeling"])
         last_act = "   Current Dataset: "+str(dataset)
+        data_set = " Size: "+str(len(self.get_curr_df()))
 
-
-        self.task_menu.getUserInfo().value = "User id: "+str(self.login_model.get_userid())+" | "+perfs+" | "+pred_score+"    |    "+last_act
+        #self.task_menu.getUserInfo().value = "User id: "+str(self.login_model.get_userid())+" | "+perfs+" | "+pred_score+"    |    "+last_act+" | "+data_set
         
-        self.data_selection_view.setUserID("User id: "+str(self.login_model.get_userid())+" | "+perfs+" | "+pred_score+"    |    "+last_act)
-        self.data_selection_view.read_dataset(None)
+        self.data_selection_view.setUserID("User id: "+str(self.login_model.get_userid())+" | "+perfs+" | "+pred_score+"    |    "+last_act+" | "+data_set)
 
     def finished_task(self):
         if self.developer_mode == False:

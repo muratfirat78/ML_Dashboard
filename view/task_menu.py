@@ -307,13 +307,12 @@ class TaskMenuView:
             return (
                 widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"})),
                 self.userid,
-                self.subsubtask_box,
-                self.statusbox,
+                widgets.Box(layout=widgets.Layout(border='solid 1px lightblue', width='99%', height='1px', margin='5px 0px',style={'background': "#C7EFFF"})),
                 widgets.HBox(
                     [
-                        widgets.VBox(
+                        widgets.HBox(
                             [
-                                widgets.Label("Actions"),
+                                widgets.Label(value="Actions",layout = widgets.Layout(width='50px')),
                                 self.timeline
                             ],
                             layout=widgets.Layout(
@@ -322,17 +321,8 @@ class TaskMenuView:
                                 width='100%'
                             )
                         ),
-                        self.vertical_seperator,
-                        widgets.VBox(
-                            [self.undo_button, self.topic_explaination_button],
-                            layout=widgets.Layout(
-                                width='15%',
-                                justify_content='center',
-                                align_items='stretch',
-                                gap='4px',
-                                padding='0px 4px'
-                            )
-                        )
+                        #self.vertical_seperator,
+                      
                     ],
                     layout=widgets.Layout(
                         align_items='stretch',
@@ -340,6 +330,18 @@ class TaskMenuView:
                         padding='4px 0px'
                     )
                 ),
+                widgets.HBox(
+                            [self.undo_button, self.topic_explaination_button],
+                            layout=widgets.Layout(
+                                width='99%',
+                                justify_content='center',
+                                align_items='center',
+                                gap='4px',
+                                padding='0px 4px'
+                            )
+                        ),
+                self.subsubtask_box,
+                self.statusbox,
                 widgets.Box(layout=widgets.Layout(
                     border='solid 1px lightblue', width='99%',
                     height='1px', margin='4px 0px',

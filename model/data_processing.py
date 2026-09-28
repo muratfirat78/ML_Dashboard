@@ -764,6 +764,21 @@ class DataProcessingModel:
             Xtrain_df = self.main_model.get_XTrain()
             ytrain_df = self.main_model.getYtrain().to_frame()
             ytest_df = self.main_model.get_YTest().to_frame()
+
+            if encodingtype == "Ordinal Encoding":
+
+                classorder =[x for x in ordselect]
+                encoder = OrdinalEncoder(categories=[classorder])
+
+                Xtrain_df[colname] = encoder.fit_transform(Xtrain_df[colname]) # train 
+                Xtrain_df[colname] = Xtrain_df[colname].apply(np.int64)
+   
+                Xtest_df[colname] = encoder.transform(Xtest_df[colname]) # test
+                Xtest_df[colname] = Xtest_df[colname].apply(np.int64)
+               
+                self.logger.add_action(['DataProcessing', 'OrdinalEncoding'], colname, [colname,encodingtype,ordselect,None])
+                write_log('Ordinal encoding->'+encodingtype+', col '+colname+', done. ', result2exp, 'Data processing')
+                
     
             if encodingtype == "Label Encoding":
                 
@@ -841,7 +856,6 @@ class DataProcessingModel:
                 write_log('Encoding->'+encodingtype+', col '+colname+', done. ', result2exp, 'Data processing')
 
             if encodingtype == 'Ordinal Encoding':
-
 
                 write_log('Ordinal encoding, orderb->'+str(ordselect))
                 classorder =[x for x in ordselect]

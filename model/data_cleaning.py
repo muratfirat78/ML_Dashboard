@@ -172,7 +172,8 @@ class DataCleaningModel:
                         curr_df[colname] = curr_df[colname].fillna(value)
                     if handling == 'Remove-Missing': 
                         curr_df = curr_df.dropna(subset = [colname], how='any')
-       
+
+            write_log('Cleaning action done.. missing vals: '+str(curr_df.isnull().sum()),  result2aexp, 'Data cleaning') 
             self.main_model.set_curr_df(curr_df)
             write_log('Cleaning action done..'+str(self.main_model.get_curr_df().columns)+", missing vals: "+str(self.controller.get_curr_df().isnull().sum()),  result2aexp, 'Data cleaning') 
             write_log('Final data size'+str(len(self.main_model.get_curr_df())),  result2aexp, 'Data cleaning')  

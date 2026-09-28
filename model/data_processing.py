@@ -840,12 +840,13 @@ class DataProcessingModel:
                 write_log('Encoding->'+encodingtype+', col '+colname+', done. ', result2exp, 'Data processing')
 
             if encodingtype == 'Ordinal Encoding':
-                
+
+
+                write_log('Ordinal encoding, orderb->'+str(ordselect))
                 classorder =[x for x in ordselect]
 
-
                 encoder = OrdinalEncoder(categories=[classorder])
-                curr_df[colname]  = encoder.fit_transform(curr_df[colname])
+                curr_df[colname]  = encoder.fit_transform(curr_df[[colname]])
 
                 self.logger.add_action(['DataProcessing', 'OrdinalEncoding'], colname, [colname,encodingtype,ordselect,None])
                 write_log('Ordinal encoding->'+encodingtype+', col '+colname+', done. ', result2exp, 'Data processing')

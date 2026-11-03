@@ -114,7 +114,12 @@ class TaskMenuView:
         self.slider.value = step
 
     def undo_click(self, button):
-        self.controller.logger.undo(self.slider.value)
+        if self.mode == "monitored":
+            self.controller.logger.undo(self.slider.value)
+        else:
+            # guided mode has no per-action timeline, so just drop the last performed action
+            call_stack = self.controller.logger.call_stack
+            self.controller.logger.undo(max(0, len(call_stack) - 1))
 
     def topic_explaination_button_click(self, button):
         self.controller.switch_tab_to_topic_info()
@@ -269,10 +274,14 @@ class TaskMenuView:
             self.statusbox.layout.visibility = 'hidden'
             self.statusbox.layout.display    = 'none'
             self.hint_textarea.layout.width  = "99%"
+            self.undo_button.description        = "Revert to this action"
             self.undo_button.layout.visibility  = 'visible'
             self.hint_button.layout.visibility  = 'hidden'
             self.subsubtask_textarea.description = "Action"
             self.subsubtask_box.children = [self.subsubtask_textarea, self.hint_textarea]
+        else:
+            self.undo_button.description       = "Undo last action"
+            self.undo_button.layout.visibility = 'visible'
 
         self.mode = mode
 

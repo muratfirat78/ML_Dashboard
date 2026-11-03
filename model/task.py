@@ -149,6 +149,18 @@ class TaskModel:
   def set_current_task(self,task):
     self.current_task = task
 
+  def reset_progress(self):
+    # Reset status/applied_values of the current (guided) task back to its initial state.
+    # Used when undoing actions, since the task's subsubtasks mutate in place.
+    for subtask in self.current_task.get("subtasks", []):
+      subtask["status"] = "todo"
+      subtask["applied_values"] = []
+      for subsubtask in subtask["subtasks"]:
+        subsubtask["status"] = "todo"
+        subsubtask["applied_values"] = []
+    self.current_subtask = 1
+    self.current_subsubtask = 1
+
   def set_reference_task(self,task):
      self.reference_task = task
 

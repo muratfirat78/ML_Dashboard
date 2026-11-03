@@ -147,9 +147,11 @@ class DataCleaningView:
                     new_df = pd.DataFrame([row])
                     missing_df = pd.concat([missing_df, new_df], axis=0, ignore_index=True)
                     
+            plt.figure(figsize=(max(6, 0.5 * len(missing_df)), 4))
             g = sns.barplot(x='feature', y='missing values', data=missing_df)
-            g.set_xticklabels(g.get_xticklabels(),rotation= 45)
+            g.set_xticklabels(g.get_xticklabels(), rotation=45, ha='right', fontsize=8)
             plt.title('Total Missing Values: '+str(totalmisses))
+            plt.tight_layout()
             plt.show()
 
         self.main_view.dt_features.options = [col for (miss,col) in new_list]

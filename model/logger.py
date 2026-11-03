@@ -100,6 +100,9 @@ class Logger:
         #reset performance
         self.student_performance = StudentPerformance(self.controller)
         self.controller.task_menu.clear_actions_monitored_mode()
+        if not self.controller.monitored_mode:
+            # guided mode's task progress mutates in place, so it needs an explicit reset before replaying
+            self.controller.task_model.reset_progress()
         split = False
         selectTarget = False
         for action in call_stack_backup: 
@@ -125,5 +128,9 @@ class Logger:
             parameters = action[1]
             function(*parameters)
         self.call_stack = call_stack_backup
+        if not self.controller.monitored_mode:
+            # make sure the guided view reflects the reset state even if nothing was replayed
+            self.controller.task_model.update_statusses_and_set_current_tasks()
+            self.controller.task_menu.set_current_task(self.controller.task_model.get_current_task(), 'guided')
         self.controller.data_cleaning_view.refresh_data()
         self.controller.data_processing_view.featurepr_click(None)

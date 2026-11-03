@@ -100,10 +100,12 @@ class DataSelectionView:
                 missing_df = pd.concat([missing_df, new_df], axis=0, ignore_index=True)
                 totalmisses+=df[col].isnull().sum()
 
+            plt.figure(figsize=(max(6, 0.5 * len(missing_df)), 4))
             g = sns.barplot(x='feature', y='missing values', data=missing_df)
-            g.set_xticklabels(g.get_xticklabels(),rotation= 45)
+            g.set_xticklabels(g.get_xticklabels(), rotation=45, ha='right', fontsize=8)
             plt.title('Total Missing Values: '+str(totalmisses))
-            plt.show()                
+            plt.tight_layout()
+            plt.show()
         
         self.main_view.process_types.value = self.main_view.process_types.options[0]
 
@@ -181,13 +183,13 @@ class DataSelectionView:
 
         self.DFPage = widgets.Output(layout=Layout(width='50%',height='150px',align_items='center',overflow="visible"))
         self.HeadPage = widgets.Output(layout=Layout(width='99%',height='200px',align_items='center',overflow="visible"))
-        self.SamplePage = widgets.Output(layout=Layout(width='99%',height='200px',align_items='center',overflow="visible"))
+        self.SamplePage = widgets.Output(layout=Layout(width='99%',height='200px',align_items='center',overflow="auto"))
         self.InfoPage = widgets.Textarea(layout=Layout(width='500px',height='150px',align_items='center',overflow="visible", visibility="hidden"),style={'background': "#ECF9F6"})
 
         self.InfoPage.layout.width = '99%'
         self.InfoPage.layout.height = '250px'
         self.HeadPage.layout.height = '275px'
-        self.SamplePage.layout.height = '190px'
+        self.SamplePage.layout.height = '230px'
         self.DFPage.layout.height = '200px'
 
         self.infotext = widgets.HTML("")

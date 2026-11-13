@@ -337,8 +337,12 @@ class LearningManagerModel:
             with open(os.path.join(path,filename),'r') as file:
                 for line in file:
                     try:
+                        date_str = filename.replace('.txt', '')
+                        if '__' in date_str:
+                            # strip the "<run>__" cohort prefix before parsing the timestamp
+                            date_str = date_str.split('__', 1)[1]
                         performance = StudentPerformance(self.controller)
-                        performance.string_to_student_performance(line, filename.replace('.txt', ''))
+                        performance.string_to_student_performance(line, date_str)
                         self.performances.append(performance)
                     except:
                         None

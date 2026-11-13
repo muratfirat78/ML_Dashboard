@@ -11,9 +11,15 @@ import numpy as np
 import io
 import json
 
+from model.run_config import RUN
+
+
 class GoogleDrive:
     # In online mode this class is used, in offline mode the local_drive.py file is used
     # This class contains the functions to write to Google Drive and save the users performances
+
+    RUN = RUN
+
     def __init__(self):
         auth.authenticate_user()
         self.drive_service = build('drive', 'v3')
@@ -115,6 +121,8 @@ class GoogleDrive:
 
     def upload_log(self, result, userid, timestamp, call_stack, pred_modeling_score):
         #upload the performance to the Google Drive
+        #prefix with the run/cohort label so the master version can filter saves per run
+        timestamp = self.RUN + '__' + timestamp
         with open('./drive/'+ userid + '/' + timestamp +
                     '.txt', 'w') as f:
             f.write(str(self.to_serializable(result)))

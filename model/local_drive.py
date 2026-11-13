@@ -4,9 +4,15 @@ import random
 from datetime import datetime
 import json
 
+from model.run_config import RUN
+
+
 class GoogleDrive():
     # In offline mode this class is used, in online mode the google_drive.py file is used
     # This class contains the functions to write to local folder and save the users performances
+
+    RUN = RUN
+
     def login_correct(self,userid):
         if userid == '':
            return False
@@ -17,6 +23,7 @@ class GoogleDrive():
            return False
         
     def upload_log(self, result, userid, timestamp, call_stack, pred_modeling_score):
+       timestamp = self.RUN + '__' + timestamp
        with open('./drive/'+ userid + '/' + timestamp + '.txt', 'w') as f:
           f.write(str(result))
        with open('./drive/'+ userid + '/' + timestamp + '~' + pred_modeling_score + '.json', 'w') as f:
